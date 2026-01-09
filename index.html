@@ -13,6 +13,7 @@
   <link href="assets/css/styles.css" rel="stylesheet" />
   <script defer="" src="assets/js/script.js">
   </script>
+  <script defer="" src="assets/js/bg-animation.js"></script>
   <link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,7 +109,9 @@
   </header>
   <main id="main-content">
     <section class="hero">
-      <div class="hero__bg"></div>
+      <div class="hero__bg">
+        <canvas id="hero-canvas"></canvas>
+      </div>
       <div class="hero__overlay"></div>
       <div class="container hero__content">
         <h1 class="hero__title">
