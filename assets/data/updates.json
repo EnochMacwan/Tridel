@@ -1,0 +1,38 @@
+[
+    {
+        "date": "2 days ago",
+        "text": "Tridel Technologies is proud to announce our participation in the upcoming Ocean Business 2025 event in Southampton, UK. Visit us at booth H5 to discover our latest innovations in autonomous survey solutions. #OceanBusiness #MarineTech",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=Ocean+Business+2025",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    },
+    {
+        "date": "6 days ago",
+        "text": "Our team just completed a successful multibeam echosounder (MBES) survey for the Port of Melbourne. The high-resolution data will be crucial for upcoming dredging operations. #Hydrography #Surveying",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=Port+of+Melbourne",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    },
+    {
+        "date": "2 weeks ago",
+        "text": "Meet our new Vessel Side Mount, engineered for rapid deployment and robust performance in challenging sea states, providing unmatched flexibility for your survey operations. #Engineering #Maritime",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=Vessel+Side+Mount",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    },
+    {
+        "date": "3 weeks ago",
+        "text": "Our commitment to sustainability continues. We've just integrated new low-power sensors into our buoy systems, reducing their environmental footprint without compromising data quality. #Sustainability #GreenTech",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=Sustainable+Buoy",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    },
+    {
+        "date": "3 weeks ago",
+        "text": "Team Spotlight: Meet our lead software engineer, Jane Doe. Jane was instrumental in developing our ATtide prediction model, which is now used by ports globally. #Team #Innovation",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=Team+Spotlight",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    },
+    {
+        "date": "4 weeks ago",
+        "text": "Our latest whitepaper on the application of AI in predictive tidal modeling is now available for download on our website. #AI #MachineLearning #Oceanography",
+        "image": "https://placehold.co/800x450/0f3d6b/ffffff?text=AI+Whitepaper",
+        "link": "https://www.linkedin.com/feed/update/urn:li:activity:7123456789012345678/"
+    }
+]

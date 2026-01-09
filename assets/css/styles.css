@@ -1,0 +1,1102 @@
+/* ---------------------------------- */
+/* 1. Design Tokens: Electric Geospatial */
+/* ---------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Brand Core - Reference Site Match */
+    --color-primary: #0b1120;
+    /* Deepest Black-Blue (Hero BG) */
+    --color-primary-light: #1e293b;
+    /* Lighter Navy */
+
+    /* Electric Accent - The "Tridel" Blue */
+    --color-accent: #00AAE7;
+    /* Electric Cyan */
+    --color-accent-hover: #0090c5;
+    --color-accent-glow: rgba(0, 170, 231, 0.4);
+
+    /* Surface System - Clean Corporate */
+    --color-surface-base: #f8fafc;
+    /* Ice White/Gray */
+    --color-surface-pure: #ffffff;
+
+    /* Text */
+    --color-text-main: #1e293b;
+    /* Slate 900 */
+    --color-text-muted: #64748b;
+    /* Slate 500 */
+    --color-text-light: #94a3b8;
+
+    /* Typography - Geometric & Modern */
+    --font-display: 'Outfit', sans-serif;
+    /* Similar to Reference */
+    --font-body: 'Montserrat', sans-serif;
+    /* Clean Tech */
+
+    /* Spacing */
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 48px;
+    --space-2xl: 80px;
+
+    /* Shadows - Soft Tech */
+    --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Radius - Modern Tech (Not too round, not too square) */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-pill: 50px;
+
+    /* Transitions */
+    --ease-tech: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------------------------------- */
+/* 2. Global Reset & Body             */
+/* ---------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-surface-base);
+    color: var(--color-text-main);
+    line-height: 1.7;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s var(--ease-tech);
+}
+
+ul {
+    list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-text-main);
+    letter-spacing: -0.02em;
+}
+
+/* ---------------------------------- */
+/* 3. Clean Tech Header               */
+/* ---------------------------------- */
+.header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.header__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__logo img {
+    height: 42px;
+}
+
+.header__nav-list {
+    display: flex;
+    gap: 32px;
+}
+
+.header__nav-link {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 0;
+    position: relative;
+}
+
+.header__nav-link:hover {
+    color: var(--color-accent);
+}
+
+.header__nav-link[aria-current="page"] {
+    color: var(--color-accent);
+}
+
+.header__nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transition: width 0.3s;
+}
+
+.header__nav-link:hover::after,
+.header__nav-link[aria-current="page"]::after {
+    width: 100%;
+}
+
+.header__menu-toggle {
+    display: none;
+}
+
+/* ---------------------------------- */
+/* 4. Immersive Hero                  */
+/* ---------------------------------- */
+.hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: #000;
+    /* Fallback for darker vibe */
+    color: white;
+}
+
+.hero__bg {
+    position: absolute;
+    inset: 0;
+    /* Deep Blue Gradient matching reference vibe */
+    background: radial-gradient(circle at 70% 30%, #002D50 0%, #001220 100%);
+    z-index: 1;
+}
+
+.hero__overlay {
+    position: absolute;
+    inset: 0;
+    /* Tech Grid - Very subtle */
+    background-image: linear-gradient(rgba(0, 170, 231, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 170, 231, 0.05) 1px, transparent 1px);
+    background-size: 100px 100px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+    z-index: 2;
+}
+
+.hero__content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding-top: 60px;
+}
+
+.hero__title {
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 32px;
+    color: white;
+}
+
+/* Simulating the "Blue Highlight" on key words via generic bolding for now */
+.hero__title span,
+.hero__title strong {
+    color: var(--color-accent);
+}
+
+.hero__subtitle {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    color: #cadbed;
+    max-width: 50ch;
+    margin-bottom: 48px;
+    font-weight: 300;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 24px;
+}
+
+/* ---------------------------------- */
+/* 5. Ghost & Electric Buttons        */
+/* ---------------------------------- */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    transition: all 0.3s var(--ease-tech);
+    cursor: pointer;
+    border: none;
+}
+
+.button--primary {
+    background: var(--color-accent);
+    color: white;
+    border: 2px solid var(--color-accent);
+}
+
+.button--primary:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+.button--secondary {
+    background: transparent;
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+}
+
+.button--secondary:hover {
+    background: var(--color-accent);
+    color: white;
+}
+
+/* ---------------------------------- */
+/* 6. Corporate Tech Cards            */
+/* ---------------------------------- */
+.container {
+    width: 90%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.section {
+    padding: 80px 0;
+    /* Standardized spacing */
+}
+
+.section__title {
+    text-align: left;
+    font-size: 2.5rem;
+    margin-bottom: 60px;
+    /* Standardized spacing */
+    color: var(--color-text-main);
+    position: relative;
+    padding-left: 20px;
+    border-left: 6px solid var(--color-accent);
+}
+
+.highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    /* Standardized Gap */
+}
+
+
+.highlight-card {
+    background: var(--color-surface-pure);
+    /* Tech Accent Removed */
+    padding: 0;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.highlight-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-float);
+}
+
+.card__image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.card__content {
+    padding: 32px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card__title {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.card__excerpt {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
+
+.card__link {
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card__link::after {
+    content: '→';
+    transition: transform 0.2s;
+}
+
+.card__link:hover::after {
+    transform: translateX(4px);
+}
+
+/* ---------------------------------- */
+/* 7. Products - Tech Grid            */
+/* ---------------------------------- */
+.page-header {
+    background: #001220;
+    /* Deep Blue */
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.product-category__title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: var(--color-text-main);
+    border-bottom: 2px solid #e2e8f0;
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.product-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Standardized 320px */
+    gap: 40px;
+    /* Standardized 40px */
+}
+
+/* [chunk 1: Remove border-top from product-item] */
+.product-item {
+    background: white;
+    border: 1px solid #f1f5f9;
+    /* Removed border-top */
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
+    transition: all 0.3s;
+}
+
+/* [chunk 2: Remove border-top from category-card and resize image] */
+.category-card {
+    background: var(--color-surface-pure);
+    border: 1px solid #f1f5f9;
+    /* Removed border-top */
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    padding: 32px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-float);
+}
+
+.category-card__image {
+    width: 100%;
+    height: 320px;
+    object-fit: contain;
+    margin-bottom: 24px;
+    padding: 16px;
+    /* Added padding to match Products */
+    background: #f8fafc;
+    /* Added background to match Products */
+}
+
+
+
+.product-item:hover {
+    box-shadow: var(--shadow-float);
+    transform: translateY(-4px);
+}
+
+.product-item__image {
+    width: 100%;
+    height: 320px;
+    /* Increased size for visibility */
+    object-fit: contain;
+    padding: 16px;
+    background: #f8fafc;
+}
+
+.product-item h4 {
+    font-size: 1.25rem;
+    color: var(--color-text-main);
+}
+
+.product-item__excerpt {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
+
+.product-item .button {
+    width: 100%;
+    margin-top: auto;
+}
+
+/* ---------------------------------- */
+/* 8. Clients - Single Banner         */
+/* ---------------------------------- */
+.client-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 32px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
+}
+
+.client-logos::-webkit-scrollbar {
+    display: none;
+}
+
+.client-logo {
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    filter: grayscale(100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.client-logo img {
+    height: 150px;
+    /* Increased size */
+    width: auto;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.client-logo:hover {
+    opacity: 1;
+    filter: grayscale(0) drop-shadow(0 0 10px rgba(0, 170, 231, 0.6));
+    transform: scale(1.1);
+}
+
+/* ---------------------------------- */
+/* 9. Team - Corporate                */
+/* ---------------------------------- */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 40px;
+}
+
+.team-member-card {
+    text-align: center;
+    transition: 0.3s;
+}
+
+.team-member__photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 24px;
+    border: 4px solid var(--color-surface-pure);
+    /* Removed blue ring box-shadow */
+    transition: all 0.3s;
+}
+
+.team-member-card:hover .team-member__photo {
+    /* Removed hover ring */
+    transform: scale(1.05);
+}
+
+.team-member__name {
+    font-size: 1.1rem;
+    color: var(--color-text-main);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.team-member__title {
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ---------------------------------- */
+/* 10. Success Stories                */
+/* ---------------------------------- */
+.stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 40px;
+}
+
+.story-card {
+    background: var(--color-surface-pure);
+    border: 1px solid #f1f5f9;
+    /* Removed border-top */
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.story-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-float);
+}
+
+.story-card__image {
+    width: 100%;
+    height: 240px;
+    object-fit: contain;
+    /* Changed to contain for full visibility */
+    border-bottom: 1px solid #f1f5f9;
+    padding: 16px;
+    /* Added padding */
+    background: #f8fafc;
+    /* Added background */
+}
+
+.story-card__content {
+    padding: 32px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.story-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--color-text-main);
+    line-height: 1.4;
+}
+
+.story-card p {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .stories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ---------------------------------- */
+/* 11. Testimonials                   */
+/* ---------------------------------- */
+.testimonials {
+    margin-top: 60px;
+}
+
+.testimonial-slider-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    overflow: hidden;
+    /* Mask overflow for slider */
+}
+
+.testimonial-slider {
+    display: flex;
+    /* Horizontal alignment */
+    transition: transform 0.5s ease-in-out;
+    /* Smooth sliding */
+}
+
+.testimonial-slide {
+    min-width: 100%;
+    /* Force 1 slide per view */
+    background: var(--color-surface-pure);
+    padding: 40px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 0;
+    /* Remove vertical spacing */
+    position: relative;
+    border-left: 6px solid var(--color-accent);
+}
+
+.testimonial-text {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--color-text-main);
+    margin-bottom: 24px;
+    line-height: 1.8;
+}
+
+.testimonial-author {
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-align: right;
+}
+
+.slider-btn {
+    background: white;
+    border: 1px solid #e2e8f0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    transition: all 0.3s;
+    box-shadow: var(--shadow-subtle);
+}
+
+.slider-btn:hover {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+/* ---------------------------------- */
+/* 12. Services Page (Renumbered)     */
+/* ---------------------------------- */
+/* ---------------------------------- */
+/* 11. Services Page                  */
+/* ---------------------------------- */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Standardized 320px */
+    gap: 40px;
+}
+
+
+
+.category-card__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--color-text-main);
+}
+
+.category-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+}
+
+.category-card__list {
+    list-style: none;
+    /* Remove default bullets */
+    padding: 0;
+    margin-top: auto;
+}
+
+.category-card__list li {
+    margin-bottom: 12px;
+    padding-left: 20px;
+    position: relative;
+    font-weight: 500;
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+}
+
+.category-card__list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 800;
+}
+
+/* ---------------------------------- */
+/* 12. Forms (Careers/Contact)        */
+/* ---------------------------------- */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--color-surface-pure);
+    padding: 60px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    /* Removed border-top */
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        padding: 32px;
+    }
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: #f8fafc;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+    background: white;
+}
+
+.button--large {
+    width: 100%;
+    padding: 18px;
+    font-size: 1rem;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: 0.3s;
+}
+
+.button--large:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--color-accent-glow);
+}
+
+
+
+/* ---------------------------------- */
+/* 13. Contact Page Layout            */
+/* ---------------------------------- */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+.contact-details {
+    background: var(--color-primary);
+    /* Dark Navy Card */
+    color: white;
+    padding: 40px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-float);
+    position: sticky;
+    top: 100px;
+}
+
+.contact-details .section__title {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 32px;
+    border-left-color: var(--color-accent);
+}
+
+.contact-details h4 {
+    color: var(--color-accent);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    margin-top: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.contact-details h4:first-of-type {
+    margin-top: 0;
+}
+
+.contact-details p {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 16px;
+}
+
+.contact-details p:last-child {
+    border-bottom: none;
+}
+
+/* ---------------------------------- */
+/* 9. Blue Footer                     */
+/* ---------------------------------- */
+.footer {
+    background: var(--color-accent);
+    /* Bold Move - Electric Footer like reference highlights */
+    background: linear-gradient(135deg, #00AAE7 0%, #0081b0 100%);
+    color: white;
+    padding-top: 80px;
+}
+
+.footer__container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.map-canvas {
+    height: 100% !important;
+    /* Stretch to match details */
+    min-height: 350px;
+    /* User preferred baseline */
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 0;
+}
+
+.map-details {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: auto;
+    /* Allow growth */
+    min-height: 350px;
+    /* No scroll */
+}
+
+.leaflet-control-attribution {
+    display: none !important;
+    /* HIde attribution */
+}
+
+.footer__heading {
+    color: white;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+}
+
+.footer__link {
+    color: rgba(255, 255, 255, 0.8);
+    display: block;
+    margin-bottom: 12px;
+}
+
+.footer__link:hover {
+    color: white;
+    padding-left: 8px;
+}
+
+.footer__bottom {
+    background: rgba(0, 0, 0, 0.1);
+    margin-top: 60px;
+    padding: 24px 0;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.footer__logo img {
+    filter: brightness(0) invert(1);
+    height: 40px;
+}
+
+/* ---------------------------------- */
+/* 10. Mobile                         */
+/* ---------------------------------- */
+@media (max-width: 1024px) {
+    .header__nav {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background: var(--color-primary);
+        padding: 40px;
+        z-index: 999;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Show menu when open */
+    body.nav-open .header__nav {
+        display: block;
+        animation: fadeInUp 0.3s ease-out;
+    }
+
+    .header__nav-list {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+    }
+
+    .header__nav-link {
+        font-size: 1.5rem;
+    }
+
+    .header__menu-toggle {
+        display: block;
+    }
+
+    /* Icon Toggling */
+    .icon-close {
+        display: none;
+    }
+
+    body.nav-open .icon-open {
+        display: none;
+    }
+
+    body.nav-open .icon-close {
+        display: block;
+    }
+
+    /* Hide Action Button in Nav if duplicate */
+    .header__actions .button {
+        display: none;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ---------------------------------- */
+/* 14. Map Section Layout             */
+/* ---------------------------------- */
+.map-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    align-items: stretch;
+    /* Match heights */
+}
+
+
+
+.location-info {
+    background: white;
+    padding: 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    border-left: 4px solid #e2e8f0;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.location-info:hover,
+.location-info.location-info--active {
+    border-left-color: var(--color-accent);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-float);
+}
+
+.location-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text-main);
+}
+
+.location-info p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .map-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .map-details {
+        flex-direction: column;
+        /* Stack vertically on mobile */
+        height: auto;
+        overflow-y: visible;
+        margin-top: 24px;
+    }
+
+    .location-info {
+        min-width: 100%;
+        /* Full width cards */
+    }
+}
