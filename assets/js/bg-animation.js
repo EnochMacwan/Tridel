@@ -3,9 +3,7 @@
  * Theme: Multi-Page Generative Animations with Mouse Interactivity
  */
 
-const canvas = document.getElementById('hero-canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-let width, height;
+let canvas, ctx, width, height;
 let animationId;
 let globalTime = 0;
 
@@ -30,7 +28,13 @@ let boat = { x: -100, y: 0, speed: 1.5 };
 
 // Initialization
 function init() {
-    if (!canvas) return;
+    canvas = document.getElementById('hero-canvas');
+    if (!canvas) {
+        console.warn("Canvas element 'hero-canvas' not found.");
+        return;
+    }
+    ctx = canvas.getContext('2d');
+
     resize();
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => {
