@@ -73,19 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const LOCATIONS = [
             {
                 id: 'uae',
-                name: 'Tridel Technologies FZCO (Dubai, UAE)',
+                name: 'Tridel Technologies FZCO',
                 address: 'QD01, DAFZA Industrial Park, Qusais, Dubai, UAE',
                 coords: [25.2893458, 55.4034675]
             },
             {
                 id: 'india',
-                name: 'Tridel Technologies Pvt. Ltd. (Chennai, India)',
+                name: 'Tridel Technologies Pvt Ltd',
                 address: 'No 10/1, 2nd Street, Thirumurugan Nagar, Arcot Road, Porur, Chennai, TN 600116',
                 coords: [13.0371328, 80.1607926]
             },
             {
                 id: 'australia',
-                name: 'Tridel Technologies Pty. Ltd. (Eden Hills, Adelaide, AU)',
+                name: 'Tridel Technologies Pty Ltd',
                 address: 'Eden Hills, Adelaide, SA',
                 coords: [-35.0240257, 138.5861123]
             }
@@ -104,7 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const group = L.featureGroup().addTo(map);
 
         LOCATIONS.forEach(loc => {
-            const marker = L.marker(loc.coords).addTo(map);
+            // Create a custom icon that displays the name directly
+            const textIcon = L.divIcon({
+                className: 'custom-map-pin',
+                html: `<div class="pin-wrapper"><div class="pin-text">${loc.name}</div><div class="pin-dot"></div></div>`,
+                iconSize: null, // Let CSS handle sizing independent of content
+                iconAnchor: [0, 0] // We will translate using CSS relative to this point
+            });
+
+            const marker = L.marker(loc.coords, { icon: textIcon }).addTo(map);
+
+            // Keep full details in popup for click
             marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.address}`);
             group.addLayer(marker);
 
@@ -166,7 +176,44 @@ document.addEventListener('DOMContentLoaded', () => {
             firstFocusableEl.focus();
 
             // Add event listeners
-            modal.addEventListener('keydown', trapFocus);
+            // Product Modal Functionality (Only on Products Page)
+            const modal = document.getElementById('product-modal');
+            if (modal) {
+                const modalTitle = document.getElementById('modal-title');
+                const modalDesc = document.getElementById('modal-description');
+                const modalSpecs = document.getElementById('modal-specs');
+                const closeModal = document.querySelector('.close-modal');
+
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const card = btn.closest('.product-card');
+                        const title = card.querySelector('h3').textContent;
+                        const desc = card.querySelector('p').textContent;
+                        // In a real app, specs would come from a data attribute or API
+                        const specs = "<strong>Specifications:</strong><br>High-grade sensors<br>Real-time telemetry<br>Solar powered option available.";
+
+                        modalTitle.textContent = title;
+                        modalDesc.textContent = desc;
+                        modalSpecs.innerHTML = specs;
+
+                        modal.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                    });
+                });
+
+                closeModal.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target == modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            } modal.addEventListener('keydown', trapFocus);
             modal.addEventListener('keydown', closeOnEscape);
             closeButtons.forEach(btn => btn.addEventListener('click', closeModal));
             modal.querySelector('.modal__backdrop').addEventListener('click', closeModal);
@@ -392,9 +439,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    openButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            openModal(e.currentTarget);
+});
+
+
+
+/* 17. Product Gallery Logic          */
+/* ---------------------------------- */
+
+// Global functions for inline HTML calls
+window.changeImage = function (src) {
+    const mainImage = document.getElementById('main-product-image');
+    if (mainImage) {
+        // Fade out
+        mainImage.style.opacity = '0';
+        setTimeout(() => {
+            mainImage.src = src;
+            mainImage.style.opacity = '1';
+        }, 200);
+    }
+
+    // Update active thumb
+    const thumbs = document.querySelectorAll('.gallery-thumbs img');
+    thumbs.forEach(img => {
+        if (img.src === src) img.classList.add('active');
+        else img.classList.remove('active');
+    });
+};
+
+// --- 22. Back to Top Button (Auto-Inject) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const backToTopBtn = document.createElement('button');
+    backToTopBtn.id = 'back-to-top';
+    backToTopBtn.ariaLabel = 'Back to Top';
+    backToTopBtn.innerHTML = `
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    `;
+    document.body.appendChild(backToTopBtn);
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
         });
     });
 });
+
+window.openLightbox = function (el) {
+    const src = el.querySelector('img') ? el.querySelector('img').src : el.src;
+
+    // Create Modal if not exists
+    let modal = document.getElementById('lightbox-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'lightbox-modal';
+        modal.className = 'lightbox-modal';
+        modal.innerHTML = `
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <img class="lightbox-content" id="lightbox-img" src="">
+        `;
+        document.body.appendChild(modal);
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeLightbox();
+        });
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    }
+
+    document.getElementById('lightbox-img').src = src;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeLightbox = function () {
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) {
+        modal.classList.remove('is-open');
+        document.body.style.overflow = 'auto';
+    }
+};

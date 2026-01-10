@@ -11,8 +11,10 @@
         content="Explore our portfolio of successful projects and latest updates, showcasing our expertise in environmental monitoring, hydrographic surveying, and custom solution development."
         name="description" />
     <link href="assets/css/styles.css" rel="stylesheet" />
-    <script defer="" src="assets/js/script.js"></script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="assets/js/bg-animation.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/theme-toggle.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,7 +26,7 @@
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -66,6 +68,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
@@ -111,10 +117,12 @@
         </section>
         <section class="section">
             <div class="container stories-grid">
-                <div class="story-card">
-                    <img alt="Hydrographic Survey of Dubai" class="story-card__image"
-                        src="assets/images/projects/project-1.jpg" />
-                    <div class="story-card__content">
+                <div class="grid-card-wrapper">
+                    <div class="grid-card-visual">
+                        <img alt="Hydrographic Survey of Dubai" class="story-card__image"
+                            src="assets/images/projects/project-1.jpg" />
+                    </div>
+                    <div class="grid-content-outside">
                         <h3 class="story-card__title">
                             Hydrographic Survey of Emirate of Dubai
                         </h3>
@@ -125,10 +133,12 @@
                         </p>
                     </div>
                 </div>
-                <div class="story-card">
-                    <img alt="Bio-Digital Survey of Marine Habitats" class="story-card__image"
-                        src="assets/images/clients/client-2.png" />
-                    <div class="story-card__content">
+                <div class="grid-card-wrapper">
+                    <div class="grid-card-visual">
+                        <img alt="Bio-Digital Survey of Marine Habitats" class="story-card__image"
+                            src="assets/images/clients/client-2.png" />
+                    </div>
+                    <div class="grid-content-outside">
                         <h3 class="story-card__title">
                             Bio-Digital Survey of Marine Habitats in the UAE
                         </h3>
@@ -139,10 +149,12 @@
                         </p>
                     </div>
                 </div>
-                <div class="story-card">
-                    <img alt="Integrated Environmental Monitoring System" class="story-card__image"
-                        src="assets/images/clients/client-3.png" />
-                    <div class="story-card__content">
+                <div class="grid-card-wrapper">
+                    <div class="grid-card-visual">
+                        <img alt="Integrated Environmental Monitoring System" class="story-card__image"
+                            src="assets/images/clients/client-3.png" />
+                    </div>
+                    <div class="grid-content-outside">
                         <h3 class="story-card__title">
                             Integrated Environmental Monitoring Vehicle
                         </h3>
@@ -153,10 +165,12 @@
                         </p>
                     </div>
                 </div>
-                <div class="story-card">
-                    <img alt="Odor Monitoring for ENOC" class="story-card__image"
-                        src="assets/images/clients/client-4.png" />
-                    <div class="story-card__content">
+                <div class="grid-card-wrapper">
+                    <div class="grid-card-visual">
+                        <img alt="Odor Monitoring for ENOC" class="story-card__image"
+                            src="assets/images/clients/client-4.png" />
+                    </div>
+                    <div class="grid-content-outside">
                         <h3 class="story-card__title">
                             Odor Monitoring System for ENOC
                         </h3>

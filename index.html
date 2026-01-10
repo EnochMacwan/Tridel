@@ -16,10 +16,11 @@
   <script defer="" src="assets/js/bg-animation.js"></script>
   <link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
     rel="stylesheet">
   <style>
     .map-canvas {
@@ -37,10 +38,15 @@
 </head>
 
 <body class="page-home">
+  <!-- Global Animated Background -->
+  <div class="hero__bg">
+    <canvas id="hero-canvas"></canvas>
+  </div>
+
   <header class="header">
     <div class="container header__container">
       <a class="header__logo" href="index.html">
-        <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+        <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
       </a>
       <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
         <ul class="header__nav-list">
@@ -82,6 +88,10 @@
         </ul>
       </nav>
       <div class="header__actions">
+        <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+          style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+          <i class="fas fa-moon"></i>
+        </button>
         <a class="button button--primary" href="contact.html">
           Enquire Now
         </a>
@@ -109,13 +119,10 @@
   </header>
   <main id="main-content">
     <section class="hero">
-      <div class="hero__bg">
-        <canvas id="hero-canvas"></canvas>
-      </div>
       <div class="hero__overlay"></div>
       <div class="container hero__content">
         <h1 class="hero__title">
-          Connecting Environmental Science, Engineering, and Technology
+          Pioneering the Future of Maritime Intelligence
         </h1>
         <p class="hero__subtitle">
           We deliver integrated hardware, software, and services for the comprehensive maritime domain.
@@ -130,10 +137,20 @@
           </h2>
         </div>
         <div class="highlights-grid highlights-grid--4-items">
-          <a class="highlight-card" href="products.html">
-            <img alt="Tridel Navigation Buoy" class="card__image"
-              src="assets/images/products/nav-buoy/tridel-navigation-buoy.png" />
-            <div class="card__content">
+          <!-- Card 1: Hardware -->
+          <a class="grid-card-wrapper" href="products.html">
+            <div class="grid-card-visual">
+              <div class="card__image-slider">
+                <div class="card__image-track">
+                  <img alt="Tridel Navigation Buoy" src="assets/images/products/nav-buoy/nav-buoy-new.jpg" />
+                  <img alt="Tridel Coastal Buoy" src="assets/images/products/coastal-buoy/tcb-new.jpg" />
+                  <img alt="Tridel Data Buoy" src="assets/images/products/data-buoy/data-buoy-new.png" />
+                  <!-- Duplicate 1st for loop -->
+                  <img alt="Tridel Navigation Buoy" src="assets/images/products/nav-buoy/nav-buoy-new.jpg" />
+                </div>
+              </div>
+            </div>
+            <div class="grid-content-outside">
               <h3 class="card__title">
                 Hardware Product
               </h3>
@@ -146,10 +163,21 @@
               </span>
             </div>
           </a>
-          <a class="highlight-card" href="products.html">
-            <img alt="Tridel Environmental Monitoring System" class="card__image"
-              src="assets/images/services/tems.png" />
-            <div class="card__content">
+
+          <!-- Card 2: Software -->
+          <a class="grid-card-wrapper" href="products.html">
+            <div class="grid-card-visual">
+              <div class="card__image-slider">
+                <div class="card__image-track">
+                  <img alt="TEMS Platform" src="assets/images/products/tems/TEMS.jpg" />
+                  <img alt="eSpecia GIS" src="assets/images/products/especia/Especia.jpg" />
+                  <img alt="TSMS Survey Management" src="assets/images/products/t-sms/TSMS.jpg" />
+                  <!-- Duplicate 1st for loop -->
+                  <img alt="TEMS Platform" src="assets/images/products/tems/TEMS.jpg" />
+                </div>
+              </div>
+            </div>
+            <div class="grid-content-outside">
               <h3 class="card__title">
                 Software Platform
               </h3>
@@ -161,9 +189,21 @@
               </span>
             </div>
           </a>
-          <a class="highlight-card" href="success-stories.html">
-            <img alt="Hydrographic Survey of Dubai" class="card__image" src="assets/images/projects/project-1.jpg" />
-            <div class="card__content">
+
+          <!-- Card 3: Success Stories -->
+          <a class="grid-card-wrapper" href="success-stories.html">
+            <div class="grid-card-visual">
+              <div class="card__image-slider">
+                <div class="card__image-track">
+                  <img alt="Hydrographic Survey of Dubai" src="assets/images/projects/project-1.jpg" />
+                  <img alt="Met Ocean Profiling" src="assets/images/services/met-ocean-study.png" />
+                  <img alt="Areal Mapping" src="assets/images/services/areal-mapping.png" />
+                  <!-- Duplicate 1st for loop -->
+                  <img alt="Hydrographic Survey of Dubai" src="assets/images/projects/project-1.jpg" />
+                </div>
+              </div>
+            </div>
+            <div class="grid-content-outside">
               <h3 class="card__title">
                 Dubai Hydrographic Survey
               </h3>
@@ -176,10 +216,21 @@
               </span>
             </div>
           </a>
-          <a class="highlight-card" href="services.html">
-            <img alt="Uncrewed Surface Vehicle" class="card__image"
-              src="assets/images/products/aquilon-5600a/Tridel-Aquilon-5600.png" />
-            <div class="card__content">
+
+          <!-- Card 4: USV -->
+          <a class="grid-card-wrapper" href="services.html">
+            <div class="grid-card-visual">
+              <div class="card__image-slider">
+                <div class="card__image-track">
+                  <img alt="Aquilon 5600 USV" src="assets/images/products/aquilon-5600a/aquilon-5600-new.png" />
+                  <img alt="Aquilon 5600 Rear" src="assets/images/products/aquilon-5600a/aquilon-5600-02-new.png" />
+                  <img alt="Aquilon 8000 USV" src="assets/images/products/aquilon-8000/aquilon-8000-new.png" />
+                  <!-- Duplicate 1st for loop -->
+                  <img alt="Aquilon 5600 USV" src="assets/images/products/aquilon-5600a/aquilon-5600-new.png" />
+                </div>
+              </div>
+            </div>
+            <div class="grid-content-outside">
               <h3 class="card__title">
                 Ongoing Development
               </h3>
@@ -308,19 +359,20 @@
               UAE
             </h4>
             <p>
-              Tridel Technologies FZC, QD01, DAFZA Industrial Park, Qusais, Dubai, UAE
+              Tridel Technologies FZCO, QD01, DAFZA Industrial Park, Qusais, Dubai, UAE
             </p>
             <h4>
               India
             </h4>
             <p>
-              No 10/1, 2nd Street, Thirumurugan Nagar, Arcot Road, Porur, Chennai, Tamil Nadu, INDIA, PIN-600116
+              Tridel Technologies Pvt Ltd, No 10/1, 2nd Street, Thirumurugan Nagar, Arcot Road, Porur, Chennai, TN
+              600116
             </p>
             <h4>
               Australia
             </h4>
             <p>
-              Adelaide, SA, Australia
+              Tridel Technologies Pty Ltd, Eden Hills, Adelaide, SA
             </p>
           </div>
         </div>
@@ -421,6 +473,7 @@
   <script crossorigin="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
+  <script src="assets/js/theme-toggle.js"></script>
 </body>
 
 </html>

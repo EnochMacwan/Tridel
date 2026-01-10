@@ -11,8 +11,10 @@
         content="Tridel provides a full range of environmental and geo-engineering services, including geoscience studies, geoinformatics solutions, and geoengineering applications."
         name="description" />
     <link href="assets/css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer="" src="assets/js/script.js"></script>
     <script defer="" src="assets/js/bg-animation.js"></script>
+    <script defer="" src="assets/js/theme-toggle.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,7 +26,7 @@
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -66,6 +68,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
@@ -122,80 +128,122 @@
                     </p>
                 </div>
                 <div class="services-grid">
-                    <div class="category-card">
-                        <img alt="Scientist studying marine life." class="category-card__image"
-                            src="assets/images/services/Met-ocean.png" />
-                        <h3 class="category-card__title">
-                            GeoScience
-                        </h3>
-                        <p>
-                            Environmental studies and consultancy support in a wide spectrum of applications.
-                        </p>
-                        <ul class="category-card__list">
-                            <li>
-                                Ecological Baseline &amp; Biodiversity Studies
-                            </li>
-                            <li>
-                                Oceanographic &amp; Water Quality Studies
-                            </li>
-                            <li>
-                                Climatology &amp; Hydrology Studies
-                            </li>
-                            <li>
-                                Coastal &amp; Habitat Mapping
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="category-card">
-                        <img alt="Survey vessel collecting data." class="category-card__image"
-                            src="assets/images/services/Geodatabase.png" />
-                        <h3 class="category-card__title">
-                            GeoInformatics
-                        </h3>
-                        <p>
-                            Collecting geological and geographic information through integrated monitoring and
-                            surveying.
-                        </p>
-                        <ul class="category-card__list">
-                            <li>
-                                Hydrographic &amp; Geophysical Surveys
-                            </li>
-                            <li>
-                                Environmental Met-Ocean Monitoring
-                            </li>
-                            <li>
-                                Topographic &amp; Areal Mapping
-                            </li>
-                            <li>
-                                Survey System Integration
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="category-card">
-                        <img alt="Developer working on a GIS application." class="category-card__image"
-                            src="assets/images/services/BMS.png" />
-                        <h3 class="category-card__title">
-                            GeoEngineering
-                        </h3>
-                        <p>
-                            Applying collected data to develop customized solutions for effective management and
-                            decision making.
-                        </p>
-                        <ul class="category-card__list">
-                            <li>
-                                Custom Software &amp; Application Development
-                            </li>
-                            <li>
-                                Spatial &amp; Marine Databases
-                            </li>
-                            <li>
-                                GIS Applications &amp; Cartography
-                            </li>
-                            <li>
-                                Modelling &amp; Analysis Software
-                            </li>
-                        </ul>
-                    </div>
+                    <a href="services/geoscience.html" class="grid-card-wrapper"
+                        style="text-decoration: none; color: inherit;">
+                        <div class="grid-card-visual">
+                            <img alt="Scientist studying marine life." class="category-card__image"
+                                src="assets/images/services/met-ocean-study.png" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="category-card__title">
+                                GeoScience
+                            </h3>
+                            <p>
+                                Environmental studies and consultancy support in a wide spectrum of applications.
+                            </p>
+                            <ul class="category-card__list">
+                                <li>
+                                    Ecological Baseline &amp; Biodiversity Studies
+                                </li>
+                                <li>
+                                    Oceanographic &amp; Water Quality Studies
+                                </li>
+                                <li>
+                                    Climatology &amp; Hydrology Studies
+                                </li>
+                                <li>
+                                    Coastal &amp; Habitat Mapping
+                                </li>
+                            </ul>
+                        </div>
+                    </a>
+                    <a href="services/hydrography.html" class="grid-card-wrapper"
+                        style="text-decoration: none; color: inherit;">
+                        <div class="grid-card-visual">
+                            <img alt="Survey vessel collecting data." class="category-card__image"
+                                src="assets/images/services/port-monitoring.png" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="category-card__title">
+                                Hydrography
+                            </h3>
+                            <p>
+                                Comprehensive geophysical and hydrographic surveys for marine projects.
+                            </p>
+                            <ul class="category-card__list">
+                                <li>
+                                    Bathymetric &amp; Geophysical Surveys
+                                </li>
+                                <li>
+                                    Route &amp; Pipeline Inspection
+                                </li>
+                                <li>
+                                    Topographic &amp; Land Surveys
+                                </li>
+                                <li>
+                                    MetOcean Data Collection
+                                </li>
+                            </ul>
+                        </div>
+                    </a>
+                    <a href="services/geoinformatics.html" class="grid-card-wrapper"
+                        style="text-decoration: none; color: inherit;">
+                        <div class="grid-card-visual">
+                            <img alt="Data visualization on screen." class="category-card__image"
+                                src="assets/images/services/electronic-maps.png" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="category-card__title">
+                                GeoInformatics (GIS)
+                            </h3>
+                            <p>
+                                Advanced geospatial data management and custom GIS solutions.
+                            </p>
+                            <ul class="category-card__list">
+                                <li>
+                                    Enterprise GIS Implementation
+                                </li>
+                                <li>
+                                    Custom GIS Application Development
+                                </li>
+                                <li>
+                                    Data Integration &amp; Transformation
+                                </li>
+                                <li>
+                                    Spatial Analysis &amp; Modeling
+                                </li>
+                            </ul>
+                        </div>
+                    </a>
+                    <a href="services/geoengineering.html" class="grid-card-wrapper"
+                        style="text-decoration: none; color: inherit;">
+                        <div class="grid-card-visual">
+                            <img alt="Engineer inspecting equipment." class="category-card__image"
+                                src="assets/images/services/bms.png" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="category-card__title">
+                                GeoEngineering
+                            </h3>
+                            <p>
+                                Expert engineering solutions for marine and coastal infrastructure.
+                            </p>
+                            <ul class="category-card__list">
+                                <li>
+                                    Coastal Protection Structures
+                                </li>
+                                <li>
+                                    Dredging Reclamation Support
+                                </li>
+                                <li>
+                                    Underwater Instrumentation Support
+                                </li>
+                                <li>
+                                    Survey Equipment Rental &amp; Support
+                                </li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>

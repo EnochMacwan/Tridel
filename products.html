@@ -11,8 +11,10 @@
         content="Explore Tridel's innovative hardware and software products, including custom dataloggers, buoys, survey vessels, and our TEMS &amp; eSpecia data platforms."
         name="description" />
     <link href="assets/css/styles.css" rel="stylesheet" />
-    <script defer="" src="assets/js/script.js"></script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="assets/js/script.js"></script>
+    <script defer src="assets/js/bg-animation.js"></script>
+    <script defer src="assets/js/theme-toggle.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,7 +26,7 @@
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -66,6 +68,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
@@ -122,10 +128,13 @@
                         Buoys
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Tridel Coastal Buoy" class="product-item__image"
-                                src="assets/images/products/coastal-buoy/tridel-coastal-buoy.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-coastal-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Coastal Buoy" class="product-item__image"
+                                    src="assets/images/products/coastal-buoy/tcb-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Tridel Coastal Buoys
                                 </h4>
@@ -133,15 +142,18 @@
                                     A robust and versatile floating platform engineered for nearshore and coastal marine
                                     applications.
                                 </p>
-                                <a class="button button--secondary" href="products/product-coastal-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Tridel Data Buoy" class="product-item__image"
-                                src="assets/images/products/data-buoy/tridel-data-buoy.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-data-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Data Buoy" class="product-item__image"
+                                    src="assets/images/products/data-buoy/data-buoy-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Data Buoys
                                 </h4>
@@ -149,15 +161,18 @@
                                     Bespoke-design buoy platforms built for advanced marine monitoring and research,
                                     featuring plug-and-play integration.
                                 </p>
-                                <a class="button button--secondary" href="products/product-data-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Tridel Navigation Buoy" class="product-item__image"
-                                src="assets/images/products/nav-buoy/tridel-navigation-buoy.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-nav-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Navigation Buoy" class="product-item__image"
+                                    src="assets/images/products/nav-buoy/nav-buoy-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Navigation Buoys (AtoN)
                                 </h4>
@@ -165,15 +180,18 @@
                                     Tailor-made platforms suitable for environmental monitoring and as official Aids to
                                     Navigation (AtoN).
                                 </p>
-                                <a class="button button--secondary" href="products/product-nav-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Mooring Buoy" class="product-item__image"
-                                src="assets/images/products/mooring-buoy/Mooring-Buoys.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-mooring-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Mooring Buoy" class="product-item__image"
+                                    src="assets/images/products/mooring-buoy/mooring-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Mooring Buoys
                                 </h4>
@@ -181,14 +199,18 @@
                                     A versatile range of mooring buoys suitable for commercial, Naval, and offshore
                                     applications in all marine conditions.
                                 </p>
-                                <a class="button button--secondary" href="products/product-mooring-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Deepwater Buoy" class="product-item__image" src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-deepwater-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Deepwater Buoy" class="product-item__image"
+                                    src="assets/images/products/deepwater-buoy/deepwater-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Deepwater Buoys
                                 </h4>
@@ -196,15 +218,18 @@
                                     Proven expertise in designing and deploying Deep-water buoys for complex, long-term
                                     scientific applications.
                                 </p>
-                                <a class="button button--secondary" href="products/product-deepwater-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Drifter Buoy" class="product-item__image"
-                                src="assets/images/products/drifter-buoy/Drifter-Buoy.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-drifter-buoy.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Drifter Buoy" class="product-item__image"
+                                    src="assets/images/products/drifter-buoy/drifter-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Drifter Buoys
                                 </h4>
@@ -212,11 +237,11 @@
                                     Autonomous floating devices that provide cost-effective, real-time data for
                                     understanding marine environments.
                                 </p>
-                                <a class="button button--secondary" href="products/product-drifter-buoy.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -224,10 +249,13 @@
                         Vessels
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Tridel Ark Survey Vessel" class="product-item__image"
-                                src="assets/images/products/tridel-ark/Tridel-Ark.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-tridel-ark.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Ark Survey Vessel" class="product-item__image"
+                                    src="assets/images/products/tridel-ark/tridel-ark-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Tridel Ark
                                 </h4>
@@ -235,15 +263,18 @@
                                     Durable 18m fiberglass monohull survey vessel ideal for Gulf waters, customizable
                                     for seismic and magnetic surveys.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tridel-ark.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Monohull Survey Vessel" class="product-item__image"
-                                src="assets/images/products/monohull-vessel/Monohull.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-monohull-vessel.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Monohull Survey Vessel" class="product-item__image"
+                                    src="assets/images/products/monohull-vessel/monohull-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Monohull Vessel
                                 </h4>
@@ -251,15 +282,18 @@
                                     11m fiberglass-reinforced hydrographic survey vessel designed for extended offshore
                                     missions and two-operator setups.
                                 </p>
-                                <a class="button button--secondary" href="products/product-monohull-vessel.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Catamaran Survey Vessel" class="product-item__image"
-                                src="assets/images/products/catamaran-vessel/Cataraman.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-catamaran-vessel.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Catamaran Survey Vessel" class="product-item__image"
+                                    src="assets/images/products/catamaran-vessel/catamaran-new.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Catamaran Survey Vessel
                                 </h4>
@@ -267,11 +301,11 @@
                                     25m GRP catamaran purpose-built for coastal and offshore hydrographic survey
                                     missions, classified under DNV 1A HSLC R2.
                                 </p>
-                                <a class="button button--secondary" href="products/product-catamaran-vessel.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -287,10 +321,13 @@
                         Tridel Proprietary Series
                     </h4>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Tridel Aquilon 5600A USV" class="product-item__image"
-                                src="assets/images/products/aquilon-5600a/Tridel-Aquilon-5600.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-aquilon-5600a.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Aquilon 5600A USV" class="product-item__image"
+                                    src="assets/images/products/aquilon-5600a/aquilon-5600-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Aquilon 5600 (Carbon Fiber Hybrid)
                                 </h4>
@@ -298,15 +335,18 @@
                                     Carbon Fiber Hybrid USV designed for shallow to medium-depth coastal and offshore
                                     surveys with rotatable pods and solar support.
                                 </p>
-                                <a class="button button--secondary" href="products/product-aquilon-5600a.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Tridel Aquilon 8000 USV" class="product-item__image"
-                                src="assets/images/products/aquilon-8000/Tridel-Aquilon-8000.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-aquilon-8000.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Tridel Aquilon 8000 USV" class="product-item__image"
+                                    src="assets/images/products/aquilon-8000/aquilon-8000-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Aquilon 8000 (Diesel-Electric Hybrid)
                                 </h4>
@@ -314,21 +354,24 @@
                                     A diesel-electric hybrid ASV designed for comprehensive hydrographic and
                                     oceanographic missions, featuring a full oceanographic suite.
                                 </p>
-                                <a class="button button--secondary" href="products/product-aquilon-8000.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     <h4
                         style="color: var(--color-gray-900); font-size: var(--text-lg); margin-top: var(--space-xl); margin-bottom: var(--space-sm);">
                         Seafloor Systems Series
                     </h4>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Seafloor TriDrone USV" class="product-item__image"
-                                src="assets/images/products/tridrone/Seafloor-Tridrone.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-tridrone.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Seafloor TriDrone USV" class="product-item__image"
+                                    src="assets/images/products/tridrone/tridrone-new.webp" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Seafloor TriDrone
                                 </h4>
@@ -336,15 +379,18 @@
                                     A super-compact, ultra-portable platform designed for conducting hydrographic
                                     surveys in confined and remote bodies of water.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tridrone.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Seafloor HydroCat-550 USV" class="product-item__image"
-                                src="assets/images/products/hydrocat-550/Seafloor-Hydrocat-550.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-hydrocat-550.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Seafloor HydroCat-550 USV" class="product-item__image"
+                                    src="assets/images/products/hydrocat-550/hydrocat-new.webp" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Seafloor HydroCat-550
                                 </h4>
@@ -352,11 +398,11 @@
                                     Capable of transiting from inshore to nearshore environments to conduct preplanned
                                     Autonomous Hydrographic surveys.
                                 </p>
-                                <a class="button button--secondary" href="products/product-hydrocat-550.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -364,10 +410,13 @@
                         Tridel Electric Winch (TEW Series)
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="TEW500 Electric Winch" class="product-item__image"
-                                src="assets/images/products/tew500/Profiling-Winches.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-tew500.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="TEW500 Electric Winch" class="product-item__image"
+                                    src="assets/images/products/tew500/Profiling-Winches.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     TEW500 Compact Winch
                                 </h4>
@@ -375,26 +424,29 @@
                                     A compact, high-performance winch designed for precision Marine Oceanographic,
                                     Hydrographic, and Geophysical Survey applications.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tew500.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="TEW1500 Heavy-Duty Winch" class="product-item__image"
-                                src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-tew1500.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="TEW1500 Heavy-Duty Winch" class="product-item__image"
+                                    src="assets/images/products/tew1500/tew1500-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     TEW1500 Heavy-Duty Winch
                                 </h4>
                                 <p class="product-item__excerpt">
                                     A heavy-duty winch built for demanding deep-water and heavy-payload survey missions.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tew1500.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -402,10 +454,13 @@
                         Tridel Data Logger (TDL 720)
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="TDL 720 Data Logger" class="product-item__image"
-                                src="assets/images/products/tdl720/TDL714_PCBCaseR1.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-tdl720.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="TDL 720 Data Logger" class="product-item__image"
+                                    src="assets/images/products/tdl720/tdl720-new.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     TDL 720 Data Logger
                                 </h4>
@@ -413,11 +468,11 @@
                                     A robust, low-power data logger designed for remote environmental monitoring and
                                     industrial applications with exceptional data acquisition capabilities.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tdl720.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -425,10 +480,13 @@
                         Mooring Frames &amp; Bottom Mounts
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Mooring Frame &amp; Bottom Mount" class="product-item__image"
-                                src="assets/images/products/mooring-frame/Mooring-Frames.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-mooring-frame.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Mooring Frame &amp; Bottom Mount" class="product-item__image"
+                                    src="assets/images/products/mooring-frame/Mooring-Frames.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Mooring Frames &amp; Bottom Mounts
                                 </h4>
@@ -436,11 +494,11 @@
                                     Robust, non-corrosive bottom mounts and mooring frames for deploying underwater
                                     instrumentation.
                                 </p>
-                                <a class="button button--secondary" href="products/product-mooring-frame.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div class="product-category">
@@ -448,10 +506,13 @@
                         Surface and Sub-Surface Floats
                     </h3>
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="Surface and Sub-Surface Float" class="product-item__image"
-                                src="assets/images/products/sub-floats/Surface-and-Subsurface-floats.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-sub-floats.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Surface and Sub-Surface Float" class="product-item__image"
+                                    src="assets/images/products/sub-floats/Surface-and-Subsurface-floats.png" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     Surface and Sub-Surface Floats
                                 </h4>
@@ -459,11 +520,11 @@
                                     A full range of floats (pick-up buoys) used to mark the position of underwater
                                     oceanographic moorings.
                                 </p>
-                                <a class="button button--secondary" href="products/product-sub-floats.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -477,10 +538,13 @@
                 </div>
                 <div class="product-category">
                     <div class="product-list-grid">
-                        <div class="product-item">
-                            <img alt="TEMS Software Interface" class="product-item__image"
-                                src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        <a href="products/product-tems.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="TEMS Software Interface" class="product-item__image"
+                                    src="assets/images/products/tems/TEMS.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     TEMS
                                 </h4>
@@ -488,15 +552,18 @@
                                     A customized real-time data publishing platform that integrates multiple
                                     environmental monitoring systems.
                                 </p>
-                                <a class="button button--secondary" href="products/product-tems.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="eSpecia GIS Application" class="product-item__image"
-                                src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-especia.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="eSpecia GIS Application" class="product-item__image"
+                                    src="assets/images/products/especia/Especia.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     eSpecia GIS Application
                                 </h4>
@@ -504,15 +571,18 @@
                                     An efficient platform for collating and managing environmental and ecological data
                                     for protected areas.
                                 </p>
-                                <a class="button button--secondary" href="products/product-especia.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="ATtide Tidal Analysis Software" class="product-item__image"
-                                src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-attide.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="ATtide Tidal Analysis Software" class="product-item__image"
+                                    src="assets/images/products/attide/ATtide.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     ATtide - Tidal Analysis
                                 </h4>
@@ -520,15 +590,18 @@
                                     Hand-crafted, custom software for complex tidal analysis that automates process to
                                     minimize user error.
                                 </p>
-                                <a class="button button--secondary" href="products/product-attide.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
-                        <div class="product-item">
-                            <img alt="Survey Management System" class="product-item__image"
-                                src="assets/images/logo/tridel.png" />
-                            <div class="product-item__content">
+                        </a>
+                        <a href="products/product-t-sms.html" class="product-grid-wrapper"
+                            style="text-decoration: none; color: inherit;">
+                            <div class="product-card-visual">
+                                <img alt="Survey Management System" class="product-item__image"
+                                    src="assets/images/products/t-sms/TSMS.jpg" />
+                            </div>
+                            <div class="product-content-outside">
                                 <h4>
                                     TSMS - Survey Management
                                 </h4>
@@ -536,11 +609,11 @@
                                     Survey workflow management and reporting software for efficient project management
                                     and data utilization.
                                 </p>
-                                <a class="button button--secondary" href="products/product-t-sms.html">
+                                <span class="button button--secondary">
                                     View Details
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>

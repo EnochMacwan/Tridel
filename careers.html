@@ -11,6 +11,7 @@
         content="Join the Tridel team. We are always looking for passionate, talented individuals to help us innovate in the maritime technology sector."
         name="description" />
     <link href="assets/css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer="" src="assets/js/script.js"></script>
     <script defer="" src="assets/js/bg-animation.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +25,7 @@
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -66,6 +67,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
@@ -285,6 +290,8 @@
             </div>
         </div>
     </footer>
+    </footer>
+    <script src="assets/js/theme-toggle.js"></script>
 </body>
 
 </html>

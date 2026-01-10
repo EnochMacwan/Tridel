@@ -10,9 +10,11 @@
     <meta
         content="Meet the team of engineers, scientists, and hydrographers at Tridel who are dedicated to solving complex challenges in the marine environment."
         name="description" />
-    <link href="assets/css/styles.css" rel="stylesheet" />
-    <script defer="" src="assets/js/script.js"></script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
+    <link href="assets/css/styles.css?v=cachebust" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="assets/js/bg-animation.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/theme-toggle.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,7 +26,7 @@
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" style="height: 32px;" />
+                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -66,6 +68,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
@@ -136,378 +142,509 @@
                     </h2>
                 </div>
                 <div class="team-grid">
-                    <div class="team-member-card">
-                        <img alt="Shaijan Baby" class="team-member__photo" src="assets/images/team/shaijan-baby.jpg" />
-                        <h3 class="team-member__name">
-                            Shaijan Baby
-                        </h3>
-                        <p class="team-member__title">
-                            Founder &amp; Managing Director
-                        </p>
-                        <p class="team-member__bio">
-                            Shaijan brings a wealth of knowledge in environmental science and project management,
-                            ensuring excellence in every solution we deliver.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Shaijan Baby" class="team-member__photo-full"
+                                src="assets/images/team/shaijan-baby.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Shaijan Baby
+                            </h3>
+                            <p class="team-member__title">
+                                Founder &amp; Managing Director
+                            </p>
+                            <p class="team-member__bio">
+                                Shaijan brings a wealth of knowledge in environmental science and project management,
+                                ensuring excellence in every solution we deliver.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Sanjeev Sharma" class="team-member__photo"
-                            src="assets/images/team/sanjeev-sharma.jpg" />
-                        <h3 class="team-member__name">
-                            Cdr. Sanjeev Sharma, IN Retd.
-                        </h3>
-                        <p class="team-member__title">
-                            Chief Operating Officer (COO)
-                        </p>
-                        <p class="team-member__bio">
-                            With extensive experience in marine operations and technology, Sanjeev leads our team with a
-                            focus on innovation and strategic growth.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Sanjeev Sharma" class="team-member__photo-full"
+                                src="assets/images/team/sanjeev-sharma.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Cdr. Sanjeev Sharma, IN Retd.
+                            </h3>
+                            <p class="team-member__title">
+                                Chief Operating Officer (COO)
+                            </p>
+                            <p class="team-member__bio">
+                                With extensive experience in marine operations and technology, Sanjeev leads our team
+                                with a
+                                focus on innovation and strategic growth.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Sharon Philip" class="team-member__photo"
-                            src="assets/images/team/sharon-philip.jpg" />
-                        <h3 class="team-member__name">
-                            Sharon Philip
-                        </h3>
-                        <p class="team-member__title">
-                            Director-Operations
-                        </p>
-                        <p class="team-member__bio">
-                            Leading oceanographic and geophysical projects with proficiency. Interpretation of
-                            bathymetric, geological, oceanographic, and geophysical data.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Sharon Philip" class="team-member__photo-full"
+                                src="assets/images/team/sharon-philip.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Sharon Philip
+                            </h3>
+                            <p class="team-member__title">
+                                Director-Operations
+                            </p>
+                            <p class="team-member__bio">
+                                Leading oceanographic and geophysical projects with proficiency. Interpretation of
+                                bathymetric, geological, oceanographic, and geophysical data.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Balakrishna M" class="team-member__photo"
-                            src="assets/images/team/balakrishna-m.jpg" />
-                        <h3 class="team-member__name">
-                            Balakrishna M
-                        </h3>
-                        <p class="team-member__title">
-                            Director-Business Development
-                        </p>
-                        <p class="team-member__bio">
-                            Securing opportunities and driving business growth. Driving revenue growth for the
-                            organization.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Balakrishna M" class="team-member__photo-full"
+                                src="assets/images/team/balakrishna-m.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Balakrishna M
+                            </h3>
+                            <p class="team-member__title">
+                                Director-Business Development
+                            </p>
+                            <p class="team-member__bio">
+                                Securing opportunities and driving business growth. Driving revenue growth for the
+                                organization.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Dr. John Luick" class="team-member__photo" src="assets/images/team/john-luick.jpg" />
-                        <h3 class="team-member__name">
-                            Dr. John Luick
-                        </h3>
-                        <p class="team-member__title">
-                            Director-Australia
-                        </p>
-                        <p class="team-member__bio">
-                            Leading Australia office operations. Expertise in oceanographic studies, marine modelling
-                            and marine data QA/QC and reporting.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Dr. John Luick" class="team-member__photo-full"
+                                src="assets/images/team/john-luick.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Dr. John Luick
+                            </h3>
+                            <p class="team-member__title">
+                                Director-Australia
+                            </p>
+                            <p class="team-member__bio">
+                                Leading Australia office operations. Expertise in oceanographic studies, marine
+                                modelling
+                                and marine data QA/QC and reporting.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Anoop Panicker" class="team-member__photo"
-                            src="assets/images/team/anoop-panicker.jpg" />
-                        <h3 class="team-member__name">
-                            Anoop Panicker, IN Retd.
-                        </h3>
-                        <p class="team-member__title">
-                            Director-India
-                        </p>
-                        <p class="team-member__bio">
-                            Leading India office operations. Managing Hardware and Software Product Development
-                            Initiatives
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Anoop Panicker" class="team-member__photo-full"
+                                src="assets/images/team/anoop-panicker.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Anoop Panicker, IN Retd.
+                            </h3>
+                            <p class="team-member__title">
+                                Director-India
+                            </p>
+                            <p class="team-member__bio">
+                                Leading India office operations. Managing Hardware and Software Product Development
+                                Initiatives
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Reema Shetty" class="team-member__photo" src="assets/images/team/reema-shetty.jpg" />
-                        <h3 class="team-member__name">
-                            Reema Shetty
-                        </h3>
-                        <p class="team-member__title">
-                            Commercial Manager
-                        </p>
-                        <p class="team-member__bio">
-                            Leading financial management, procurement strategies, subcontractor and vendor management.
-                            Negotiating contracts and ensuring the smooth execution of projects.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Reema Shetty" class="team-member__photo-full"
+                                src="assets/images/team/reema-shetty.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Reema Shetty
+                            </h3>
+                            <p class="team-member__title">
+                                Commercial Manager
+                            </p>
+                            <p class="team-member__bio">
+                                Leading financial management, procurement strategies, subcontractor and vendor
+                                management.
+                                Negotiating contracts and ensuring the smooth execution of projects.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="D.K. Sinha" class="team-member__photo"
-                            src="assets/images/team/deepakkumar-sinha.jpg" />
-                        <h3 class="team-member__name">
-                            D.K. Sinha
-                        </h3>
-                        <p class="team-member__title">
-                            Lead-Strategic Initiatives
-                        </p>
-                        <p class="team-member__bio">
-                            Leads strategic initiatives, driving development and execution of key projects. Retired DG
-                            at Directorate General of Lighthouses and Lightships/Ex-Councillor IALA
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="D.K. Sinha" class="team-member__photo-full"
+                                src="assets/images/team/deepakkumar-sinha.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                D.K. Sinha
+                            </h3>
+                            <p class="team-member__title">
+                                Lead-Strategic Initiatives
+                            </p>
+                            <p class="team-member__bio">
+                                Leads strategic initiatives, driving development and execution of key projects. Retired
+                                DG
+                                at Directorate General of Lighthouses and Lightships/Ex-Councillor IALA
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Jojo Scaria George" class="team-member__photo"
-                            src="assets/images/team/jojo-scaria-george.jpg" />
-                        <h3 class="team-member__name">
-                            Jojo Scaria George
-                        </h3>
-                        <p class="team-member__title">
-                            Vice President- Marine Construction
-                        </p>
-                        <p class="team-member__bio">
-                            Manage marine construction projects including ports, harbours, and offshore platforms.
-                            Ensuring compliance with marine regulations and safety standards.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Jojo Scaria George" class="team-member__photo-full"
+                                src="assets/images/team/jojo-scaria-george.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Jojo Scaria George
+                            </h3>
+                            <p class="team-member__title">
+                                Vice President- Marine Construction
+                            </p>
+                            <p class="team-member__bio">
+                                Manage marine construction projects including ports, harbours, and offshore platforms.
+                                Ensuring compliance with marine regulations and safety standards.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Shiyas P R" class="team-member__photo" src="assets/images/team/shiyas-pr.jpg" />
-                        <h3 class="team-member__name">
-                            Shiyas P R
-                        </h3>
-                        <p class="team-member__title">
-                            Senior Manager-Operations
-                        </p>
-                        <p class="team-member__bio">
-                            Proficient in instrumentation and control technologies, including PLCs, DCSs, and SCADA.
-                            Core competency in Data Analytics
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Shiyas P R" class="team-member__photo-full"
+                                src="assets/images/team/shiyas-pr.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Shiyas P R
+                            </h3>
+                            <p class="team-member__title">
+                                Senior Manager-Operations
+                            </p>
+                            <p class="team-member__bio">
+                                Proficient in instrumentation and control technologies, including PLCs, DCSs, and SCADA.
+                                Core competency in Data Analytics
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Azza Elbadri" class="team-member__photo" src="assets/images/team/azza-elbadri.jpg" />
-                        <h3 class="team-member__name">
-                            Azza Elbadri Mohamed Ismail
-                        </h3>
-                        <p class="team-member__title">
-                            Manager- HSE &amp; Compliance
-                        </p>
-                        <p class="team-member__bio">
-                            Implementation of ISO standard requirements; ISO9001, ISO 14001 and ISO 45001Promoting
-                            culture of safety and quality.
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Azza Elbadri" class="team-member__photo-full"
+                                src="assets/images/team/azza-elbadri.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Azza Elbadri Mohamed Ismail
+                            </h3>
+                            <p class="team-member__title">
+                                Manager- HSE &amp; Compliance
+                            </p>
+                            <p class="team-member__bio">
+                                Implementation of ISO standard requirements; ISO9001, ISO 14001 and ISO 45001Promoting
+                                culture of safety and quality.
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Gordon Bisset" class="team-member__photo"
-                            src="assets/images/team/gordon-bisset.jpg" />
-                        <h3 class="team-member__name">
-                            Gordon Bisset
-                        </h3>
-                        <p class="team-member__title">
-                            Manager- Business Development
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Gordon Bisset" class="team-member__photo-full"
+                                src="assets/images/team/gordon-bisset.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Gordon Bisset
+                            </h3>
+                            <p class="team-member__title">
+                                Manager- Business Development
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Harold Pieters" class="team-member__photo"
-                            src="assets/images/team/harold-pieters.jpg" />
-                        <h3 class="team-member__name">
-                            Harold Pieters
-                        </h3>
-                        <p class="team-member__title">
-                            Manager- Survey Operations
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Harold Pieters" class="team-member__photo-full"
+                                src="assets/images/team/harold-pieters.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Harold Pieters
+                            </h3>
+                            <p class="team-member__title">
+                                Manager- Survey Operations
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Prabhu K" class="team-member__photo" src="assets/images/team/prabhu-k.jpg" />
-                        <h3 class="team-member__name">
-                            Prabhu K
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Software Development
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Prabhu K" class="team-member__photo-full" src="assets/images/team/prabhu-k.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Prabhu K
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Software Development
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Rajam Alwan" class="team-member__photo" src="assets/images/team/rajam-alwan.jpg" />
-                        <h3 class="team-member__name">
-                            Rajam Alwan
-                        </h3>
-                        <p class="team-member__title">
-                            Finance Controller
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Rajam Alwan" class="team-member__photo-full"
+                                src="assets/images/team/rajam-alwan.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Rajam Alwan
+                            </h3>
+                            <p class="team-member__title">
+                                Finance Controller
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Raju K N" class="team-member__photo" src="assets/images/team/raju-kn.jpg" />
-                        <h3 class="team-member__name">
-                            Raju K N
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Construction
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Raju K N" class="team-member__photo-full" src="assets/images/team/raju-kn.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Raju K N
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Construction
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Prakash Nair" class="team-member__photo" src="assets/images/team/prakash-nair.jpg" />
-                        <h3 class="team-member__name">
-                            Prakash Nair
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Production
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Prakash Nair" class="team-member__photo-full"
+                                src="assets/images/team/prakash-nair.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Prakash Nair
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Production
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Shaji Jacob" class="team-member__photo" src="assets/images/team/shaji-jacob.jpg" />
-                        <h3 class="team-member__name">
-                            Shaji Jacob
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Logistics
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Shaji Jacob" class="team-member__photo-full"
+                                src="assets/images/team/shaji-jacob.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Shaji Jacob
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Logistics
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Srinivasan Radhakrishnan" class="team-member__photo"
-                            src="assets/images/team/srinivasan-radhakrishnan.jpg" />
-                        <h3 class="team-member__name">
-                            Srinivasan Radhakrishnan
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Engineering
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Srinivasan Radhakrishnan" class="team-member__photo-full"
+                                src="assets/images/team/srinivasan-radhakrishnan.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Srinivasan Radhakrishnan
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Engineering
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Deepika Nair" class="team-member__photo" src="assets/images/team/deepika-nair.jpg" />
-                        <h3 class="team-member__name">
-                            Deepika Nair
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Accounts
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Deepika Nair" class="team-member__photo-full"
+                                src="assets/images/team/deepika-nair.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Deepika Nair
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Accounts
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Jisha Kalluravi" class="team-member__photo"
-                            src="assets/images/team/jisha-kalluravi.jpg" />
-                        <h3 class="team-member__name">
-                            Jisha Kalluravi
-                        </h3>
-                        <p class="team-member__title">
-                            Senior Software Developer
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Jisha Kalluravi" class="team-member__photo-full"
+                                src="assets/images/team/jisha-kalluravi.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Jisha Kalluravi
+                            </h3>
+                            <p class="team-member__title">
+                                Senior Software Developer
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Dr. Shajen Azeem" class="team-member__photo"
-                            src="assets/images/team/shajen-azeem.jpg" />
-                        <h3 class="team-member__name">
-                            Dr. Shajen Azeem
-                        </h3>
-                        <p class="team-member__title">
-                            Marine Ecologist
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Dr. Shajen Azeem" class="team-member__photo-full"
+                                src="assets/images/team/shajen-azeem.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Dr. Shajen Azeem
+                            </h3>
+                            <p class="team-member__title">
+                                Marine Ecologist
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Dr. Deljo Davis" class="team-member__photo"
-                            src="assets/images/team/deljo-davis.jpg" />
-                        <h3 class="team-member__name">
-                            Dr. Deljo Davis
-                        </h3>
-                        <p class="team-member__title">
-                            Environmental Specialist
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Dr. Deljo Davis" class="team-member__photo-full"
+                                src="assets/images/team/deljo-davis.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Dr. Deljo Davis
+                            </h3>
+                            <p class="team-member__title">
+                                Environmental Specialist
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Stan Soman" class="team-member__photo" src="assets/images/team/stan-soman.jpg" />
-                        <h3 class="team-member__name">
-                            Stan Soman
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Operations
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Stan Soman" class="team-member__photo-full"
+                                src="assets/images/team/stan-soman.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Stan Soman
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Operations
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Sajith Kurup" class="team-member__photo" src="assets/images/team/sajith-kurup.jpg" />
-                        <h3 class="team-member__name">
-                            Sajith Kurup
-                        </h3>
-                        <p class="team-member__title">
-                            Manager-Projects
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Sajith Kurup" class="team-member__photo-full"
+                                src="assets/images/team/sajith-kurup.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Sajith Kurup
+                            </h3>
+                            <p class="team-member__title">
+                                Manager-Projects
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Haneema Varghese" class="team-member__photo"
-                            src="assets/images/team/haneema-varghese.jpg" />
-                        <h3 class="team-member__name">
-                            Haneema Varghese
-                        </h3>
-                        <p class="team-member__title">
-                            Assistant Manager-Projects
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Haneema Varghese" class="team-member__photo-full"
+                                src="assets/images/team/haneema-varghese.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Haneema Varghese
+                            </h3>
+                            <p class="team-member__title">
+                                Assistant Manager-Projects
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Asif M" class="team-member__photo" src="assets/images/team/asif-m.jpg" />
-                        <h3 class="team-member__name">
-                            Asif M
-                        </h3>
-                        <p class="team-member__title">
-                            Assistant Manager- HR &amp; Admin
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Asif M" class="team-member__photo-full" src="assets/images/team/asif-m.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Asif M
+                            </h3>
+                            <p class="team-member__title">
+                                Assistant Manager- HR &amp; Admin
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Komal Digrani" class="team-member__photo"
-                            src="assets/images/team/komal-digrani.jpg" />
-                        <h3 class="team-member__name">
-                            Komal Digrani
-                        </h3>
-                        <p class="team-member__title">
-                            Assistant Manager-Business Development
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Komal Digrani" class="team-member__photo-full"
+                                src="assets/images/team/komal-digrani.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Komal Digrani
+                            </h3>
+                            <p class="team-member__title">
+                                Assistant Manager-Business Development
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
-                    <div class="team-member-card">
-                        <img alt="Khushbu" class="team-member__photo" src="assets/images/team/khushbu.jpg" />
-                        <h3 class="team-member__name">
-                            Khushbu
-                        </h3>
-                        <p class="team-member__title">
-                            Assitant Manager-Business Development
-                        </p>
-                        <p class="team-member__bio">
-                            Brief Bio
-                        </p>
+                    <div class="grid-card-wrapper">
+                        <div class="grid-card-visual">
+                            <img alt="Khushbu" class="team-member__photo-full" src="assets/images/team/khushbu.jpg" />
+                        </div>
+                        <div class="grid-content-outside">
+                            <h3 class="team-member__name">
+                                Khushbu
+                            </h3>
+                            <p class="team-member__title">
+                                Assitant Manager-Business Development
+                            </p>
+                            <p class="team-member__bio">
+                                Brief Bio
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
