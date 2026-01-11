@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -17,6 +17,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="../assets/js/theme-toggle.js"></script>
 </head>
 
 <body>
@@ -65,6 +67,10 @@
                 </ul>
             </nav>
             <div class="header__actions">
+                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a class="button button--primary" href="../contact.html">
                     Enquire Now
                 </a>
@@ -95,80 +101,81 @@
             </div>
         </div>
     </header>
-    <main class="product-page" id="main-content">
-        <div class="container">
-            <a class="back-to-products" href="../products.html">
-                ← Back to products
-            </a>
-            <div class="product-breadcrumb">
-                Products / Vessels / Catamaran
-            </div>
-            <div class="detail-layout">
-                <div class="detail-layout__content">
-                    <h1 class="detail-layout__title">
-                        Catamaran Survey Vessel
-                    </h1>
-                    <p class="detail-layout__description">
-                        This 25 m GRP catamaran is purpose-built for coastal and offshore hydrographic survey missions,
-                        including multibeam sonar, sub-bottom profiling, and environmental data collection.
-                    </p>
-                    <h3>
-                        Key Features
-                    </h3>
-                    <ul class="detail-layout__list">
-                        <li>
-                            25m GRP Catamaran for superior stability
-                        </li>
-                        <li>
-                            Purpose-built for MBES, SBP, and environmental sampling
-                        </li>
-                        <li>
-                            DNV 1A HSLC R2 Classification
-                        </li>
-                        <li>
-                            Power: Twin Volvo D13-1000 engines
-                        </li>
-                        <li>
-                            Redundancy: Dual 45 kVA Fischer Panda gensets
-                        </li>
-                        <li>
-                            Endurance: 10,200L fuel &amp; 2,000L freshwater + RO system
-                        </li>
-                        <li>
-                            Cruise Speed: 14 knots (Max 18 knots)
-                        </li>
-                        <li>
-                            Survey Speed: 4-10 knots
-                        </li>
-                    </ul>
-                    <a class="button button--primary" href="../contact.html">
-                        Enquire About This Product
-                    </a>
-                </div>
-                <div class="detail-layout__image">
-                    <div class="product-gallery">
-                        <div class="gallery-main" onclick="openLightbox(this)">
-                            <img id="main-product-image"
-                                src="../assets/images/products/catamaran-vessel/catamaran-new.jpg"
-                                alt="Catamaran - View 1">
-                            <div class="enlarge-hint">
-                                <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                                    width="16">
-                                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                                </svg>
-                                Click to Enlarge
-                            </div>
+    <main id="main-content">
+        <section class="section">
+            <div class="container">
+
+
+                <div class="detail-layout">
+                    <div class="detail-layout__content">
+
+                        <h1 class="detail-layout__title">
+                            Catamaran Survey Vessel
+                        </h1>
+                        <p class="detail-layout__description">
+                            This 25 m GRP catamaran is purpose-built for coastal and offshore hydrographic survey
+                            missions,
+                            including multibeam sonar, sub-bottom profiling, and environmental data collection.
+                        </p>
+                        <h3>
+                            Key Features
+                        </h3>
+                        <ul class="detail-layout__list">
+                            <li>
+                                25m GRP Catamaran for superior stability
+                            </li>
+                            <li>
+                                Purpose-built for MBES, SBP, and environmental sampling
+                            </li>
+                            <li>
+                                DNV 1A HSLC R2 Classification
+                            </li>
+                            <li>
+                                Power: Twin Volvo D13-1000 engines
+                            </li>
+                            <li>
+                                Redundancy: Dual 45 kVA Fischer Panda gensets
+                            </li>
+                            <li>
+                                Endurance: 10,200L fuel &amp; 2,000L freshwater + RO system
+                            </li>
+                            <li>
+                                Cruise Speed: 14 knots (Max 18 knots)
+                            </li>
+                            <li>
+                                Survey Speed: 4-10 knots
+                            </li>
+                        </ul>
+                        <div class="product-actions">
+                            <a class="button button--primary" href="../contact.html">Request Quote</a>
+                            <a href="../products.html" class="button button--soft">Back to Products</a>
                         </div>
-                        <div class="gallery-thumbs">
-                            <img src="../assets/images/products/catamaran-vessel/catamaran-new.jpg"
-                                onclick="changeImage(this.src)" class="active" alt="View 1">
-                            <img src="../assets/images/products/catamaran-vessel/catamaran-2.jpg"
-                                onclick="changeImage(this.src)" alt="View 2">
+                    </div>
+                    <div class="detail-layout__image">
+                        <div class="product-gallery">
+                            <div class="gallery-main" onclick="openLightbox(this)">
+                                <img id="main-product-image"
+                                    src="../assets/images/products/catamaran-vessel/catamaran-new.jpg"
+                                    alt="Catamaran - View 1">
+                                <div class="enlarge-hint">
+                                    <svg fill="none" height="16" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" width="16">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                                    </svg>
+                                    Click to Enlarge
+                                </div>
+                            </div>
+                            <div class="gallery-thumbs">
+                                <img src="../assets/images/products/catamaran-vessel/catamaran-new.jpg"
+                                    onclick="changeImage(this.src)" class="active" alt="View 1">
+                                <img src="../assets/images/products/catamaran-vessel/catamaran-2.jpg"
+                                    onclick="changeImage(this.src)" alt="View 2">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
     <footer class="footer">
         <div class="container footer__container">
