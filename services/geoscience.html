@@ -68,57 +68,51 @@
     </header>
 
     <main id="main-content">
-        <section class="page-header" style="background: transparent; padding-top: 120px; padding-bottom: 40px;">
-            <div class="hero__bg"><canvas id="hero-canvas"></canvas></div>
-            <div class="container">
-                <h1 class="page-header__title" style="color: var(--color-text-main);">GeoScience</h1>
-                <p class="page-header__subtitle"
-                    style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
-                    Environmental studies and consultancy support in a wide spectrum of applications.
-                </p>
-            </div>
-        </section>
-
         <section class="section">
             <div class="container">
                 <div class="detail-layout">
-                    <div class="detail-layout__image">
-                        <div class="product-gallery">
-                            <div class="gallery-main" style="cursor: default;">
-                                <img alt="GeoScience" id="mainImage"
-                                    src="../assets/images/services/met-ocean-study.png" />
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Content Left -->
                     <div class="detail-layout__content">
-                        <h2 class="detail-layout__title">
-                            Service Overview
-                        </h2>
+                        <h1 class="detail-layout__title">
+                            GeoScience
+                        </h1>
                         <p class="detail-layout__description">
                             Tridel Technologies provides comprehensive GeoScience solutions, integrating environmental
                             science with advanced technology to deliver precise and actionable insights for marine and
                             coastal projects. Our team of experts conducts rigorous studies to ensure environmental
                             compliance and sustainable development.
                         </p>
-                        <div class="product-features">
-                            <h3 class="product-features__title">
-                                Key Capabilities
-                            </h3>
-                            <ul class="product-features__list">
-                                <li>Ecological Baseline & Biodiversity Studies</li>
-                                <li>Oceanographic & Water Quality Studies</li>
-                                <li>Climatology & Hydrology Studies</li>
-                                <li>Coastal & Habitat Mapping</li>
-                                <li>Environmental Impact Assessments (EIA)</li>
-                            </ul>
+
+                        <h3>Key Capabilities</h3>
+                        <ul class="detail-layout__list">
+                            <li><strong>Ecological Baseline & Biodiversity Studies</strong></li>
+                            <li><strong>Oceanographic & Water Quality Studies</strong></li>
+                            <li><strong>Climatology & Hydrology Studies</strong></li>
+                            <li><strong>Coastal & Habitat Mapping</strong></li>
+                            <li><strong>Environmental Impact Assessments (EIA)</strong></li>
+                        </ul>
+
+                        <div class="product-actions">
+                            <a class="button button--primary" href="../contact.html">Request Service</a>
+                            <a href="../services.html" class="button button--soft">Back to Services</a>
                         </div>
-                        <div class="detail-actions">
-                            <a class="button button--primary" href="../contact.html">
-                                Request Service
-                            </a>
-                            <a class="button button--secondary" href="../services.html">
-                                Back to Services
-                            </a>
+                    </div>
+
+                    <!-- Image Right -->
+                    <div class="detail-layout__image">
+                        <div class="product-gallery">
+                            <div class="gallery-main" onclick="openLightbox(this)">
+                                <img id="main-product-image" src="../assets/images/services/met-ocean-study.png"
+                                    alt="GeoScience Service"
+                                    style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
+                                <div class="enlarge-hint">
+                                    <svg fill="none" height="16" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" width="16">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                                    </svg>
+                                    Click to Enlarge
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

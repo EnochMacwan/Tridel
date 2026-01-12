@@ -67,56 +67,51 @@
     </header>
 
     <main id="main-content">
-        <section class="page-header" style="background: transparent; padding-top: 120px; padding-bottom: 40px;">
-            <div class="hero__bg"><canvas id="hero-canvas"></canvas></div>
-            <div class="container">
-                <h1 class="page-header__title" style="color: var(--color-text-main);">Hydrography</h1>
-                <p class="page-header__subtitle"
-                    style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
-                    Comprehensive geophysical and hydrographic surveys for marine projects.
-                </p>
-            </div>
-        </section>
-
         <section class="section">
             <div class="container">
                 <div class="detail-layout">
-                    <div class="detail-layout__image">
-                        <div class="product-gallery">
-                            <div class="gallery-main" style="cursor: default;">
-                                <img alt="Hydrography" id="mainImage"
-                                    src="../assets/images/services/port-monitoring.png" />
-                            </div>
+                    <!-- Content Left -->
+                    <div class="detail-layout__content">
+                        <h1 class="detail-layout__title">
+                            Hydrography
+                        </h1>
+                        <p class="detail-layout__description">
+                            Comprehensive geophysical and hydrographic surveys for marine projects. Our services employ
+                            state-of-the-art sonar and positioning technology to map the seabed with high precision.
+                            From route surveys for pipelines to port construction monitoring, we deliver data that
+                            ensures safe navigation and successful engineering.
+                        </p>
+
+                        <h3>Key Capabilities</h3>
+                        <ul class="detail-layout__list">
+                            <li><strong>Bathymetric & Geophysical Surveys</strong></li>
+                            <li><strong>Route & Pipeline Inspection</strong></li>
+                            <li><strong>Topographic & Land Surveys</strong></li>
+                            <li><strong>MetOcean Data Collection</strong></li>
+                            <li><strong>Subsea Asset Integrity Monitoring</strong></li>
+                        </ul>
+
+                        <div class="product-actions">
+                            <a class="button button--primary" href="../contact.html">Request Service</a>
+                            <a href="../services.html" class="button button--soft">Back to Services</a>
                         </div>
                     </div>
-                    <div class="detail-layout__content">
-                        <h2 class="detail-layout__title">
-                            Service Overview
-                        </h2>
-                        <p class="detail-layout__description">
-                            Our hydrography services employ state-of-the-art sonar and positioning technology to map the
-                            seabed with high precision. From route surveys for pipelines to port construction
-                            monitoring, we deliver data that ensures safe navigation and successful engineering.
-                        </p>
-                        <div class="product-features">
-                            <h3 class="product-features__title">
-                                Key Capabilities
-                            </h3>
-                            <ul class="product-features__list">
-                                <li>Bathymetric & Geophysical Surveys</li>
-                                <li>Route & Pipeline Inspection</li>
-                                <li>Topographic & Land Surveys</li>
-                                <li>MetOcean Data Collection</li>
-                                <li>Subsea Asset Integrity Monitoring</li>
-                            </ul>
-                        </div>
-                        <div class="detail-actions">
-                            <a class="button button--primary" href="../contact.html">
-                                Request Service
-                            </a>
-                            <a class="button button--secondary" href="../services.html">
-                                Back to Services
-                            </a>
+
+                    <!-- Image Right -->
+                    <div class="detail-layout__image">
+                        <div class="product-gallery">
+                            <div class="gallery-main" onclick="openLightbox(this)">
+                                <img id="main-product-image" src="../assets/images/services/port-monitoring.png"
+                                    alt="Hydrography Service"
+                                    style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
+                                <div class="enlarge-hint">
+                                    <svg fill="none" height="16" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" width="16">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                                    </svg>
+                                    Click to Enlarge
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

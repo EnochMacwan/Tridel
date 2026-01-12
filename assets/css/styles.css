@@ -10,12 +10,12 @@
     --color-primary-light: #202124;
     /* Google Gray 900 */
 
-    /* Electric Accent - Google Blue */
-    --color-accent: #1a73e8;
-    /* Google Blue 600 */
-    --color-accent-hover: #174ea6;
-    /* Google Blue 800 */
-    --color-accent-glow: rgba(26, 115, 232, 0.3);
+    /* Electric Accent - Tridel Blue */
+    --color-accent: #00AAE7;
+    /* Footer Blue (Cyan-ish) */
+    --color-accent-hover: #0081b0;
+    /* Footer Gradient End */
+    --color-accent-glow: rgba(0, 170, 231, 0.3);
 
     /* Surface System */
     --color-surface-base: #ffffff;
@@ -69,18 +69,26 @@
     --color-primary-light: #e8eaed;
     /* Google Gray 200 */
 
-    /* Electric Accent - Google Blue Light */
-    --color-accent: #8ab4f8;
-    /* Google Blue 300 */
-    --color-accent-hover: #aecbfa;
-    /* Google Blue 200 */
-    --color-accent-glow: rgba(138, 180, 248, 0.4);
+    /* Electric Accent - Tridel Blue */
+    --color-accent: #00AAE7;
+    /* Keep consistent match */
+    --color-accent-hover: #2ebcf0;
+    /* Lighter for hover in dark */
+    --color-accent-glow: rgba(0, 170, 231, 0.4);
 
     /* Surface System - Dark Void */
-    --color-surface-base: #050505;
-    /* Almost Pure Black */
-    --color-surface-pure: #121212;
-    /* Material Dark Surface */
+    /* Surface System - Dark Void */
+    --color-surface-base: #000000;
+    /* Pitch Black */
+    --color-surface-pure: #000000;
+    /* Pitch Black for Cards too? Or slightly distinct? 
+       If "make IT pitch black", likely referring to page bg. 
+       Let's keep cards distinguishable or distinct? 
+       Usually pitch black app uses #000 for bg and #121212 for cards.
+       But user asked for "product page background".
+       Let's set base to #000000.
+    */
+    --color-surface-pure: #0a0a0a;
 
     /* Text */
     --color-text-main: #e8eaed;
@@ -175,13 +183,11 @@ h6 {
     top: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(255, 255, 255, 1);
-    /* Solid White as requested */
-    backdrop-filter: none;
-    /* Remove blur as it's solid now */
-    -webkit-backdrop-filter: none;
-    /* The "Apple Blur" */
+    background: rgba(255, 255, 255, 0.8);
+    /* Translucent White for Glass Effect */
+    backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+    /* The "Apple Blur" */
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     /* Ultra subtle border */
     padding: 16px 0;
@@ -376,16 +382,19 @@ h6 {
 }
 
 .button--primary {
-    background: var(--color-accent);
+    background: linear-gradient(135deg, #00AAE7 0%, #0081b0 100%);
+    /* Sync with Footer */
     color: white;
     box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3);
     /* Colored Shadow */
 }
 
 .button--primary:hover {
-    background: var(--color-accent-hover);
+    background: linear-gradient(135deg, #2ebcf0 0%, #0095cc 100%);
+    /* Brighter Gradient */
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 170, 231, 0.4);
+    /* Matching Shadow Color */
 }
 
 .button--secondary {
@@ -736,18 +745,38 @@ h6 {
 }
 
 /* Fix for Product Images to fit perfectly in cards */
+/* Fix for Product Images to fit perfectly in cards */
 .product-card-visual .product-item__image {
-    object-fit: contain;
-    padding: 16px;
-    background-color: white;
+    object-fit: cover;
+    padding: 0;
+    background-color: var(--color-surface-pure);
     /* Ensure clean background for PNGs */
 }
 
 /* Ensure sliders fill the visual card */
+/* Ensure sliders fill the visual card */
 .grid-card-visual .card__image-slider {
     height: 100% !important;
+    width: 100%;
     /* Restore height for slider */
     border-radius: 28px;
+}
+
+
+.grid-card-visual .card__image-track {
+    display: flex;
+    height: 100%;
+    width: 400%;
+    /* 4 slides */
+    animation: scroll-paused 12s ease-in-out infinite;
+}
+
+.grid-card-visual .card__image-track img {
+    width: 25%;
+    /* 1/4 of track */
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Hover state for the visual card */
@@ -1485,6 +1514,16 @@ body {
     display: block;
     margin-bottom: 12px;
     transition: all 0.3s ease;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.footer__links ul li {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
 }
 
 .footer__link:hover {
@@ -1579,6 +1618,25 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Dark Mode Override for Mobile Menu */
+@media (max-width: 1024px) {
+    [data-theme="dark"] .header__nav {
+        background: #000000;
+        /* Force black background in dark mode */
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+
+}
+
+/* Force Pitch Black sections GLOBALLY */
+[data-theme="dark"] .section--light-bg {
+    background-color: transparent !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    backdrop-filter: none !important;
 }
 
 

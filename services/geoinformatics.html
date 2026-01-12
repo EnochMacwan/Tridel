@@ -67,56 +67,50 @@
     </header>
 
     <main id="main-content">
-        <section class="page-header" style="background: transparent; padding-top: 120px; padding-bottom: 40px;">
-            <div class="hero__bg"><canvas id="hero-canvas"></canvas></div>
-            <div class="container">
-                <h1 class="page-header__title" style="color: var(--color-text-main);">GeoInformatics (GIS)</h1>
-                <p class="page-header__subtitle"
-                    style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
-                    Advanced geospatial data management and custom GIS solutions.
-                </p>
-            </div>
-        </section>
-
         <section class="section">
             <div class="container">
                 <div class="detail-layout">
-                    <div class="detail-layout__image">
-                        <div class="product-gallery">
-                            <div class="gallery-main" style="cursor: default;">
-                                <img alt="GeoInformatics" id="mainImage"
-                                    src="../assets/images/services/electronic-maps.png" />
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Content Left -->
                     <div class="detail-layout__content">
-                        <h2 class="detail-layout__title">
-                            Service Overview
-                        </h2>
+                        <h1 class="detail-layout__title">
+                            GeoInformatics (GIS)
+                        </h1>
                         <p class="detail-layout__description">
                             We transform complex spatial data into intuitive visual insights. Our GeoInformatics
                             services range from enterprise GIS implementation to custom application development, helping
                             clients manage, analyze, and display their geospatial assets effectively.
                         </p>
-                        <div class="product-features">
-                            <h3 class="product-features__title">
-                                Key Capabilities
-                            </h3>
-                            <ul class="product-features__list">
-                                <li>Enterprise GIS Implementation</li>
-                                <li>Custom GIS Application Development</li>
-                                <li>Data Integration & Transformation</li>
-                                <li>Spatial Analysis & Modeling</li>
-                                <li>Web/Mobile GIS Solutions</li>
-                            </ul>
+
+                        <h3>Key Capabilities</h3>
+                        <ul class="detail-layout__list">
+                            <li><strong>Enterprise GIS Implementation</strong></li>
+                            <li><strong>Custom GIS Application Development</strong></li>
+                            <li><strong>Data Integration & Transformation</strong></li>
+                            <li><strong>Spatial Analysis & Modeling</strong></li>
+                            <li><strong>Web/Mobile GIS Solutions</strong></li>
+                        </ul>
+
+                        <div class="product-actions">
+                            <a class="button button--primary" href="../contact.html">Request Service</a>
+                            <a href="../services.html" class="button button--soft">Back to Services</a>
                         </div>
-                        <div class="detail-actions">
-                            <a class="button button--primary" href="../contact.html">
-                                Request Service
-                            </a>
-                            <a class="button button--secondary" href="../services.html">
-                                Back to Services
-                            </a>
+                    </div>
+
+                    <!-- Image Right -->
+                    <div class="detail-layout__image">
+                        <div class="product-gallery">
+                            <div class="gallery-main" onclick="openLightbox(this)">
+                                <img id="main-product-image" src="../assets/images/services/electronic-maps.png"
+                                    alt="GeoInformatics Service"
+                                    style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
+                                <div class="enlarge-hint">
+                                    <svg fill="none" height="16" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" width="16">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                                    </svg>
+                                    Click to Enlarge
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
