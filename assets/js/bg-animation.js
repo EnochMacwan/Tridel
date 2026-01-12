@@ -14,8 +14,8 @@ let mouseHasMoved = false;
 // Configuration
 const config = {
     colors: {
-        accent: '#4285F4',
-        accentGlow: 'rgba(66, 133, 244, 0.4)',
+        accent: '#00AAE7',
+        accentGlow: 'rgba(0, 170, 231, 0.4)',
         bg: '#050505',
         text: '#ffffff'
     }
@@ -75,9 +75,9 @@ function resize() {
    ========================================= */
 function initHome() {
     waves = [
-        { y: height * 0.75, length: 0.01, amplitude: 15, speed: 0.02, color: 'rgba(66, 133, 244, 0.1)' },
-        { y: height * 0.75, length: 0.006, amplitude: 20, speed: 0.015, color: 'rgba(66, 133, 244, 0.2)' },
-        { y: height * 0.75, length: 0.003, amplitude: 25, speed: 0.01, color: 'rgba(138, 180, 248, 0.3)' }
+        { y: height * 0.75, length: 0.01, amplitude: 15, speed: 0.02, color: 'rgba(0, 170, 231, 0.1)' },
+        { y: height * 0.75, length: 0.006, amplitude: 20, speed: 0.015, color: 'rgba(0, 170, 231, 0.2)' },
+        { y: height * 0.75, length: 0.003, amplitude: 25, speed: 0.01, color: 'rgba(51, 187, 236, 0.3)' }
     ];
 
     // Math Particles
@@ -240,7 +240,7 @@ function animateHome() {
 function initUniform() {
     particles = [];
     const count = Math.floor(width / 15); // Higher density confetti
-    const colors = ['#4285F4', '#8AB4F8', '#1967D2', '#D2E3FC']; // Google Blue Spectrum
+    const colors = ['#00AAE7', '#33BBEC', '#FF7F00', '#FFA040']; // Tridel Blue & Orange Spectrum
 
     // FORCE Clear Background (Fix for "Still Not White" issue)
     const bgDiv = document.querySelector('.hero__bg');
