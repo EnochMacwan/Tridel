@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Card Design Concepts</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Inter', sans-serif;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 60px;
+            color: #333;
+        }
+
+        section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #555;
+            border-left: 5px solid #00AAE7;
+            padding-left: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        /* CONCEPT 1: NEON TECH */
+        .card-neon {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-neon:hover {
+            border-color: #00AAE7;
+            box-shadow: 0 0 20px rgba(0, 170, 231, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .card-neon iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        /* CONCEPT 2: ELEGANT ACCENT */
+        .card-elegant {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            border-bottom: 4px solid #ccc;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-elegant:hover {
+            border-bottom-color: #FF7F00;
+            /* Tridel Orange */
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-elegant iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        /* CONCEPT 3: INSET FRAME */
+        .card-inset {
+            border-radius: 20px;
+            padding: 12px;
+            background: #fff;
+            /* or dark grey */
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05), 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card-inset:hover {
+            background: #f0f8ff;
+            /* Light blue tint */
+            padding: 8px;
+            /* Smooth shrink effect? No, simple color shift */
+            box-shadow: inset 0 0 0 2px #00AAE7, 0 15px 40px rgba(0, 170, 231, 0.15);
+        }
+
+        .card-inset iframe {
+            width: 100%;
+            height: 480px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Design Concepts for LinkedIn Cards</h1>
+
+    <!-- Concept 1 -->
+    <section>
+        <h2 class="section-title">Concept 1: Neon Tech (High-Tech, User-Aware)</h2>
+        <div class="grid-4">
+            <div class="card-neon"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600"
+                    title="Post 1"></iframe></div>
+            <div class="card-neon"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7414735364030164992"
+                    title="Post 2"></iframe></div>
+            <div class="card-neon"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7404381845112741888"
+                    title="Post 3"></iframe></div>
+            <div class="card-neon"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7398916570242158592"
+                    title="Post 4"></iframe></div>
+        </div>
+    </section>
+
+    <!-- Concept 2 -->
+    <section>
+        <h2 class="section-title">Concept 2: Elegant Accent (Corporate, Clean)</h2>
+        <div class="grid-4">
+            <div class="card-elegant"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600"
+                    title="Post 1"></iframe></div>
+            <div class="card-elegant"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7414735364030164992"
+                    title="Post 2"></iframe></div>
+            <div class="card-elegant"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7404381845112741888"
+                    title="Post 3"></iframe></div>
+            <div class="card-elegant"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7398916570242158592"
+                    title="Post 4"></iframe></div>
+        </div>
+    </section>
+
+    <!-- Concept 3 -->
+    <section>
+        <h2 class="section-title">Concept 3: Inset Frame (Depth, Tactile)</h2>
+        <div class="grid-4">
+            <div class="card-inset"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600"
+                    title="Post 1"></iframe></div>
+            <div class="card-inset"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7414735364030164992"
+                    title="Post 2"></iframe></div>
+            <div class="card-inset"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7404381845112741888"
+                    title="Post 3"></iframe></div>
+            <div class="card-inset"><iframe
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7398916570242158592"
+                    title="Post 4"></iframe></div>
+        </div>
+    </section>
+
+</body>
+
+</html>

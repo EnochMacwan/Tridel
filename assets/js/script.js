@@ -79,9 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 id: 'india',
-                name: 'Tridel Technologies Pvt Ltd',
+                name: 'Tridel Technologies Pvt Ltd (Chennai)',
                 address: 'No 10/1, 2nd Street, Thirumurugan Nagar, Arcot Road, Porur, Chennai, TN 600116',
                 coords: [13.0371328, 80.1607926]
+            },
+            {
+                id: 'india-vadodara',
+                name: 'Tridel Vadodara',
+                address: '<strong>Vadodara Factory:</strong><br>Block No. 680 / Plot No. 2, Shah Industrial Estate-2, Lamdapura Road, Manjusar, Savli, Vadodara, Gujarat – 390025<br><br><strong>Vadodara Office:</strong><br>76, Swaminarayan Nagar, Nizampura, Vadodara, Gujarat – 390002',
+                coords: [22.3824, 73.2144]
             },
             {
                 id: 'australia',
