@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Impact Map - Refined</title>
+    <link href="assets/css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #001220;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #map-container {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        #map-hero {
+            height: 100%;
+            width: 100%;
+        }
+
+        #sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .header-content {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .header-content h1 {
+            font-size: 1.8rem;
+            color: #001220;
+            margin-bottom: 10px;
+        }
+
+        .header-content p {
+            color: #666;
+            margin: 0;
+        }
+
+        /* Testimonial Card Styles */
+        .testimonial-display {
+            opacity: 0;
+            transform: translateX(30px);
+            /* Swipe in from right */
+            transition: all 0.5s ease;
+        }
+
+        .testimonial-display.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .card-logo {
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .card-quote {
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #202124;
+            position: relative;
+        }
+
+        .card-quote::before {
+            content: '“';
+            font-family: serif;
+            font-size: 4rem;
+            color: #00AAE7;
+            opacity: 0.2;
+            position: absolute;
+            top: -40px;
+            left: -20px;
+        }
+
+        .card-author {
+            font-weight: 800;
+            color: #00AAE7;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-role {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            margin-top: 40px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00AAE7;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            #map-container {
+                flex: 1;
+                height: 50vh;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: 50vh;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">← Back to Main</a>
+
+    <div id="map-container">
+        <div id="map-hero"></div>
+    </div>
+
+    <div id="sidebar">
+        <div class="header-content">
+            <h1>Global Client Stories</h1>
+            <p>Exploring our impact across the world.</p>
+        </div>
+
+        <div id="testimonial-content" class="testimonial-display active">
+            <img id="t-logo" src="" alt="Logo" class="card-logo">
+            <p id="t-quote" class="card-quote"></p>
+            <div id="t-author" class="card-author"></div>
+            <div id="t-role" class="card-role"></div>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progress" class="progress-fill"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Init Map
+        const map = L.map('map-hero', { zoomControl: false }).setView([25.0, 55.0], 3);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy;OpenStreetMap, &copy;CartoDB'
+        }).addTo(map);
+
+        // Data - All 14 Testimonials with Coordinates
+        const testimonials = [
+            {
+                lat: 19.0760, lng: 72.8777,
+                name: "Shankar Surveys", location: "Navi Mumbai, India", logo: "testimonial-01.png",
+                quote: "The assistance provided by the team helped us initiate the field programs at Adani Vizhinjam Port with a complete success. We value the support and look forward to our cooperation with Tridel.",
+                author: "Sreenivasan Shankar", role: "Founder & Director"
+            },
+            {
+                lat: 46.8139, lng: -71.2080,
+                name: "Probiosphere", location: "Quebec, Canada", logo: "testimonial-02.png",
+                quote: "The environmental services you are providing are more than essential. If you cannot measure it, you cannot improve it. That is exactly where your collaboration is crucial for us.",
+                author: "Dr. Pierre Naider Fanfan", role: "President and CEO"
+            },
+            {
+                lat: 63.4305, lng: 10.3951,
+                name: "Norseatech", location: "TRØNDELAG, Norway", logo: "testimonial-03.png",
+                quote: "We see potential in our partnership with Tridel Technologies for jointly delivering value added services to the growing aquaculture market in Middle East.",
+                author: "Dr. Rahman Mankettikkara", role: "Director"
+            },
+            {
+                lat: 11.4102, lng: 79.6953,
+                name: "Annamalai University", location: "Tamil Nadu, India", logo: "testimonial-04.png",
+                quote: "I whole heartedly appreciate and congratulate the excellent initiative of Tridel. Hats off to the team with great fire and enthusiasm.",
+                author: "Professor K. Kathiresan", role: "Former Dean & Director"
+            },
+            {
+                lat: -34.9285, lng: 138.6007,
+                name: "Austides Consulting", location: "Adelaide, Australia", logo: "testimonial-05.png",
+                quote: "I have witnessed the growth of Tridel, which I attribute to the hard work of its dynamic team, as well as to the vision of its leadership.",
+                author: "Dr. John Luick", role: "CEO"
+            },
+            {
+                lat: 25.2048, lng: 55.2708,
+                name: "DDCR", location: "Dubai, UAE", logo: "testimonial-06.png",
+                quote: "During the whole study of 'Biodiversity Baseline Survey for Dubai Emirate', Tridel team demonstrated excellent work ethics and professional skills supporting the research activities.",
+                author: "Tamer Khafaga", role: "Conservation Research Manager"
+            },
+            {
+                lat: 15.2993, lng: 74.1240,
+                name: "NIO", location: "Goa, India", logo: "testimonial-07.png",
+                quote: "I must complement the Tridel Management for their striving to be fully committed... the best asset created for Dubai Municipality.",
+                author: "Dr. Ramaiah Nagappa", role: "Former Chief Scientist"
+            },
+            {
+                lat: 30.3165, lng: 78.0322,
+                name: "CEDAR", location: "Dehradun, India", logo: "testimonial-08.png",
+                quote: "My experience working with Tridel Technologies... has been extremely positive. This project has been very challenging... However, the team has been up to the task.",
+                author: "Dr. Ghazala Shahabuddin", role: "Senior Ecologist"
+            },
+            {
+                lat: 25.276987, lng: 55.296249, // Dubai Municipality (Slight offset for visual separation)
+                name: "Dubai Municipality", location: "Dubai, UAE", logo: "testimonial-09.png",
+                quote: "Tridel Technologies has delivered high quality projects which enabled them to gain Dubai Municipality’s trust.",
+                author: "Hind Mahmoud Mahaba", role: "Head of EPSS"
+            },
+            {
+                lat: 25.1124, lng: 55.1390,
+                name: "Nakheel", location: "Palm Jumeirah, Dubai", logo: "testimonial-10.png",
+                quote: "I really appreciate the efforts of your team members, who have worked day and night to make our valuable tenants happy.",
+                author: "Kumar Giri", role: "Facilities Supervisor"
+            },
+            {
+                lat: 24.4539, lng: 54.3773,
+                name: "NMDC", location: "Abu Dhabi, UAE", logo: "testimonial-11.png",
+                quote: "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation. Best wishes to the Tridel team.",
+                author: "Firman Christopherus Minar", role: "Area Survey Manager"
+            },
+            {
+                lat: 25.3463, lng: 55.4209,
+                name: "EPAA", location: "Sharjah, UAE", logo: "testimonial-12.png",
+                quote: "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental and ecological data.",
+                author: "Dr. Osama M Wahba", role: "Environmental Specialist"
+            },
+            {
+                lat: 25.0657, lng: 55.1713, // Jebel Ali / Vibrocomp approximate
+                name: "Vibrocomp", location: "Dubai, UAE", logo: "testimonial-13.png",
+                quote: "I continue to be impressed with their skills and professionalism. Our collaboration has always been smooth and very effective.",
+                author: "Dr. Tijana Kosanic", role: "Head of Environment"
+            },
+            {
+                lat: 24.9857, lng: 55.0712,
+                name: "ENOC", location: "Jebel Ali, Dubai", logo: "testimonial-14.png",
+                quote: "We are satisfied by the services offered by M/s Tridel. The odour monitoring station supplied meets requirement.",
+                author: "Pawan Rai", role: "EHS Manager"
+            }
+        ];
+
+        // Sort Testimonials by Longitude (West to East)
+        testimonials.sort((a, b) => a.lng - b.lng);
+
+        // State
+        let currentIndex = 0;
+        let isPaused = false;
+        let timer;
+        let indicators = [];
+        let markers = [];
+        const duration = 3000; // 3 seconds
+        let progressInterval;
+        let startTime;
+
+        // Custom Icon - Dropper Style
+        const iconNormal = L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="
+                width: 24px; 
+                height: 24px; 
+                background: #00AAE7; 
+                border-radius: 50% 50% 50% 0; 
+                transform: rotate(-45deg);
+                border: 2px solid white;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                display: flex; align-items: center; justify-content: center;
+                margin-top: -34px; margin-left: -12px;">
+                <div style="width: 8px; height: 8px; background: white; border-radius: 50%; transform: rotate(45deg);"></div>
+            </div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        const iconActive = L.divIcon({
+            className: 'custom-pin-active',
+            html: `<div style="
+                width: 36px; 
+                height: 36px; 
+                background: white; 
+                border-radius: 50% 50% 50% 0; 
+                transform: rotate(-45deg);
+                border: 4px solid #00AAE7;
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+                display: flex; align-items: center; justify-content: center;
+                margin-top: -48px; margin-left: -18px; z-index: 1000;">
+                <div style="width: 12px; height: 12px; background: #00AAE7; border-radius: 50%; transform: rotate(45deg);"></div>
+            </div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+        });
+
+        // Initialize Plotting
+        testimonials.forEach((t, index) => {
+            const marker = L.marker([t.lat, t.lng], { icon: iconNormal }).addTo(map);
+            marker.testimonialIndex = index;
+
+            // Hover Events
+            marker.on('mouseover', () => {
+                isPaused = true;
+                showTestimonial(index);
+            });
+
+            marker.on('mouseout', () => {
+                isPaused = false;
+                // Don't auto-advance immediately, let the timer resume or wait for next tick?
+                // Actually, logic says "stop at the pin under cursor". 
+                // So if we mouseout, we should probably resume auto-play from this point or just let the global loop handle it.
+                // Simpler: Set isPaused=true on hover. Set isPaused=false on out.
+                // The global loop checks isPaused.
+            });
+
+            marker.on('click', () => {
+                showTestimonial(index);
+                // Optional: Force jump to this index in the loop
+                currentIndex = index;
+                resetTimer();
+            });
+
+            markers.push(marker);
+        });
+
+        function showTestimonial(index) {
+            const t = testimonials[index];
+            const content = document.getElementById('testimonial-content');
+
+            // Text Update
+            document.getElementById('t-logo').src = `assets/images/testimonials/${t.logo}`;
+            document.getElementById('t-quote').textContent = t.quote;
+            document.getElementById('t-author').textContent = t.author;
+            document.getElementById('t-role').textContent = `${t.role}, ${t.location}`;
+
+            // Map Update
+            markers.forEach((m, i) => {
+                if (i === index) {
+                    m.setIcon(iconActive);
+                    m.setZIndexOffset(1000);
+                } else {
+                    m.setIcon(iconNormal);
+                    m.setZIndexOffset(0);
+                }
+            });
+
+            map.flyTo([t.lat, t.lng], 4, { animate: true, duration: 1.5 });
+        }
+
+        function nextSlide() {
+            if (isPaused) return; // Don't advance if paused
+
+            currentIndex = (currentIndex + 1) % testimonials.length;
+            showTestimonial(currentIndex);
+            resetProgress();
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timer = setInterval(nextSlide, duration);
+            resetProgress();
+        }
+
+        function resetProgress() {
+            const bar = document.getElementById('progress');
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.transition = `width ${duration}ms linear`;
+                bar.style.width = '100%';
+            }, 50);
+        }
+
+        // Start
+        showTestimonial(0);
+        resetTimer();
+
+        // Global Hover Pause on Sidebar too?
+        // Pause on Zoom
+        map.on('zoom', () => {
+            if (map.getZoom() > 4) {
+                isPaused = true;
+                document.getElementById('progress').style.width = '0%';
+            } else {
+                if (!document.querySelector('#sidebar:hover')) {
+                    isPaused = false;
+                }
+            }
+        });
+
+        document.getElementById('sidebar').addEventListener('mouseenter', () => isPaused = true);
+        document.getElementById('sidebar').addEventListener('mouseleave', () => {
+            if (map.getZoom() <= 4) {
+                isPaused = false;
+            }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 5: Client Roster</title>
+    <link href="assets/css/styles.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            color: #333;
+        }
+
+        .roster-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            font-weight: 300;
+            letter-spacing: -1px;
+        }
+
+        .section-title strong {
+            font-weight: 800;
+            color: #00AAE7;
+        }
+
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1px;
+            background: #eee;
+            /* for borders */
+            border: 1px solid #eee;
+        }
+
+        .roster-item {
+            background: white;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 180px;
+        }
+
+        .roster-item:hover {
+            z-index: 10;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
+
+        .roster-logo {
+            max-width: 80%;
+            max-height: 80px;
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .roster-item:hover .roster-logo {
+            filter: grayscale(0);
+            opacity: 1;
+        }
+
+        /* Overlay/Modal for styling */
+        .quote-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+
+        .quote-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .quote-modal {
+            background: white;
+            padding: 60px;
+            max-width: 700px;
+            width: 90%;
+            border-radius: 4px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .quote-overlay.active .quote-modal {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-quote {
+            font-family: 'Georgia', serif;
+            font-size: 1.5rem;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #333;
+        }
+
+        .modal-author {
+            font-weight: 700;
+            color: #00AAE7;
+            font-size: 1.1rem;
+        }
+
+        .modal-role {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            opacity: 0.5;
+            transition: opacity 0.3s
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">← Return</a>
+
+    <div class="roster-section">
+        <h2 class="section-title">Trusted by <strong>Industry Leaders</strong></h2>
+
+        <div class="roster-grid">
+            <!-- Generate items -->
+            <div class="roster-item" onclick="openModal(0)">
+                <img src="assets/images/testimonials/testimonial-09.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(1)">
+                <img src="assets/images/testimonials/testimonial-14.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(2)">
+                <img src="assets/images/testimonials/testimonial-12.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(3)">
+                <img src="assets/images/testimonials/testimonial-11.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(4)">
+                <img src="assets/images/testimonials/testimonial-10.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(5)">
+                <img src="assets/images/testimonials/testimonial-06.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(6)">
+                <img src="assets/images/testimonials/testimonial-13.png" class="roster-logo">
+            </div>
+            <div class="roster-item" onclick="openModal(7)">
+                <img src="assets/images/testimonials/testimonial-07.png" class="roster-logo">
+            </div>
+        </div>
+    </div>
+
+    <div class="quote-overlay" id="overlay" onclick="closeModal(event)">
+        <div class="quote-modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <p class="modal-quote" id="m-quote"></p>
+            <div class="modal-author" id="m-author"></div>
+            <div class="modal-role" id="m-role"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            { q: "Tridel Technologies offers a range of experiences and capabilities and has delivered high-quality projects.", a: "Hind Mahmoud Mahaba", r: "Dubai Municipality" },
+            { q: "We are satisfied by the services offered by M/s Tridel.", a: "Pawan Rai", r: "ENOC Group" },
+            { q: "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental data.", a: "Dr. Osama M Wahba", r: "EPAA Sharjah" },
+            { q: "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation.", a: "Firman Christopherus Minar", r: "NMDC" },
+            { q: "I really appreciate the efforts of your team members, who have worked day and night.", a: "Kumar Giri", r: "Nakheel" },
+            { q: "Tridel team demonstrated excellent work ethics and professional skills supporting research activities.", a: "Tamer Khafaga", r: "DDCR" },
+            { q: "Our collaboration has always been smooth and very effective.", a: "Dr. Tijana Kosanic", r: "Vibrocomp" },
+            { q: "I must complement the Tridel Management for their striving to be fully committed.", a: "Dr. Ramaiah Nagappa", r: "NIO" }
+        ];
+
+        function openModal(idx) {
+            const d = data[idx];
+            document.getElementById('m-quote').innerText = `"${d.q}"`;
+            document.getElementById('m-author').innerText = d.a;
+            document.getElementById('m-role').innerText = d.r;
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>

@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
             htmlElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateIcon(newTheme);
+            
+            // Dispatch a custom event for other components (like the map) to listen to
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
         });
     }
 });

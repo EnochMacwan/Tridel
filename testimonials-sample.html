@@ -5,34 +5,36 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>
-    <title>Tridel Technologies</title>
-    <meta
-      content="Tridel Technologies is a multinational organization in Environmental Industry, specialized in developing end-to-end solutions for Surveying, Monitoring and Mapping through environmental data collection, data management, data analytics, integration with GIS database and developing custom build software and applications."
-      name="description" />
-    <link href="assets/css/styles.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script defer="" src="assets/js/script.js">
-    </script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
-      rel="stylesheet">
-    <style>
-      .map-canvas {
-        height: 460px;
-        width: 100%;
-        border-radius: 16px;
-        overflow: hidden;
-      }
+    TRIDEL | Marine Technology &amp; Environmental Solutions
+  </title>
+  <meta
+    content="Tridel Technologies is a multinational organization in Environmental Industry, specialized in developing end-to-end solutions for Surveying, Monitoring and Mapping through environmental data collection, data management, data analytics, integration with GIS database and developing custom build software and applications."
+    name="description" />
+  <link href="assets/css/styles.css" rel="stylesheet" />
+  <script defer="" src="assets/js/script.js">
+  </script>
+  <script defer="" src="assets/js/bg-animation.js"></script>
+  <link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    .map-canvas {
+      height: 460px;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+    }
 
-      .location-info.is-active {
-        outline: 2px solid #1e90ff;
-        border-radius: 8px;
-      }
-    </style>
+    .location-info.is-active {
+      outline: 2px solid #1e90ff;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 
 <body class="page-home">
@@ -284,31 +286,271 @@
             </div>
           </div>
         </div>
-        <div class="testimonials" style="grid-column: span 2;">
-          <div id="map-container-section">
-            <div id="map-hero-canvas"></div>
-            <div id="map-sidebar">
-              <div class="map-header-content">
-                <h3>Global Client Stories</h3>
-                <p>Exploring our impact across the world.</p>
+        <div class="testimonials">
+          <h2 class="section__title">
+            What Our Clients Say
+          </h2>
+          <div class="testimonial-scroll-container">
+            <!-- 1. Shankar Surveys -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-01.png" alt="Shankar Surveys"
+                  class="testimonial-card__logo">
               </div>
-
-              <div id="map-testimonial-content" class="map-testimonial-display active">
-                <img id="t-logo" src="" alt="Logo" class="map-card-logo">
-                <p id="t-quote" class="map-card-quote"></p>
-                <div id="t-author" class="map-card-author"></div>
-                <div id="t-role" class="map-card-role"></div>
-              </div>
-
-              <div class="map-controls">
-                <button class="map-nav-btn" id="map-prev" aria-label="Previous">←</button>
-                <button class="map-nav-btn" id="map-next" aria-label="Next">→</button>
-              </div>
-
-              <div class="map-progress-bar">
-                <div id="progress" class="map-progress-fill"></div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "The assistance provided by the team helped us initiate the field programs at Adani Vizhinjam Port
+                  with a complete success. We value the support and look forward to our cooperation with Tridel on
+                  similar large environmental monitoring and survey programs."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Sreenivasan Shankar</p>
+                  <p class="testimonial-author-title">Founder & Director<br>Shankar Surveys,<br>Navi Mumbai, India</p>
+                </div>
               </div>
             </div>
+
+            <!-- 2. Probiosphere -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-02.png" alt="Probiosphere"
+                  class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I really appreciate the work you are doing, and the environmental services you are providing to your
+                  community are more than essential. There is a saying: if you cannot measure it, you cannot improve it.
+                  That is exactly where your collaboration is crucial for us."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Pierre Naider Fanfan</p>
+                  <p class="testimonial-author-title">President and CEO<br>Probiosphere Inc.<br>Quebec, Canada</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Norseatech -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-03.png" alt="Norseatech"
+                  class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "We see potential in our partnership with Tridel Technologies for jointly delivering value added
+                  services to the growing aquaculture market in Middle East."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Rahman Mankettikkara</p>
+                  <p class="testimonial-author-title">Director<br>Norseatech AS<br>TRØNDELAG, Norway</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Tridel (Kathiresan) -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-04.png" alt="Annamalai University"
+                  class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I whole heartedly appreciate and congratulate the excellent initiative of Tridel. Hats off to the
+                  team with great fire and enthusiasm."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Professor K. Kathiresan</p>
+                  <p class="testimonial-author-title">Former Dean and Director,<br>CAS in Marine Biology, Annamalai
+                    University<br>Tamil Nadu, India</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. Austides -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-05.png" alt="Austides Consulting"
+                  class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I saw the potential in Tridel and have been in cooperation since its inception in 2015... I have
+                  witnessed the growth of Tridel, which I attribute to the hard work of its dynamic team, as well as to
+                  the vision of its leadership. Keep up the great work."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. John Luick</p>
+                  <p class="testimonial-author-title">CEO<br>Austides Consulting<br>Australia</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. DDCR -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-06.png" alt="DDCR" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "During the whole study of 'Biodiversity Baseline Survey for Dubai Emirate', Tridel team demonstrated
+                  excellent work ethics and professional skills that supported the research activities."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Tamer Khafaga</p>
+                  <p class="testimonial-author-title">Regional Chair for West Asia, CEM-IUCN<br>Conservation Research
+                    Manager,<br>DDCR, Dubai, U.A.E.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. NIO -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-07.png" alt="NIO" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I must complement the Tridel Management for their striving to be fully committed to facilitate the
+                  project team to conduct the surveys, analyses and report preparations... the best asset created for
+                  Dubai Municipality."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Ramaiah Nagappa</p>
+                  <p class="testimonial-author-title">Former Chief Scientist and Professor AcSIR,<br>National Institute
+                    of Oceanography,<br>Goa, India</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 8. CEDAR -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-08.png" alt="CEDAR" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "My experience working with Tridel Technologies as well as the appointed project team... has been
+                  extremely positive. This project has been very challenging... However, both the Management as well as
+                  the field project team have been up to the task."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Ghazala Shahabuddin</p>
+                  <p class="testimonial-author-title">Senior Ecologist,<br>CEDAR,<br>Govt. of India</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 9. Dubai Municipality -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-09.png" alt="Dubai Municipality"
+                  class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "Tridel Technologies offers range of experiences and capabilities and has delivered high quality
+                  projects which enabled them to gain Dubai Municipality’s trust. In addition to the exceptional
+                  communication and support, Tridel Technologies offers a wide range of technological advancements."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Hind Mahmoud Mahaba</p>
+                  <p class="testimonial-author-title">Head of Environmental Planning and Studies (EPSS)<br>Dubai
+                    Municipality-Environment Department</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 10. Nakheel -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-10.png" alt="Nakheel" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I am writing you today to say thank you for your project attendance at work... I really appreciate
+                  the efforts of your team members, who have worked day and night to make our valuable tenants happy.
+                  Thank you for all that you do for Palm Jumeirah."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Kumar Giri</p>
+                  <p class="testimonial-author-title">Facilities Supervisor<br>Nakheel Community Planning & Management
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 11. NMDC -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-11.png" alt="NMDC" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation. Best
+                  wishes to the Tridel team."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Firman Christopherus Minar</p>
+                  <p class="testimonial-author-title">Area Survey Manager<br>National Marine Dredging Company
+                    (NMDC)<br>Abu Dhabi, U.A.E.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 12. EPAA -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-12.png" alt="EPAA" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "we see Tridel eSpecia GIS application as an efficient platform for collating and managing
+                  environmental and ecological data and thereby selected for implementing the monitoring system for Sir
+                  Bo Naair Island Protected Area."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Osama M Wahba</p>
+                  <p class="testimonial-author-title">Environmental Specialist<br>Environment and Protected Areas
+                    Authority (EPAA)<br>Sharjah, U.A.E.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 13. Vibrocomp -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-13.png" alt="Vibrocomp" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "I have come to know TRIDEL TECHNOLOGIES through our affiliation with Dubai Municipality... I continue
+                  to be impressed with their skills and professionalism. Our collaboration has always been smooth and
+                  very effective."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Dr. Tijana Kosanic</p>
+                  <p class="testimonial-author-title">Head of Environment<br>VIBROCOMP ME FZCO, Dubai, U.A.E.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 14. ENOC -->
+            <div class="testimonial-card">
+              <div class="testimonial-card__header">
+                <img src="assets/images/testimonials/testimonial-14.png" alt="ENOC" class="testimonial-card__logo">
+              </div>
+              <div class="testimonial-card__content">
+                <p class="testimonial-card__quote">
+                  "M/s Tridel supplied and installed odour monitoring station at our premises in Jebel Ali... We are
+                  satisfied by the services offered by M/s Tridel."
+                </p>
+                <div class="testimonial-card__author-info">
+                  <p class="testimonial-author-name">Pawan Rai</p>
+                  <p class="testimonial-author-title">EHS and BE Manager<br>Emirates Gas LLC – Member of ENOC Group</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -501,259 +743,10 @@
       </div>
     </div>
   </footer>
+  <script crossorigin="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
   <script src="assets/js/theme-toggle.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    // Map Testimonial Logic
-    document.addEventListener('DOMContentLoaded', function () {
-      const mapEl = document.getElementById('map-hero-canvas');
-      if (!mapEl) return;
-
-      // Enable Zoom Control (+/- buttons)
-      const map = L.map('map-hero-canvas', { zoomControl: true }).setView([25.0, 55.0], 3);
-
-      // Move zoom control to bottom right to avoid blocking pins
-      map.zoomControl.setPosition('bottomright');
-
-      // Map Layers
-      const lightTiles = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-      const darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-      let tileLayer = L.tileLayer(lightTiles, {
-        attribution: '&copy;OpenStreetMap, &copy;CartoDB'
-      }).addTo(map);
-
-      let geoJsonLayer = null;
-
-      // Function to update map style based on theme
-      function updateMapTheme(theme) {
-        const isDark = theme === 'dark';
-        const newUrl = isDark ? darkTiles : lightTiles;
-        tileLayer.setUrl(newUrl);
-
-        const container = document.getElementById('map-container-section');
-        if (container) {
-          container.style.background = isDark ? '#001220' : '#f8f9fa';
-          container.style.color = isDark ? 'white' : '#333';
-        }
-
-        if (geoJsonLayer) {
-          geoJsonLayer.setStyle({
-            color: isDark ? '#4a4a4a' : '#cbd5e0', // Subtle light grey for dark mode, subtle dark grey for light mode
-            weight: 1.5,
-            opacity: 0.8
-          });
-        }
-      }
-
-      // Initial Theme Check
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-      updateMapTheme(currentTheme);
-
-      // Listen for Theme Changes
-      window.addEventListener('themeChanged', (e) => {
-        updateMapTheme(e.detail.theme);
-      });
-
-      // Overlay Official India Boundary (Survey of India Compliant)
-      fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')
-        .then(response => response.json())
-        .then(data => {
-          geoJsonLayer = L.geoJSON(data, {
-            style: {
-              color: "#cbd5e0",    // Initial default (light mode compliant)
-              weight: 1.5,         // Thinner, "normal" lines
-              opacity: 0.8,
-              fillOpacity: 0
-            }
-          }).addTo(map);
-
-          // Apply correct style immediately after loading based on current theme
-          const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
-          updateMapTheme(activeTheme);
-        })
-        .catch(err => console.log('Error loading India GeoJSON:', err));
-
-      const testimonials = [
-        { lat: 19.0760, lng: 72.8777, name: "Shankar Surveys", location: "Navi Mumbai, India", logo: "testimonial-01.png", quote: "The assistance provided by the team helped us initiate the field programs at Adani Vizhinjam Port with a complete success. We value the support and look forward to our cooperation with Tridel.", author: "Sreenivasan Shankar", role: "Founder & Director" },
-        { lat: 46.8139, lng: -71.2080, name: "Probiosphere", location: "Quebec, Canada", logo: "testimonial-02.png", quote: "The environmental services you are providing are more than essential. If you cannot measure it, you cannot improve it. That is exactly where your collaboration is crucial for us.", author: "Dr. Pierre Naider Fanfan", role: "President and CEO" },
-        { lat: 63.4305, lng: 10.3951, name: "Norseatech", location: "TRØNDELAG, Norway", logo: "testimonial-03.png", quote: "We see potential in our partnership with Tridel Technologies for jointly delivering value added services to the growing aquaculture market in Middle East.", author: "Dr. Rahman Mankettikkara", role: "Director" },
-        { lat: 11.4102, lng: 79.6953, name: "Annamalai University", location: "Tamil Nadu, India", logo: "testimonial-04.png", quote: "I whole heartedly appreciate and congratulate the excellent initiative of Tridel. Hats off to the team with great fire and enthusiasm.", author: "Professor K. Kathiresan", role: "Former Dean & Director" },
-        { lat: -34.9285, lng: 138.6007, name: "Austides Consulting", location: "Adelaide, Australia", logo: "testimonial-05.png", quote: "I have witnessed the growth of Tridel, which I attribute to the hard work of its dynamic team, as well as to the vision of its leadership.", author: "Dr. John Luick", role: "CEO" },
-        { lat: 25.2048, lng: 55.2708, name: "DDCR", location: "Dubai, UAE", logo: "testimonial-06.png", quote: "During the whole study of 'Biodiversity Baseline Survey for Dubai Emirate', Tridel team demonstrated excellent work ethics and professional skills supporting the research activities.", author: "Tamer Khafaga", role: "Conservation Research Manager" },
-        { lat: 15.2993, lng: 74.1240, name: "NIO", location: "Goa, India", logo: "testimonial-07.png", quote: "I must complement the Tridel Management for their striving to be fully committed... the best asset created for Dubai Municipality.", author: "Dr. Ramaiah Nagappa", role: "Former Chief Scientist" },
-        { lat: 30.3165, lng: 78.0322, name: "CEDAR", location: "Dehradun, India", logo: "testimonial-08.png", quote: "My experience working with Tridel Technologies... has been extremely positive. This project has been very challenging... However, the team has been up to the task.", author: "Dr. Ghazala Shahabuddin", role: "Senior Ecologist" },
-        { lat: 25.276987, lng: 55.296249, name: "Dubai Municipality", location: "Dubai, UAE", logo: "testimonial-09.png", quote: "Tridel Technologies has delivered high quality projects which enabled them to gain Dubai Municipality’s trust.", author: "Hind Mahmoud Mahaba", role: "Head of EPSS" },
-        { lat: 25.1124, lng: 55.1390, name: "Nakheel", location: "Palm Jumeirah, Dubai", logo: "testimonial-10.png", quote: "I really appreciate the efforts of your team members, who have worked day and night to make our valuable tenants happy.", author: "Kumar Giri", role: "Facilities Supervisor" },
-        { lat: 24.4539, lng: 54.3773, name: "NMDC", location: "Abu Dhabi, UAE", logo: "testimonial-11.png", quote: "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation. Best wishes to the Tridel team.", author: "Firman Christopherus Minar", role: "Area Survey Manager" },
-        { lat: 25.3463, lng: 55.4209, name: "EPAA", location: "Sharjah, UAE", logo: "testimonial-12.png", quote: "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental and ecological data.", author: "Dr. Osama M Wahba", role: "Environmental Specialist" },
-        { lat: 25.0657, lng: 55.1713, name: "Vibrocomp", location: "Dubai, UAE", logo: "testimonial-13.png", quote: "I continue to be impressed with their skills and professionalism. Our collaboration has always been smooth and very effective.", author: "Dr. Tijana Kosanic", role: "Head of Environment" },
-        { lat: 24.9857, lng: 55.0712, name: "ENOC", location: "Jebel Ali, Dubai", logo: "testimonial-14.png", quote: "We are satisfied by the services offered by M/s Tridel. The odour monitoring station supplied meets requirement.", author: "Pawan Rai", role: "EHS Manager" }
-      ];
-
-      testimonials.sort((a, b) => a.lng - b.lng);
-
-      const iconNormal = L.divIcon({
-        className: 'custom-pin',
-        html: `<div style="
-                  width: 24px;
-                  height: 24px;
-                  background: #00AAE7;
-                  border-radius: 50% 50% 50% 0;
-                  transform: rotate(-45deg);
-                  border: 2px solid white;
-                  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                  display: flex; align-items: center; justify-content: center;
-                  margin-top: -34px; margin-left: -12px;">
-                  <div style="width: 8px; height: 8px; background: white; border-radius: 50%; transform: rotate(45deg);"></div>
-              </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
-
-      const iconActive = L.divIcon({
-        className: 'custom-pin-active',
-        html: `<div style="
-                  width: 36px;
-                  height: 36px;
-                  background: white;
-                  border-radius: 50% 50% 50% 0;
-                  transform: rotate(-45deg);
-                  border: 4px solid #00AAE7;
-                  box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
-                  display: flex; align-items: center; justify-content: center;
-                  margin-top: -48px; margin-left: -18px; z-index: 1000;">
-                  <div style="width: 12px; height: 12px; background: #00AAE7; border-radius: 50%; transform: rotate(45deg);"></div>
-              </div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
-      });
-
-      let markers = [];
-      testimonials.forEach((t, index) => {
-        const marker = L.marker([t.lat, t.lng], { icon: iconNormal }).addTo(map);
-        marker.index = index;
-        marker.on('mouseover', () => {
-          if (!isManualInteraction) { isPaused = true; showTestimonial(index); }
-        });
-        marker.on('mouseout', () => {
-          if (!isManualInteraction) { isPaused = false; }
-        });
-        marker.on('click', () => {
-          isManualInteraction = true; // Stop auto-play permanently on click
-          showTestimonial(index);
-          currentIndex = index;
-          stopTimer();
-        });
-        markers.push(marker);
-      });
-
-      let currentIndex = 0;
-      let isPaused = false;
-      let isManualInteraction = false;
-      let timer;
-      const duration = 5000; // 5 Seconds
-
-      function showTestimonial(index) {
-        const t = testimonials[index];
-        const content = document.getElementById('map-testimonial-content');
-
-        // Force reflow for animation
-        content.classList.remove('active');
-        void content.offsetWidth;
-
-        document.getElementById('t-logo').src = 'assets/images/testimonials/' + t.logo;
-        document.getElementById('t-quote').textContent = t.quote;
-        document.getElementById('t-author').textContent = t.author;
-        document.getElementById('t-role').textContent = t.role + ', ' + t.location;
-        content.classList.add('active');
-
-        markers.forEach((m, i) => {
-          if (i === index) { m.setIcon(iconActive); m.setZIndexOffset(1000); }
-          else { m.setIcon(iconNormal); m.setZIndexOffset(0); }
-        });
-
-        map.flyTo([t.lat, t.lng], 4, { animate: true, duration: 2 });
-      }
-
-      function nextSlide() {
-        if (isPaused || isManualInteraction) return;
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        showTestimonial(currentIndex);
-        resetProgress();
-      }
-
-      function resetTimer() {
-        stopTimer();
-        timer = setInterval(nextSlide, duration);
-        resetProgress();
-      }
-
-      function stopTimer() {
-        clearInterval(timer);
-        document.getElementById('progress').style.width = '0%';
-      }
-
-      function resetProgress() {
-        const bar = document.getElementById('progress');
-        bar.style.transition = 'none';
-        bar.style.width = '0%';
-        setTimeout(() => {
-          if (!isPaused && !isManualInteraction) {
-            bar.style.transition = 'width ' + duration + 'ms linear';
-            bar.style.width = '100%';
-          }
-        }, 50);
-      }
-
-      // Navigation Buttons
-      document.getElementById('map-prev').addEventListener('click', () => {
-        isManualInteraction = true;
-        stopTimer();
-        currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
-        showTestimonial(currentIndex);
-      });
-
-      document.getElementById('map-next').addEventListener('click', () => {
-        isManualInteraction = true;
-        stopTimer();
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        showTestimonial(currentIndex);
-      });
-
-      document.getElementById('map-sidebar').addEventListener('mouseenter', () => isPaused = true);
-      document.getElementById('map-sidebar').addEventListener('mouseleave', () => {
-        // Only resume if map is zoomed out and no manual interaction occurred
-        if (map.getZoom() <= 4 && !isManualInteraction) {
-          isPaused = false;
-          resetTimer(); // Resume timer
-        }
-      });
-
-      // Pause on Zoom
-      map.on('zoom', () => {
-        if (map.getZoom() > 4) {
-          isPaused = true;
-          stopTimer();
-        } else {
-          // Only resume if not hovering and no manual interaction
-          if (!document.querySelector('#map-sidebar:hover') && !isManualInteraction) {
-            isPaused = false;
-            resetTimer();
-          }
-        }
-      });
-
-      // Pause on Drag
-      map.on('dragstart', () => {
-        isManualInteraction = true;
-        stopTimer();
-      });
-
-      showTestimonial(0);
-      resetTimer();
-    });
-  </script>
 </body>
 
 </html>
