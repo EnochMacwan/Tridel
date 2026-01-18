@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 4: Data Earth | Tridel</title>
+    <link rel="stylesheet" href="../assets/css/sample-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Globe GL -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            z-index: 10;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .hero-text {
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--color-accent);
+            margin-bottom: 5px;
+        }
+
+        .stat-item span {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-btn {
+            pointer-events: auto;
+            display: inline-block;
+            background: white;
+            color: black;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: var(--color-accent);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Samples</a>
+
+    <div class="sample-nav">
+        <a href="concept1-depth.html">Depth Journey</a>
+        <a href="concept2-control.html">Mission Control</a>
+        <a href="concept3-lab.html">Tridel Lab</a>
+        <a href="concept4-globe.html" class="active">Data Earth</a>
+    </div>
+
+    <div class="overlay">
+        <div class="hero-text">
+            <h1>Global<br>Impact.</h1>
+            <p>Tridel technologies are deployed in 12 countries, monitoring oceans across 3 continents.</p>
+            <a href="#" class="cta-btn">View Case Studies</a>
+
+            <div class="stat-row">
+                <div class="stat-item">
+                    <h3>120+</h3>
+                    <span>Deployments</span>
+                </div>
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <span>Monitoring</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globeViz"></div>
+
+    <script>
+        // Sample Data: Tridel Locations
+        const places = [
+            { name: "Gujarat HQ", lat: 21.1702, lng: 72.8311, size: 1.0 }, // Surat (Approx)
+            { name: "Mumbai High", lat: 19.0760, lng: 72.8777, size: 0.6 },
+            { name: "Bay of Bengal", lat: 15.0, lng: 88.0, size: 0.6 },
+            { name: "Andaman Sea", lat: 10.0, lng: 93.0, size: 0.6 },
+            { name: "Dubai, UAE", lat: 25.2048, lng: 55.2708, size: 0.6 },
+            { name: "Singapore", lat: 1.3521, lng: 103.8198, size: 0.6 },
+            { name: "Maldives", lat: 3.2028, lng: 73.2207, size: 0.6 }
+        ];
+
+        // Draw Globe
+        const world = Globe()
+            (document.getElementById('globeViz'))
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+            .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+            .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+            .pointsData(places)
+            .pointAltitude(0.1)
+            .pointColor(() => '#00AAE7')
+            .pointRadius(0.5)
+            .pointLabel('name')
+            .arcsData([
+                // Curves from HQ to other spots
+                { startLat: 21.1702, startLng: 72.8311, endLat: 25.2048, endLng: 55.2708, color: '#FFFFFF' }, // To Dubai
+                { startLat: 21.1702, startLng: 72.8311, endLat: 1.3521, endLng: 103.8198, color: '#FFFFFF' }, // To Singapore
+                { startLat: 21.1702, startLng: 72.8311, endLat: 15.0, endLng: 88.0, color: '#FFFFFF' }, // To BoB
+            ])
+            .arcColor('color')
+            .arcDashLength(0.4)
+            .arcDashGap(0.2)
+            .arcDashAnimateTime(2000)
+            .arcStroke(0.5)
+            .atmosphereColor('#00AAE7')
+            .atmosphereAltitude(0.2);
+
+        // Auto-rotate
+        world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.5;
+
+        // Interactive Zoom on Load
+        world.pointOfView({ lat: 20.0, lng: 75.0, altitude: 2.0 });
+
+    </script>
+</body>
+
+</html>

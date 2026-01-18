@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 3: Tridel Lab | Tridel</title>
+    <link rel="stylesheet" href="../assets/css/sample-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1a2a3a 0%, #001220 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .showcase-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Product placeholder since we don't have a 3D model immediately ready */
+        .product-stage {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+        }
+
+        /* Hotspots */
+        .hotspot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 0 0 0 rgba(0, 170, 231, 0.7);
+            animation: pulse-ring 2s infinite;
+        }
+
+        .hotspot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(0, 170, 231, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 15px rgba(0, 170, 231, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(0, 170, 231, 0);
+            }
+        }
+
+        /* Tooltip Card */
+        .spec-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            width: 250px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+        }
+
+        .spec-card.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .spec-card h4 {
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .spec-card p {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        /* UI Controls */
+        .lab-controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: white;
+            color: var(--color-primary);
+        }
+
+        .lab-header {
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .lab-header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .lab-header p {
+            opacity: 0.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Samples</a>
+
+    <div class="sample-nav">
+        <a href="concept1-depth.html">Depth Journey</a>
+        <a href="concept2-control.html">Mission Control</a>
+        <a href="concept3-lab.html" class="active">Tridel Lab</a>
+        <a href="concept4-globe.html">Data Earth</a>
+    </div>
+
+    <div class="lab-header">
+        <h1>Tridel Lab</h1>
+        <p>Interactive engineering showcase. Explore the robust construction of our Coastal Buoys.</p>
+    </div>
+
+    <div class="showcase-container">
+        <!-- Using the Coastal Buoy image available in project -->
+        <div class="product-stage">
+            <img src="../assets/images/products/coastal-buoy/tcb-new.jpg" class="product-image" alt="Coastal Buoy 3D">
+
+            <!-- Interactives -->
+            <div class="hotspot" style="top: 20%; left: 50%;" data-title="Solar Array"
+                data-desc="High-efficiency marine grade solar panels providing continuous power autonomy."></div>
+            <div class="hotspot" style="top: 45%; left: 50%;" data-title="Data Logger Payload"
+                data-desc="Centralised TDL-720 processor with Iridium satellite telemetry module inside IP67 enclosure.">
+            </div>
+            <div class="hotspot" style="top: 70%; left: 50%;" data-title="Polyethylene Hull"
+                data-desc="Rotationally molded UV-stabilized polyethylene, filled with closed-cell foam for unsinkability.">
+            </div>
+
+            <!-- Tooltip Container -->
+            <div id="tooltip" class="spec-card">
+                <h4 id="tt-title">Title</h4>
+                <p id="tt-desc">Description</p>
+            </div>
+        </div>
+
+        <div class="lab-controls">
+            <button class="control-btn" title="Rotate Left"><i class="fas fa-undo"></i></button>
+            <button class="control-btn" title="Rotate Right"><i class="fas fa-redo"></i></button>
+            <button class="control-btn" title="Explode View"><i class="fas fa-layer-group"></i></button>
+            <button class="control-btn" title="Night Mode"><i class="fas fa-adjust"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const hotspots = document.querySelectorAll('.hotspot');
+        const tooltip = document.getElementById('tooltip');
+        const ttTitle = document.getElementById('tt-title');
+        const ttDesc = document.getElementById('tt-desc');
+
+        hotspots.forEach(spot => {
+            spot.addEventListener('mouseenter', (e) => {
+                const title = spot.getAttribute('data-title');
+                const desc = spot.getAttribute('data-desc');
+
+                ttTitle.textContent = title;
+                ttDesc.textContent = desc;
+
+                // Position tooltip near hotspot
+                const rect = spot.getBoundingClientRect();
+                tooltip.style.left = (spot.offsetLeft + 40) + 'px';
+                tooltip.style.top = (spot.offsetTop - 20) + 'px';
+
+                tooltip.classList.add('active');
+            });
+
+            spot.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('active');
+            });
+        });
+    </script>
+
+</body>
+
+</html>

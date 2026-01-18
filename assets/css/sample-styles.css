@@ -1,0 +1,123 @@
+/* Shared Styles for Tridel Flagship Samples */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap');
+
+:root {
+    --color-primary: #002855;
+    --color-primary-dark: #001220;
+    --color-accent: #00AAE7;
+    --color-white: #ffffff;
+    --color-text-dark: #333333;
+    --color-text-light: #f8f9fa;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-primary-dark);
+    color: var(--color-text-light);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    line-height: 1.2;
+}
+
+.sample-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 10px 30px;
+    border-radius: 50px;
+    z-index: 1000;
+    display: flex;
+    gap: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sample-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.sample-nav a:hover,
+.sample-nav a.active {
+    color: var(--color-accent);
+}
+
+.back-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    z-index: 1000;
+}
+
+.back-link:hover {
+    opacity: 1;
+}
+
+/* Utilities */
+.text-accent {
+    color: var(--color-accent);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background: #0088ba;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+}
+
+.btn-outline:hover {
+    background: rgba(0, 170, 231, 0.1);
+}
