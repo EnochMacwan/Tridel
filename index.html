@@ -2,37 +2,36 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>
-    <title>Tridel Technologies</title>
-    <meta
-      content="Tridel Technologies is a multinational organization in Environmental Industry, specialized in developing end-to-end solutions for Surveying, Monitoring and Mapping through environmental data collection, data management, data analytics, integration with GIS database and developing custom build software and applications."
-      name="description" />
-    <link href="assets/css/styles.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script defer="" src="assets/js/script.js">
-    </script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
-      rel="stylesheet">
-    <style>
-      .map-canvas {
-        height: 460px;
-        width: 100%;
-        border-radius: 16px;
-        overflow: hidden;
-      }
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Tridel Technologies</title>
+  <meta
+    content="Tridel Technologies is a multinational organization in Environmental Industry, specialized in developing end-to-end solutions for Surveying, Monitoring and Mapping through environmental data collection, data management, data analytics, integration with GIS database and developing custom build software and applications."
+    name="description">
+  <link href="assets/css/styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script defer src="assets/js/script.js">
+  </script>
+  <script defer src="assets/js/bg-animation.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Outfit:wght@400;500;700;800&amp;display=swap"
+    rel="stylesheet">
+  <style>
+    .map-canvas {
+      height: 460px;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+    }
 
-      .location-info.is-active {
-        outline: 2px solid #1e90ff;
-        border-radius: 8px;
-      }
-    </style>
+    .location-info.is-active {
+      outline: 2px solid #1e90ff;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 
 <body class="page-home">
@@ -44,7 +43,7 @@
   <header class="header">
     <div class="container header__container">
       <a class="header__logo" href="index.html">
-        <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
+        <img alt="Tridel Logo" src="assets/images/logo/tridel.png">
       </a>
       <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
         <ul class="header__nav-list">
@@ -65,20 +64,21 @@
             <div class="mega-menu-container">
               <div class="mega-menu-content">
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-life-ring"></i> Buoys & Floats</span>
+                  <span class="mega-category"><i class="fa-solid fa-life-ring"></i> Platforms: Buoys</span>
                   <ul class="mega-list-small">
                     <li><a href="products/product-coastal-buoy.html">Tridel Coastal Buoys</a></li>
                     <li><a href="products/product-data-buoy.html">Data Buoys</a></li>
                     <li><a href="products/product-nav-buoy.html">Navigation Buoys (AtoN)</a></li>
+                    <li><a href="products/product-wind-farm-buoy.html">Wind Farm (LiDAR) Buoys</a></li>
                     <li><a href="products/product-mooring-buoy.html">Mooring Buoys</a></li>
                     <li><a href="products/product-deepwater-buoy.html">Deepwater Buoys</a></li>
                     <li><a href="products/product-drifter-buoy.html">Drifter Buoys</a></li>
-                    <li><a href="products/product-sub-floats.html">Surface & Sub-Surface Floats</a></li>
+                    <li><a href="products/product-sub-floats.html">Surface &amp; Sub-Surface Floats</a></li>
                   </ul>
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-ship"></i> Vessels & USVs</span>
+                  <span class="mega-category"><i class="fa-solid fa-ship"></i> Platforms: Vessels & ASVs</span>
                   <ul class="mega-list-small">
                     <li><a href="products/product-tridel-ark.html">Tridel Ark</a></li>
                     <li><a href="products/product-monohull-vessel.html">Monohull Vessel</a></li>
@@ -86,12 +86,11 @@
                     <li><a href="products/product-aquilon-5600a.html">Aquilon 5600 (Hybrid)</a></li>
                     <li><a href="products/product-aquilon-8000.html">Aquilon 8000 (Hybrid)</a></li>
                     <li><a href="products/product-tridrone.html">Seafloor TriDrone</a></li>
-                    <li><a href="products/product-hydrocat-550.html">Seafloor HydroCat-550</a></li>
                   </ul>
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-screwdriver-wrench"></i> Equipment</span>
+                  <span class="mega-category"><i class="fa-solid fa-screwdriver-wrench"></i> Platforms: Equipment</span>
                   <ul class="mega-list-small">
                     <li><a href="products/product-tew500.html">TEW500 Compact Winch</a></li>
                     <li><a href="products/product-tew1500.html">TEW1500 Heavy-Duty Winch</a></li>
@@ -101,12 +100,13 @@
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-laptop-code"></i> Software</span>
+                  <span class="mega-category"><i class="fa-solid fa-laptop-code"></i> Software & Integrated</span>
                   <ul class="mega-list-small">
                     <li><a href="products/product-tems.html">TEMS Platform</a></li>
                     <li><a href="products/product-especia.html">eSpecia GIS</a></li>
                     <li><a href="products/product-attide.html">ATtide Analysis</a></li>
                     <li><a href="products/product-t-sms.html">TSMS Management</a></li>
+                    <li><a href="products.html#integrated-solutions">Integrated Solutions</a></li>
                   </ul>
                 </div>
               </div>
@@ -119,42 +119,27 @@
             <div class="mega-menu-container">
               <div class="mega-menu-content">
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-earth-americas"></i> GeoScience</span>
+                  <span class="mega-category"><i class="fa-solid fa-seedling"></i>
+                    Environmental Monitoring</span>
                   <ul class="mega-list-small">
-                    <li><a href="services/geoscience.html">Ecological Baseline Studies</a></li>
-                    <li><a href="services/geoscience.html">Oceanographic Studies</a></li>
-                    <li><a href="services/geoscience.html">Climatology & Hydrology</a></li>
-                    <li><a href="services/geoscience.html">Coastal & Habitat Mapping</a></li>
+                    <li><a href="services/hydrography.html#metocean">MetOcean Monitoring</a></li>
+                    <li><a href="services/atmospheric-noise.html">Atmospheric &amp; Underwater Noise</a>
+                    </li>
+                    <li><a href="services/air-quality.html">Air Quality Monitoring</a></li>
+                    <li><a href="services/water-quality.html">Water Quality Monitoring</a></li>
+                    <li><a href="services/ground-water.html">Ground Water Monitoring</a></li>
                   </ul>
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-water"></i> Hydrography</span>
+                  <span class="mega-category"><i class="fa-solid fa-map-location-dot"></i>
+                    Surveys</span>
                   <ul class="mega-list-small">
                     <li><a href="services/hydrography.html">Bathymetric Surveys</a></li>
-                    <li><a href="services/hydrography.html">Route & Pipeline Inspection</a></li>
-                    <li><a href="services/hydrography.html">Topographic Surveys</a></li>
-                    <li><a href="services/hydrography.html">MetOcean Data Collection</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-map-location-dot"></i> GeoInformatics (GIS)</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/geoinformatics.html">Enterprise GIS Implementation</a></li>
-                    <li><a href="services/geoinformatics.html">Custom GIS Development</a></li>
-                    <li><a href="services/geoinformatics.html">Data Integration</a></li>
-                    <li><a href="services/geoinformatics.html">Spatial Analysis</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-helmet-safety"></i> GeoEngineering</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/geoengineering.html">Coastal Protection</a></li>
-                    <li><a href="services/geoengineering.html">Dredging Support</a></li>
-                    <li><a href="services/geoengineering.html">Underwater Instrumentation</a></li>
-                    <li><a href="services/geoengineering.html">Equipment Rental</a></li>
+                    <li><a href="services/uxo-survey.html">UXO Survey</a></li>
+                    <li><a href="services/geoengineering.html">GeoTechnical Survey</a></li>
+                    <li><a href="services/navigational-charting.html">Navigational Charting</a></li>
+                    <li><a href="services/hydrography.html#topographic">Topographic Survey</a></li>
                   </ul>
                 </div>
               </div>
@@ -178,14 +163,14 @@
         </ul>
       </nav>
       <div class="header__actions">
-        <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+        <button type="button" id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
           style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
           <i class="fas fa-moon"></i>
         </button>
         <a class="button button--primary" href="contact.html">
           Enquire Now
         </a>
-        <button aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation menu"
+        <button type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation menu"
           class="header__menu-toggle" id="menu-toggle">
           <svg class="icon-open" fill="none" height="24" viewbox="0 0 24 24" width="24"
             xmlns="http://www.w3.org/2000/svg">
@@ -230,7 +215,7 @@
           <!-- Card 1: Hardware -->
           <a class="grid-card-wrapper" href="products.html">
             <div class="grid-card-visual">
-              <img alt="Tridel Navigation Buoy" src="assets/images/products/nav-buoy/nav-buoy-new.jpg" />
+              <img alt="Tridel Navigation Buoy" src="assets/images/products/nav-buoy/nav-buoy-new.jpg">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">
@@ -249,7 +234,7 @@
           <!-- Card 2: Software -->
           <a class="grid-card-wrapper" href="products.html">
             <div class="grid-card-visual">
-              <img alt="TEMS Platform" src="assets/images/products/tems/TEMS.jpg" />
+              <img alt="TEMS Platform" src="assets/images/products/tems/TEMS.jpg">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">
@@ -267,7 +252,7 @@
           <!-- Card 3: Success Stories -->
           <a class="grid-card-wrapper" href="success-stories.html">
             <div class="grid-card-visual">
-              <img alt="Hydrographic Survey of Dubai" src="assets/images/projects/project-1.jpg" />
+              <img alt="Hydrographic Survey of Dubai" src="assets/images/projects/project-1.jpg">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">
@@ -286,7 +271,7 @@
           <!-- Card 4: USV -->
           <a class="grid-card-wrapper" href="services.html">
             <div class="grid-card-visual">
-              <img alt="Aquilon 5600 USV" src="assets/images/products/aquilon-5600a/aquilon-5600-new.png" />
+              <img alt="Aquilon 5600 USV" src="assets/images/products/aquilon-5600a/aquilon-5600-new.png">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">
@@ -313,8 +298,8 @@
           <div id="news-feed-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <!-- Post 1 -->
             <div class="news-card">
-              <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600" frameborder="0"
-                allowfullscreen="" title="Tridel Technologies LinkedIn Post 1"></iframe>
+              <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600" allowfullscreen
+                title="Tridel Technologies LinkedIn Post 1"></iframe>
               <div class="news-card__footer">
                 <a href="https://www.linkedin.com/feed/update/urn:li:share:7407035127169433600" target="_blank"
                   class="news-card__button">
@@ -330,7 +315,7 @@
             <!-- Post 2 -->
             <div class="news-card">
               <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7414735364030164992"
-                frameborder="0" allowfullscreen="" title="Tridel Technologies LinkedIn Post 2"></iframe>
+                allowfullscreen title="Tridel Technologies LinkedIn Post 2"></iframe>
               <div class="news-card__footer">
                 <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7414735364030164992" target="_blank"
                   class="news-card__button">
@@ -346,7 +331,7 @@
             <!-- Post 3 -->
             <div class="news-card">
               <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7404381845112741888"
-                frameborder="0" allowfullscreen="" title="Tridel Technologies LinkedIn Post 3"></iframe>
+                allowfullscreen title="Tridel Technologies LinkedIn Post 3"></iframe>
               <div class="news-card__footer">
                 <a href="https://www.linkedin.com/feed/update/urn:li:activity:7404381845112741888" target="_blank"
                   class="news-card__button">
@@ -362,7 +347,7 @@
             <!-- Post 4 -->
             <div class="news-card">
               <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7398916570242158592"
-                frameborder="0" allowfullscreen="" title="Tridel Technologies LinkedIn Post 4"></iframe>
+                allowfullscreen title="Tridel Technologies LinkedIn Post 4"></iframe>
               <div class="news-card__footer">
                 <a href="https://www.linkedin.com/feed/update/urn:li:activity:7398916570242158592" target="_blank"
                   class="news-card__button">
@@ -386,15 +371,15 @@
               </div>
 
               <div id="map-testimonial-content" class="map-testimonial-display active">
-                <img id="t-logo" src="" alt="Logo" class="map-card-logo">
+                <img id="t-logo" src="assets/images/logo/tridel.png" alt="Logo" class="map-card-logo">
                 <p id="t-quote" class="map-card-quote"></p>
                 <div id="t-author" class="map-card-author"></div>
                 <div id="t-role" class="map-card-role"></div>
               </div>
 
               <div class="map-controls">
-                <button class="map-nav-btn" id="map-prev" aria-label="Previous">←</button>
-                <button class="map-nav-btn" id="map-next" aria-label="Next">→</button>
+                <button type="button" class="map-nav-btn" id="map-prev" aria-label="Previous">←</button>
+                <button type="button" class="map-nav-btn" id="map-next" aria-label="Next">→</button>
               </div>
 
               <div class="map-progress-bar">
@@ -412,24 +397,122 @@
             Our Clients &amp; Partners
           </h2>
         </div>
-        <div class="client-logos">
-          <div class="client-logo">
-            <img alt="Dubai Municipality Logo" src="assets/images/clients/client-1.png" />
-          </div>
-          <div class="client-logo">
-            <img alt="MOCCAE Logo" src="assets/images/clients/client-2.png" />
-          </div>
-          <div class="client-logo">
-            <img alt="ENOC Group Logo" src="assets/images/clients/client-3.png" />
-          </div>
-          <div class="client-logo">
-            <img alt="EPAA Sharjah Logo" src="assets/images/clients/client-4.png" />
-          </div>
-          <div class="client-logo">
-            <img alt="Scentroid Logo" src="assets/images/clients/client-5.png" />
-          </div>
+      </div>
+      <div class="client-logos">
+        <div class="client-logo-track">
+          <!-- Original Set -->
+          <!-- Government & Public Sector -->
+          <div class="client-logo"><img alt="Dubai Municipality" src="assets/images/clients/client-1.png"></div>
+          <div class="client-logo"><img alt="MOCCAE" src="assets/images/clients/client-2.png"></div>
+          <div class="client-logo"><img alt="DAEP" src="assets/images/clients/DAEP.png"></div>
+          <div class="client-logo"><img alt="DEWA" src="assets/images/clients/DEWA.jpg"></div>
+          <div class="client-logo"><img alt="SEWA" src="assets/images/clients/SEWA.png"></div>
+          <div class="client-logo"><img alt="Sharjah EPAA" src="assets/images/clients/client-4.png"></div>
+          <div class="client-logo"><img alt="NEOM" src="assets/images/clients/NEOM.jpg"></div>
+
+          <!-- Oil, Gas & Energy -->
+          <div class="client-logo"><img alt="ADNOC" src="assets/images/clients/NADC.png"></div>
+          <div class="client-logo"><img alt="Qatar Energy" src="assets/images/clients/QatarEnergy.png"></div>
+          <div class="client-logo"><img alt="ExxonMobil" src="assets/images/clients/ExxonMobil.png"></div>
+          <div class="client-logo"><img alt="ENOC" src="assets/images/clients/client-3.png"></div>
+
+          <!-- Ports & Marine -->
+          <div class="client-logo"><img alt="AD Ports" src="assets/images/clients/ADPorts.png"></div>
+          <div class="client-logo"><img alt="Adani Ports" src="assets/images/clients/Adani Ports Logo.png"></div>
+          <div class="client-logo"><img alt="Nakheel" src="assets/images/clients/Nakheel.png"></div>
+          <div class="client-logo"><img alt="Six Construct" src="assets/images/clients/SixConstruct.png"></div>
+
+          <!-- Research & Institutes -->
+          <div class="client-logo"><img alt="NIOT" src="assets/images/clients/NIOT.jpg"></div>
+          <div class="client-logo"><img alt="INCOIS" src="assets/images/clients/INCOIS.png"></div>
+          <div class="client-logo"><img alt="NHO" src="assets/images/clients/NHO.jpg"></div>
+          <div class="client-logo"><img alt="NCCR" src="assets/images/clients/NCCR.png"></div>
+          <div class="client-logo"><img alt="NCSCM" src="assets/images/clients/NCSCM.jpg"></div>
+          <div class="client-logo"><img alt="CMFRI" src="assets/images/clients/CMFRI.png"></div>
+          <div class="client-logo"><img alt="NCW" src="assets/images/clients/NCW.jpg"></div>
+          <div class="client-logo"><img alt="MOES" src="assets/images/clients/MOES.jpg"></div>
+          <div class="client-logo"><img alt="NUS" src="assets/images/clients/NUS.avif"></div>
+
+          <!-- Private/Other -->
+          <div class="client-logo"><img alt="Bayanat" src="assets/images/clients/Bayanat.png"></div>
+          <div class="client-logo"><img alt="L&amp;T" src="assets/images/clients/L&amp;T.jpg"></div>
+
+          <!-- Duplicate Set for Continuous Scroll -->
+          <!-- Government & Public Sector -->
+          <div class="client-logo"><img alt="Dubai Municipality" src="assets/images/clients/client-1.png"></div>
+          <div class="client-logo"><img alt="MOCCAE" src="assets/images/clients/client-2.png"></div>
+          <div class="client-logo"><img alt="DAEP" src="assets/images/clients/DAEP.png"></div>
+          <div class="client-logo"><img alt="DEWA" src="assets/images/clients/DEWA.jpg"></div>
+          <div class="client-logo"><img alt="SEWA" src="assets/images/clients/SEWA.png"></div>
+          <div class="client-logo"><img alt="Sharjah EPAA" src="assets/images/clients/client-4.png"></div>
+          <div class="client-logo"><img alt="NEOM" src="assets/images/clients/NEOM.jpg"></div>
+
+          <!-- Oil, Gas & Energy -->
+          <div class="client-logo"><img alt="ADNOC" src="assets/images/clients/NADC.png"></div>
+          <div class="client-logo"><img alt="Qatar Energy" src="assets/images/clients/QatarEnergy.png"></div>
+          <div class="client-logo"><img alt="ExxonMobil" src="assets/images/clients/ExxonMobil.png"></div>
+          <div class="client-logo"><img alt="ENOC" src="assets/images/clients/client-3.png"></div>
+
+          <!-- Ports & Marine -->
+          <div class="client-logo"><img alt="AD Ports" src="assets/images/clients/ADPorts.png"></div>
+          <div class="client-logo"><img alt="Adani Ports" src="assets/images/clients/Adani Ports Logo.png"></div>
+          <div class="client-logo"><img alt="Nakheel" src="assets/images/clients/Nakheel.png"></div>
+          <div class="client-logo"><img alt="Six Construct" src="assets/images/clients/SixConstruct.png"></div>
+
+          <!-- Research & Institutes -->
+          <div class="client-logo"><img alt="NIOT" src="assets/images/clients/NIOT.jpg"></div>
+          <div class="client-logo"><img alt="INCOIS" src="assets/images/clients/INCOIS.png"></div>
+          <div class="client-logo"><img alt="NHO" src="assets/images/clients/NHO.jpg"></div>
+          <div class="client-logo"><img alt="NCCR" src="assets/images/clients/NCCR.png"></div>
+          <div class="client-logo"><img alt="NCSCM" src="assets/images/clients/NCSCM.jpg"></div>
+          <div class="client-logo"><img alt="CMFRI" src="assets/images/clients/CMFRI.png"></div>
+          <div class="client-logo"><img alt="NCW" src="assets/images/clients/NCW.jpg"></div>
+          <div class="client-logo"><img alt="MOES" src="assets/images/clients/MOES.jpg"></div>
+          <div class="client-logo"><img alt="NUS" src="assets/images/clients/NUS.avif"></div>
+
+          <!-- Private/Other -->
+          <div class="client-logo"><img alt="Bayanat" src="assets/images/clients/Bayanat.png"></div>
+          <div class="client-logo"><img alt="L&amp;T" src="assets/images/clients/L&amp;T.jpg"></div>
+
+          <!-- Triplicate Set for Extra Smoothness on Wide Screens -->
+          <!-- Government & Public Sector -->
+          <div class="client-logo"><img alt="Dubai Municipality" src="assets/images/clients/client-1.png"></div>
+          <div class="client-logo"><img alt="MOCCAE" src="assets/images/clients/client-2.png"></div>
+          <div class="client-logo"><img alt="DAEP" src="assets/images/clients/DAEP.png"></div>
+          <div class="client-logo"><img alt="DEWA" src="assets/images/clients/DEWA.jpg"></div>
+          <div class="client-logo"><img alt="SEWA" src="assets/images/clients/SEWA.png"></div>
+          <div class="client-logo"><img alt="Sharjah EPAA" src="assets/images/clients/client-4.png"></div>
+          <div class="client-logo"><img alt="NEOM" src="assets/images/clients/NEOM.jpg"></div>
+
+          <!-- Oil, Gas & Energy -->
+          <div class="client-logo"><img alt="ADNOC" src="assets/images/clients/NADC.png"></div>
+          <div class="client-logo"><img alt="Qatar Energy" src="assets/images/clients/QatarEnergy.png"></div>
+          <div class="client-logo"><img alt="ExxonMobil" src="assets/images/clients/ExxonMobil.png"></div>
+          <div class="client-logo"><img alt="ENOC" src="assets/images/clients/client-3.png"></div>
+
+          <!-- Ports & Marine -->
+          <div class="client-logo"><img alt="AD Ports" src="assets/images/clients/ADPorts.png"></div>
+          <div class="client-logo"><img alt="Adani Ports" src="assets/images/clients/Adani Ports Logo.png"></div>
+          <div class="client-logo"><img alt="Nakheel" src="assets/images/clients/Nakheel.png"></div>
+          <div class="client-logo"><img alt="Six Construct" src="assets/images/clients/SixConstruct.png"></div>
+
+          <!-- Research & Institutes -->
+          <div class="client-logo"><img alt="NIOT" src="assets/images/clients/NIOT.jpg"></div>
+          <div class="client-logo"><img alt="INCOIS" src="assets/images/clients/INCOIS.png"></div>
+          <div class="client-logo"><img alt="NHO" src="assets/images/clients/NHO.jpg"></div>
+          <div class="client-logo"><img alt="NCCR" src="assets/images/clients/NCCR.png"></div>
+          <div class="client-logo"><img alt="NCSCM" src="assets/images/clients/NCSCM.jpg"></div>
+          <div class="client-logo"><img alt="CMFRI" src="assets/images/clients/CMFRI.png"></div>
+          <div class="client-logo"><img alt="NCW" src="assets/images/clients/NCW.jpg"></div>
+          <div class="client-logo"><img alt="MOES" src="assets/images/clients/MOES.jpg"></div>
+          <div class="client-logo"><img alt="NUS" src="assets/images/clients/NUS.avif"></div>
+
+          <!-- Private/Other -->
+          <div class="client-logo"><img alt="Bayanat" src="assets/images/clients/Bayanat.png"></div>
+          <div class="client-logo"><img alt="L&amp;T" src="assets/images/clients/L&amp;T.jpg"></div>
         </div>
       </div>
+
     </section>
     <section class="section section--light-bg" id="map-section">
       <div class="container">
@@ -507,7 +590,7 @@
       <div class="footer__brand">
         <a class="footer__logo" href="index.html">
           <img alt="Tridel Logo" src="assets/images/logo/tridel1.png"
-            style="height: 32px; filter: brightness(0) invert(1);" />
+            style="height: 32px; filter: brightness(0) invert(1);">
         </a>
         <p class="footer__tagline">
           Connecting Environmental Science, Engineering, and Technology
@@ -675,12 +758,12 @@
         { lat: 25.2048, lng: 55.2708, name: "DDCR", location: "Dubai, UAE", logo: "testimonial-06.png", quote: "During the whole study of 'Biodiversity Baseline Survey for Dubai Emirate', Tridel team demonstrated excellent work ethics and professional skills supporting the research activities.", author: "Tamer Khafaga", role: "Conservation Research Manager" },
         { lat: 15.2993, lng: 74.1240, name: "NIO", location: "Goa, India", logo: "testimonial-07.png", quote: "I must complement the Tridel Management for their striving to be fully committed... the best asset created for Dubai Municipality.", author: "Dr. Ramaiah Nagappa", role: "Former Chief Scientist" },
         { lat: 30.3165, lng: 78.0322, name: "CEDAR", location: "Dehradun, India", logo: "testimonial-08.png", quote: "My experience working with Tridel Technologies... has been extremely positive. This project has been very challenging... However, the team has been up to the task.", author: "Dr. Ghazala Shahabuddin", role: "Senior Ecologist" },
-        { lat: 25.276987, lng: 55.296249, name: "Dubai Municipality", location: "Dubai, UAE", logo: "testimonial-09.png", quote: "Tridel Technologies has delivered high quality projects which enabled them to gain Dubai Municipality’s trust.", author: "Hind Mahmoud Mahaba", role: "Head of EPSS" },
-        { lat: 25.1124, lng: 55.1390, name: "Nakheel", location: "Palm Jumeirah, Dubai", logo: "testimonial-10.png", quote: "I really appreciate the efforts of your team members, who have worked day and night to make our valuable tenants happy.", author: "Kumar Giri", role: "Facilities Supervisor" },
+        { lat: 25.276987, lng: 55.296249, name: "Dubai Municipality", location: "Dubai, UAE", logo: "../clients/client-1.png", quote: "Tridel Technologies has delivered high quality projects which enabled them to gain Dubai Municipality’s trust.", author: "Hind Mahmoud Mahaba", role: "Head of EPSS" },
+        { lat: 25.1124, lng: 55.1390, name: "Nakheel", location: "Palm Jumeirah, Dubai", logo: "../clients/Nakheel.png", quote: "I really appreciate the efforts of your team members, who have worked day and night to make our valuable tenants happy.", author: "Kumar Giri", role: "Facilities Supervisor" },
         { lat: 24.4539, lng: 54.3773, name: "NMDC", location: "Abu Dhabi, UAE", logo: "testimonial-11.png", quote: "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation. Best wishes to the Tridel team.", author: "Firman Christopherus Minar", role: "Area Survey Manager" },
-        { lat: 25.3463, lng: 55.4209, name: "EPAA", location: "Sharjah, UAE", logo: "testimonial-12.png", quote: "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental and ecological data.", author: "Dr. Osama M Wahba", role: "Environmental Specialist" },
+        { lat: 25.3463, lng: 55.4209, name: "EPAA", location: "Sharjah, UAE", logo: "../clients/client-4.png", quote: "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental and ecological data.", author: "Dr. Osama M Wahba", role: "Environmental Specialist" },
         { lat: 25.0657, lng: 55.1713, name: "Vibrocomp", location: "Dubai, UAE", logo: "testimonial-13.png", quote: "I continue to be impressed with their skills and professionalism. Our collaboration has always been smooth and very effective.", author: "Dr. Tijana Kosanic", role: "Head of Environment" },
-        { lat: 24.9857, lng: 55.0712, name: "ENOC", location: "Jebel Ali, Dubai", logo: "testimonial-14.png", quote: "We are satisfied by the services offered by M/s Tridel. The odour monitoring station supplied meets requirement.", author: "Pawan Rai", role: "EHS Manager" }
+        { lat: 24.9857, lng: 55.0712, name: "ENOC", location: "Jebel Ali, Dubai", logo: "../clients/client-3.png", quote: "We are satisfied by the services offered by M/s Tridel. The odour monitoring station supplied meets requirement.", author: "Pawan Rai", role: "EHS Manager" }
       ];
 
       testimonials.sort((a, b) => a.lng - b.lng);
