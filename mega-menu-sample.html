@@ -32,6 +32,128 @@
         outline: 2px solid #1e90ff;
         border-radius: 8px;
       }
+
+      /* Mega Menu Styles (Apple-style) */
+      .header__nav-list li {
+        position: static;
+        /* Allows menu to be full width relative to something else if needed, but for full screen width we usually need static on parent or absolute to viewport */
+      }
+
+      /* Make list item capable of showing dropdown if we want it relative to item, 
+         BUT user wants Apple style which is usually full width. 
+         Let's try full screen width relative to header */
+      .header__nav-list {
+        position: static;
+      }
+
+      .mega-menu-container {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 40px 0 60px 0;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        z-index: 999;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Hover trigger on the LI */
+      .header__nav-list li:hover .mega-menu-container,
+      .mega-menu-container:hover {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .mega-menu-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+        padding: 0 24px;
+      }
+
+      .mega-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .mega-category {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        color: #86868b;
+        /* Apple gray */
+        margin-bottom: 10px;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+      }
+
+      .mega-list,
+      .mega-list-small {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* Large Links (like "Explore All Mac") */
+      .mega-link-large {
+        font-size: 1.5rem;
+        /* 24px */
+        font-weight: 600;
+        color: #1d1d1f;
+        text-decoration: none;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        transition: color 0.2s;
+      }
+
+      /* Small Links */
+      .mega-list-small li a {
+        font-size: 0.95rem;
+        /* 15px */
+        font-weight: 500;
+        color: #1d1d1f;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .mega-link-large:hover,
+      .mega-list-small li a:hover {
+        color: #00AAE7;
+        /* Tridel Blue */
+        text-decoration: none;
+      }
+
+      /* Dark Mode Support */
+      [data-theme="dark"] .mega-menu-container {
+        background: rgba(20, 20, 22, 0.98);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      [data-theme="dark"] .mega-link-large,
+      [data-theme="dark"] .mega-list-small li a {
+        color: #f5f5f7;
+      }
+
+      [data-theme="dark"] .mega-category {
+        color: #86868b;
+      }
+
+      [data-theme="dark"] .mega-link-large:hover,
+      [data-theme="dark"] .mega-list-small li a:hover {
+        color: #00AAE7;
+      }
     </style>
 </head>
 
@@ -65,48 +187,41 @@
             <div class="mega-menu-container">
               <div class="mega-menu-content">
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-life-ring"></i> Buoys & Floats</span>
-                  <ul class="mega-list-small">
-                    <li><a href="products/product-coastal-buoy.html">Tridel Coastal Buoys</a></li>
-                    <li><a href="products/product-data-buoy.html">Data Buoys</a></li>
-                    <li><a href="products/product-nav-buoy.html">Navigation Buoys (AtoN)</a></li>
-                    <li><a href="products/product-mooring-buoy.html">Mooring Buoys</a></li>
-                    <li><a href="products/product-deepwater-buoy.html">Deepwater Buoys</a></li>
-                    <li><a href="products/product-drifter-buoy.html">Drifter Buoys</a></li>
-                    <li><a href="products/product-sub-floats.html">Surface & Sub-Surface Floats</a></li>
+                  <span class="mega-category">Services</span>
+                  <ul class="mega-list">
+                    <li><a href="#" class="mega-link-large">Explore All Services</a></li>
+                    <li><a href="#" class="mega-link-large">Tidal & Current Analysis</a></li>
+                    <li><a href="#" class="mega-link-large">Numerical Modelling</a></li>
+                    <li><a href="#" class="mega-link-large">Benthic Studies</a></li>
+                    <li><a href="#" class="mega-link-large">Bathymetry Survey</a></li>
+                    <li><a href="#" class="mega-link-large">Topography Survey</a></li>
                   </ul>
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-ship"></i> Vessels & USVs</span>
+                  <span class="mega-category">By Sector</span>
                   <ul class="mega-list-small">
-                    <li><a href="products/product-tridel-ark.html">Tridel Ark</a></li>
-                    <li><a href="products/product-monohull-vessel.html">Monohull Vessel</a></li>
-                    <li><a href="products/product-catamaran-vessel.html">Catamaran Survey Vessel</a></li>
-                    <li><a href="products/product-aquilon-5600a.html">Aquilon 5600 (Hybrid)</a></li>
-                    <li><a href="products/product-aquilon-8000.html">Aquilon 8000 (Hybrid)</a></li>
-                    <li><a href="products/product-tridrone.html">Seafloor TriDrone</a></li>
-                    <li><a href="products/product-hydrocat-550.html">Seafloor HydroCat-550</a></li>
+                    <li><a href="#">Oil & Gas</a></li>
+                    <li><a href="#">Ports & Harbours</a></li>
+                    <li><a href="#">Coastal Development</a></li>
+                    <li><a href="#">Desalination Plants</a></li>
+                    <li><a href="#">Power Plants</a></li>
+                  </ul>
+
+                  <span class="mega-category" style="margin-top: 24px;">Specialized</span>
+                  <ul class="mega-list-small">
+                    <li><a href="#">Hyper-spectral Imagery</a></li>
+                    <li><a href="#">LIDAR Surveys</a></li>
                   </ul>
                 </div>
 
                 <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-screwdriver-wrench"></i> Equipment</span>
+                  <span class="mega-category">Products</span>
                   <ul class="mega-list-small">
-                    <li><a href="products/product-tew500.html">TEW500 Compact Winch</a></li>
-                    <li><a href="products/product-tew1500.html">TEW1500 Heavy-Duty Winch</a></li>
-                    <li><a href="products/product-tdl720.html">TDL 720 Data Logger</a></li>
-                    <li><a href="products/product-mooring-frame.html">Mooring Frames & Mounts</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-laptop-code"></i> Software</span>
-                  <ul class="mega-list-small">
-                    <li><a href="products/product-tems.html">TEMS Platform</a></li>
-                    <li><a href="products/product-especia.html">eSpecia GIS</a></li>
-                    <li><a href="products/product-attide.html">ATtide Analysis</a></li>
-                    <li><a href="products/product-t-sms.html">TSMS Management</a></li>
+                    <li><a href="#">eSpecia (GIS Database)</a></li>
+                    <li><a href="#">Real-time Monitoring Systems</a></li>
+                    <li><a href="#">Environmental Sensors</a></li>
+                    <li><a href="#">Data Analytics Dashboard</a></li>
                   </ul>
                 </div>
               </div>
@@ -116,49 +231,6 @@
             <a class="header__nav-link" href="services.html">
               Services
             </a>
-            <div class="mega-menu-container">
-              <div class="mega-menu-content">
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-earth-americas"></i> GeoScience</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/geoscience.html">Ecological Baseline Studies</a></li>
-                    <li><a href="services/geoscience.html">Oceanographic Studies</a></li>
-                    <li><a href="services/geoscience.html">Climatology & Hydrology</a></li>
-                    <li><a href="services/geoscience.html">Coastal & Habitat Mapping</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-water"></i> Hydrography</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/hydrography.html">Bathymetric Surveys</a></li>
-                    <li><a href="services/hydrography.html">Route & Pipeline Inspection</a></li>
-                    <li><a href="services/hydrography.html">Topographic Surveys</a></li>
-                    <li><a href="services/hydrography.html">MetOcean Data Collection</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-map-location-dot"></i> GeoInformatics (GIS)</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/geoinformatics.html">Enterprise GIS Implementation</a></li>
-                    <li><a href="services/geoinformatics.html">Custom GIS Development</a></li>
-                    <li><a href="services/geoinformatics.html">Data Integration</a></li>
-                    <li><a href="services/geoinformatics.html">Spatial Analysis</a></li>
-                  </ul>
-                </div>
-
-                <div class="mega-column">
-                  <span class="mega-category"><i class="fa-solid fa-helmet-safety"></i> GeoEngineering</span>
-                  <ul class="mega-list-small">
-                    <li><a href="services/geoengineering.html">Coastal Protection</a></li>
-                    <li><a href="services/geoengineering.html">Dredging Support</a></li>
-                    <li><a href="services/geoengineering.html">Underwater Instrumentation</a></li>
-                    <li><a href="services/geoengineering.html">Equipment Rental</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </li>
           <li>
             <a class="header__nav-link" href="success-stories.html">

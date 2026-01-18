@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tridel Flagship Concepts</title>
+    <link rel="stylesheet" href="../assets/css/sample-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #001220;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 170, 231, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 170, 231, 0.1) 0%, transparent 20%);
+        }
+
+        .menu-container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #00AAE7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #8899a6;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-accent);
+            box-shadow: 0 10px 30px rgba(0, 170, 231, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: var(--color-accent);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .tag {
+            background: #002855;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            display: inline-block;
+            color: var(--color-accent);
+            border: 1px solid rgba(0, 170, 231, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../index.html" class="back-link"><i class="fas fa-home"></i> Back to Live Site</a>
+
+    <div class="menu-container">
+        <h1>Flagship Concepts</h1>
+        <p class="subtitle">Experimental designs to elevate the Tridel digital experience.</p>
+
+        <div class="cards-grid">
+
+            <a href="concept1-depth.html" class="concept-card">
+                <div class="card-icon"><i class="fas fa-arrow-down"></i></div>
+                <div class="card-title">The Depth Journey</div>
+                <div class="card-desc">Vertical "Scrollytelling" experience moving from satellite comms down to the
+                    seabed.</div>
+                <span class="tag">Immersive Storytelling</span>
+            </a>
+
+            <a href="concept2-control.html" class="concept-card">
+                <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                <div class="card-title">Mission Control</div>
+                <div class="card-desc">Software dashboard simulation proving real-time monitoring capabilities.</div>
+                <span class="tag">Live Simulation</span>
+            </a>
+
+            <a href="concept3-lab.html" class="concept-card">
+                <div class="card-icon"><i class="fas fa-cube"></i></div>
+                <div class="card-title">Tridel Lab</div>
+                <div class="card-desc">Interactive product showcase with 3D-style rotation and hotspot details.</div>
+                <span class="tag">Product Interactive</span>
+            </a>
+
+            <a href="concept4-globe.html" class="concept-card">
+                <div class="card-icon"><i class="fas fa-globe-asia"></i></div>
+                <div class="card-title">Data Earth</div>
+                <div class="card-desc">Cinematic 3D globe visualizing global deployments and connectivity.</div>
+                <span class="tag">WebGL Visualization</span>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
