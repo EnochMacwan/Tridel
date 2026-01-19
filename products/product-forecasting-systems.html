@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="Forecasting Systems - Tridel Technologies" name="title" />
+    <meta
+        content="Advanced met-ocean forecasting systems for operational planning. Advanced marine technology solutions."
+        name="description" />
+    <title>Forecasting Systems | Tridel Technologies</title>
+    <!-- Favicon -->
+    <link href="../assets/images/logo/favicon.ico" rel="icon" />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <!-- Global Styles -->
+    <link href="../assets/css/styles.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <!-- Theme Toggle -->
+    <script defer src="../assets/js/theme-toggle.js"></script>
+</head>
+
+<body>
+    <!-- HEADER (Mega Menu) -->
+    <header class="header glass-wing">
+        <div class="container header__container">
+            <a class="header__logo" href="../index.html">
+                <img alt="Tridel Logo" class="logo-light" src="../assets/images/logo/tridel1.png" />
+                <img alt="Tridel Logo" class="logo-dark" src="../assets/images/logo/tridel-dark.png" />
+            </a>
+            <button aria-label="Toggle navigation" class="mobile-toggle" id="mobile-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <nav class="nav" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item"><a class="nav__link" href="../index.html">Home</a></li>
+                    <li class="nav__item"><a class="nav__link" href="../about.html">About Us</a></li>
+                    <li class="nav__item dropdown">
+                        <a class="nav__link dropdown__trigger" href="../products.html">Products <i
+                                class="fas fa-chevron-down"></i></a>
+                        <div class="mega-menu glass-mode">
+                            <div class="mega-menu__container">
+                                <div class="mega-menu__col">
+                                    <h4 class="mega-menu__title"><i class="fas fa-microchip"></i> Hardware</h4>
+                                    <ul class="mega-menu__list">
+                                        <li><a href="product-data-buoy.html">Data Buoy</a></li>
+                                        <li><a href="product-tew500.html">TEW 500 (Wave Buoy)</a></li>
+                                        <li><a href="product-tew1500.html">TEW 1500 (Tsunami Buoy)</a></li>
+                                        <li><a href="product-t-sms.html">T-SMS (Sediment Monitoring)</a></li>
+                                        <li><a href="product-tems.html">TEMS (Telemetry)</a></li>
+                                        <li><a href="product-tdl720.html">TDL 720 (Data Logger)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu__col">
+                                    <h4 class="mega-menu__title"><i class="fas fa-life-ring"></i> Buoys & Floats</h4>
+                                    <ul class="mega-menu__list">
+                                        <li><a href="product-nav-buoy.html">Navigation Buoys</a></li>
+                                        <li><a href="product-mooring-buoy.html">Mooring Buoys</a></li>
+                                        <li><a href="product-deepwater-buoy.html">Deep Water Buoys</a></li>
+                                        <li><a href="product-sub-floats.html">Surface & Sub-surface Floats</a></li>
+                                        <li><a href="product-mooring-frame.html">Mooring Frames</a></li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu__col mega-menu__spotlight">
+                                    <div class="spotlight-card">
+                                        <span class="spotlight-badge"><i class="fas fa-star"></i> Featured</span>
+                                        <h4 id="glass-title-products"
+                                            style="margin-bottom: 6px; font-weight: 600; color:white;">TDL 720 Logger
+                                        </h4>
+                                        <p id="glass-desc-products"
+                                            style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 12px; color: white;">
+                                            Advanced data logging for oceanographic applications.</p>
+                                        <a href="product-tdl720.html" id="glass-btn-products"
+                                            style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View
+                                            Details &rarr;</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav__item dropdown">
+                        <a class="nav__link dropdown__trigger" href="../services.html">Services <i
+                                class="fas fa-chevron-down"></i></a>
+                        <div class="mega-menu glass-mode">
+                            <div class="mega-menu__container">
+                                <div class="mega-menu__col">
+                                    <h4 class="mega-menu__title"><i class="fas fa-satellite-dish"></i> Env. Monitoring
+                                    </h4>
+                                    <ul class="mega-menu__list">
+                                        <li><a href="../services/met-ocean.html" class="glass-link"
+                                                data-title="MetOcean Monitoring"
+                                                data-desc="Real-time MetOcean data collection."
+                                                data-img="../assets/images/services/metocean.png">MetOcean
+                                                Monitoring</a></li>
+                                        <li><a href="../services/atmospheric-noise.html" class="glass-link"
+                                                data-title="Atmospheric & Noise"
+                                                data-desc="Monitoring noise levels in marine environments."
+                                                data-img="../assets/images/services/noise.png">Atmospheric & Noise</a>
+                                        </li>
+                                        <li><a href="../services/air-quality.html" class="glass-link"
+                                                data-title="Air Quality"
+                                                data-desc="Precise monitoring of air quality parameters."
+                                                data-img="../assets/images/services/air-quality.png">Air Quality</a>
+                                        </li>
+                                        <li><a href="../services/water-quality.html" class="glass-link"
+                                                data-title="Water Quality"
+                                                data-desc="Comprehensive water quality analysis."
+                                                data-img="../assets/images/services/water-quality.png">Water Quality</a>
+                                        </li>
+                                        <li><a href="../services/ground-water.html" class="glass-link"
+                                                data-title="Ground Water"
+                                                data-desc="Ground water level and quality monitoring."
+                                                data-img="../assets/images/services/ground-water.png">Ground Water</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu__col">
+                                    <h4 class="mega-menu__title"><i class="fas fa-map-marked-alt"></i> Env. Surveying
+                                    </h4>
+                                    <ul class="mega-menu__list">
+                                        <li><a href="../services/hydrography.html" class="glass-link"
+                                                data-title="Bathymetric Surveys"
+                                                data-desc="High-resolution mapping of underwater terrain."
+                                                data-img="../assets/images/services/bms.png">Bathymetric Surveys</a>
+                                        </li>
+                                        <li><a href="../services/uxo-survey.html" class="glass-link"
+                                                data-title="UXO Survey" data-desc="Unexploded Ordnance detection."
+                                                data-img="../assets/images/services/port-monitoring.png">UXO Survey</a>
+                                        </li>
+                                        <li><a href="../services/geotechnical-survey.html" class="glass-link"
+                                                data-title="GeoTechnical Survey"
+                                                data-desc="Soil analysis and sub-bottom profiling."
+                                                data-img="../assets/images/services/geodatabase-illustration.png">GeoTechnical
+                                                Survey</a></li>
+                                        <li><a href="../services/navigational-charting.html" class="glass-link"
+                                                data-title="Navigational Charting"
+                                                data-desc="Electronic navigational charts (ENC)."
+                                                data-img="../assets/images/services/electronic-maps.png">Navigational
+                                                Charting</a></li>
+                                        <li><a href="../services/hydrography.html#topographic" class="glass-link"
+                                                data-title="Topographic Survey" data-desc="Land survey and mapping."
+                                                data-img="../assets/images/services/areal-mapping.png">Topographic
+                                                Survey</a></li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu__col mega-menu__spotlight">
+                                    <div class="spotlight-card">
+                                        <span class="spotlight-badge"><i class="fas fa-star"></i> Featured</span>
+                                        <h4 id="glass-title-services"
+                                            style="margin-bottom: 6px; font-weight: 600; color:white;">Bathymetric
+                                            Surveys</h4>
+                                        <p id="glass-desc-services"
+                                            style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 12px; color: white;">
+                                            Precision mapping for marine safety and construction.</p>
+                                        <a href="../services/hydrography.html" id="glass-btn-services"
+                                            style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View
+                                            Details &rarr;</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav__item"><a class="nav__link" href="../success-stories.html">Success Stories</a></li>
+                    <li class="nav__item"><a class="nav__link" href="../careers.html">Careers</a></li>
+                    <li class="nav__item"><a class="nav__link" href="../contact.html">Contact</a></li>
+                </ul>
+                <div class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <!-- CTA Button -->
+                <a class="btn btn--primary nav__cta" href="../contact.html">Enquire Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="page-header section">
+            <div class="hero__bg"></div>
+            <div class="container">
+                <h1 class="page-header__title">Forecasting Systems</h1>
+                <p class="page-header__subtitle">Integrated Solutions / Forecasting Systems</p>
+            </div>
+        </section>
+
+        <!-- Product Details -->
+        <section class="section">
+            <div class="container">
+                <div class="product-details__grid">
+                    <!-- Image Gallery -->
+                    <div class="product-details__gallery">
+                        <div class="product-gallery__main">
+                            <!-- Placeholder for Integrated Solution Image -->
+                            <div
+                                style="width: 100%; height: 300px; background: #e0e7ff; display: flex; align-items: center; justify-content: center; border-radius: 12px;">
+                                <i class="fa-solid fa-cloud-sun-rain"
+                                    style="font-size: 5rem; color: var(--color-primary);"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="product-details__content">
+                        <h2 class="section__title section__title--left">Forecasting Systems</h2>
+                        <p class="product-details__overview"
+                            style="font-size: 1.1rem; color: var(--color-text-light); margin-bottom: 2rem;">
+                            Advanced met-ocean forecasting systems for operational planning.
+                        </p>
+
+                        <div class="product-details__tabs"
+                            style="background: var(--color-surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--color-border);">
+                            <h3>Coming Soon</h3>
+                            <p>Detailed specifications and features for Forecasting Systems will be available shortly.
+                                Contact us for more information.</p>
+                        </div>
+
+                        <div class="product-details__cta" style="margin-top: 2rem;">
+                            <a class="btn btn--primary" href="../contact.html">Request Information</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer__container">
+            <div class="footer__brand">
+                <a class="footer__logo" href="../index.html">
+                    <img alt="Tridel Logo" src="../assets/images/logo/tridel1.png"
+                        style="height: 32px; filter: brightness(0) invert(1);" />
+                </a>
+                <p class="footer__tagline">
+                    Connecting Environmental Science, Engineering, and Technology
+                </p>
+            </div>
+            <div class="footer__links">
+                <div class="footer__links-col">
+                    <h3 class="footer__heading">Quick Links</h3>
+                    <ul>
+                        <li><a class="footer__link" href="../about.html">About Us</a></li>
+                        <li><a class="footer__link" href="../products.html">Products</a></li>
+                        <li><a class="footer__link" href="../services.html">Services</a></li>
+                        <li><a class="footer__link" href="../contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer__links-col">
+                    <h3 class="footer__heading">Contact</h3>
+                    <ul>
+                        <li class="footer__contact-item"><i class="fas fa-map-marker-alt"></i> Vadodara, Gujarat</li>
+                        <li class="footer__contact-item"><i class="fas fa-envelope"></i> info@tridel.in</li>
+                        <li class="footer__contact-item"><i class="fas fa-phone"></i> +91 98765 43210</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2025 Tridel Technologies. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="../assets/js/script.js"></script>
+</body>
+
+</html>
