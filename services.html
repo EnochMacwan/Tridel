@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -10,6 +10,27 @@
     <meta
         content="Tridel provides a full range of environmental and geo-engineering services, including geoscience studies, geoinformatics solutions, and geoengineering applications."
         name="description">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Environmental Monitoring & Surveying",
+      "provider": {
+        "@type": "Organization",
+        "name": "Tridel Technologies"
+      },
+      "areaServed": "Global",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Environmental Services",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "MetOcean Monitoring" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Bathymetric Surveys" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Water Quality Monitoring" } }
+        ]
+      }
+    }
+    </script>
     <link href="assets/css/styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="assets/js/script.js"></script>
@@ -50,7 +71,7 @@
                                     <span class="mega-category"><i class="fa-solid fa-life-ring"></i> Platforms:
                                         Buoys</span>
                                     <ul class="mega-list-small">
-                                        <li><a href="products/product-coastal-buoy.html">Tridel Coastal Buoys</a></li>
+                                        <li><a href="products/product-coastal-buoy.html">Coastal Buoys</a></li>
                                         <li><a href="products/product-data-buoy.html">Data Buoys</a></li>
                                         <li><a href="products/product-nav-buoy.html">Navigation Buoys (AtoN)</a></li>
                                         <li><a href="products/product-wind-farm-buoy.html">Wind Farm (LiDAR) Buoys</a>
@@ -69,13 +90,12 @@
                                         &amp;
                                         ASVs</span>
                                     <ul class="mega-list-small">
-                                        <li><a href="products/product-tridel-ark.html">Tridel Ark</a></li>
                                         <li><a href="products/product-monohull-vessel.html">Monohull Vessel</a></li>
                                         <li><a href="products/product-catamaran-vessel.html">Catamaran Survey Vessel</a>
                                         </li>
                                         <li><a href="products/product-aquilon-5600a.html">Aquilon 5600 (Hybrid)</a></li>
                                         <li><a href="products/product-aquilon-8000.html">Aquilon 8000 (Hybrid)</a></li>
-                                        <li><a href="products/product-tridrone.html">Seafloor TriDrone</a></li>
+
                                     </ul>
                                 </div>
 
@@ -128,7 +148,7 @@
 
                                 <div class="mega-column">
                                     <span class="mega-category"><i class="fa-solid fa-map-location-dot"></i>
-                                        Surveys</span>
+                                        Environmental Surveying</span>
                                     <ul class="mega-list-small">
                                         <li><a href="services/hydrography.html">Bathymetric Surveys</a></li>
                                         <li><a href="services/uxo-survey.html">UXO Survey</a></li>
@@ -217,7 +237,8 @@
                 <div class="product-list-grid">
                     <a href="services/hydrography.html#metocean" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="MetOcean Monitoring" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="MetOcean Monitoring"
+                                class="product-item__image product-image-style"
                                 src="assets/images/services/met-ocean-study.png">
                         </div>
                         <div class="product-content-outside">
@@ -229,7 +250,7 @@
                     </a>
                     <a href="services/atmospheric-noise.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Atmospheric &amp; Underwater Noise"
+                            <img loading="lazy" alt="Atmospheric &amp; Underwater Noise"
                                 class="product-item__image product-image-style"
                                 src="assets/images/products/data-buoy/data-buoy-new.png">
                         </div>
@@ -242,7 +263,8 @@
                     </a>
                     <a href="services/air-quality.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Air Quality Monitoring" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Air Quality Monitoring"
+                                class="product-item__image product-image-style"
                                 src="assets/images/services/Eddy-Covariance-Flux-System.png">
                         </div>
                         <div class="product-content-outside">
@@ -254,7 +276,8 @@
                     </a>
                     <a href="services/water-quality.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Water Quality Monitoring" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Water Quality Monitoring"
+                                class="product-item__image product-image-style"
                                 src="assets/images/products/coastal-buoy/tcb-new.jpg">
                         </div>
                         <div class="product-content-outside">
@@ -266,7 +289,8 @@
                     </a>
                     <a href="services/ground-water.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Ground Water Monitoring" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Ground Water Monitoring"
+                                class="product-item__image product-image-style"
                                 src="assets/images/services/geodatabase-illustration.png">
                         </div>
                         <div class="product-content-outside">
@@ -284,13 +308,14 @@
         <section class="section">
             <div class="container">
                 <div class="section__header">
-                    <h2 class="section__title">Surveys</h2>
+                    <h2 class="section__title">Environmental Surveying</h2>
                     <p class="section__subtitle">Comprehensive hydrographic and geophysical survey services.</p>
                 </div>
                 <div class="product-list-grid">
                     <a href="services/hydrography.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Bathymetric Surveys" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Bathymetric Surveys"
+                                class="product-item__image product-image-style"
                                 src="assets/images/services/port-monitoring.png">
                         </div>
                         <div class="product-content-outside">
@@ -301,7 +326,7 @@
                     </a>
                     <a href="services/uxo-survey.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="UXO Survey" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="UXO Survey" class="product-item__image product-image-style"
                                 src="assets/images/services/electronic-maps.png">
                         </div>
                         <div class="product-content-outside">
@@ -313,8 +338,8 @@
                     </a>
                     <a href="services/geoengineering.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="GeoTechnical Survey" class="product-item__image product-image-style"
-                                src="assets/images/services/bm2s.png">
+                            <img loading="lazy" alt="GeoTechnical Survey"
+                                class="product-item__image product-image-style" src="assets/images/services/bm2s.png">
                         </div>
                         <div class="product-content-outside">
                             <h4>GeoTechnical Survey</h4>
@@ -325,7 +350,8 @@
                     </a>
                     <a href="services/navigational-charting.html" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Navigational Charting" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Navigational Charting"
+                                class="product-item__image product-image-style"
                                 src="assets/images/services/electronic-maps.png">
                         </div>
                         <div class="product-content-outside">
@@ -337,7 +363,7 @@
                     </a>
                     <a href="services/hydrography.html#topographic" class="product-grid-wrapper">
                         <div class="product-card-visual">
-                            <img alt="Topographic Survey" class="product-item__image product-image-style"
+                            <img loading="lazy" alt="Topographic Survey" class="product-item__image product-image-style"
                                 src="assets/images/services/areal-mapping.png">
                         </div>
                         <div class="product-content-outside">

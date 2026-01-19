@@ -2,30 +2,60 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>
-        Careers | TRIDEL
+        Services | TRIDEL
     </title>
     <meta
-        content="Join the Tridel team. We are always looking for passionate, talented individuals to help us innovate in the maritime technology sector."
-        name="description" />
-    <link href="assets/css/styles.css" rel="stylesheet" />
+        content="Tridel provides a full range of environmental and geo-engineering services, including geoscience studies, geoinformatics solutions, and geoengineering applications."
+        name="description">
+    <link href="../assets/css/styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script defer="" src="assets/js/script.js"></script>
-    <script defer="" src="assets/js/bg-animation.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
-        rel="stylesheet">
+    <script defer src="../assets/js/script.js"></script>
+    <script defer src="../assets/js/bg-animation.js"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "serviceType": "Environmental Monitoring & Surveys",
+  "provider": {
+    "@type": "Organization",
+    "name": "Tridel Technologies"
+  },
+  "areaServed": {
+    "@type": "Place",
+    "name": "Global"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Environmental Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "MetOcean Monitoring"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Hydrographic Survey"
+        }
+      }
+    ]
+  }
+}
+</script>
 </head>
 
-<body class="page-careers">
+<body class="page-services">
     <header class="header">
         <div class="container header__container">
             <a class="header__logo" href="index.html">
-                <img alt="Tridel Logo" src="assets/images/logo/tridel.png" />
+                <img alt="Tridel Logo" src="../assets/images/logo/tridel.png">
             </a>
             <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
                 <ul class="header__nav-list">
@@ -57,13 +87,15 @@
                                         <li><a href="products/product-mooring-buoy.html">Mooring Buoys</a></li>
                                         <li><a href="products/product-deepwater-buoy.html">Deepwater Buoys</a></li>
                                         <li><a href="products/product-drifter-buoy.html">Drifter Buoys</a></li>
-                                        <li><a href="products/product-sub-floats.html">Surface & Sub-Surface Floats</a>
+                                        <li><a href="products/product-sub-floats.html">Surface &amp; Sub-Surface
+                                                Floats</a>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div class="mega-column">
-                                    <span class="mega-category"><i class="fa-solid fa-ship"></i> Platforms: Vessels &
+                                    <span class="mega-category"><i class="fa-solid fa-ship"></i> Platforms: Vessels
+                                        &amp;
                                         ASVs</span>
                                     <ul class="mega-list-small">
                                         <li><a href="products/product-monohull-vessel.html">Monohull Vessel</a></li>
@@ -82,13 +114,14 @@
                                         <li><a href="products/product-tew500.html">TEW500 Compact Winch</a></li>
                                         <li><a href="products/product-tew1500.html">TEW1500 Heavy-Duty Winch</a></li>
                                         <li><a href="products/product-tdl720.html">TDL 720 Data Logger</a></li>
-                                        <li><a href="products/product-mooring-frame.html">Mooring Frames & Mounts</a>
+                                        <li><a href="products/product-mooring-frame.html">Mooring Frames &amp;
+                                                Mounts</a>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div class="mega-column">
-                                    <span class="mega-category"><i class="fa-solid fa-laptop-code"></i> Software &
+                                    <span class="mega-category"><i class="fa-solid fa-laptop-code"></i> Software &amp;
                                         Integrated</span>
                                     <ul class="mega-list-small">
                                         <li><a href="products/product-tems.html">TEMS Platform</a></li>
@@ -102,7 +135,7 @@
                         </div>
                     </li>
                     <li>
-                        <a class="header__nav-link" href="services.html">
+                        <a aria-current="page" class="header__nav-link" href="services.html">
                             Services
                         </a>
                         <div class="mega-menu-container">
@@ -141,7 +174,7 @@
                         </a>
                     </li>
                     <li>
-                        <a aria-current="page" class="header__nav-link" href="careers.html">
+                        <a class="header__nav-link" href="careers.html">
                             Careers
                         </a>
                     </li>
@@ -153,14 +186,14 @@
                 </ul>
             </nav>
             <div class="header__actions">
-                <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
-                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+                <button type="button" id="theme-toggle" class="button button--icon theme-toggle-btn"
+                    aria-label="Toggle Dark Mode">
                     <i class="fas fa-moon"></i>
                 </button>
                 <a class="button button--primary" href="contact.html">
                     Enquire Now
                 </a>
-                <button aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation menu"
+                <button type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation menu"
                     class="header__menu-toggle" id="menu-toggle">
                     <svg class="icon-open" fill="none" height="24" viewbox="0 0 24 24" width="24"
                         xmlns="http://www.w3.org/2000/svg">
@@ -188,100 +221,161 @@
         </div>
     </header>
     <main id="main-content">
-        <section class="page-header">
+        <section class="page-header section">
             <div class="hero__bg"><canvas id="hero-canvas"></canvas></div>
             <div class="container">
                 <h1 class="page-header__title">
-                    Join Our Team
+                    Our Services
                 </h1>
                 <p class="page-header__subtitle">
-                    We are always looking for passionate, talented individuals to help us innovate in the maritime
-                    technology sector. See a future with us? Get in touch.
+                    Providing end-to-end solutions across the entire project lifecycle, from initial studies to data
+                    management and custom engineering.
                 </p>
             </div>
         </section>
-        <section class="section" id="eoi-form">
-            <div class="container form-container">
+
+        <!-- Environmental Monitoring -->
+        <section class="section section--light-bg">
+            <div class="container">
                 <div class="section__header">
-                    <h2 class="section__title">
-                        Expression of Interest
-                    </h2>
-                    <p>
-                        If you don't see a current opening that fits your profile, please use this form to tell us about
-                        yourself and we'll keep your details on file for future opportunities.
-                    </p>
+                    <h2 class="section__title">Environmental Monitoring</h2>
+                    <p class="section__subtitle">Advanced data collection and analysis for marine and coastal
+                        environments.</p>
                 </div>
-                <form action="https://formsubmit.co/geminibaba1@gmail.com" class="contact-form"
-                    enctype="multipart/form-data" method="POST">
-                    <div class="form-group">
-                        <label class="form-label" for="name">
-                            Full Name
-                        </label>
-                        <input class="form-control" id="name" name="name" required="" type="text" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="dob">
-                            Date of Birth
-                        </label>
-                        <input class="form-control" id="dob" name="dob" required="" type="date" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="qualification">
-                            Highest Qualification
-                        </label>
-                        <input class="form-control" id="qualification" name="qualification"
-                            placeholder="e.g., Master of Hydrography" required="" type="text" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="interest">
-                            Interested Areas &amp; Position
-                        </label>
-                        <textarea class="form-control" id="interest" name="interest"
-                            placeholder="Tell us about the roles and fields you are interested in..."
-                            required=""></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="location">
-                            Preferred Location
-                        </label>
-                        <select class="form-control" id="location" name="location" required="">
-                            <option disabled="" selected="" value="">
-                                Select a location
-                            </option>
-                            <option value="Australia">
-                                Australia
-                            </option>
-                            <option value="UAE">
-                                UAE
-                            </option>
-                            <option value="India">
-                                India
-                            </option>
-                            <option value="Remote">
-                                Remote / Flexible
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="cover-letter">
-                            Cover Letter
-                        </label>
-                        <textarea class="form-control" id="cover-letter" name="cover-letter"
-                            placeholder="Tell us why you'd be a great fit for TRIDEL..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="resume">
-                            Upload Resume
-                        </label>
-                        <input accept=".pdf,.doc,.docx" class="form-control" id="resume" name="attachment" required=""
-                            type="file" />
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="button button--large" type="submit">
-                            Submit Application
-                        </button>
-                    </div>
-                </form>
+                <div class="product-list-grid">
+                    <a href="services/hydrography.html#metocean" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="MetOcean Monitoring" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/met-ocean-study.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>MetOcean Monitoring</h4>
+                            <p class="product-item__excerpt">Comprehensive meteorological and oceanographic data
+                                collection services.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/atmospheric-noise.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Atmospheric &amp; Underwater Noise"
+                                class="product-item__image product-image-style" loading="lazy"
+                                src="../assets/images/products/data-buoy/data-buoy-new.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Atmospheric &amp; Underwater Noise</h4>
+                            <p class="product-item__excerpt">Monitoring ambient noise levels in marine and coastal
+                                environments.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/air-quality.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Air Quality Monitoring" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/Eddy-Covariance-Flux-System.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Air Quality Monitoring</h4>
+                            <p class="product-item__excerpt">Precision air quality monitoring for offshore and coastal
+                                projects.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/water-quality.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Water Quality Monitoring" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/products/coastal-buoy/tcb-new.jpg">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Water Quality Monitoring</h4>
+                            <p class="product-item__excerpt">Real-time water quality parameter tracking and analysis.
+                            </p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/ground-water.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Ground Water Monitoring" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/geodatabase-illustration.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Ground Water Monitoring</h4>
+                            <p class="product-item__excerpt">Subsurface water level and quality monitoring solutions.
+                            </p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Surveys -->
+        <section class="section">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Environmental Surveying</h2>
+                    <p class="section__subtitle">Comprehensive hydrographic and geophysical survey services.</p>
+                </div>
+                <div class="product-list-grid">
+                    <a href="services/hydrography.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Bathymetric Surveys" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/port-monitoring.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Bathymetric Surveys</h4>
+                            <p class="product-item__excerpt">High-resolution seabed mapping and depth measurement.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/uxo-survey.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="UXO Survey" class="product-item__image product-image-style" loading="lazy"
+                                src="../assets/images/services/electronic-maps.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>UXO Survey</h4>
+                            <p class="product-item__excerpt">Unexploded Ordnance (UXO) detection and risk assessment.
+                            </p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/geoengineering.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="GeoTechnical Survey" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/bm2s.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>GeoTechnical Survey</h4>
+                            <p class="product-item__excerpt">Soil analysis and sub-bottom profiling for engineering
+                                projects.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/navigational-charting.html" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Navigational Charting" class="product-item__image product-image-style"
+                                loading="lazy" src="../assets/images/services/electronic-maps.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Navigational Charting</h4>
+                            <p class="product-item__excerpt">Production of electronic navigation charts and
+                                publications.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                    <a href="services/hydrography.html#topographic" class="product-grid-wrapper">
+                        <div class="product-card-visual">
+                            <img alt="Topographic Survey" class="product-item__image product-image-style" loading="lazy"
+                                src="../assets/images/services/areal-mapping.png">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>Topographic Survey</h4>
+                            <p class="product-item__excerpt">Land survey and mapping for coastal and onshore
+                                infrastructure.</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
@@ -289,8 +383,8 @@
         <div class="container footer__container">
             <div class="footer__brand">
                 <a class="footer__logo" href="index.html">
-                    <img alt="Tridel Logo" src="assets/images/logo/tridel1.png"
-                        style="height: 32px; filter: brightness(0) invert(1);" />
+                    <img alt="Tridel Logo" loading="lazy" src="../assets/images/logo/tridel1.png"
+                        class="footer-logo-style">
                 </a>
                 <p class="footer__tagline">
                     Connecting Environmental Science, Engineering, and Technology
@@ -376,8 +470,6 @@
             </div>
         </div>
     </footer>
-    </footer>
-    <script src="assets/js/theme-toggle.js"></script>
 </body>
 
 </html>
