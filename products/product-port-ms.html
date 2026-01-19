@@ -1,208 +1,410 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="Port MS - Tridel Technologies" name="title" />
-    <meta content="Port Monitoring System for operational efficiency and environmental compliance." name="description" />
-    <title>Port MS | Tridel Technologies</title>
-    <!-- Favicon -->
-    <link href="../assets/images/logo/favicon.ico" rel="icon" />
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <!-- Global Styles -->
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <!-- Scripts -->
-    <script defer src="../assets/js/script.js"></script>
-    <script defer src="../assets/js/bg-animation.js"></script>
-    <script defer src="../assets/js/theme-toggle.js"></script>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>
+    Data Buoys | TRIDEL
+  </title>
+  <meta content="Tridel Data Buoys — bespoke platforms for advanced marine monitoring and research."
+    name="description" />
+  <link href="../assets/css/styles.css" rel="stylesheet" />
+  <script defer="" src="../assets/js/script.js">
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script defer src="../assets/js/theme-toggle.js"></script>
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header class="header glass-wing">
-        <div class="container header__container">
-            <a class="header__logo" href="../index.html">
-                <img alt="Tridel Logo" class="logo-light" src="../assets/images/logo/tridel1.png" />
-                <img alt="Tridel Logo" class="logo-dark" src="../assets/images/logo/tridel-dark.png" />
+  <header class="header">
+    <div class="container header__container">
+      <a class="header__logo" href="../index.html">
+        <img alt="Tridel Logo" src="../assets/images/logo/tridel.png" />
+      </a>
+      <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
+        <ul class="header__nav-list">
+          <li>
+            <a class="header__nav-link" href="../index.html">
+              Home
             </a>
-            <button aria-label="Toggle navigation" class="mobile-toggle" id="mobile-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-            <nav class="nav" id="nav-menu">
-                <ul class="nav__list">
-                    <li class="nav__item"><a class="nav__link" href="../index.html">Home</a></li>
-                    <li class="nav__item"><a class="nav__link" href="../about.html">About Us</a></li>
-                    <li class="nav__item dropdown">
-                        <a class="nav__link dropdown__trigger" href="../products.html">Products <i class="fas fa-chevron-down"></i></a>
-                        <!-- Mega Menu Placeholder (simplified for brevity, main script handles interactions) -->
+          </li>
+          <li>
+            <a class="header__nav-link" href="../about.html">
+              About Us
+            </a>
+          </li>
+                              <li>
+                        <a class="header__nav-link" href="../products.html">
+                            Products <i class="fas fa-chevron-down" style="font-size: 0.7em; margin-left: 6px;"></i>
+                        </a>
+                        <!-- Mega Menu (Concept 3: Glass Prism) -->
                         <div class="mega-menu glass-mode">
-                            <div class="mega-menu__container">
-                                <div class="mega-menu__col">
-                                    <h4 class="mega-menu__title"><i class="fas fa-microchip"></i> Hardware</h4>
-                                    <ul class="mega-menu__list">
-                                        <li><a href="product-data-buoy.html">Data Buoy</a></li>
-                                        <li><a href="product-tew500.html">TEW 500 (Wave Buoy)</a></li>
-                                        <li><a href="product-tew1500.html">TEW 1500 (Tsunami Buoy)</a></li>
-                                        <li><a href="product-t-sms.html">T-SMS (Sediment Monitoring)</a></li>
-                                        <li><a href="product-tems.html">TEMS (Telemetry)</a></li>
-                                        <li><a href="product-tdl720.html">TDL 720 (Data Logger)</a></li>
-                                    </ul>
+                            <div class="mm-glass-grid">
+                                <!-- Col 1: Buoys -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-life-ring"></i> Buoys</h4>
+                                    <a href="product-coastal-buoy.html" class="glass-link" data-title="Coastal Monitoring Buoy"
+                                        data-desc="Robust floating platforms for nearshore and coastal applications."
+                                        data-img="../assets/images/products/coastal-buoy/tcb-quality.png">Coastal Buoys</a>
+                                    <a href="product-data-buoy.html" class="glass-link" data-title="Data Buoys"
+                                        data-desc="Bespoke platforms for advanced marine monitoring and research."
+                                        data-img="../assets/images/products/data-buoy/data-buoy-1.png">Data Buoys</a>
+                                    <a href="product-nav-buoy.html" class="glass-link" data-title="Navigation Buoys (AtoN)"
+                                        data-desc="Aids to Navigation for marking channels and hazards."
+                                        data-img="../assets/images/products/nav-buoy/nav-buoy-new.jpg">Navigation (AtoN)</a>
+                                    <a href="product-wind-farm-buoy.html" class="glass-link" data-title="Wind Farm (LiDAR) Buoys"
+                                        data-desc="Specialized monitoring solutions for offshore wind energy."
+                                        data-img="../assets/images/products/nav-buoy/nav-buoy-new.jpg">LiDAR / Wind Farm</a>
+                                    <a href="product-mooring-buoy.html" class="glass-link" data-title="Mooring Buoys"
+                                        data-desc="Commercial, Naval, and offshore mooring solutions."
+                                        data-img="../assets/images/products/mooring-buoy/mooring-new.jpg">Mooring Buoys</a>
+                                    <a href="product-deepwater-buoy.html" class="glass-link" data-title="Deepwater Buoys"
+                                        data-desc="Long-term scientific applications in deep-water environments."
+                                        data-img="../assets/images/products/deepwater-buoy/deepwater-new.jpg">Deepwater Buoys</a>
+                                    <a href="product-drifter-buoy.html" class="glass-link" data-title="Drifter Buoys"
+                                        data-desc="Autonomous devices for tracking currents and marine conditions."
+                                        data-img="../assets/images/products/drifter-buoy/drifter-1.jpg">Drifter Buoys</a>
+                                    <a href="product-sub-floats.html" class="glass-link" data-title="Surface & Sub-Surface Floats"
+                                        data-desc="Floats for marking underwater oceanographic moorings."
+                                        data-img="../assets/images/products/sub-floats/hdpe-floats.png">Surface Floats</a>
                                 </div>
-                                <div class="mega-menu__col">
-                                    <h4 class="mega-menu__title"><i class="fas fa-life-ring"></i> Buoys & Floats</h4>
-                                    <ul class="mega-menu__list">
-                                        <li><a href="product-nav-buoy.html">Navigation Buoys</a></li>
-                                        <li><a href="product-mooring-buoy.html">Mooring Buoys</a></li>
-                                        <li><a href="product-deepwater-buoy.html">Deep Water Buoys</a></li>
-                                        <li><a href="product-sub-floats.html">Surface & Sub-surface Floats</a></li>
-                                        <li><a href="product-mooring-frame.html">Mooring Frames</a></li>
-                                    </ul>
+
+                                <!-- Col 2: Vessels -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-ship"></i> Vessels</h4>
+                                    <a href="product-aquilon-8000.html" class="glass-link" data-title="Aquilon 8000 (Hybrid)"
+                                        data-desc="Diesel-electric hybrid ASV for comprehensive missions."
+                                        data-img="../assets/images/products/aquilon-8000/aquilon-8000-new.png">Aquilon 8000 <span class="badge-new">New</span></a>
+                                    <a href="product-aquilon-5600a.html" class="glass-link" data-title="Aquilon 5600 (Hybrid)"
+                                        data-desc="Carbon Fiber Hybrid USV for coastal surveys."
+                                        data-img="../assets/images/products/aquilon-5600a/aquilon-5600-new.png">Aquilon 5600</a>
+                                    <a href="product-monohull-vessel.html" class="glass-link" data-title="Monohull Survey Vessel"
+                                        data-desc="11m fiberglass-reinforced hydrographic survey vessel."
+                                        data-img="../assets/images/products/monohull-vessel/monohull-new.png">Monohull Survey</a>
+                                    <a href="product-catamaran-vessel.html" class="glass-link" data-title="Catamaran Survey Vessel"
+                                        data-desc="25m GRP catamaran for coastal and offshore missions."
+                                        data-img="../assets/images/products/catamaran-vessel/catamaran-new.jpg">Catamaran Survey</a>
                                 </div>
-                                <div class="mega-menu__col mega-menu__spotlight">
-                                     <div class="spotlight-card">
-                                        <span class="spotlight-badge"><i class="fas fa-star"></i> Featured</span>
-                                        <h4 id="glass-title-products" style="margin-bottom: 6px; font-weight: 600; color:white;">TDL 720 Logger</h4>
-                                        <p id="glass-desc-products" style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 12px; color: white;">Advanced data logging for oceanographic applications.</p>
-                                        <a href="product-tdl720.html" id="glass-btn-products" style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View Details &rarr;</a>
+
+                                <!-- Col 3: Equipment -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-screwdriver-wrench"></i> Equipment</h4>
+                                    <a href="product-tew500.html" class="glass-link" data-title="TEW500 Compact Winch"
+                                        data-desc="High-performance winch for precision surveys."
+                                        data-img="../assets/images/products/tew500/Profiling-Winches.jpg">TEW500 Winch</a>
+                                    <a href="product-tew1500.html" class="glass-link" data-title="TEW1500 Heavy-Duty Winch"
+                                        data-desc="Heavy-duty winch for deep-water missions."
+                                        data-img="../assets/images/products/tew1500/tew1500-new.png">TEW1500 Winch</a>
+                                    <a href="product-tdl720.html" class="glass-link" data-title="TDL 720 Data Logger"
+                                        data-desc="Robust, low-power data logger for remote monitoring."
+                                        data-img="../assets/images/products/tdl720/tdl720-new.png">TDL 720 Logger</a>
+                                    <a href="product-mooring-frame.html" class="glass-link" data-title="Mooring Frames & Mounts"
+                                        data-desc="Non-corrosive mounts for underwater instrumentation."
+                                        data-img="../assets/images/products/mooring-frame/Mooring frame.png">Frames & Mounts</a>
+                                </div>
+
+                                <!-- Col 4: Software -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-laptop-code"></i> Software</h4>
+                                    <a href="product-tems.html" class="glass-link" data-title="TEMS Platform"
+                                        data-desc="Real-time data publishing platform integrating multiple systems."
+                                        data-img="../assets/images/software/tems.png">TEMS Platform</a>
+                                    <a href="product-especia.html" class="glass-link" data-title="eSpecia GIS"
+                                        data-desc="Advanced GIS solutions for environmental data analysis."
+                                        data-img="../assets/images/software/especia.png">eSpecia GIS</a>
+                                    <a href="../products.html#port" class="glass-link" data-title="Port Management"
+                                        data-desc="Comprehensive management systems for port operations."
+                                        data-img="../assets/images/software/port-management.png">Port Management</a>
+                                    <a href="product-t-sms.html" class="glass-link" data-title="TSMS Management"
+                                        data-desc="Total Ship Management System for fleet optimization."
+                                        data-img="../assets/images/software/tsms.png">TSMS Management</a>
+                                </div>
+
+                                                                <!-- Col 5: Integrated Solutions -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-network-wired"></i> Integrated Solutions</h4>
+                                    <a href="../products/product-geodb.html" class="glass-link" data-title="GeoDB" data-desc="Geospatial Database solutions." data-img="../assets/images/logo/tridel1.png">GeoDB</a>
+                                    <a href="../products/product-beach-ms.html" class="glass-link" data-title="Beach MS" data-desc="Beach Monitoring System." data-img="../assets/images/logo/tridel1.png">Beach MS</a>
+                                    <a href="../products/product-port-ms.html" class="glass-link" data-title="Port MS" data-desc="Port Monitoring System." data-img="../assets/images/logo/tridel1.png">Port MS</a>
+                                    <a href="../products/product-ecfs.html" class="glass-link" data-title="ECFS" data-desc="Electronic Charting & Forecasting." data-img="../assets/images/logo/tridel1.png">ECFS</a>
+                                    <a href="../products/product-aqms.html" class="glass-link" data-title="AQMS" data-desc="Air Quality Monitoring System." data-img="../assets/images/logo/tridel1.png">AQMS</a>
+                                    <a href="../products/product-forecasting-systems.html" class="glass-link" data-title="Forecasting" data-desc="Advanced forecasting systems." data-img="../assets/images/logo/tridel1.png">Forecasting</a>
+                                </div>
+
+                                <!-- Col 5: Spotlight -->
+                                <div class="glass-col">
+                                    <div class="glass-spotlight" id="glass-featured">
+                                        <img src="../assets/images/products/aquilon-8000/aquilon-8000-new.png" alt="Featured" id="glass-img">
+                                        <h5 id="glass-title" style="margin-bottom: 6px; font-weight: 600; color:white;">Aquilon 8000</h5>
+                                        <p id="glass-desc" style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 12px; color: white;">Our most advanced hybrid USV for deep-sea exploration.</p>
+                                        <a href="product-aquilon-8000.html" id="glass-btn"
+                                            style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View Details &rarr;</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </li>
-                    <li class="nav__item dropdown">
-                        <a class="nav__link dropdown__trigger" href="../services.html">Services <i class="fas fa-chevron-down"></i></a>
-                         <div class="mega-menu glass-mode">
-                            <div class="mega-menu__container">
-                                <div class="mega-menu__col">
-                                    <h4 class="mega-menu__title"><i class="fas fa-satellite-dish"></i> Env. Monitoring</h4>
-                                    <ul class="mega-menu__list">
-                                        <li><a href="../services/met-ocean.html" class="glass-link" data-title="MetOcean Monitoring" data-desc="Real-time MetOcean data collection." data-img="../assets/images/services/metocean.png">MetOcean Monitoring</a></li>
-                                        <li><a href="../services/atmospheric-noise.html" class="glass-link" data-title="Atmospheric & Noise" data-desc="Monitoring noise levels in marine environments." data-img="../assets/images/services/noise.png">Atmospheric & Noise</a></li>
-                                        <li><a href="../services/air-quality.html" class="glass-link" data-title="Air Quality" data-desc="Precise monitoring of air quality parameters." data-img="../assets/images/services/air-quality.png">Air Quality</a></li>
-                                        <li><a href="../services/water-quality.html" class="glass-link" data-title="Water Quality" data-desc="Comprehensive water quality analysis." data-img="../assets/images/services/water-quality.png">Water Quality</a></li>
-                                        <li><a href="../services/ground-water.html" class="glass-link" data-title="Ground Water" data-desc="Ground water level and quality monitoring." data-img="../assets/images/services/ground-water.png">Ground Water</a></li>
-                                    </ul>
+                              <li>
+                        <a class="header__nav-link" href="../services.html">
+                            Services <i class="fas fa-chevron-down" style="font-size: 0.7em; margin-left: 6px;"></i>
+                        </a>
+                        <!-- Mega Menu (Concept 3: Glass Prism) -->
+                        <div class="mega-menu glass-mode">
+                            <div class="mm-glass-grid">
+                                <!-- Col 1: Environmental Monitoring -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-seedling"></i> Env. Monitoring</h4>
+                                    <a href="../services/hydrography.html#metocean" class="glass-link" data-title="MetOcean Monitoring"
+                                        data-desc="Meteorological and Oceanographic monitoring solutions."
+                                        data-img="../assets/images/services/metocean.png">MetOcean Monitoring</a>
+                                    <a href="../services/atmospheric-noise.html" class="glass-link" data-title="Atmospheric & Underwater Noise"
+                                        data-desc="Monitoring noise levels in marine and coastal environments."
+                                        data-img="../assets/images/services/noise-monitoring.png">Atmospheric & Noise</a>
+                                    <a href="../services/air-quality.html" class="glass-link" data-title="Air Quality Monitoring"
+                                        data-desc=" precise monitoring of air quality parameters."
+                                        data-img="../assets/images/services/air-quality.png">Air Quality</a>
+                                    <a href="../services/water-quality.html" class="glass-link" data-title="Water Quality Monitoring"
+                                        data-desc="Comprehensive analysis of water quality metrics."
+                                        data-img="../assets/images/services/water-quality.png">Water Quality</a>
+                                    <a href="../services/ground-water.html" class="glass-link" data-title="Ground Water Monitoring"
+                                        data-desc="Monitoring ground water levels and quality."
+                                        data-img="../assets/images/services/ground-water.png">Ground Water</a>
                                 </div>
-                                <div class="mega-menu__col">
-                                    <h4 class="mega-menu__title"><i class="fas fa-map-marked-alt"></i> Env. Surveying</h4>
-                                    <ul class="mega-menu__list">
-                                        <li><a href="../services/hydrography.html" class="glass-link" data-title="Bathymetric Surveys" data-desc="High-resolution mapping of underwater terrain." data-img="../assets/images/services/bms.png">Bathymetric Surveys</a></li>
-                                        <li><a href="../services/uxo-survey.html" class="glass-link" data-title="UXO Survey" data-desc="Unexploded Ordnance detection." data-img="../assets/images/services/port-monitoring.png">UXO Survey</a></li>
-                                        <li><a href="../services/geotechnical-survey.html" class="glass-link" data-title="GeoTechnical Survey" data-desc="Soil analysis and sub-bottom profiling." data-img="../assets/images/services/geodatabase-illustration.png">GeoTechnical Survey</a></li>
-                                        <li><a href="../services/navigational-charting.html" class="glass-link" data-title="Navigational Charting" data-desc="Electronic navigational charts (ENC)." data-img="../assets/images/services/electronic-maps.png">Navigational Charting</a></li>
-                                        <li><a href="../services/hydrography.html#topographic" class="glass-link" data-title="Topographic Survey" data-desc="Land survey and mapping." data-img="../assets/images/services/areal-mapping.png">Topographic Survey</a></li>
-                                    </ul>
+
+                                <!-- Col 2: Environmental Surveying -->
+                                <div class="glass-col">
+                                    <h4><i class="fas fa-map-location-dot"></i> Env. Surveying</h4>
+                                    <a href="../services/hydrography.html" class="glass-link" data-title="Bathymetric Surveys"
+                                        data-desc="High-resolution mapping of the underwater terrain."
+                                        data-img="../assets/images/services/bathymetry.jpg">Bathymetric Surveys</a>
+                                    <a href="../services/uxo-survey.html" class="glass-link" data-title="UXO Survey"
+                                        data-desc="Detection and mapping of Unexploded Ordnance."
+                                        data-img="../assets/images/services/uxo.png">UXO Survey</a>
+                                    <a href="../services/geoengineering.html" class="glass-link" data-title="GeoTechnical Survey"
+                                        data-desc="Analysis of soil and rock properties for engineering."
+                                        data-img="../assets/images/services/geotechnical.png">GeoTechnical Survey</a>
+                                    <a href="../services/navigational-charting.html" class="glass-link" data-title="Navigational Charting"
+                                        data-desc="Production of electronic navigational charts (ENC)."
+                                        data-img="../assets/images/services/charting.png">Navigational Charting</a>
+                                    <a href="../services/hydrography.html#topographic" class="glass-link" data-title="Topographic Survey"
+                                        data-desc="Land surveying and mapping services."
+                                        data-img="../assets/images/services/topographic.png">Topographic Survey</a>
                                 </div>
-                                <div class="mega-menu__col mega-menu__spotlight">
-                                    <div class="spotlight-card">
-                                        <span class="spotlight-badge"><i class="fas fa-star"></i> Featured</span>
-                                        <h4 id="glass-title-services" style="margin-bottom: 6px; font-weight: 600; color:white;">Bathymetric Surveys</h4>
-                                        <p id="glass-desc-services" style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 12px; color: white;">Precision mapping for marine safety and construction.</p>
-                                        <a href="../services/hydrography.html" id="glass-btn-services" style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View Details &rarr;</a>
+
+                                <!-- Col 3: Spotlight -->
+                                <div class="glass-col">
+                                    <div class="glass-spotlight" id="glass-featured-services">
+                                        <img src="../assets/images/services/bathymetry.jpg" alt="Featured" id="glass-img-services">
+                                        <h5 id="glass-title-services" style="margin-bottom: 6px; font-weight: 600; color:white;">Bathymetric Surveys</h5>
+                                        <p id="glass-desc-services" style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 12px; color: white;">Precision mapping for marine safety and construction.</p>
+                                        <a href="../services/hydrography.html" id="glass-btn-services"
+                                            style="color: var(--color-accent); font-size: 0.9rem; font-weight: 500;">View Details &rarr;</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </li>
-                    <li class="nav__item"><a class="nav__link" href="../success-stories.html">Success Stories</a></li>
-                    <li class="nav__item"><a class="nav__link" href="../careers.html">Careers</a></li>
-                    <li class="nav__item"><a class="nav__link" href="../contact.html">Contact</a></li>
-                </ul>
-                <div class="theme-toggle" id="theme-toggle">
-                    <i class="fas fa-moon"></i>
+          <li>
+            <a class="header__nav-link" href="../success-stories.html">
+              Success Stories
+            </a>
+          </li>
+          <li>
+            <a class="header__nav-link" href="../careers.html">
+              Careers
+            </a>
+          </li>
+          <li>
+            <a class="header__nav-link" href="../contact.html">
+              Contact
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="header__actions">
+        <button id="theme-toggle" class="button button--icon" aria-label="Toggle Dark Mode"
+          style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-main); margin-right: 16px;">
+          <i class="fas fa-moon"></i>
+        </button>
+        <a class="button button--primary" href="../contact.html">
+          Enquire Now
+        </a>
+        <button aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation menu"
+          class="header__menu-toggle" id="menu-toggle">
+          <svg class="icon-open" fill="none" height="24" viewbox="0 0 24 24" width="24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12H21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            </path>
+            <path d="M3 6H21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            </path>
+            <path d="M3 18H21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            </path>
+          </svg>
+          <svg class="icon-close" fill="none" height="24" viewbox="0 0 24 24" width="24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            </path>
+            <path d="M6 6L18 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            </path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main-content">
+    <section class="section">
+      <div class="container">
+        <div class="detail-layout">
+          <div class="detail-layout__content">
+            <h1 class="detail-layout__title">
+              Data Buoys
+            </h1>
+            <p class="detail-layout__description">
+              Our TDBs (Tridel Data Buoys) are bespoke-design buoy platforms built for advanced marine monitoring and
+              research applications. They are designed for sensor-agnostic, autonomous operation in demanding
+              environments.
+            </p>
+            <h3>
+              Key Features
+            </h3>
+            <ul class="detail-layout__list">
+              <li><strong> Open-Architecture: </strong> Sensor-agnostic framework for plug-and-play sensor/payload
+                integration with data-loggers.</li>
+              <li><strong> Modular Design: </strong> Standardized mechanical, electrical, and software interfaces
+                support evolving research needs and rapid deployment of new marine technologies.</li>
+              <li><strong> Autonomous Operation: </strong> Solar-powered autonomy for long-term, remote operations.</li>
+              <li><strong> Versatile Payload: </strong> Features sensor/payload deployment via moon pools.</li>
+              <li><strong> Common Applications: </strong> Oceanographic data collection, long-term environmental
+                monitoring, and research use.</li>
+            </ul>
+            <div class="product-actions">
+              <a class="button button--primary" href="../contact.html">Request Quote</a>
+              <a href="../products.html" class="button button--soft">Back to Products</a>
+            </div>
+          </div>
+          <div class="detail-layout__image">
+            <div class="product-gallery">
+              <div class="gallery-main" onclick="openLightbox(this)">
+                <img loading="lazy" id="main-product-image" src="../assets/images/products/data-buoy/data-buoy-1.png"
+                  alt="Tridel Data Buoys">
+                <div class="enlarge-hint">
+                  <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                  Click to Enlarge
                 </div>
-                <a class="btn btn--primary nav__cta" href="../contact.html">Enquire Now</a>
-            </nav>
+              </div>
+              <div class="gallery-thumbs">
+                <img loading="lazy" src="../assets/images/products/data-buoy/data-buoy-1.png"
+                  onclick="changeImage(this.src)" class="active" alt="View 2">
+                <img loading="lazy" src="../assets/images/products/data-buoy/data-buoy-new.png"
+                  onclick="changeImage(this.src)" alt="View 1">
+              </div>
+            </div>
+          </div>
         </div>
-    </header>
-
-    <main>
-        <!-- Page Header -->
-        <section class="page-header section">
-            <div class="hero__bg" id="hero-canvas"></div>
-            <div class="container">
-                <h1 class="page-header__title">Port MS</h1>
-                <p class="page-header__subtitle">Integrated Solutions / Port MS</p>
-            </div>
-        </section>
-
-        <!-- Product Details -->
-        <section class="section">
-            <div class="container">
-                <div class="product-details__grid">
-                    <!-- Image Gallery -->
-                    <div class="product-details__gallery">
-                        <div class="product-gallery__main">
-                           <div style="width: 100%; height: 300px; background: var(--color-surface-pure); display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: var(--shadow-card);">
-                                <i class="fas fa-anchor" style="font-size: 8rem; color: var(--color-text-main);"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="product-details__content">
-                        <h2 class="section__title section__title--left">Port MS</h2>
-                        <p class="product-details__overview" style="font-size: 1.1rem; color: var(--color-text-light); margin-bottom: 2rem;">
-                            Port Monitoring System for operational efficiency and environmental compliance.
-                        </p>
-
-                        <div class="product-details__tabs" style="background: var(--color-surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--color-border);">
-                            <h3>Coming Soon</h3>
-                            <p>Detailed specifications and features for Port MS will be available shortly. Contact us for more information.</p>
-                        </div>
-
-                        <div class="product-details__cta" style="margin-top: 2rem;">
-                            <a class="btn btn--primary" href="../contact.html">Request Information</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container footer__container">
-            <div class="footer__brand">
-                <a class="footer__logo" href="../index.html">
-                    <img alt="Tridel Logo" src="../assets/images/logo/tridel1.png" style="height: 32px; filter: brightness(0) invert(1);" />
-                </a>
-                <p class="footer__tagline">
-                    Connecting Environmental Science, Engineering, and Technology
-                </p>
-            </div>
-            <div class="footer__links">
-                <div class="footer__links-col">
-                    <h3 class="footer__heading">Quick Links</h3>
-                    <ul>
-                        <li><a class="footer__link" href="../about.html">About Us</a></li>
-                        <li><a class="footer__link" href="../products.html">Products</a></li>
-                        <li><a class="footer__link" href="../services.html">Services</a></li>
-                        <li><a class="footer__link" href="../contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer__links-col">
-                    <h3 class="footer__heading">Contact</h3>
-                    <ul>
-                        <li class="footer__contact-item"><i class="fas fa-map-marker-alt"></i> Vadodara, Gujarat</li>
-                        <li class="footer__contact-item"><i class="fas fa-envelope"></i> info@tridel.in</li>
-                        <li class="footer__contact-item"><i class="fas fa-phone"></i> +91 98765 43210</li>
-                    </ul>
-                </div>
-            </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer__container">
+      <div class="footer__brand">
+        <a class="footer__logo" href="../index.html">
+          <img alt="Tridel Logo" src="../assets/images/logo/tridel1.png"
+            style="height: 32px; filter: brightness(0) invert(1);" />
+        </a>
+        <p class="footer__tagline">
+          Connecting Environmental Science, Engineering, and Technology
+        </p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__links-col">
+          <h3 class="footer__heading">
+            Quick Links
+          </h3>
+          <ul>
+            <li>
+              <a class="footer__link" href="../about.html">
+                About Us
+              </a>
+            </li>
+            <li>
+              <a class="footer__link" href="../products.html">
+                Products
+              </a>
+            </li>
+            <li>
+              <a class="footer__link" href="../services.html">
+                Services
+              </a>
+            </li>
+          </ul>
         </div>
-        <div class="footer__bottom">
-            <div class="container">
-                <p>&copy; 2025 Tridel Technologies. All Rights Reserved.</p>
-            </div>
+        <div class="footer__links-col">
+          <h3 class="footer__heading">
+            Company
+          </h3>
+          <ul>
+            <li>
+              <a class="footer__link" href="../success-stories.html">
+                Success Stories
+              </a>
+            </li>
+            <li>
+              <a class="footer__link" href="../careers.html">
+                Careers
+              </a>
+            </li>
+            <li>
+              <a class="footer__link" href="../contact.html">
+                Contact
+              </a>
+            </li>
+          </ul>
         </div>
-    </footer>
+      </div>
+      <div class="footer__social">
+        <h3 class="footer__heading">
+          Connect
+        </h3>
+        <a aria-label="LinkedIn" class="footer__social-link"
+          href="https://www.linkedin.com/company/tridel-technologies/">
+          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
+            </path>
+            <rect height="12" width="4" x="2" y="9">
+            </rect>
+            <circle cx="4" cy="4" r="2">
+            </circle>
+          </svg>
+        </a>
+        <a aria-label="Twitter" class="footer__social-link" href="#">
+          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+            </path>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="container">
+        <p>
+          © 2025 Tridel Technologies. All Rights Reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
 </body>
+
 </html>
+
+
+
