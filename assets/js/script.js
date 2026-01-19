@@ -498,6 +498,54 @@ document.addEventListener('DOMContentLoaded', () => {
             behavior: 'smooth'
         });
     });
+
+    // --- Mega Menu Interaction (Glass Prism) ---
+    const glassLinks = document.querySelectorAll('.glass-link');
+    let updateTimeout;
+
+    function updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href) {
+        // 1. Fade out content slightly
+        card.style.opacity = '0.7';
+        imgEl.style.transform = 'scale(0.95)';
+
+        // 2. Change content after short delay
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            imgEl.src = img;
+            titleEl.textContent = title;
+            descEl.textContent = desc;
+            if (btnEl) btnEl.href = href; // Sync the button link
+
+            // 3. Fade in and pop
+            card.style.opacity = '1';
+            imgEl.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    glassLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            // Find the parent grid and the spotlight card within it
+            const container = link.closest('.mm-glass-grid');
+            if (!container) return;
+
+            const card = container.querySelector('.glass-spotlight');
+            if (!card) return;
+
+            const imgEl = card.querySelector('img');
+            const titleEl = card.querySelector('h5');
+            const descEl = card.querySelector('p');
+            const btnEl = card.querySelector('a'); // The "View Details" button
+
+            const title = link.getAttribute('data-title');
+            const desc = link.getAttribute('data-desc');
+            const img = link.getAttribute('data-img');
+            const href = link.getAttribute('href');
+
+            if (title && img) {
+                updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href);
+            }
+        });
+    });
 });
 
 window.openLightbox = function (el) {
