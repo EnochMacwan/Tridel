@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tridel Flagship Concepts</title>
+    <link rel="stylesheet" href="../assets/css/sample-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #001220;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 170, 231, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 170, 231, 0.1) 0%, transparent 20%);
+        }
+
+        .menu-container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #00AAE7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #8899a6;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-accent);
+            box-shadow: 0 10px 30px rgba(0, 170, 231, 0.2);
+        }
+
+        .concept-card.featured {
+            border: 1px solid var(--color-accent);
+            box-shadow: 0 0 20px rgba(0, 170, 231, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: var(--color-accent);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .tag {
+            background: #002855;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            display: inline-block;
+            color: var(--color-accent);
+            border: 1px solid rgba(0, 170, 231, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../index.html" class="back-link"><i class="fas fa-home"></i> Back to Live Site</a>
+
+    <div class="menu-container">
+        <h1>Flagship Concept Lab</h1>
+        <p class="subtitle">Latest Experimental Designs</p>
+
+        <div class="cards-grid">
+
+            <a href="concept5-boat.html" class="concept-card">
+                <div class="card-icon"><i class="fas fa-ship"></i></div>
+                <div class="card-title">Future Seas (V1)</div>
+                <div class="card-desc">Advanced "Boat Style" hero animation with neon aesthetics.</div>
+            </a>
+
+            <a href="concept5-v2.html" class="concept-card featured">
+                <div
+                    style="position:absolute; top:10px; right:10px; background:var(--color-accent); color:black; font-weight:700; font-size:0.7rem; padding:2px 8px; border-radius:4px;">
+                    LATEST</div>
+                <div class="card-icon"><i class="fas fa-water"></i></div>
+                <div class="card-title">Future Seas (Replica)</div>
+                <div class="card-desc">Exact Index.html replica with new Cyber Boat animation.</div>
+                <span class="tag">Refined Concept</span>
+            </a>
+
+            <a href="concept6-fleet.html" class="concept-card">
+                <div
+                    style="position:absolute; top:10px; right:10px; background:#FF8C00; color:black; font-weight:700; font-size:0.7rem; padding:2px 8px; border-radius:4px;">
+                    NEW</div>
+                <div class="card-icon"><i class="fas fa-ship"></i></div>
+                <div class="card-title">Coastal Ecosystem</div>
+                <div class="card-desc">Animated panorama featuring Orange USV, Survey Ship, and Buoys.</div>
+                <span class="tag">Fleet Showcase</span>
+            </a>
+
+            <!-- Restored Placeholders for consistency (Need to rebuild files to activate links fully) -->
+            <a href="#" class="concept-card" style="opacity:0.5; pointer-events:none;">
+                <div class="card-icon"><i class="fas fa-arrow-down"></i></div>
+                <div class="card-title">Depth Journey</div>
+                <div class="card-desc">Restoration pending...</div>
+            </a>
+
+            <a href="#" class="concept-card" style="opacity:0.5; pointer-events:none;">
+                <div class="card-icon"><i class="fas fa-earth-asia"></i></div>
+                <div class="card-title">Data Earth</div>
+                <div class="card-desc">Restoration pending...</div>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

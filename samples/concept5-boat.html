@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 5: Future Seas | Tridel</title>
+    <link rel="stylesheet" href="../assets/css/sample-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #00050a;
+            /* Darker than primary */
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 1. Futuristic Grid Background */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 170, 231, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 170, 231, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 500px;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) scale(2);
+            transform-origin: top center;
+            opacity: 0.3;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 500px;
+            }
+        }
+
+        /* 2. Central Boat (CSS Constructed or Placeholder) */
+        .boat-container {
+            position: relative;
+            z-index: 10;
+            width: 600px;
+            height: 300px;
+            animation: boatBob 4s ease-in-out infinite;
+        }
+
+        /* Using a stylized SVG outline for the boat */
+        .cyber-boat-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px rgba(0, 170, 231, 0.6));
+        }
+
+        /* Neon lines on the boat */
+        .boat-line {
+            stroke: #00AAE7;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 3s ease-out forwards;
+        }
+
+        .boat-fill {
+            fill: rgba(0, 40, 85, 0.8);
+            opacity: 0;
+            animation: fadeIn 1s forwards 2s;
+        }
+
+        @keyframes boatBob {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(1deg);
+            }
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 3. Water/Waves */
+        .water-surface {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40vh;
+            background: linear-gradient(to top, rgba(0, 170, 231, 0.1), transparent);
+            z-index: 5;
+            backdrop-filter: blur(2px);
+        }
+
+        .wave-line {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 200%;
+            height: 2px;
+            background: rgba(0, 170, 231, 0.4);
+            box-shadow: 0 0 10px rgba(0, 170, 231, 0.8);
+        }
+
+        .wave-1 {
+            animation: waveMove 10s linear infinite;
+            opacity: 0.5;
+            bottom: 15vh;
+        }
+
+        .wave-2 {
+            animation: waveMove 15s linear infinite reverse;
+            opacity: 0.3;
+            bottom: 10vh;
+        }
+
+        .wave-3 {
+            animation: waveMove 7s linear infinite;
+            opacity: 0.7;
+            bottom: 20vh;
+            height: 1px;
+        }
+
+        @keyframes waveMove {
+            0% {
+                transform: translateX(0) skewX(20deg);
+            }
+
+            100% {
+                transform: translateX(-50%) skewX(-20deg);
+            }
+        }
+
+        /* 4. HUD / Text Elements */
+        .hud-text {
+            position: absolute;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .main-title {
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 10px;
+            text-shadow: 0 0 20px rgba(0, 170, 231, 0.8);
+            background: linear-gradient(to bottom, #fff, #00AAE7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            animation: textGlitch 0.5s forwards 1s;
+        }
+
+        .status-panel {
+            top: 40%;
+            right: 10%;
+            text-align: right;
+        }
+
+        .hud-stat {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .hud-label {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Scanner Effect */
+        .scanner {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 20px #0f0;
+            z-index: 20;
+            opacity: 0;
+            animation: scan 5s ease-in-out infinite 4s;
+        }
+
+        @keyframes scan {
+            0% {
+                left: 0%;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.8;
+            }
+
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes textGlitch {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) skew(20deg);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) skew(-20deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) skew(0deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Samples</a>
+
+    <div class="sample-nav">
+        <!-- New Concept Only for Focus -->
+        <a href="concept5-boat.html" class="active">Concept 5: Future Seas</a>
+    </div>
+
+    <div class="hero-section">
+
+        <div class="grid-bg"></div>
+        <div class="scanner"></div>
+
+        <h1 class="hud-text main-title">TRIDEL <br> <span
+                style="font-size:1.5rem; letter-spacing:5px; color:white;">ADVANCED MARINE SYSTEMS</span></h1>
+
+        <div class="boat-container">
+            <!-- SVG Silhouette of a Futuristic Boat -->
+            <svg class="cyber-boat-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- Hull -->
+                <path class="boat-fill boat-line" d="M 50 200 L 150 280 L 450 280 L 550 200 L 500 150 L 100 150 Z" />
+                <!-- Cabin -->
+                <path class="boat-fill boat-line" d="M 200 150 L 220 100 L 380 100 L 400 150" />
+                <!-- Antenna / Tech -->
+                <line class="boat-line" x1="300" y1="100" x2="300" y2="50" style="animation-delay: 1s;" />
+                <circle class="boat-line" cx="300" cy="40" r="10" />
+                <!-- Water Line (Glow) -->
+                <line x1="50" y1="260" x2="550" y2="260" stroke="#00AAE7" stroke-width="2" opacity="0.5" />
+            </svg>
+        </div>
+
+        <div class="water-surface">
+            <div class="wave-line wave-1"></div>
+            <div class="wave-line wave-2"></div>
+            <div class="wave-line wave-3"></div>
+        </div>
+
+        <div class="hud-text status-panel">
+            <div class="hud-stat">42.5 KN</div>
+            <div class="hud-label">VELOCITY</div>
+            <div class="hud-stat" style="margin-top:20px;">STABLE</div>
+            <div class="hud-label">SYSTEM STATUS</div>
+        </div>
+
+        <div class="hud-text" style="bottom: 15%; left: 10%;">
+            <div class="hud-label">LAT: 24.112N</div>
+            <div class="hud-label">LNG: 55.201E</div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
