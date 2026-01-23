@@ -4424,12 +4424,5 @@ body {
 }
 
 
-/* Square Cards Override */
-.grid-card-visual,
-.product-card-visual,
-.highlight-card,
-.news-card,
-.highlights-grid .grid-card-visual {
-    border-radius: 0px !important;
-}
+
 
