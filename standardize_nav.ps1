@@ -3,7 +3,6 @@ $rootDir = "c:\Users\AKALPURAKH\Downloads\OneDrive_2026-01-07\tridel website\Tri
 $goldenNavContent = [System.IO.File]::ReadAllText($goldenNavPath)
 
 # Regex to find the existing <nav> block
-$navRegex = '(?s)<nav[^>]*id="main-nav"[^>]*>.*?</nav>'
 
 # Function to adjust paths for subdirectory files
 function Get-SubDirNav ($content) {
@@ -104,19 +103,23 @@ Get-ChildItem -Path $rootDir -Filter *.html -Recurse | ForEach-Object {
     # The previous attempt might have failed due to greedy .* skipping too much or too little? 
     # Let's try matching the exact boundary.
     
-    $regex = '(?s)<header class="header">.*?(?=<main)'
+    $regex = '(?s)<header[^>]*class="header"[^>]*>.*?(?=<main)'
     
     # We will read file, replace, write.
     if ($fileContent -match $regex) {
-        $clean = "<header class=`"header`">`n$newNav`n</header>`n"
+        # Construct the new header block
+        
+        $clean = "<header class=`"header`">`n$newNav`n</header>"
+        
         $fileContent = $fileContent -replace $regex, $clean
         [System.IO.File]::WriteAllText($filePath, $fileContent)
         Write-Host "Fixed (Boundary Method) Navigation in: $fileName"
     }
     else {
-        # Fallback: exact match if main isn't found easily (unlikely but safe)
-        if ($fileContent -match '(?s)<header class="header">.*?</header>') {
-            $fileContent = $fileContent -replace '(?s)<header class="header">.*?</header>', $cleanHeader
+        # Fallback: simple header replacement
+        if ($fileContent -match '(?s)<header[^>]*class="header"[^>]*>.*?</header>') {
+            $clean = "<header class=`"header`">`n$newNav`n</header>"
+            $fileContent = $fileContent -replace '(?s)<header[^>]*class="header"[^>]*>.*?</header>', $clean
             [System.IO.File]::WriteAllText($filePath, $fileContent)
             Write-Host "Fixed Standard Navigation in: $fileName"
         }

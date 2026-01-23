@@ -1,13 +1,12 @@
 
 $root = "c:\Users\AKALPURAKH\Downloads\OneDrive_2026-01-07\tridel website\Tridel-main\Tridel-main"
-$imagesDir = Join-Path $root "assets\images"
 $htmlFiles = Get-ChildItem -Path $root -Recurse -Filter *.html
 
 foreach ($file in $htmlFiles) {
     $content = Get-Content $file.FullName
-    $matches = [regex]::Matches($content, 'src="(assets/images/[^"]+)"')
+    $imgMatches = [regex]::Matches($content, 'src="(assets/images/[^"]+)"')
     
-    foreach ($match in $matches) {
+    foreach ($match in $imgMatches) {
         $relPath = $match.Groups[1].Value
         $fullPath = Join-Path $root ($relPath -replace "/", "\")
         
