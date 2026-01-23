@@ -1655,49 +1655,131 @@ body {
 /* ---------------------------------- */
 /* 10. Mobile                         */
 /* ---------------------------------- */
+/* ---------------------------------- */
+/* 10. Mobile Glass Sidebar           */
+/* ---------------------------------- */
+/* ---------------------------------- */
+/* 10. Mobile Glass Sidebar (Accordion) */
+/* ---------------------------------- */
 @media (max-width: 1024px) {
-    .footer__links {
-        flex-direction: column;
-        gap: 32px;
+    .header__menu-toggle {
+        display: block;
+        z-index: 2001;
+        position: relative;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .header__menu-toggle .icon-close {
+        display: none;
+    }
+
+    body.nav-open .header__menu-toggle .icon-open {
+        display: none;
+    }
+
+    body.nav-open .header__menu-toggle .icon-close {
+        display: block;
     }
 
     .header__nav {
-        display: none;
-        /* Hidden by default */
+        display: block !important;
         position: fixed;
-        top: 80px;
-        left: 0;
-        width: 100%;
-        height: calc(100vh - 80px);
-        background: var(--color-primary);
-        padding: 40px;
-        z-index: 999;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 85%;
+        max-width: 400px;
+        height: 100vh;
+        padding: 80px 30px;
+        /* Reduced padding */
+        z-index: 2000;
+
+        /* Dark Sidebar Look */
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        visibility: hidden;
+        overflow-y: auto;
+        /* Scrollable if expaneded */
     }
 
-    /* Show menu when open */
+    /* Open State */
     body.nav-open .header__nav {
-        display: block;
-        animation: fadeInUp 0.3s ease-out;
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    /* Backdrop */
+    body.nav-open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1500;
+        animation: fadeIn 0.4s ease forwards;
     }
 
     .header__nav-list {
         flex-direction: column;
-        align-items: center;
-        gap: 32px;
+        align-items: flex-start;
+        gap: 0;
+        /* Removing gap, using padding instead */
+        width: 100%;
+    }
+
+    .header__nav-list>li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .header__nav-link {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        /* Slightly smaller for mobile */
+        font-weight: 600;
+        color: #ffffff;
+        display: flex;
+        /* Flex to align chevron */
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 16px 0;
+        border-bottom: none;
+        /* Handled by li */
+    }
+
+    .header__nav-link i {
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
+    }
+
+    /* Rotate chevron when open */
+    li.mobile-menu-open .header__nav-link i {
+        transform: rotate(180deg);
     }
 
     .header__menu-toggle {
         display: block;
+        z-index: 2001;
+        position: relative;
     }
 
-    /* Icon Toggling */
     .icon-close {
         display: none;
+        filter: invert(1);
     }
 
     body.nav-open .icon-open {
@@ -1708,34 +1790,125 @@ body {
         display: block;
     }
 
-    /* Hide Action Button in Nav if duplicate */
-    .header__actions .button {
+    .footer__links {
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    /* --- Accordion Sub-Menu Styling --- */
+
+    /* Initially Hidden */
+    .mega-menu {
+        display: none !important;
+        /* Default hidden */
+        position: static !important;
+        /* Force static flow */
+        width: 100% !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        background: transparent !important;
+        /* No glass card on mobile */
+        box-shadow: none !important;
+        padding: 0 0 20px 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Active State (toggled by JS) */
+    li.mobile-menu-open .mega-menu {
+        display: block !important;
+        /* Show when active */
+        animation: slideDown 0.3s ease;
+    }
+
+    .mm-glass-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 10px 0 0 10px !important;
+        /* Indent */
+    }
+
+    /* Flatten Grid to List */
+    .mm-products,
+    .mm-services {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
+        /* Reset grid */
+    }
+
+    .header__nav-list .glass-col {
+        margin-bottom: 0;
+    }
+
+    /* Headers inside mega menu */
+    .glass-col h4 {
+        color: var(--color-accent);
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+        margin-top: 12px;
+    }
+
+    /* Links inside mega menu */
+    .glass-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        /* Specific mobile color */
+        padding: 8px 0;
+        font-size: 1rem;
+        margin: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Hide Spotlights on Mobile to save space */
+    .glass-col:has(.glass-spotlight),
+    .glass-spotlight {
         display: none;
     }
-}
 
-/* Animation */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 }
 
-/* Dark Mode Override for Mobile Menu */
+/* Dark Mode Override for Glass Sidebar */
 @media (max-width: 1024px) {
     [data-theme="dark"] .header__nav {
-        background: #000000;
-        /* Force black background in dark mode */
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 10, 10, 0.85);
+        /* Dark Glass */
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
     }
 
+    [data-theme="dark"] .header__nav-link {
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
+    [data-theme="dark"] body.nav-open::before {
+        background: rgba(0, 0, 0, 0.6);
+        /* Darker dim */
+    }
 }
 
 /* Force Pitch Black sections GLOBALLY */
@@ -2327,6 +2500,34 @@ body {
     position: relative;
     margin-top: 40px;
     align-items: stretch;
+}
+
+.glass-spotlight {
+    display: none;
+    /* Revert mobile spotlight display to 'none' */
+}
+
+@media (min-width: 769px) {
+
+    /* Assuming desktop is > 768px */
+    .glass-spotlight {
+        grid-column: 2 / span 3;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        /* Slightly narrower than container */
+        max-width: 900px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        height: 180px;
+        /* Fixed height for consistency */
+    }
 }
 
 /* Blue Corner Ribbon - REMOVED for Subtle Clean Design */
@@ -3325,4 +3526,893 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+}
+
+/* ---------------------------------- */
+/* 5. Utility Classes                 */
+/* ---------------------------------- */
+
+/* Contact Page Map Section Utilities */
+.contact-location-group {
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s var(--ease-tech);
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.contact-location-group:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .contact-location-group:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.contact-location-label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    display: block;
+}
+
+.contact-location-address {
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+.contact-location-address br {
+    margin-bottom: 4px;
+}
+
+[data-theme="dark"] .contact-location-address {
+    color: var(--color-text-muted);
+}
+
+/* Standardized Mega Menu Utilities */
+.nav-icon-small {
+    font-size: 0.7em;
+    margin-left: 6px;
+}
+
+.spotlight-title {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: white;
+}
+
+.spotlight-desc {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.spotlight-link {
+    color: var(--color-accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* ---------------------------------- */
+/* 23. Glass Prism Mega Menu Layout   */
+/* ---------------------------------- */
+
+/* Grid System */
+.mm-glass-grid {
+    display: grid;
+    gap: 24px;
+    padding: 30px;
+}
+
+/* Products Grid: 5 Columns + Bottom Spotlight */
+.mm-products {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-areas:
+        "col1 col2 col3 col4 col5"
+        ".    spot .    .    .";
+    /* Fallback if we don't use direct child indexing */
+}
+
+/* Force the 6th child (Spotlight) to bottom center */
+.mm-products>.glass-col:last-child {
+    grid-column: 2 / span 3;
+    /* Span middle 3 columns */
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Services Grid: 3 Columns Simple */
+.mm-services {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Glass Column Styling */
+.glass-col h4 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 8px;
+}
+
+.glass-col i {
+    margin-right: 8px;
+    opacity: 0.8;
+}
+
+/* Link Styling */
+.glass-link {
+    display: block;
+    padding: 8px 12px;
+    margin: 4px -12px;
+    border-radius: 8px;
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.glass-link:hover {
+    background: rgba(0, 0, 0, 0.03);
+    /* Light Mode Hover */
+    color: var(--color-accent);
+    transform: translateX(5px);
+}
+
+[data-theme="dark"] .glass-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.glass-link[data-title]:hover::after {
+    /* Optional: Tooltip logic could go here, but we use spotlight instead */
+}
+
+/* Spotlight Card Styling - "Little bit larger" */
+.glass-spotlight {
+    position: relative;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.01));
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+
+[data-theme="dark"] .glass-spotlight {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.spotlight-title {
+    font-size: 1.2rem;
+    /* Larger font */
+    color: var(--color-text-main);
+}
+
+.spotlight-desc {
+    font-size: 0.95rem;
+    /* Larger font */
+    color: var(--color-text-muted);
+}
+
+/* Badge New */
+.badge-new {
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* ---------------------------------- */
+/* 24. Mega Menu Visibility Fixes     */
+/* ---------------------------------- */
+
+/* Explicit Glass Mode Backgrounds to ensure text contrast */
+.mega-menu.glass-mode {
+    background: rgba(255, 255, 255, 0.98);
+    /* Opaque enough for text */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .mega-menu.glass-mode {
+    background: #0a0a0a;
+    /* Fallback */
+    background: rgba(10, 10, 10, 0.98);
+    /* Dark opaque */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Force Link Colors */
+.mega-menu.glass-mode .glass-link {
+    color: var(--color-text-main);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .mega-menu.glass-mode .glass-link {
+    color: #ffffff;
+    /* Pure white for max contrast */
+}
+
+.mega-menu.glass-mode .glass-link:hover {
+    color: var(--color-accent);
+}
+
+/* Headers */
+.mega-menu.glass-mode .glass-col h4 {
+    color: var(--color-accent);
+    /* Blue is safe on both */
+}
+/* ---------------------------------- */
+/* 24. Tridel Glass HUD Mobile Redesign */
+/* ---------------------------------- */
+
+/* Default State: Bottom Nav is Hidden (Desktop) */
+.bottom-glass-nav {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+
+    /* --- Top Header Simplification --- */
+    /* Hide standard nav completely initially, will be shown as HUD */
+    .header__nav {
+        display: none !important; /* Important to override any other display rules */
+    }
+
+    /* We show the HUD menu specifically when the class is added via JS or targeted */
+    .header__nav.mobile-hud-menu {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(30px);
+        z-index: 9990; /* Below bottom bar z-index of 9999 */
+        padding: 80px 20px 100px 20px;
+        transform: translateY(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        overflow-y: auto;
+    }
+
+    body.nav-open .header__nav.mobile-hud-menu {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .header__actions .button--primary {
+        display: none; /* Hide 'Enquire Now' button on mobile header */
+    }
+
+    .header__menu-toggle {
+        display: none !important; /* Hide old toggle button */
+    }
+
+    .header {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent) !important;
+        backdrop-filter: none !important;
+        border-bottom: none !important;
+        pointer-events: none; /* Let clicks pass through empty areas */
+    }
+
+    .header__container {
+        pointer-events: auto; /* Re-enable pointer events for logo/theme toggle */
+        justify-content: space-between;
+    }
+
+    /* --- Bottom Glass Navigation --- */
+    .bottom-glass-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        max-width: 400px;
+        height: 70px;
+        background: rgba(10, 10, 10, 0.65); /* Dark Glass */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 35px; /* Pill shape */
+        z-index: 9999;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        padding: 0 10px;
+    }
+
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        font-size: 0.75rem;
+        gap: 4px;
+        padding: 8px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .bottom-nav-item i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+
+    .bottom-nav-item.active,
+    .bottom-nav-item:hover {
+        color: white;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .bottom-nav-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 5px;
+        width: 4px;
+        height: 4px;
+        background: var(--color-accent, #00d2ff);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--color-accent, #00d2ff);
+    }
+
+    /* Menu Trigger Special Styling */
+    .menu-trigger .icon-close {
+        display: none;
+    }
+
+    body.nav-open .menu-trigger .icon-menu {
+        display: none;
+    }
+
+    body.nav-open .menu-trigger .icon-close {
+        display: block;
+        color: #ff4757; /* accent color for close */
+    }
+
+    /* Ensure list stacks vertically */
+    .mobile-hud-menu .header__nav-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    /* --- Mobile Accordion & Horizontal Scroll Logic --- */
+
+    /* Reset Mega Menu for Mobile HUD flow */
+    .mobile-hud-menu .mega-menu {
+        position: static;
+        width: 100%;
+        max-width: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        background: transparent !important;
+        border: none;
+        padding: 0;
+        margin-top: 10px;
+        display: none; /* Hidden by default (Accordion) */
+        overflow: visible; /* Allow children to scroll */
+    }
+
+    /* Show when Parent LI is open (JS toggles .mobile-menu-open on LI) */
+    .header__nav-list li.mobile-menu-open .mega-menu {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Turn Grid into Horizontal Snap Scroll */
+    .mobile-hud-menu .mm-glass-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        gap: 16px;
+        padding: 4px 4px 20px 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .mobile-hud-menu .mm-glass-grid::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+
+    /* Style Columns as HUD Cards */
+    .mobile-hud-menu .glass-col {
+        flex: 0 0 85%; /* Card width */
+        min-width: 85%;
+        scroll-snap-align: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        margin-bottom: 0; /* Override default */
+    }
+
+    /* HUD Tech Markers for glass-col */
+    .mobile-hud-menu .glass-col::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        border-top: 2px solid rgba(0, 210, 255, 0.5);
+        border-left: 2px solid rgba(0, 210, 255, 0.5);
+        border-top-left-radius: 16px;
+    }
+
+    .mobile-hud-menu .glass-col::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        border-bottom: 2px solid rgba(0, 210, 255, 0.5);
+        border-right: 2px solid rgba(0, 210, 255, 0.5);
+        border-bottom-right-radius: 16px;
+    }
+
+    /* Inner Content Styling */
+    .mobile-hud-menu .glass-col h4 {
+        font-size: 1.2rem;
+        color: var(--color-accent);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mobile-hud-menu .glass-link {
+        display: block;
+        padding: 12px 10px;
+        margin-bottom: 4px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+        border: 1px solid transparent;
+        color: rgba(255, 255, 255, 0.9) !important; /* Force white text */
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-hud-menu .glass-link:active {
+        background: rgba(0, 210, 255, 0.1);
+        border-color: rgba(0, 210, 255, 0.3);
+    }
+
+    /* Ensure Spotlight is visible and styled as a large card at the end */
+    .mobile-hud-menu .glass-spotlight {
+        display: block !important;
+        margin-top: 10px;
+        background: radial-gradient(circle at top right, rgba(0, 210, 255, 0.2), transparent);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .mobile-hud-menu .glass-spotlight img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    /* Nav Links in HUD (Top Level) */
+    .mobile-hud-menu .header__nav-link {
+        font-size: 2rem; /* Big editorial text */
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+        padding: 20px 0;
+        display: block;
+        transition: color 0.3s ease;
+    }
+
+    .mobile-hud-menu .header__nav-link:hover,
+    .header__nav-list li.mobile-menu-open .header__nav-link {
+        color: white;
+    }
+}
+
+
+
+/* ---------------------------------- */
+/* 23. Glass Prism Mega Menu Layout (Revised) */
+/* ---------------------------------- */
+
+/* Grid System */
+.mm-glass-grid {
+    display: grid;
+    gap: 30px;
+    padding: 40px;
+}
+
+/* Products Grid: 4 Columns + Bottom Spotlight */
+/* Products Grid: 5 Columns (Spotlight takes 5th) */
+.mm-products {
+    grid-template-columns: repeat(5, 1fr);
+    /* 5 columns: Buoys, Vessels, Equipment, Software, SPOTLIGHT */
+}
+
+/* Force the Spotlight (Column 5) */
+.mm-products .glass-spotlight {
+    grid-column: 5;
+    grid-row: 1; /* Sit in the first row alongside lists */
+    margin-top: 0;
+    text-align: center;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    height: 100%; /* Fill height */
+    min-height: 350px; /* Ensure visual presence */
+}
+
+/* Services Grid: 3 Columns Simple */
+.mm-services {
+    grid-template-columns: 1fr 1fr 1fr;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Glass Column Styling */
+.glass-col h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 20px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.glass-col h4 i {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Link Styling */
+.glass-link {
+    display: block;
+    padding: 8px 12px;
+    margin: 4px -12px;
+    border-radius: 8px;
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.glass-link:hover {
+    background: rgba(0, 50, 255, 0.05);
+    /* Light Mode Hover - Subtle Blue Tint */
+    color: var(--color-accent);
+    transform: translateX(4px);
+    border-color: rgba(0, 50, 255, 0.1);
+}
+
+[data-theme="dark"] .glass-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Spotlight Card Styling */
+.glass-spotlight {
+    position: relative;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.01));
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.glass-spotlight:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    border-color: var(--color-accent);
+}
+
+.glass-spotlight img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    transition: transform 0.3s ease;
+}
+
+.glass-spotlight:hover img {
+    transform: scale(1.02);
+}
+
+[data-theme="dark"] .glass-spotlight {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.spotlight-title {
+    font-size: 1.4rem;
+    color: var(--color-text-main);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.spotlight-desc {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.spotlight-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    margin-top: auto;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.spotlight-btn i {
+    transition: transform 0.2s ease;
+}
+
+.spotlight-btn:hover i {
+    transform: translateX(4px);
+}
+
+
+/* Badge New */
+.badge-new {
+    background: linear-gradient(135deg, var(--color-accent), #00c6ff);
+    color: white;
+    font-size: 0.65em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+    box-shadow: 0 2px 5px rgba(0, 210, 255, 0.3);
+}
+
+/* ---------------------------------- */
+/* Mega Menu Visibility & Themes      */
+/* ---------------------------------- */
+
+/* Explicit Glass Mode Backgrounds */
+.mega-menu.glass-mode {
+    background: rgba(255, 255, 255, 0.85); /* Proper Translucent Glass */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.2) inset;
+    padding: 0; /* Reset default padding, let grid handle it */
+}
+
+[data-theme="dark"] .mega-menu.glass-mode {
+    background: rgba(15, 15, 20, 0.85); /* Deep Dark Glass */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+
+/* Force Link Colors */
+.mega-menu.glass-mode .glass-link {
+    color: var(--color-text-main);
+}
+
+[data-theme="dark"] .mega-menu.glass-mode .glass-link {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mega-menu.glass-mode .glass-link:hover {
+    color: var(--color-accent);
+}
+
+/* --- Spotlight Redesign (Step 1522) --- */
+.glass-spotlight img {
+    /* Re-adding base image style for spotlight */
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.glass-spotlight:hover img {
+    transform: scale(1.05);
+}
+
+.mm-products .glass-spotlight h3 {
+     /* Targeting the spotlight title specifically */
+     font-size: 1.1rem;
+     margin-bottom: 8px;
+     color: var(--color-text-main);
+ }
+ 
+ .mm-products .glass-spotlight p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      margin-bottom: 12px;
+ }
+
+/* --- FIX: 6 Column Upgrade (Step 1612) --- */
+/* Overriding the previous 5-column rule */
+
+.mm-products {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 20px !important;
+}
+
+.mm-products .glass-spotlight {
+    grid-column: 6 !important;
+    grid-row: 1 !important;
+    min-height: 400px !important;
+}
+
+/* --- FIX: Disable Spotlight Hover Movement (Step 1650) --- */
+.glass-spotlight:hover {
+    transform: none !important;
+    box-shadow: none !important; /* Optional: Keep shadow static too if desired, or remove this line to keep shadow effect */
+}
+
+/* Ensure image still scales if desired, or disable that too if 'it should not move' applies to internal elements */
+/* Keeping image distinct as scaling is usually fine, but user said 'card should not move' */
+
+/* --- FIX: Strict NO MOVEMENT on Spotlight Hover (Step 1685) --- */
+/* High Specificity Override */
+.mm-products .glass-spotlight:hover {
+    transform: none !important;
+    margin-top: 0 !important; /* Ensure no margin creeping */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; /* Keep original shadow, don't grow */
+    border-color: rgba(255, 255, 255, 0.3) !important; /* Keep original border, or let it change color but no size change */
+}
+
+/* Stop Image Scaling if interpreted as movement */
+.mm-products .glass-spotlight:hover img {
+    transform: none !important;
+}
+
+/* --- FIX: Wide Menu Layout (Step 1700) --- */
+/* The mega menu is squeezed. We need to widen it significantly. */
+.mega-menu.glass-mode {
+    width: 90vw !important; /* Use 90% of viewport width */
+    max-width: 1400px !important; /* Cap at reasonable max */
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* Center it */
+    padding: 40px !important;
+}
+
+/* Ensure the parent nav item doesn't constrain it */
+.header__nav-list li {
+    position: static !important; /* Allow menu to escape the li width */
+}
+
+/* Adjust grid gap for breathing room */
+.mm-products {
+    gap: 30px !important;
+}
+
+/* Ensure spotlight card has minimum width to not look squashed */
+.mm-products .glass-spotlight {
+    min-width: 250px !important;
+}
+
+/* --- FIX: SPOTLIGHT MOVEMENT OVERKILL (Step 1735) --- */
+/* The user says it moves RIGHT on hover. This could be due to margin handling or width transitions. */
+
+.mm-products .glass-spotlight,
+.mm-products .glass-spotlight:hover {
+    transform: none !important;
+    translate: 0 0 !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    position: relative !important;
+    width: auto !important; 
+    /* Locking everything down */
+}
+
+/* Also ensure the grid item align-self is stable */
+.mm-products .glass-spotlight {
+    align-self: stretch !important;
+    justify-self: stretch !important;
+}
+
+/* Check if the button inside is triggering a parent shift? Unlikely but let's lock it */
+.spotlight-btn:hover {
+    transform: none !important;
+}
+
+/* --- FIX: Services Menu Layout MATCHING Products (Step 1782) --- */
+/* User wants same 6-col massive layout structure */
+
+.mm-services {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 20px !important;
+}
+
+/* Make the 2 service columns wider to fill the space better since we only have 2 */
+.mm-services .glass-col {
+    grid-column: span 2; /* Takes 2 slots (width of 2 product cols) */
+}
+
+/* Force the Spotlight to the far right (Col 6) */
+.mm-services .glass-spotlight {
+    grid-column: 6 !important;
+    grid-row: 1 !important;
+    min-height: 400px !important;
+    
+    /* Ensure all the stability fixes apply here too */
+    transform: none !important;
+    margin: 0 !important;
+    min-width: 250px !important;
+}
+
+/* --- FIX: Products Page Subtitle (Step 1802) --- */
+.page-products .section__subtitle {
+    text-align: center !important;
+    font-size: 32px !important;
+    margin-bottom: 60px; /* Optional: add spacing if needed since 32px is large */
 }

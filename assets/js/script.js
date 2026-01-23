@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Mobile Navigation ---
+    // --- Mobile Navigation ---
     const menuToggle = document.getElementById('menu-toggle');
+    const headerNav = document.querySelector('.header__nav');
+
     if (menuToggle) {
         menuToggle.addEventListener('click', () => {
             document.body.classList.toggle('nav-open');
@@ -9,6 +12,34 @@ document.addEventListener('DOMContentLoaded', () => {
             menuToggle.setAttribute('aria-expanded', isNavOpen);
         });
     }
+
+    // --- Mobile Accordion Logic ---
+    // Select nav links that have a mega menu sibling
+    const navLinks = document.querySelectorAll('.header__nav-list > li > a');
+
+    navLinks.forEach(link => {
+        // Check if this link has a mega menu sibling
+        const megaMenu = link.nextElementSibling;
+        if (megaMenu && megaMenu.classList.contains('mega-menu')) {
+            link.addEventListener('click', (e) => {
+                // Determine if we are on mobile (using the same breakpoint as CSS)
+                if (window.innerWidth <= 1024) {
+                    e.preventDefault(); // Prevent navigation
+
+                    // Toggle active class on parent li
+                    const parentLi = link.parentElement;
+                    parentLi.classList.toggle('mobile-menu-open');
+
+                    // Optional: Close other menus (accordion style)
+                    document.querySelectorAll('.header__nav-list > li').forEach(li => {
+                        if (li !== parentLi) {
+                            li.classList.remove('mobile-menu-open');
+                        }
+                    });
+                }
+            });
+        }
+    });
 
     // --- Interactive Testimonial Slider ---
     const sliderContainer = document.querySelector('.testimonial-slider-container');
@@ -290,9 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('product-modal');
 
     if (!modal) {
-        console.error("❌ FATAL ERROR: The element <div id='product-modal'> was not found in your HTML.");
-        console.error("Please make sure you pasted the 'MODAL SHELL' HTML at the very bottom of products.html");
-        return; // Stop here
+        // Modal is optional on pages other than products
+        return;
     }
 
     console.log("2. Modal found! Looking for buttons...");
@@ -506,19 +536,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href) {
         // 1. Fade out content slightly
         card.style.opacity = '0.7';
-        imgEl.style.transform = 'scale(0.95)';
+        if (imgEl) imgEl.style.transform = 'scale(0.95)';
 
         // 2. Change content after short delay
         clearTimeout(updateTimeout);
         updateTimeout = setTimeout(() => {
-            imgEl.src = img;
-            titleEl.textContent = title;
-            descEl.textContent = desc;
+            if (imgEl && img) imgEl.src = img;
+            if (titleEl) titleEl.textContent = title;
+            if (descEl) descEl.textContent = desc;
             if (btnEl) btnEl.href = href; // Sync the button link
 
             // 3. Fade in and pop
             card.style.opacity = '1';
-            imgEl.style.transform = 'scale(1)';
+            if (imgEl) imgEl.style.transform = 'scale(1)';
         }, 200);
     }
 
@@ -541,7 +571,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = link.getAttribute('data-img');
             const href = link.getAttribute('href');
 
-            if (title && img) {
+            // Allow update if at least title is present. Image is optional.
+            if (title) {
                 updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href);
             }
         });
