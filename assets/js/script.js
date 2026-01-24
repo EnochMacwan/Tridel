@@ -1,17 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Mobile Navigation ---
-    // --- Mobile Navigation ---
-    const menuToggle = document.getElementById('menu-toggle');
-    const headerNav = document.querySelector('.header__nav');
-
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            document.body.classList.toggle('nav-open');
-            const isNavOpen = document.body.classList.contains('nav-open');
-            menuToggle.setAttribute('aria-expanded', isNavOpen);
-        });
-    }
+    // --- Mobile Navigation Logic Removed (Menu button removed) ---
 
     // --- Mobile Accordion Logic ---
     // Select nav links that have a mega menu sibling
