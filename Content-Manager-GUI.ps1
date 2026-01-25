@@ -1,0 +1,1454 @@
+<#
+.SYNOPSIS
+    Tridel Content Manager (GUI)
+    A Windows Forms application to manage website content easily.
+#>
+
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$Root = $PSScriptRoot
+$AssetsDir = Join-Path $Root "assets/js"
+$ImagesDir = Join-Path $Root "assets/images"
+
+# --- HELPER FUNCTIONS ---
+
+function Get-RelativePath {
+    param($FullPath)
+    if ($FullPath.StartsWith($Root)) {
+        $Rel = $FullPath.Substring($Root.Length).TrimStart("\")
+        return $Rel -replace "\\", "/"
+    }
+    return $FullPath
+}
+
+function Slugify {
+    param($Text)
+    return $Text.ToLower().Replace(" ", "-").Replace("[^a-z0-9-]", "")
+}
+
+function Smart-Import-Image {
+    param($SourcePath, $ContextName)
+    
+    # 1. Check if already in project
+    if ($SourcePath.StartsWith($Root)) {
+        return (Get-RelativePath $SourcePath)
+    }
+    
+    # 2. Ask to copy
+    $Confirm = [System.Windows.Forms.MessageBox]::Show("To ensure this image works on other computers and the live website, it should be copied to the local 'assets' folder.`n`nDo you want to auto-copy and rename it?", "Smart Import", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
+    
+    if ($Confirm -eq [System.Windows.Forms.DialogResult]::Yes) {
+        $Ext = [System.IO.Path]::GetExtension($SourcePath)
+        
+        # Create a "smart name"
+        $Base = if ($ContextName) { (Slugify $ContextName) } else { "uploaded-image" }
+        $DateTag = Get-Date -Format "yyyyMMdd-HHmm"
+        $NewName = "$Base-$DateTag$Ext"
+        
+        $DestDir = Join-Path $AssetsDir "../images/uploads"
+        if (-not (Test-Path $DestDir)) { New-Item -ItemType Directory -Path $DestDir | Out-Null }
+        
+        $DestPath = Join-Path $DestDir $NewName
+        Copy-Item $SourcePath $DestPath
+        
+        [System.Windows.Forms.MessageBox]::Show("Image copied to addresses: assets/images/uploads/$NewName")
+        return "assets/images/uploads/$NewName"
+    }
+    
+    return $SourcePath
+}
+
+function Select-Image {
+    param($ContextName)
+    $Dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $Dialog.Filter = "Images|*.png;*.jpg;*.jpeg;*.gif;*.webp"
+    
+    if ($Dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+        return (Smart-Import-Image $Dialog.FileName $ContextName)
+    }
+    return $null
+}
+
+function Add-To-File {
+    param($FilePath, $Obj)
+    
+    if (-not (Test-Path $FilePath)) {
+        [System.Windows.Forms.MessageBox]::Show("Error: File not found: $FilePath", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        return
+    }
+
+    $Content = Get-Content $FilePath -Raw
+    
+    # Construct JS Object String
+    $JsStr = "  {" + [Environment]::NewLine
+    foreach ($Key in $Obj.Keys) {
+        $Val = $Obj[$Key]
+        $Val = $Val -replace '"', '\"' # Escape quotes
+        
+        if ($Val -eq $true -or $Val -eq $false) {
+            $JsStr += "    ${Key}: $Val," + [Environment]::NewLine
+        }
+        else {
+            $JsStr += "    ${Key}: `"$Val`"," + [Environment]::NewLine
+        }
+    }
+    $JsStr = $JsStr.TrimEnd(",`r`n") + [Environment]::NewLine
+    $JsStr += "  }"
+
+    # Append Logic
+    $LastBracketIndex = $Content.LastIndexOf("];")
+    if ($LastBracketIndex -ge 0) {
+        $Pre = $Content.Substring(0, $LastBracketIndex).TrimEnd()
+        if (-not $Pre.Trim().EndsWith("[")) { $Pre += "," }
+        
+        $NewContent = $Pre + [Environment]::NewLine + $JsStr + [Environment]::NewLine + "];"
+        Set-Content -Path $FilePath -Value $NewContent -Encoding UTF8
+        [System.Windows.Forms.MessageBox]::Show("Item added successfully!", "Success", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    }
+    else {
+        [System.Windows.Forms.MessageBox]::Show("Error: Could not find end of array '];' in file.", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    }
+}
+
+# --- GUI SETUP ---
+
+$Form = New-Object System.Windows.Forms.Form
+$Form.Text = "Tridel Content Manager (Pro Edition)"
+$Form.Size = New-Object System.Drawing.Size(900, 750) # Made wider for tabs
+$Form.StartPosition = "CenterScreen"
+$Form.BackColor = [System.Drawing.Color]::White
+
+$TabControl = New-Object System.Windows.Forms.TabControl
+$TabControl.Dock = "Fill"
+$Form.Controls.Add($TabControl)
+
+# === TAB 1: PRODUCTS ===
+$TabProducts = New-Object System.Windows.Forms.TabPage
+$TabProducts.Text = "Add Product"
+$TabProducts.Padding = New-Object System.Windows.Forms.Padding(20)
+$TabControl.Controls.Add($TabProducts)
+
+# Controls for Product
+$Y = 20
+function Add-Label-Text {
+    param($Parent, $LabelTxt, $RefVarName)
+    
+    $Lbl = New-Object System.Windows.Forms.Label
+    $Lbl.Text = $LabelTxt
+    $Lbl.Location = New-Object System.Drawing.Point(20, $script:Y)
+    $Lbl.AutoSize = $true
+    $Parent.Controls.Add($Lbl)
+    
+    $script:Y += 25
+    
+    $Txt = New-Object System.Windows.Forms.TextBox
+    $Txt.Location = New-Object System.Drawing.Point(20, $script:Y)
+    $Txt.Width = 500
+    $Parent.Controls.Add($Txt)
+    
+    $script:Y += 40
+    return $Txt
+}
+
+$TxtProdName = Add-Label-Text $TabProducts "Product Name"
+$TxtProdCat = Add-Label-Text $TabProducts "Category (Buoys / Vessels / Equipment / Software)"
+$TxtProdDesc = Add-Label-Text $TabProducts "Description"
+
+# Image Picker
+$LblProdImg = New-Object System.Windows.Forms.Label
+$LblProdImg.Text = "Image Path"
+$LblProdImg.Location = New-Object System.Drawing.Point(20, $Y)
+$TabProducts.Controls.Add($LblProdImg)
+$Y += 25
+
+$TxtProdImg = New-Object System.Windows.Forms.TextBox
+$TxtProdImg.Location = New-Object System.Drawing.Point(20, $Y)
+$TxtProdImg.Width = 400
+$TabProducts.Controls.Add($TxtProdImg)
+
+$BtnProdBrowse = New-Object System.Windows.Forms.Button
+$BtnProdBrowse.Text = "Browse..."
+$BtnProdBrowse.Location = New-Object System.Drawing.Point(430, ([int]$Y - 2))
+$BtnProdBrowse.Add_Click({
+        $Path = Select-Image $TxtProdName.Text
+        if ($Path) { $TxtProdImg.Text = $Path }
+    })
+$TabProducts.Controls.Add($BtnProdBrowse)
+$Y += 40
+
+$TxtProdLink = Add-Label-Text $TabProducts "Link (e.g. products.html#id)"
+
+$ChkProdNew = New-Object System.Windows.Forms.CheckBox
+$ChkProdNew.Text = "Mark as NEW?"
+$ChkProdNew.Location = New-Object System.Drawing.Point(20, $Y)
+$TabProducts.Controls.Add($ChkProdNew)
+$Y += 40
+
+$BtnSaveProd = New-Object System.Windows.Forms.Button
+$BtnSaveProd.Text = "SAVE PRODUCT"
+$BtnSaveProd.BackColor = [System.Drawing.Color]::LightBlue
+$BtnSaveProd.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveProd.Size = New-Object System.Drawing.Size(200, 40)
+$BtnSaveProd.Add_Click({
+        $Data = [ordered]@{
+            name        = $TxtProdName.Text
+            category    = $TxtProdCat.Text
+            description = $TxtProdDesc.Text
+            link        = $TxtProdLink.Text
+            image       = $TxtProdImg.Text
+            isNew       = $ChkProdNew.Checked
+        }
+        Add-To-File (Join-Path $AssetsDir "products-data.js") $Data
+    
+        # Reset
+        $TxtProdName.Text = ""
+        $TxtProdDesc.Text = ""
+    })
+$TabProducts.Controls.Add($BtnSaveProd)
+
+
+# === TAB 2: SERVICES ===
+$TabServices = New-Object System.Windows.Forms.TabPage
+$TabServices.Text = "Add Service"
+$TabControl.Controls.Add($TabServices)
+$Y = 20
+
+$TxtSvcTitle = Add-Label-Text $TabServices "Service Title"
+$TxtSvcSub = Add-Label-Text $TabServices "Subtitle"
+$TxtSvcCat = Add-Label-Text $TabServices "Category (Env Monitoring / Env Surveying / Geoscience)"
+$TxtSvcDesc = Add-Label-Text $TabServices "Description"
+$TxtSvcImg = Add-Label-Text $TabServices "Image Path (Paste or type)"
+$TxtSvcLink = Add-Label-Text $TabServices "Link"
+
+$BtnSaveSvc = New-Object System.Windows.Forms.Button
+$BtnSaveSvc.Text = "SAVE SERVICE"
+$BtnSaveSvc.BackColor = [System.Drawing.Color]::LightGreen
+$BtnSaveSvc.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveSvc.Size = New-Object System.Drawing.Size(200, 40)
+$BtnSaveSvc.Add_Click({
+        $Data = [ordered]@{
+            title       = $TxtSvcTitle.Text
+            subtitle    = $TxtSvcSub.Text
+            category    = $TxtSvcCat.Text
+            description = $TxtSvcDesc.Text
+            link        = $TxtSvcLink.Text
+            image       = $TxtSvcImg.Text
+        }
+        Add-To-File (Join-Path $AssetsDir "services-data.js") $Data
+        $TxtSvcTitle.Text = ""
+    })
+$TabServices.Controls.Add($BtnSaveSvc)
+
+
+# === TAB 3: CLIENTS ===
+$TabClients = New-Object System.Windows.Forms.TabPage
+$TabClients.Text = "Add Client"
+$TabControl.Controls.Add($TabClients)
+$Y = 20
+
+$TxtCliName = Add-Label-Text $TabClients "Client Name"
+$TxtCliCat = Add-Label-Text $TabClients "Category (Government/Energy/Marine/Research/Private)"
+
+# Simple Image path for client
+$LblCliImg = New-Object System.Windows.Forms.Label
+$LblCliImg.Text = "Logo Path"
+$LblCliImg.Location = New-Object System.Drawing.Point(20, $Y)
+$TabClients.Controls.Add($LblCliImg)
+$Y += 25
+
+$TxtCliImg = New-Object System.Windows.Forms.TextBox
+$TxtCliImg.Location = New-Object System.Drawing.Point(20, $Y)
+$TxtCliImg.Width = 400
+$TabClients.Controls.Add($TxtCliImg)
+
+$BtnCliBrowse = New-Object System.Windows.Forms.Button
+$BtnCliBrowse.Text = "Browse..."
+$BtnCliBrowse.Location = New-Object System.Drawing.Point(430, ([int]$Y - 2))
+$BtnCliBrowse.Add_Click({
+        $Path = Select-Image $TxtCliName.Text
+        if ($Path) { $TxtCliImg.Text = $Path }
+    })
+$TabClients.Controls.Add($BtnCliBrowse)
+$Y += 40
+
+$BtnSaveCli = New-Object System.Windows.Forms.Button
+$BtnSaveCli.Text = "SAVE CLIENT"
+$BtnSaveCli.BackColor = [System.Drawing.Color]::LightCoral
+$BtnSaveCli.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveCli.Size = New-Object System.Drawing.Size(200, 40)
+$BtnSaveCli.Add_Click({
+        $Data = [ordered]@{
+            name     = $TxtCliName.Text
+            logo     = $TxtCliImg.Text
+            category = $TxtCliCat.Text
+        }
+        Add-To-File (Join-Path $AssetsDir "clients-data.js") $Data
+        $TxtCliName.Text = ""
+    })
+$TabClients.Controls.Add($BtnSaveCli)
+
+
+# === TAB 4: STORIES ===
+$TabStories = New-Object System.Windows.Forms.TabPage
+$TabStories.Text = "Add Story"
+$TabControl.Controls.Add($TabStories)
+$Y = 20
+
+$TxtStryTitle = Add-Label-Text $TabStories "Project Title"
+$TxtStryCat = Add-Label-Text $TabStories "Category"
+$TxtStryDesc = Add-Label-Text $TabStories "Description"
+$TxtStryImg = Add-Label-Text $TabStories "Image Path"
+$TxtStryId = Add-Label-Text $TabStories "ID (Unique, no spaces)"
+
+$BtnSaveStry = New-Object System.Windows.Forms.Button
+$BtnSaveStry.Add_Click({
+        if (-not $TxtStryTitle.Text -or -not $TxtStryId.Text) {
+            [System.Windows.Forms.MessageBox]::Show("Error: Project Title and ID are required.")
+            return
+        }
+
+        $Data = [ordered]@{
+            id          = $TxtStryId.Text
+            title       = $TxtStryTitle.Text
+            category    = $TxtStryCat.Text
+            image       = $TxtStryImg.Text
+            description = $TxtStryDesc.Text
+        }
+        Add-To-File (Join-Path $AssetsDir "success-stories-data.js") $Data
+        
+        # Reset
+        $TxtStryId.Text = ""
+        $TxtStryTitle.Text = ""
+        $TxtStryDesc.Text = ""
+    })
+$TabStories.Controls.Add($BtnSaveStry)
+
+
+# === TAB 5: REMOVE ITEMS ===
+$TabRemove = New-Object System.Windows.Forms.TabPage
+$TabRemove.Text = "Remove Item"
+$TabControl.Controls.Add($TabRemove)
+$Y = 20
+
+$LblRemType = New-Object System.Windows.Forms.Label
+$LblRemType.Text = "Select Content Type to Remove From:"
+$LblRemType.Location = New-Object System.Drawing.Point(20, $Y)
+$LblRemType.AutoSize = $true
+$TabRemove.Controls.Add($LblRemType)
+$Y += 25
+
+$CmbRemType = New-Object System.Windows.Forms.ComboBox
+$CmbRemType.Location = New-Object System.Drawing.Point(20, $Y)
+$CmbRemType.Width = 300
+$CmbRemType.Items.Add("Products")
+$CmbRemType.Items.Add("Services")
+$CmbRemType.Items.Add("Clients")
+$CmbRemType.Items.Add("Stories")
+$CmbRemType.DropDownStyle = "DropDownList"
+$TabRemove.Controls.Add($CmbRemType)
+$Y += 40
+
+$LblRemItem = New-Object System.Windows.Forms.Label
+$LblRemItem.Text = "Select Item to Delete:"
+$LblRemItem.Location = New-Object System.Drawing.Point(20, $Y)
+$LblRemItem.AutoSize = $true
+$TabRemove.Controls.Add($LblRemItem)
+$Y += 25
+
+$LstRemItems = New-Object System.Windows.Forms.ListBox
+$LstRemItems.Location = New-Object System.Drawing.Point(20, $Y)
+$LstRemItems.Width = 500
+$LstRemItems.Height = 300
+$TabRemove.Controls.Add($LstRemItems)
+$Y += 310
+
+$BtnDelete = New-Object System.Windows.Forms.Button
+$BtnDelete.Text = "DELETE SELECTED ITEM"
+$BtnDelete.BackColor = [System.Drawing.Color]::Salmon
+$BtnDelete.ForeColor = [System.Drawing.Color]::White
+$BtnDelete.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnDelete.Size = New-Object System.Drawing.Size(200, 40)
+$TabRemove.Controls.Add($BtnDelete)
+
+# --- REMOVE LOGIC ---
+
+function Get-JS-Items {
+    param($Type)
+    $File = ""
+    $Key = ""
+    $UseComposite = $false
+    
+    switch ($Type) {
+        "Products" { $File = "products-data.js"; $Key = "name" }
+        "Services" { $File = "services-data.js"; $Key = "title" }
+        "Clients" { $File = "clients-data.js"; $Key = "name" }
+        "Stories" { $File = "success-stories-data.js"; $Key = "title"; $UseComposite = $true }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return @() }
+    
+    $Raw = Get-Content $Path -Raw
+    
+    if ($UseComposite) {
+        # Parsing distinct logic for Stories to show "ID | Title"
+        # Since regex is complex for multi-line JSON, let's try a simpler approach or capture both
+        # We need to find blocks and extract id and title
+        
+        # Split by objects approximately
+        $Items = @()
+        $Matches = [regex]::Matches($Raw, "\{([^\}]+)\}")
+        foreach ($m in $Matches) {
+            $Block = $m.Groups[1].Value
+            
+            # Extract ID
+            $IdMatch = [regex]::Match($Block, "['`"]?id['`"]?\s*:\s*(['`"])(.*?)\1")
+            $TitleMatch = [regex]::Match($Block, "['`"]?title['`"]?\s*:\s*(['`"])(.*?)\1")
+            
+            if ($IdMatch.Success -and $TitleMatch.Success) {
+                $Id = $IdMatch.Groups[2].Value
+                $Title = $TitleMatch.Groups[2].Value
+               
+                # Only add if not empty
+                if ($Id -ne "" -or $Title -ne "") {
+                    $Items += "$Id | $Title"
+                }
+            }
+        }
+        return $Items
+    }
+    else {
+        # Regex to find names/titles
+        # Matches: name: "Something" or "name": 'Something'
+        $Pattern = "['`"]?$Key['`"]?\s*:\s*(['`"])(.*?)\1"
+        $Matches = [regex]::Matches($Raw, $Pattern)
+        
+        $Names = @()
+        foreach ($m in $Matches) {
+            $Names += $m.Groups[2].Value
+        }
+        return $Names
+    }
+}
+
+function Remove-JS-Item {
+    param($Type, $Name)
+    $File = ""
+    $Key = ""
+    
+    # Handle Composite Name for Stories
+    if ($Type -eq "Stories" -and $Name -match "^(.*?) \| (.*)$") {
+        # If it's "ID | Title", we search by ID ideally because it's unique
+        # Check standard
+        $RealName = $matches[1] # The ID part
+        $File = "success-stories-data.js"
+        $Key = "id" 
+    }
+    else {
+        $RealName = $Name
+        switch ($Type) {
+            "Products" { $File = "products-data.js"; $Key = "name" }
+            "Services" { $File = "services-data.js"; $Key = "title" }
+            "Clients" { $File = "clients-data.js"; $Key = "name" }
+            "Stories" { $File = "success-stories-data.js"; $Key = "title" } # Fallback
+        }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return $false }
+    
+    $Raw = Get-Content $Path -Raw
+    
+    # 1. Find matched line index
+    $EscName = [regex]::Escape($RealName)
+    # Match key: "Name" or key: 'Name'
+    $Pattern = "['`"]?$Key['`"]?\s*:\s*(['`"])$EscName\1"
+    $Match = [regex]::Match($Raw, $Pattern)
+    
+    if (-not $Match.Success) {
+        [System.Windows.Forms.MessageBox]::Show("Debug: Item regex match failed for '$RealName'. Pattern: $Pattern")
+        return $false 
+    }
+    
+    $HitIndex = $Match.Index
+    
+    # 2. Walk Backwards to find '{'
+    $StartIndex = -1
+    $Balance = 0
+    for ($i = $HitIndex; $i -ge 0; $i--) {
+        $char = $Raw[$i]
+        if ($char -eq '}') { $Balance++ }
+        if ($char -eq '{') {
+            if ($Balance -eq 0) { $StartIndex = $i; break }
+            $Balance--
+        }
+    }
+    
+    if ($StartIndex -eq -1) { 
+        [System.Windows.Forms.MessageBox]::Show("Debug: Could not find start brace '{' for item.")
+        return $false 
+    }
+    
+    # 3. Walk Forwards to find '}'
+    $EndIndex = -1
+    $Balance = 1
+    for ($i = $StartIndex + 1; $i -lt $Raw.Length; $i++) {
+        $char = $Raw[$i]
+        if ($char -eq '{') { $Balance++ }
+        if ($char -eq '}') {
+            $Balance--
+            if ($Balance -eq 0) { $EndIndex = $i; break }
+        }
+    }
+    
+    if ($EndIndex -eq -1) { 
+        [System.Windows.Forms.MessageBox]::Show("Debug: Could not find end brace '}' for item.")
+        return $false 
+    }
+
+    # 4. Check for trailing comma
+    $RemoveEnd = $EndIndex
+    $j = $EndIndex + 1
+    while ($j -lt $Raw.Length -and [char]::IsWhiteSpace($Raw[$j])) { $j++ }
+    if ($j -lt $Raw.Length -and $Raw[$j] -eq ',') { $RemoveEnd = $j }
+    
+    # 5. Remove
+    $NewRaw = $Raw.Remove($StartIndex, ($RemoveEnd - $StartIndex + 1))
+    Set-Content $Path -Value $NewRaw -Encoding UTF8
+    return $true
+}
+
+# Events
+$CmbRemType.Add_SelectedIndexChanged({
+        $LstRemItems.Items.Clear()
+        $Items = Get-JS-Items $CmbRemType.SelectedItem
+        foreach ($i in $Items) {
+            $LstRemItems.Items.Add($i)
+        }
+    })
+
+$BtnDelete.Add_Click({
+        if ($LstRemItems.SelectedItem) {
+            $Confirmed = [System.Windows.Forms.MessageBox]::Show("Are you sure you want to delete '" + $LstRemItems.SelectedItem + "'?", "Confirm Delete", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Warning)
+    
+            if ($Confirmed -eq [System.Windows.Forms.DialogResult]::Yes) {
+                $Result = Remove-JS-Item $CmbRemType.SelectedItem $LstRemItems.SelectedItem
+                if ($Result) {
+                    [System.Windows.Forms.MessageBox]::Show("Item deleted successfully.")
+                    # Refresh
+                    $LstRemItems.Items.Clear()
+                    $Items = Get-JS-Items $CmbRemType.SelectedItem
+                    foreach ($i in $Items) { $LstRemItems.Items.Add($i) }
+                }
+                else {
+                    [System.Windows.Forms.MessageBox]::Show("Failed to delete item. It might not exist or file structure is unexpected.")
+                }
+            }
+        }
+        else {
+            [System.Windows.Forms.MessageBox]::Show("Please select an item to delete first.")
+        }
+    })
+
+
+# === TAB 6: MOVE / EDIT CATEGORY ===
+$TabMove = New-Object System.Windows.Forms.TabPage
+$TabMove.Text = "Move / Edit"
+$TabControl.Controls.Add($TabMove)
+$Y = 20
+
+$LblMovType = New-Object System.Windows.Forms.Label
+$LblMovType.Text = "Select Content Type:"
+$LblMovType.Location = New-Object System.Drawing.Point(20, $Y)
+$LblMovType.AutoSize = $true
+$TabMove.Controls.Add($LblMovType)
+$Y += 25
+
+$CmbMovType = New-Object System.Windows.Forms.ComboBox
+$CmbMovType.Location = New-Object System.Drawing.Point(20, $Y)
+$CmbMovType.Width = 300
+$CmbMovType.Items.Add("Products")
+$CmbMovType.Items.Add("Services")
+$CmbMovType.Items.Add("Clients")
+$CmbMovType.Items.Add("Stories")
+$CmbMovType.DropDownStyle = "DropDownList"
+$TabMove.Controls.Add($CmbMovType)
+$Y += 40
+
+$LblMovItem = New-Object System.Windows.Forms.Label
+$LblMovItem.Text = "Select Item to Move:"
+$LblMovItem.Location = New-Object System.Drawing.Point(20, $Y)
+$LblMovItem.AutoSize = $true
+$TabMove.Controls.Add($LblMovItem)
+$Y += 25
+
+$LstMovItems = New-Object System.Windows.Forms.ListBox
+$LstMovItems.Location = New-Object System.Drawing.Point(20, $Y)
+$LstMovItems.Width = 500
+$LstMovItems.Height = 200
+$TabMove.Controls.Add($LstMovItems)
+$Y += 210
+
+$LblMovNewCat = New-Object System.Windows.Forms.Label
+$LblMovNewCat.Text = "Select New Category:"
+$LblMovNewCat.Location = New-Object System.Drawing.Point(20, $Y)
+$LblMovNewCat.AutoSize = $true
+$TabMove.Controls.Add($LblMovNewCat)
+$Y += 25
+
+$CmbMovNewCat = New-Object System.Windows.Forms.ComboBox
+$CmbMovNewCat.Location = New-Object System.Drawing.Point(20, $Y)
+$CmbMovNewCat.Width = 300
+# Product Categories
+$CmbMovNewCat.Items.Add("Buoys")
+$CmbMovNewCat.Items.Add("Vessels")
+$CmbMovNewCat.Items.Add("Equipment")
+$CmbMovNewCat.Items.Add("Software")
+$CmbMovNewCat.Items.Add("Integrated Solutions")
+# Service Categories
+$CmbMovNewCat.Items.Add("Environmental Monitoring")
+$CmbMovNewCat.Items.Add("Environmental Surveying")
+$CmbMovNewCat.Items.Add("Geoscience Studies")
+$TabMove.Controls.Add($CmbMovNewCat)
+$Y += 40
+
+$BtnMove = New-Object System.Windows.Forms.Button
+$BtnMove.Text = "UPDATE CATEGORY"
+$BtnMove.BackColor = [System.Drawing.Color]::LightSkyBlue
+$BtnMove.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnMove.Size = New-Object System.Drawing.Size(200, 40)
+$TabMove.Controls.Add($BtnMove)
+$Y += 60
+
+# --- SEPARATOR ---
+$LblSep = New-Object System.Windows.Forms.Label
+$LblSep.Text = "--------------------------------------------------------"
+$LblSep.Location = New-Object System.Drawing.Point(20, $Y)
+$LblSep.Width = 500
+$TabMove.Controls.Add($LblSep)
+$Y += 20
+
+# --- UPDATE IMAGE SECTION ---
+$LblUpdImg = New-Object System.Windows.Forms.Label
+$LblUpdImg.Text = "Update Cover Photo:"
+$LblUpdImg.Font = New-Object System.Drawing.Font($Form.Font, [System.Drawing.FontStyle]::Bold)
+$LblUpdImg.Location = New-Object System.Drawing.Point(20, $Y)
+$LblUpdImg.AutoSize = $true
+$TabMove.Controls.Add($LblUpdImg)
+$Y += 25
+
+$TxtUpdImg = New-Object System.Windows.Forms.TextBox
+$TxtUpdImg.Location = New-Object System.Drawing.Point(20, $Y)
+$TxtUpdImg.Width = 400
+$TabMove.Controls.Add($TxtUpdImg)
+
+$BtnUpdBrowse = New-Object System.Windows.Forms.Button
+$BtnUpdBrowse.Text = "Browse..."
+$BtnUpdBrowse.Location = New-Object System.Drawing.Point(430, ([int]$Y - 2))
+$BtnUpdBrowse.Add_Click({
+        $Path = Select-Image $LstMovItems.SelectedItem
+        if ($Path) { $TxtUpdImg.Text = $Path }
+    })
+$TabMove.Controls.Add($BtnUpdBrowse)
+$Y += 40
+
+$BtnSaveImg = New-Object System.Windows.Forms.Button
+$BtnSaveImg.Text = "UPDATE IMAGE"
+$BtnSaveImg.BackColor = [System.Drawing.Color]::PaleGreen
+$BtnSaveImg.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveImg.Size = New-Object System.Drawing.Size(200, 40)
+$TabMove.Controls.Add($BtnSaveImg)
+
+# --- MOVE LOGIC ---
+function Update-JS-Category {
+    param($Type, $Name, $NewCat)
+    $File = ""
+    $Key = ""
+    
+    switch ($Type) {
+        "Products" { $File = "products-data.js"; $Key = "name" }
+        "Services" { $File = "services-data.js"; $Key = "title" }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return $false }
+    
+    $Raw = Get-Content $Path -Raw
+    
+    # 1. Find matched line index
+    $EscName = [regex]::Escape($Name)
+    $Pattern = "['`"]?$Key['`"]?\s*:\s*(['`"])$EscName\1"
+    $Match = [regex]::Match($Raw, $Pattern)
+    
+    if (-not $Match.Success) {
+        [System.Windows.Forms.MessageBox]::Show("Debug: Match failed for Update Category.")
+        return $false 
+    }
+    
+    $HitIndex = $Match.Index
+    
+    # 2. Walk Backwards
+    $StartIndex = -1
+    $Balance = 0
+    for ($i = $HitIndex; $i -ge 0; $i--) {
+        $char = $Raw[$i]
+        if ($char -eq '}') { $Balance++ }
+        if ($char -eq '{') {
+            if ($Balance -eq 0) { $StartIndex = $i; break }
+            $Balance--
+        }
+    }
+    if ($StartIndex -eq -1) { return $false }
+    
+    # 3. Walk Forwards
+    $EndIndex = -1
+    $Balance = 1
+    for ($i = $StartIndex + 1; $i -lt $Raw.Length; $i++) {
+        $char = $Raw[$i]
+        if ($char -eq '{') { $Balance++ }
+        if ($char -eq '}') {
+            $Balance--
+            if ($Balance -eq 0) { $EndIndex = $i; break }
+        }
+    }
+    if ($EndIndex -eq -1) { return $false }
+    
+    # 4. Extract Block
+    $Block = $Raw.Substring($StartIndex, ($EndIndex - $StartIndex + 1))
+    
+    # 5. Regex Replace Category
+    # Handles category: "Val" or 'Val'
+    $NewBlock = $Block -replace "['`"]?category['`"]?\s*:\s*(['`"]).*?\1", "category: `"$NewCat`""
+    
+    $NewRaw = $Raw.Remove($StartIndex, ($EndIndex - $StartIndex + 1)).Insert($StartIndex, $NewBlock)
+    Set-Content $Path -Value $NewRaw -Encoding UTF8
+    return $true
+}
+
+function Update-JS-Image {
+    param($Type, $Name, $NewImg)
+    $File = ""
+    $Key = ""
+    $ImgKey = "image"
+    
+    switch ($Type) {
+        "Products" { $File = "products-data.js"; $Key = "name" }
+        "Services" { $File = "services-data.js"; $Key = "title" }
+        "Clients" { $File = "clients-data.js"; $Key = "name"; $ImgKey = "logo" }
+        "Stories" { $File = "success-stories-data.js"; $Key = "title" }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return $false }
+    
+    $Raw = Get-Content $Path -Raw
+    
+    # 1. Match item
+    $EscName = [regex]::Escape($Name)
+    $Pattern = "['`"]?$Key['`"]?\s*:\s*(['`"])$EscName\1"
+    $Match = [regex]::Match($Raw, $Pattern)
+    
+    if (-not $Match.Success) {
+        [System.Windows.Forms.MessageBox]::Show("Debug: Match failed for Update Image.")
+        return $false 
+    }
+    $HitIndex = $Match.Index
+    
+    # 2. Walk Backwards
+    $StartIndex = -1
+    $Balance = 0
+    for ($i = $HitIndex; $i -ge 0; $i--) {
+        $char = $Raw[$i]
+        if ($char -eq '}') { $Balance++ }
+        if ($char -eq '{') {
+            if ($Balance -eq 0) { $StartIndex = $i; break }
+            $Balance--
+        }
+    }
+    if ($StartIndex -eq -1) { return $false }
+    
+    # 3. Walk Forwards
+    $EndIndex = -1
+    $Balance = 1
+    for ($i = $StartIndex + 1; $i -lt $Raw.Length; $i++) {
+        $char = $Raw[$i]
+        if ($char -eq '{') { $Balance++ }
+        if ($char -eq '}') {
+            $Balance--
+            if ($Balance -eq 0) { $EndIndex = $i; break }
+        }
+    }
+    if ($EndIndex -eq -1) { return $false }
+    
+    # 4. Extract Block
+    $Block = $Raw.Substring($StartIndex, ($EndIndex - $StartIndex + 1))
+    
+    # 5. Regex Replace Image
+    $NewBlock = $Block -replace "['`"]?$ImgKey['`"]?\s*:\s*(['`"]).*?\1", "${ImgKey}: `"$NewImg`""
+    
+    $NewRaw = $Raw.Remove($StartIndex, ($EndIndex - $StartIndex + 1)).Insert($StartIndex, $NewBlock)
+    Set-Content $Path -Value $NewRaw -Encoding UTF8
+    return $true
+}
+
+
+$CmbMovType.Add_SelectedIndexChanged({
+        $LstMovItems.Items.Clear()
+        $Items = Get-JS-Items $CmbMovType.SelectedItem
+        foreach ($i in $Items) {
+            $LstMovItems.Items.Add($i)
+        }
+    
+        # Update category options based on type
+        $CmbMovNewCat.Items.Clear()
+    
+        # Only show categories if supported
+        $EnableCat = $false
+        if ($CmbMovType.SelectedItem -eq "Products") {
+            $CmbMovNewCat.Items.Add("Buoys")
+            $CmbMovNewCat.Items.Add("Vessels")
+            $CmbMovNewCat.Items.Add("Equipment")
+            $CmbMovNewCat.Items.Add("Software")
+            $CmbMovNewCat.Items.Add("Integrated Solutions")
+            $EnableCat = $true
+        }
+        elseif ($CmbMovType.SelectedItem -eq "Services") {
+            $CmbMovNewCat.Items.Add("Environmental Monitoring")
+            $CmbMovNewCat.Items.Add("Environmental Surveying")
+            $CmbMovNewCat.Items.Add("Geoscience Studies")
+            $EnableCat = $true
+        }
+    
+        $CmbMovNewCat.Enabled = $EnableCat
+        $BtnMove.Enabled = $EnableCat
+    })
+
+$BtnMove.Add_Click({
+        if ($LstMovItems.SelectedItem -and $CmbMovNewCat.SelectedItem) {
+            $Result = Update-JS-Category $CmbMovType.SelectedItem $LstMovItems.SelectedItem $CmbMovNewCat.SelectedItem
+            if ($Result) {
+                [System.Windows.Forms.MessageBox]::Show("Category updated successfully!")
+            }
+            else {
+                [System.Windows.Forms.MessageBox]::Show("Failed to update category. Item found but structure may vary.")
+            }
+        }
+        else {
+            [System.Windows.Forms.MessageBox]::Show("Please select an item and a new category.")
+        }
+    })
+
+$BtnSaveImg.Add_Click({
+        if ($LstMovItems.SelectedItem -and $TxtUpdImg.Text) {
+            $Result = Update-JS-Image $CmbMovType.SelectedItem $LstMovItems.SelectedItem $TxtUpdImg.Text
+            if ($Result) {
+                [System.Windows.Forms.MessageBox]::Show("Image updated successfully!")
+                $TxtUpdImg.Text = ""
+            }
+            else {
+                [System.Windows.Forms.MessageBox]::Show("Failed to update image.")
+            }
+        }
+        else {
+            [System.Windows.Forms.MessageBox]::Show("Please select an item and choose an image.")
+        }
+    })    
+
+
+# Show the form
+$Form.Add_Load({
+        $CmbRemType.SelectedIndex = 0
+        $CmbMovType.SelectedIndex = 0
+    })
+
+
+# === TAB 7: PUBLISH (GIT) ===
+$TabPublish = New-Object System.Windows.Forms.TabPage
+$TabPublish.Text = "Publish"
+$TabControl.Controls.Add($TabPublish)
+$Y = 20
+
+$LblGitHead = New-Object System.Windows.Forms.Label
+$LblGitHead.Text = "Website Publication Center"
+$LblGitHead.Font = New-Object System.Drawing.Font($Form.Font.FontFamily, 14, [System.Drawing.FontStyle]::Bold)
+$LblGitHead.Location = New-Object System.Drawing.Point(20, $Y)
+$LblGitHead.AutoSize = $true
+$TabPublish.Controls.Add($LblGitHead)
+$Y += 40
+
+$TxtGitLog = New-Object System.Windows.Forms.RichTextBox
+$TxtGitLog.Location = New-Object System.Drawing.Point(20, $Y)
+$TxtGitLog.Size = New-Object System.Drawing.Size(840, 400) # Wider
+$TxtGitLog.ReadOnly = $true
+$TxtGitLog.BackColor = [System.Drawing.Color]::Black
+$TxtGitLog.ForeColor = [System.Drawing.Color]::LimeGreen
+$TabPublish.Controls.Add($TxtGitLog)
+$Y += 410
+
+function Log-Git {
+    param($Msg)
+    $TxtGitLog.AppendText("[$((Get-Date).ToString('HH:mm:ss'))] $Msg`n")
+    $TxtGitLog.ScrollToCaret()
+}
+
+$BtnGitStatus = New-Object System.Windows.Forms.Button
+$BtnGitStatus.Text = "CHECK CHANGES"
+$BtnGitStatus.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnGitStatus.Size = New-Object System.Drawing.Size(200, 50)
+$BtnGitStatus.BackColor = [System.Drawing.Color]::LightGray
+$BtnGitStatus.Add_Click({
+        Log-Git "Checking status..."
+        $Out = git status 2>&1 | Out-String
+        Log-Git $Out
+    })
+$TabPublish.Controls.Add($BtnGitStatus)
+
+$BtnGitPush = New-Object System.Windows.Forms.Button
+$BtnGitPush.Text = "🚀 PUBLISH LIVE"
+$BtnGitPush.Location = New-Object System.Drawing.Point(240, $Y)
+$BtnGitPush.Size = New-Object System.Drawing.Size(300, 50)
+$BtnGitPush.BackColor = [System.Drawing.Color]::Gold
+$BtnGitPush.Font = New-Object System.Drawing.Font($Form.Font, [System.Drawing.FontStyle]::Bold)
+$BtnGitPush.Add_Click({
+        $Confirm = [System.Windows.Forms.MessageBox]::Show("This will push all changes to the LIVE website.`n`nAre you ready?", "Confirm Publish", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Exclamation)
+        if ($Confirm -eq [System.Windows.Forms.DialogResult]::Yes) {
+            Log-Git "Starting publication sequence..."
+        
+            Log-Git ">> git add ."
+            $OutAdd = git add . 2>&1 | Out-String
+            Log-Git $OutAdd
+        
+            Log-Git ">> git commit"
+            $OutCom = git commit -m "Content Update via GUI $(Get-Date)" 2>&1 | Out-String
+            Log-Git $OutCom
+        
+            Log-Git ">> git push"
+            $OutPush = git push 2>&1 | Out-String
+            Log-Git $OutPush
+        
+            Log-Git "Done! Changes should be live shortly."
+            [System.Windows.Forms.MessageBox]::Show("Publication Complete!", "Success")
+        }
+    })
+$TabPublish.Controls.Add($BtnGitPush)
+
+
+# === TAB 8: DIAGNOSTICS ===
+$TabHealth = New-Object System.Windows.Forms.TabPage
+$TabHealth.Text = "Diagnostics"
+$TabControl.Controls.Add($TabHealth)
+$Y = 20
+
+$BtnScan = New-Object System.Windows.Forms.Button
+$BtnScan.Text = "SCAN FOR BROKEN CONTENT"
+$BtnScan.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnScan.Size = New-Object System.Drawing.Size(300, 40)
+$BtnScan.BackColor = [System.Drawing.Color]::LightPink
+$TabHealth.Controls.Add($BtnScan)
+$Y += 50
+
+$TxtHealth = New-Object System.Windows.Forms.RichTextBox
+$TxtHealth.Location = New-Object System.Drawing.Point(20, $Y)
+$TxtHealth.Size = New-Object System.Drawing.Size(840, 500)
+$TxtHealth.Font = New-Object System.Drawing.Font("Consolas", 10)
+$TabHealth.Controls.Add($TxtHealth)
+
+$BtnScan.Add_Click({
+        $TxtHealth.Text = "Scanning Assets...`n---------------------`n"
+        $Issues = 0
+    
+        # Check Images in Data Files
+        $Files = @("products-data.js", "services-data.js", "clients-data.js", "success-stories-data.js")
+        foreach ($F in $Files) {
+            $Path = Join-Path $AssetsDir $F
+            if (Test-Path $Path) {
+                $Content = Get-Content $Path -Raw
+                # Matches image: "path"
+                $ImgMatches = [regex]::Matches($Content, "['`"]?(image|logo)['`"]?\s*:\s*(['`"])(.*?)\2")
+                foreach ($m in $ImgMatches) {
+                    $RelPath = $m.Groups[3].Value
+                    if (-not [string]::IsNullOrWhiteSpace($RelPath)) {
+                        # Convert JS path to Local Path
+                        $LocalPath = Join-Path $Root ($RelPath -replace "/", "\")
+                        if (-not (Test-Path $LocalPath)) {
+                            $TxtHealth.AppendText("[MISSING IMAGE] In $F : $RelPath `n")
+                            $TxtHealth.AppendText("   -> Needed at: $LocalPath `n`n")
+                            $Issues++
+                        }
+                    }
+                }
+            }
+        }
+    
+        if ($Issues -eq 0) {
+            $TxtHealth.AppendText("No issues found! All linked assets appear to exist.`n")
+        }
+        else {
+            $TxtHealth.AppendText("---------------------`nFound $Issues potential issues.")
+        }
+    })
+
+
+# === TAB 9: SORT / REORDER ===
+$TabSort = New-Object System.Windows.Forms.TabPage
+$TabSort.Text = "Sort / Reorder"
+$TabControl.Controls.Add($TabSort)
+$Y = 20
+
+$LblSortType = New-Object System.Windows.Forms.Label
+$LblSortType.Text = "Select Content Type to Reorder:"
+$LblSortType.Location = New-Object System.Drawing.Point(20, $Y)
+$LblSortType.AutoSize = $true
+$TabSort.Controls.Add($LblSortType)
+$Y += 25
+
+$CmbSortType = New-Object System.Windows.Forms.ComboBox
+$CmbSortType.Location = New-Object System.Drawing.Point(20, $Y)
+$CmbSortType.Width = 300
+$CmbSortType.Items.Add("Products")
+$CmbSortType.Items.Add("Services")
+$CmbSortType.Items.Add("Clients")
+$CmbSortType.Items.Add("Stories")
+$CmbSortType.DropDownStyle = "DropDownList"
+$TabSort.Controls.Add($CmbSortType)
+$Y += 40
+
+$LblSortInstr = New-Object System.Windows.Forms.Label
+$LblSortInstr.Text = "Select an item and move it Up or Down."
+$LblSortInstr.Location = New-Object System.Drawing.Point(20, $Y)
+$LblSortInstr.AutoSize = $true
+$TabSort.Controls.Add($LblSortInstr)
+$Y += 25
+
+$LstSortItems = New-Object System.Windows.Forms.ListBox
+$LstSortItems.Location = New-Object System.Drawing.Point(20, $Y)
+$LstSortItems.Width = 500
+$LstSortItems.Height = 300
+$TabSort.Controls.Add($LstSortItems)
+
+$BtnUp = New-Object System.Windows.Forms.Button
+$BtnUp.Text = "▲ MOVE UP"
+$BtnUp.Location = New-Object System.Drawing.Point(530, $Y)
+$BtnUp.Size = New-Object System.Drawing.Size(120, 50)
+$TabSort.Controls.Add($BtnUp)
+
+$BtnDown = New-Object System.Windows.Forms.Button
+$BtnDown.Text = "▼ MOVE DOWN"
+$YDown = $Y + 60
+$BtnDown.Location = New-Object System.Drawing.Point(530, $YDown)
+$BtnDown.Size = New-Object System.Drawing.Size(120, 50)
+$TabSort.Controls.Add($BtnDown)
+
+$Y += 310
+
+$BtnSaveSort = New-Object System.Windows.Forms.Button
+$BtnSaveSort.Text = "SAVE NEW ORDER"
+$BtnSaveSort.BackColor = [System.Drawing.Color]::LightBlue
+$BtnSaveSort.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveSort.Size = New-Object System.Drawing.Size(200, 40)
+$TabSort.Controls.Add($BtnSaveSort)
+
+# --- SORT LOGIC ---
+$Global:CurrentBlocks = @()
+
+function Get-JS-Blocks {
+    param($Type)
+    $File = ""
+    switch ($Type) {
+        "Products" { $File = "products-data.js" }
+        "Services" { $File = "services-data.js" }
+        "Clients" { $File = "clients-data.js" }
+        "Stories" { $File = "success-stories-data.js" }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return @() }
+    
+    $Raw = Get-Content $Path -Raw
+    $Blocks = @()
+    
+    # Locate array brackets
+    $StartArr = $Raw.IndexOf("[")
+    $EndArr = $Raw.LastIndexOf("]")
+    
+    if ($StartArr -lt 0 -or $EndArr -lt 0) { return @() }
+    
+    # We scan for top-level objects { ... }
+    $CurrentIdx = $StartArr + 1
+    
+    while ($CurrentIdx -lt $EndArr) {
+        # Find next {
+        $NextOpen = $Raw.IndexOf("{", $CurrentIdx)
+        if ($NextOpen -lt 0 -or $NextOpen -gt $EndArr) { break }
+        
+        # Find balanced closing }
+        $Balance = 1
+        $CloseIdx = -1
+        for ($i = $NextOpen + 1; $i -lt $Raw.Length; $i++) {
+            if ($Raw[$i] -eq '{') { $Balance++ }
+            elseif ($Raw[$i] -eq '}') { 
+                $Balance--
+                if ($Balance -eq 0) { $CloseIdx = $i; break }
+            }
+        }
+        
+        if ($CloseIdx -ne -1) {
+            # Extract Block
+            $BlockContent = $Raw.Substring($NextOpen, ($CloseIdx - $NextOpen + 1))
+            
+            # Extract Name for Display Label
+            # Try Name, then Title, then ID
+            $Display = "Unknown Item"
+            $MatchName = [regex]::Match($BlockContent, "['`"]?name['`"]?\s*:\s*(['`"])(.*?)\1")
+            $MatchTitle = [regex]::Match($BlockContent, "['`"]?title['`"]?\s*:\s*(['`"])(.*?)\1")
+            $MatchId = [regex]::Match($BlockContent, "['`"]?id['`"]?\s*:\s*(['`"])(.*?)\1")
+            
+            if ($MatchName.Success) { $Display = $MatchName.Groups[2].Value }
+            elseif ($MatchTitle.Success) { $Display = $MatchTitle.Groups[2].Value }
+            elseif ($MatchId.Success) { $Display = $MatchId.Groups[2].Value }
+            
+            # Store object with hidden block
+            $Obj = New-Object PSObject -Property @{
+                Display = $Display
+                Block   = $BlockContent
+            }
+            $Blocks += $Obj
+            
+            $CurrentIdx = $CloseIdx + 1
+        }
+        else {
+            break # Broken structure
+        }
+    }
+    return $Blocks
+}
+
+function Save-JS-Order {
+    param($Type)
+    $File = ""
+    switch ($Type) {
+        "Products" { $File = "products-data.js" }
+        "Services" { $File = "services-data.js" }
+        "Clients" { $File = "clients-data.js" }
+        "Stories" { $File = "success-stories-data.js" }
+    }
+    $Path = Join-Path $AssetsDir $File
+    
+    # Reconstruct File
+    # We need the original variable declaration part
+    $Raw = Get-Content $Path -Raw
+    $StartArr = $Raw.IndexOf("[")
+    $EndArr = $Raw.LastIndexOf("]")
+    
+    $Prefix = $Raw.Substring(0, $StartArr + 1)
+    $Suffix = $Raw.Substring($EndArr)
+    
+    # Join Blocks
+    $NewInner = ""
+    foreach ($Item in $LstSortItems.Items) {
+        # Find corresponding block in Global
+        foreach ($B in $Global:CurrentBlocks) {
+            if ($B.Display -eq $Item) {
+                $NewInner += "`n  " + $B.Block + ","
+                break
+            }
+        }
+    }
+    # Remove last comma
+    $NewInner = $NewInner.TrimEnd(",")
+    
+    $FinalContent = $Prefix + $NewInner + "`n" + $Suffix
+    Set-Content $Path -Value $FinalContent -Encoding UTF8
+}
+
+$CmbSortType.Add_SelectedIndexChanged({
+        $LstSortItems.Items.Clear()
+        $Global:CurrentBlocks = Get-JS-Blocks $CmbSortType.SelectedItem
+        foreach ($B in $Global:CurrentBlocks) {
+            $LstSortItems.Items.Add($B.Display)
+        }
+    })
+
+function Swap-Items {
+    param($Idx1, $Idx2)
+    if ($Idx1 -ge 0 -and $Idx1 -lt $LstSortItems.Items.Count -and $Idx2 -ge 0 -and $Idx2 -lt $LstSortItems.Items.Count) {
+        $Item1 = $LstSortItems.Items[$Idx1]
+        $LstSortItems.Items[$Idx1] = $LstSortItems.Items[$Idx2]
+        $LstSortItems.Items[$Idx2] = $Item1
+        $LstSortItems.SelectedIndex = $Idx2
+    }
+}
+
+$BtnUp.Add_Click({
+        $Idx = $LstSortItems.SelectedIndex
+        if ($Idx -gt 0) { Swap-Items $Idx ($Idx - 1) }
+    })
+
+$BtnDown.Add_Click({
+        $Idx = $LstSortItems.SelectedIndex
+        if ($Idx -ne -1 -and $Idx -lt ($LstSortItems.Items.Count - 1)) { Swap-Items $Idx ($Idx + 1) }
+    })
+
+$BtnSaveSort.Add_Click({
+        if ($LstSortItems.Items.Count -gt 0) {
+            Save-JS-Order $CmbSortType.SelectedItem
+            [System.Windows.Forms.MessageBox]::Show("Order saved successfully!")
+        }
+    })
+
+
+
+# === TAB 10: BULK EDITOR ===
+$TabBulk = New-Object System.Windows.Forms.TabPage
+$TabBulk.Text = "Bulk Editor"
+$TabControl.Controls.Add($TabBulk)
+[int]$Y = 20
+
+$LblBulkType = New-Object System.Windows.Forms.Label
+$LblBulkType.Text = "Select Content Type to Bulk Edit:"
+$LblBulkType.Location = New-Object System.Drawing.Point(20, $Y)
+$LblBulkType.AutoSize = $true
+$TabBulk.Controls.Add($LblBulkType)
+$Y += 25
+
+$CmbBulkType = New-Object System.Windows.Forms.ComboBox
+$CmbBulkType.Location = New-Object System.Drawing.Point(20, $Y)
+$CmbBulkType.Width = 300
+[void]$CmbBulkType.Items.Add("Products")
+[void]$CmbBulkType.Items.Add("Services")
+[void]$CmbBulkType.Items.Add("Clients")
+[void]$CmbBulkType.Items.Add("Stories")
+$CmbBulkType.DropDownStyle = "DropDownList"
+$TabBulk.Controls.Add($CmbBulkType)
+
+$BtnLoadGrid = New-Object System.Windows.Forms.Button
+$BtnLoadGrid.Text = "LOAD DATA"
+$YLoad = $Y - 2
+$BtnLoadGrid.Location = New-Object System.Drawing.Point(330, $YLoad)
+$BtnLoadGrid.Size = New-Object System.Drawing.Size(120, 25)
+$TabBulk.Controls.Add($BtnLoadGrid)
+$Y += 40
+
+# Add System.Data just in case
+Add-Type -AssemblyName System.Data
+Add-Type -AssemblyName System.Windows.Forms
+
+$Grid = New-Object System.Windows.Forms.DataGridView
+$Grid.Location = New-Object System.Drawing.Point(20, $Y)
+$Grid.Size = New-Object System.Drawing.Size(840, 400)
+$Grid.BackgroundColor = [System.Drawing.Color]::White
+$Grid.GridColor = [System.Drawing.Color]::Black
+$Grid.ForeColor = [System.Drawing.Color]::Black
+$Grid.DefaultCellStyle.ForeColor = [System.Drawing.Color]::Black
+$Grid.ColumnHeadersDefaultCellStyle.ForeColor = [System.Drawing.Color]::Black
+$Grid.AutoSizeColumnsMode = [System.Windows.Forms.DataGridViewAutoSizeColumnsMode]::Fill
+$Grid.AllowUserToAddRows = $false
+$Grid.RowHeadersVisible = $false
+$Grid.AutoGenerateColumns = $false # We will manually define columns
+
+# Define Columns Manually
+$ColId = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+$ColId.HeaderText = "ID"
+$ColId.DataPropertyName = "ID"
+$ColId.Name = "ID"
+$Grid.Columns.Add($ColId)
+
+$ColName = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+$ColName.HeaderText = "Title / Name"
+$ColName.DataPropertyName = "Name"
+$ColName.Name = "Name"
+$Grid.Columns.Add($ColName)
+
+$ColCat = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+$ColCat.HeaderText = "Category"
+$ColCat.DataPropertyName = "Category"
+$ColCat.Name = "Category"
+$Grid.Columns.Add($ColCat)
+
+$ColImg = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+$ColImg.HeaderText = "Image Path"
+$ColImg.DataPropertyName = "Image"
+$ColImg.Name = "Image"
+$Grid.Columns.Add($ColImg)
+
+$ColDesc = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+$ColDesc.HeaderText = "Description"
+$ColDesc.DataPropertyName = "Description"
+$ColDesc.Name = "Description"
+$Grid.Columns.Add($ColDesc)
+
+
+$TabBulk.Controls.Add($Grid)
+$Y += 410
+
+$BtnSaveBulk = New-Object System.Windows.Forms.Button
+$BtnSaveBulk.Text = "SAVE ALL CHANGES"
+$BtnSaveBulk.BackColor = [System.Drawing.Color]::LightGreen
+$BtnSaveBulk.Font = New-Object System.Drawing.Font($Form.Font, [System.Drawing.FontStyle]::Bold)
+$BtnSaveBulk.Location = New-Object System.Drawing.Point(20, $Y)
+$BtnSaveBulk.Size = New-Object System.Drawing.Size(840, 40)
+$TabBulk.Controls.Add($BtnSaveBulk)
+
+# --- BULK LOGIC ---
+
+function Get-JS-Objects-Table {
+    param($Type)
+    $File = ""
+    switch ($Type) {
+        "Products" { $File = "products-data.js" }
+        "Services" { $File = "services-data.js" }
+        "Clients" { $File = "clients-data.js" }
+        "Stories" { $File = "success-stories-data.js" }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    if (-not (Test-Path $Path)) { return $null }
+    
+    $Raw = Get-Content $Path -Raw
+    $Blocks = Get-JS-Blocks $Type 
+    if ($Blocks.Count -eq 0) {
+        [System.Windows.Forms.MessageBox]::Show("Debug: No blocks found in " + $File)
+    }
+    
+    $Table = New-Object System.Data.DataTable
+    $Table.Columns.Add("ID") | Out-Null
+    $Table.Columns.Add("Name") | Out-Null
+    $Table.Columns.Add("Category") | Out-Null
+    $Table.Columns.Add("Image") | Out-Null
+    $Table.Columns.Add("Description") | Out-Null
+    
+    foreach ($B in $Blocks) {
+        $Txt = $B.Block
+        $Id = [regex]::Match($Txt, "['`"]?id['`"]?\s*:\s*(['`"])(.*?)\1").Groups[2].Value
+        
+        $Name = [regex]::Match($Txt, "['`"]?name['`"]?\s*:\s*(['`"])(.*?)\1").Groups[2].Value
+        if (-not $Name) { $Name = [regex]::Match($Txt, "['`"]?title['`"]?\s*:\s*(['`"])(.*?)\1").Groups[2].Value }
+        
+        $Cat = [regex]::Match($Txt, "['`"]?category['`"]?\s*:\s*(['`"])(.*?)\1").Groups[2].Value
+        
+        $ImgMatch = [regex]::Match($Txt, "['`"]?(image|logo)['`"]?\s*:\s*(['`"])(.*?)\2")
+        $Img = $ImgMatch.Groups[3].Value
+        
+        $Desc = [regex]::Match($Txt, "['`"]?description['`"]?\s*:\s*(['`"])(.*?)\1").Groups[2].Value
+        
+        $Row = $Table.NewRow()
+        $Row["ID"] = $Id
+        $Row["Name"] = $Name
+        $Row["Category"] = $Cat
+        $Row["Image"] = $Img
+        $Row["Description"] = $Desc
+        $Table.Rows.Add($Row)
+    }
+    
+    [void][System.Windows.Forms.MessageBox]::Show("Function Internal: Generated Table with " + $Table.Rows.Count + " rows.")
+    return , $Table
+}
+
+function Save-Grid-To-JS {
+    param($Type)
+    $File = ""
+    switch ($Type) {
+        "Products" { $File = "products-data.js" }
+        "Services" { $File = "services-data.js" }
+        "Clients" { $File = "clients-data.js" }
+        "Stories" { $File = "success-stories-data.js" }
+    }
+    
+    $Path = Join-Path $AssetsDir $File
+    
+    $Raw = Get-Content $Path -Raw
+    $StartArr = $Raw.IndexOf("[")
+    $Prefix = $Raw.Substring(0, $StartArr + 1)
+    
+    # Iterate Grid Rows directly
+    $NewInner = ""
+    foreach ($Row in $Grid.Rows) {
+        # Determine Keys based on Type
+        $NameKey = "name"
+        if ($Type -eq "Services" -or $Type -eq "Stories") { $NameKey = "title" }
+        
+        $ImgKey = "image"
+        if ($Type -eq "Clients") { $ImgKey = "logo" }
+        
+        # Get Values from Cells by Column Name
+        $ValId = $Row.Cells["ID"].Value
+        $ValName = $Row.Cells["Name"].Value
+        $ValCat = $Row.Cells["Category"].Value
+        $ValImg = $Row.Cells["Image"].Value
+        $ValDesc = $Row.Cells["Description"].Value
+        
+        $ObjStr = "`n  {"
+        
+        if ($ValId) { $ObjStr += "`n    id: `"$ValId`"," }
+        $ObjStr += "`n    ${NameKey}: `"$ValName`","
+        if ($ValCat) { $ObjStr += "`n    category: `"$ValCat`"," }
+        if ($ValImg) { $ObjStr += "`n    ${ImgKey}: `"$ValImg`"," } 
+        
+        if ($ValDesc) { 
+            # cleanup newlines in desc
+            $CleanDesc = $ValDesc -replace "`r`n", " " -replace "`n", " "
+            $ObjStr += "`n    description: `"$CleanDesc`"," 
+        }
+        
+        $ObjStr = $ObjStr.TrimEnd(",")
+        $ObjStr += "`n  },"
+        
+        $NewInner += $ObjStr
+    }
+    
+    $NewInner = $NewInner.TrimEnd(",") 
+    $FinalContent = $Prefix + $NewInner + "`n];"
+    Set-Content $Path -Value $FinalContent -Encoding UTF8
+}
+
+$BtnLoadGrid.Add_Click({
+        if ($CmbBulkType.SelectedItem) {
+            $RawResult = Get-JS-Objects-Table $CmbBulkType.SelectedItem
+        
+            # Handle Pipeline: We expect a single DataTable now, but handle array wrapper just in case
+            $Table = $null
+            if ($RawResult -is [System.Array]) {
+                foreach ($Item in $RawResult) {
+                    if ($Item -is [System.Data.DataTable]) {
+                        $Table = $Item
+                        break
+                    }
+                }
+            }
+            elseif ($RawResult -is [System.Data.DataTable]) {
+                $Table = $RawResult
+            }
+        
+            if ($Table) {
+                $Grid.DataSource = $null 
+                $Grid.Rows.Clear()
+            
+                foreach ($Row in $Table.Rows) {
+                    if ($Row) {
+                        [void]$Grid.Rows.Add([string]$Row["ID"], [string]$Row["Name"], [string]$Row["Category"], [string]$Row["Image"], [string]$Row["Description"])
+                    }
+                }
+            
+                [System.Windows.Forms.MessageBox]::Show("Loaded " + $Table.Rows.Count + " rows." )
+            }
+            else {
+                [System.Windows.Forms.MessageBox]::Show("Failure. Returned Type: " + $RawResult.GetType().FullName)
+            }
+        }
+        else {
+            [System.Windows.Forms.MessageBox]::Show("Please select a content type first.")
+        }
+    })
+    
+$BtnSaveBulk.Add_Click({
+        if ($Grid.Rows.Count -gt 0) {
+            $Confirm = [System.Windows.Forms.MessageBox]::Show("This will OVERWRITE the file with the data in the grid.`nMake sure your data looks correct.`n`nContinue?", "Bulk Save", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Warning)
+            if ($Confirm -eq [System.Windows.Forms.DialogResult]::Yes) {
+                Save-Grid-To-JS $CmbBulkType.SelectedItem
+                [System.Windows.Forms.MessageBox]::Show("Saved successfully!")
+            }
+        }
+    })
+
+[void]$Form.ShowDialog()

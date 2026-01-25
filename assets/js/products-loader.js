@@ -48,8 +48,8 @@ function renderMegaMenu(container) {
         // Header
         colDiv.innerHTML = `<h4><i class="${col.icon}"></i> ${col.title}</h4>`;
 
-        // Items
-        const items = productsData.filter(p => p.category === col.category);
+        // Items - Case Insensitive Comparison
+        const items = productsData.filter(p => p.category.toLowerCase() === col.category.toLowerCase());
         
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {
@@ -137,8 +137,8 @@ function renderProductsPage(container) {
 
         // Loop through categories in this section
         section.categories.forEach(catName => {
-            // Find items
-            const items = productsData.filter(p => p.category === catName);
+            // Find items - Case Insensitive
+            const items = productsData.filter(p => p.category.toLowerCase() === catName.toLowerCase());
             if (items.length === 0) return;
 
             // Check if we need a subsection header (like "Buoys", "Vessels")
