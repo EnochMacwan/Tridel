@@ -3,7 +3,7 @@ const productsData = [
         "image":  "assets/images/Integrated Solutions/AQMS/aqms.png",
         "link":  "product-detail.html?id=aqms",
         "id":  "aqms",
-        "category":  "Integrated Solutions",
+        "category":  "Vessels",
         "description":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
         "longDescription":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
         "name":  "AQMS (VBS)",
