@@ -10,27 +10,6 @@
     <meta
         content="Tridel provides a full range of environmental and geo-engineering services, including geoscience studies, geoinformatics solutions, and geoengineering applications."
         name="description">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "name": "Environmental Monitoring & Surveying",
-      "provider": {
-        "@type": "Organization",
-        "name": "Tridel Technologies"
-      },
-      "areaServed": "Global",
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Environmental Services",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "MetOcean Monitoring" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Bathymetric Surveys" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Water Quality Monitoring" } }
-        ]
-      }
-    }
-    </script>
     <link href="assets/css/styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="assets/js/script.js"></script>
@@ -46,6 +25,12 @@
 </head>
 
 <body class="page-services">
+    
+  <!-- Dynamic Header Injection -->
+  <div id="header-placeholder"></div>
+  <script>
+    // Should be handled by scripts or standardized nav
+  </script>
     <header class="header">
 <div class="container header__container">
     <a class="header__logo" href="index.html">
@@ -70,138 +55,8 @@
                 <!-- Mega Menu (Concept 3: Glass Prism) -->
                 <div class="mega-menu glass-mode">
                     <div class="mm-glass-grid mm-products">
-                        <!-- Col 1: Buoys -->
-                        <div class="glass-col">
-                            <h4><i class="fas fa-life-ring"></i> Buoys</h4>
-                            <a href="products/product-coastal-buoy.html" class="glass-link"
-                                data-title="Coastal Monitoring Buoy"
-                                data-desc="Robust floating platforms for nearshore and coastal applications."
-                                data-img="assets/images/products/coastal-buoy/TCB1000- WAVE BUOY/TCB.jpg">Coastal Buoys</a>
-                            <a href="products/product-data-buoy.html" class="glass-link" data-title="Data Buoys"
-                                data-desc="Bespoke platforms for advanced marine monitoring and research."
-                                data-img="assets/images/products/data-buoy/TDB3000 - PROFILLING BUOY/DataBuoy.png">Data Buoys</a>
-                            <a href="products/product-nav-buoy.html" class="glass-link"
-                                data-title="Navigation Buoys (AtoN)"
-                                data-desc="Aids to Navigation for marking channels and hazards."
-                                data-img="assets/images/products/nav-buoy/nav-buoy-new.jpg">Navigation (AtoN)</a>
-                            <a href="products/product-wind-farm-buoy.html" class="glass-link"
-                                data-title="Wind Farm (LiDAR) Buoys"
-                                data-desc="Specialized monitoring solutions for offshore wind energy."
-                                data-img="assets/images/products/nav-buoy/nav-buoy-new.jpg">LiDAR / Wind Farm</a>
-                            <a href="products/product-mooring-buoy.html" class="glass-link" data-title="Mooring Buoys"
-                                data-desc="Commercial, Naval, and offshore mooring solutions."
-                                data-img="assets/images/products/mooring-buoy/mooring-new.jpg">Mooring Buoys</a>
-                            <a href="products/product-deepwater-buoy.html" class="glass-link"
-                                data-title="Deepwater Buoys"
-                                data-desc="Long-term scientific applications in deep-water environments."
-                                data-img="assets/images/products/deepwater-buoy/deepwater-new.jpg">Deepwater Buoys</a>
-                            <a href="products/product-drifter-buoy.html" class="glass-link" data-title="Drifter Buoys"
-                                data-desc="Autonomous devices for tracking currents and marine conditions."
-                                data-img="assets/images/products/drifter-buoy/drifter-1.jpg">Drifter Buoys</a>
-                            <a href="products/product-sub-floats.html" class="glass-link"
-                                data-title="Surface & Sub-Surface Floats"
-                                data-desc="Floats for marking underwater oceanographic moorings."
-                                data-img="assets/images/products/sub-floats/hdpe-floats.png">Surface Floats</a>
-                        </div>
-
-                        <!-- Col 2: Vessels -->
-                        <div class="glass-col">
-                            <h4><i class="fas fa-ship"></i> Vessels</h4>
-                            <a href="products/product-aquilon-8000.html" class="glass-link"
-                                data-title="Aquilon 8000 (Hybrid)"
-                                data-desc="Diesel-electric hybrid ASV for comprehensive missions."
-                                data-img="assets/images/products/aquilon-8000/aquilon-8000-new.png">Aquilon 8000 <span
-                                    class="badge-new">New</span></a>
-                            <a href="products/product-aquilon-5600a.html" class="glass-link"
-                                data-title="Aquilon 5600 (Hybrid)"
-                                data-desc="Carbon Fiber Hybrid USV for coastal surveys."
-                                data-img="assets/images/products/aquilon-5600a/aquilon-5600-new.png">Aquilon 5600</a>
-                            <a href="products/product-monohull-vessel.html" class="glass-link"
-                                data-title="Monohull Survey Vessel"
-                                data-desc="11m fiberglass-reinforced hydrographic survey vessel."
-                                data-img="assets/images/products/monohull-vessel/monohull-new.png">Monohull Survey</a>
-                            <a href="products/product-catamaran-vessel.html" class="glass-link"
-                                data-title="Catamaran Survey Vessel"
-                                data-desc="25m GRP catamaran for coastal and offshore missions."
-                                data-img="assets/images/products/catamaran-vessel/catamaran-new.jpg">Catamaran
-                                Survey</a>
-                        </div>
-
-                        <!-- Col 3: Equipment -->
-                        <div class="glass-col">
-                            <h4><i class="fas fa-screwdriver-wrench"></i> Equipment</h4>
-                            <a href="products/product-tew500.html" class="glass-link" data-title="TEW500 Compact Winch"
-                                data-desc="High-performance winch for precision surveys."
-                                data-img="assets/images/products/tew500/p-winch.png">TEW500 Winch</a>
-                            <a href="products/product-tew1500.html" class="glass-link"
-                                data-title="TEW1500 Heavy-Duty Winch"
-                                data-desc="Heavy-duty winch for deep-water missions."
-                                data-img="assets/images/products/tew1500/tew1500-new.png">TEW1500 Winch</a>
-                            <a href="products/product-tdl720.html" class="glass-link" data-title="TDL 720 Data Logger"
-                                data-desc="Robust, low-power data logger for remote monitoring."
-                                data-img="assets/images/products/tdl720/tdl720-new.png">TDL 720 Logger</a>
-                            <a href="products/product-mooring-frame.html" class="glass-link"
-                                data-title="Mooring Frames &amp; Mounts"
-                                data-desc="Non-corrosive mounts for underwater instrumentation."
-                                data-img="assets/images/products/mooring-frame/mooring-frame.png">Frames &amp;
-                                Mounts</a>
-                        </div>
-
-                        <!-- Col 4: Integrated Solutions -->
-                        <!-- Col 4: Software -->
-                        <div class="glass-col">
-                            <h4><i class="fas fa-laptop-code"></i> Software</h4>
-                            <a href="products/product-tems.html" class="glass-link" data-title="TEMS Platform"
-                                data-desc="Real-time data publishing platform integrating multiple systems."
-                                data-img="assets/images/software/tems.png">TEMS Platform</a>
-                            <a href="products/product-especia.html" class="glass-link" data-title="eSpecia GIS"
-                                data-desc="Advanced GIS solutions for environmental data analysis."
-                                data-img="assets/images/software/especia.png">eSpecia GIS</a>
-                            <a href="products/product-tacs-software.html" class="glass-link" data-title="TACS Software"
-                                data-desc="Command and control software for autonomous vessels."
-                                data-img="assets/images/software/tems.png">TACS Software</a>
-                            <a href="products/product-drifter-track.html" class="glass-link" data-title="Drifter Track"
-                                data-desc="Web-based tracking interface for drifting buoys."
-                                data-img="assets/images/products/drifter-buoy/drifter-1.jpg">Drifter Track</a>
-                        </div>
-                        
-                        <!-- Col 5: Integrated Solutions -->
-                        <div class="glass-col">
-                            <h4><i class="fas fa-layer-group"></i> Integrated Solutions</h4>
-                            <a href="products/product-geodb.html" class="glass-link" data-title="GeoDB"
-                                data-desc="Geospatial Database solutions."
-                                data-img="assets/images/Integrated Solutions/GeoDB/geodb.png">GeoDB</a>
-                            <a href="products/product-beach-ms.html" class="glass-link" data-title="Beach MS"
-                                data-desc="Beach Monitoring System."
-                                data-img="assets/images/Integrated Solutions/Beach Monitoring System/BMS.png">Beach MS</a>
-                            <a href="products/product-port-ms.html" class="glass-link" data-title="Port MS"
-                                data-desc="Port Monitoring System."
-                                data-img="assets/images/Integrated Solutions/Port Monitoring System/PMS.png">Port MS</a>
-                            <a href="products/product-ecfs.html" class="glass-link" data-title="ECFS"
-                                data-desc="Electronic Charting & Forecasting System."
-                                data-img="assets/images/Integrated Solutions/ECFS/ECFS.jpg">ECFS</a>
-                             <a href="products/product-aqms.html" class="glass-link" data-title="AQMS"
-                                data-desc="Air Quality Monitoring System."
-                                data-img="assets/images/Integrated Solutions/AQMS/aqms.png">AQMS</a>
-                             <a href="products/product-forecasting-systems.html" class="glass-link" data-title="Forecasting"
-                                data-desc="Advanced forecasting solutions."
-                                data-img="assets/images/Integrated Solutions/Forecasting/forecasting.png">Forecasting</a>
-                        </div>
-                    
-                        <!-- Spotlight Card (Column 6) -->
-                        <div class="glass-spotlight">
-                            <div class="spotlight-content">
-                                <span class="spotlight-tag">Featured</span>
-                                <h3>Next-Gen Autonomous Solutions</h3>
-                                <p>Discover how our hybrid USVs are redefining data acquisition.</p>
-                                <a href="products.html" class="spotlight-btn">View All Products <i
-                                        class="fas fa-arrow-right"></i></a>
-                            </div>
-                            <div class="spotlight-image">
-                                <img src="assets/images/products/aquilon-8000/aquilon-8000-new.png" alt="Aquilon 8000">
-                            </div>
-                        </div>
-                        </div>
+                        <div style="grid-column: 1/-1; text-align: center; color: white;">Loading Products...</div>
+                        <!-- Content loaded dynamically by assets/js/products-loader.js -->
                     </div>
             </li>
             <li>
@@ -329,6 +184,11 @@
 
     </nav>
 </div>
+<script defer src="assets/js/products-data.js"></script>
+<script defer src="assets/js/products-loader.js"></script>
+<script defer src="assets/js/services-data.js"></script>
+<script defer src="assets/js/services-loader.js"></script>
+</header>
 
 
 </header><main id="main-content">
@@ -345,162 +205,20 @@
             </div>
         </section>
 
-        <!-- Environmental Monitoring -->
-        <section class="section section--light-bg">
-            <div class="container">
-                <div class="section__header">
-                    <h2 class="section__title">Environmental Monitoring</h2>
-                    <p class="section__subtitle">Advanced data collection and analysis for marine and coastal
-                        environments.</p>
-                </div>
-                <div class="product-list-grid">
-                    <a href="services/hydrography.html#metocean" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="MetOcean Monitoring"
-                                class="product-item__image product-image-style"
-                                src="assets/images/services/met-ocean-study.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>MetOcean Monitoring</h4>
-                            <p class="product-item__excerpt">Comprehensive meteorological and oceanographic data
-                                collection services.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/atmospheric-noise.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Atmospheric &amp; Underwater Noise"
-                                class="product-item__image product-image-style"
-                                src="assets/images/products/data-buoy/TDB3000 - PROFILLING BUOY/DataBuoy.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Atmospheric &amp; Underwater Noise</h4>
-                            <p class="product-item__excerpt">Monitoring ambient noise levels in marine and coastal
-                                environments.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/air-quality.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Air Quality Monitoring"
-                                class="product-item__image product-image-style"
-                                src="assets/images/services/Eddy-Covariance-Flux-System.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Air Quality Monitoring</h4>
-                            <p class="product-item__excerpt">Precision air quality monitoring for offshore and coastal
-                                projects.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/water-quality.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Water Quality Monitoring"
-                                class="product-item__image product-image-style"
-                                src="assets/images/products/coastal-buoy/tcb-new.jpg">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Water Quality Monitoring</h4>
-                            <p class="product-item__excerpt">Real-time water quality parameter tracking and analysis.
-                            </p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/ground-water.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Ground Water Monitoring"
-                                class="product-item__image product-image-style"
-                                src="assets/images/services/geodatabase-illustration.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Ground Water Monitoring</h4>
-                            <p class="product-item__excerpt">Subsurface water level and quality monitoring solutions.
-                            </p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                </div>
+        <!-- Dynamic Service Grid -->
+        <div id="dynamic-services-container">
+            <div style="text-align: center; padding: 50px;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> Loading Services...
             </div>
-        </section>
+        </div>
 
-        <!-- Surveys -->
-        <section class="section">
-            <div class="container">
-                <div class="section__header">
-                    <h2 class="section__title">Environmental Surveying</h2>
-                    <p class="section__subtitle">Comprehensive hydrographic and geophysical survey services.</p>
-                </div>
-                <div class="product-list-grid">
-                    <a href="services/hydrography.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Bathymetric Surveys"
-                                class="product-item__image product-image-style"
-                                src="assets/images/services/port-monitoring.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Bathymetric Surveys</h4>
-                            <p class="product-item__excerpt">High-resolution seabed mapping and depth measurement.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/uxo-survey.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="UXO Survey" class="product-item__image product-image-style"
-                                src="assets/images/services/electronic-maps.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>UXO Survey</h4>
-                            <p class="product-item__excerpt">Unexploded Ordnance (UXO) detection and risk assessment.
-                            </p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/geoengineering.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="GeoTechnical Survey"
-                                class="product-item__image product-image-style" src="assets/images/services/bm2s.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>GeoTechnical Survey</h4>
-                            <p class="product-item__excerpt">Soil analysis and sub-bottom profiling for engineering
-                                projects.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/navigational-charting.html" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Navigational Charting"
-                                class="product-item__image product-image-style"
-                                src="assets/images/services/electronic-maps.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Navigational Charting</h4>
-                            <p class="product-item__excerpt">Production of electronic navigation charts and
-                                publications.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                    <a href="services/hydrography.html#topographic" class="product-grid-wrapper">
-                        <div class="product-card-visual">
-                            <img loading="lazy" alt="Topographic Survey" class="product-item__image product-image-style"
-                                src="assets/images/services/areal-mapping.png">
-                        </div>
-                        <div class="product-content-outside">
-                            <h4>Topographic Survey</h4>
-                            <p class="product-item__excerpt">Land survey and mapping for coastal and onshore
-                                infrastructure.</p>
-                            <span class="button button--secondary">View Details</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </section>
     </main>
     <footer class="footer">
         <div class="container footer__container">
             <div class="footer__brand">
                 <a class="footer__logo" href="index.html">
-                    <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" class="footer-logo-style">
+                    <img alt="Tridel Logo" src="assets/images/logo/tridel1.png"
+                        style="height: 32px; filter: brightness(0) invert(1);">
                 </a>
                 <p class="footer__tagline">
                     Connecting Environmental Science, Engineering, and Technology
