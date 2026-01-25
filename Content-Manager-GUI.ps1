@@ -1249,9 +1249,10 @@ $Grid.AutoGenerateColumns = $false # We will manually define columns
 
 # Define Columns Manually
 $ColId = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
-$ColId.HeaderText = "ID"
+$ColId.HeaderText = "ID (ReadOnly)"
 $ColId.DataPropertyName = "ID"
 $ColId.Name = "ID"
+$ColId.ReadOnly = $true
 $Grid.Columns.Add($ColId)
 
 $ColName = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
@@ -1308,7 +1309,7 @@ function Get-JS-Objects-Table {
     $Raw = Get-Content $Path -Raw
     $Blocks = Get-JS-Blocks $Type 
     if ($Blocks.Count -eq 0) {
-        [System.Windows.Forms.MessageBox]::Show("Debug: No blocks found in " + $File)
+        # Silent failure or log
     }
     
     $Table = New-Object System.Data.DataTable
@@ -1341,8 +1342,23 @@ function Get-JS-Objects-Table {
         $Table.Rows.Add($Row)
     }
     
-    [void][System.Windows.Forms.MessageBox]::Show("Function Internal: Generated Table with " + $Table.Rows.Count + " rows.")
     return , $Table
+}
+
+function Update-JS-Field {
+    param($Block, $KeyPattern, $NewValue)
+    if (-not $NewValue) { return $Block }
+    
+    # Escape special chars (simple double quote escape)
+    $SafeValue = $NewValue -replace '"', '\"'
+    
+    # Regex to find key: "value"
+    $Pattern = "(?mi)(['`"]?\b(?:$KeyPattern)\b['`"]?\s*:\s*)(['`"])(.*?)\2"
+    
+    if ($Block -match $Pattern) {
+        $Block = $Block -replace $Pattern, ('${1}"' + $SafeValue + '"')
+    }
+    return $Block
 }
 
 function Save-Grid-To-JS {
@@ -1357,13 +1373,25 @@ function Save-Grid-To-JS {
     
     $Path = Join-Path $AssetsDir $File
     
-    $Raw = Get-Content $Path -Raw
-    $StartArr = $Raw.IndexOf("[")
-    $Prefix = $Raw.Substring(0, $StartArr + 1)
+    # 1. Load Original Blocks to Preserve Data
+    $ExistingBlocks = Get-JS-Blocks $Type
+    $BlockMap = @{}
+    foreach ($B in $ExistingBlocks) {
+        $Txt = $B.Block
+        $MatchId = [regex]::Match($Txt, "['`"]?id['`"]?\s*:\s*(['`"])(.*?)\1")
+        if ($MatchId.Success) {
+            $Id = $MatchId.Groups[2].Value
+            $BlockMap[$Id] = $Txt
+        }
+    }
     
-    # Iterate Grid Rows directly
-    $NewInner = ""
+    # 2. Iterate Grid and Update Blocks
+    $NewBlocks = @()
+    
     foreach ($Row in $Grid.Rows) {
+        $Id = $Row.Cells["ID"].Value
+        if (-not $Id) { continue }
+        
         # Determine Keys based on Type
         $NameKey = "name"
         if ($Type -eq "Services" -or $Type -eq "Stories") { $NameKey = "title" }
@@ -1371,33 +1399,41 @@ function Save-Grid-To-JS {
         $ImgKey = "image"
         if ($Type -eq "Clients") { $ImgKey = "logo" }
         
-        # Get Values from Cells by Column Name
-        $ValId = $Row.Cells["ID"].Value
         $ValName = $Row.Cells["Name"].Value
         $ValCat = $Row.Cells["Category"].Value
         $ValImg = $Row.Cells["Image"].Value
         $ValDesc = $Row.Cells["Description"].Value
         
-        $ObjStr = "`n  {"
-        
-        if ($ValId) { $ObjStr += "`n    id: `"$ValId`"," }
-        $ObjStr += "`n    ${NameKey}: `"$ValName`","
-        if ($ValCat) { $ObjStr += "`n    category: `"$ValCat`"," }
-        if ($ValImg) { $ObjStr += "`n    ${ImgKey}: `"$ValImg`"," } 
-        
-        if ($ValDesc) { 
-            # cleanup newlines in desc
-            $CleanDesc = $ValDesc -replace "`r`n", " " -replace "`n", " "
-            $ObjStr += "`n    description: `"$CleanDesc`"," 
+        if ($BlockMap.ContainsKey($Id)) {
+            $Block = $BlockMap[$Id]
+            
+            # Non-Destructive Update using Regex
+            # We match 'name' or 'title' explicitly
+            $Block = Update-JS-Field $Block "name|title" $ValName
+            $Block = Update-JS-Field $Block "category" $ValCat
+            $Block = Update-JS-Field $Block "image|logo" $ValImg
+            
+            # Special handling for description newlines
+            if ($ValDesc) {
+                $CleanDesc = $ValDesc -replace "`r`n", " " -replace "`n", " "
+                $Block = Update-JS-Field $Block "description" $CleanDesc
+            }
+            
+            $NewBlocks += $Block
         }
-        
-        $ObjStr = $ObjStr.TrimEnd(",")
-        $ObjStr += "`n  },"
-        
-        $NewInner += $ObjStr
+        else {
+            # Fallback for New ID (Simple Construct)
+            $ObjStr = "`n  {`n    id: `"$Id`",`n    ${NameKey}: `"$ValName`",`n    category: `"$ValCat`",`n    ${ImgKey}: `"$ValImg`",`n    description: `"$ValDesc`"`n  }"
+            $NewBlocks += $ObjStr
+        }
     }
     
-    $NewInner = $NewInner.TrimEnd(",") 
+    # 3. Write Back
+    $Raw = Get-Content $Path -Raw
+    $StartArr = $Raw.IndexOf("[")
+    $Prefix = $Raw.Substring(0, $StartArr + 1)
+    
+    $NewInner = $NewBlocks -join ","
     $FinalContent = $Prefix + $NewInner + "`n];"
     Set-Content $Path -Value $FinalContent -Encoding UTF8
 }
