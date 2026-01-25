@@ -3,10 +3,28 @@ const productsData = [
         "image":  "assets/images/Integrated Solutions/AQMS/aqms.png",
         "link":  "product-detail.html?id=aqms",
         "id":  "aqms",
-        "category":  "Vessels",
+        "category":  "Integrated Solutions",
         "description":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
         "longDescription":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
         "name":  "AQMS (VBS)",
+        "gallery":  [
+                        "assets/images/Integrated Solutions/AQMS/aqms.png"
+                    ],
+        "features":  [
+                         "\u003cstrong\u003e Vessel Based: \u003c/strong\u003e Optimized for deployment on vessels.",
+                         "\u003cstrong\u003e Comprehensive Monitoring: \u003c/strong\u003e Monitors key air quality indices.",
+                         "\u003cstrong\u003e Real-time Data: \u003c/strong\u003e Integration with TEMS for real-time reporting.",
+                         "\u003cstrong\u003e Robust Design: \u003c/strong\u003e Built to withstand marine conditions."
+                     ]
+    },
+    {
+        "image":  "assets/images/Integrated Solutions/AQMS/aqms.png",
+        "link":  "product-detail.html?id=aqms1",
+        "id":  "aqms1",
+        "category":  "Vessels",
+        "description":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
+        "longDescription":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
+        "name":  "AQMS11 (VBS)",
         "gallery":  [
                         "assets/images/Integrated Solutions/AQMS/aqms.png"
                     ],
