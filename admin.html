@@ -509,6 +509,7 @@
                 <li><a href="#clients" data-section="clients"><i class="fas fa-building"></i> Clients</a></li>
                 <li><a href="#stories" data-section="stories"><i class="fas fa-trophy"></i> Success Stories</a></li>
                 <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
+                <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
             </ul>
         </nav>
         
@@ -604,6 +605,20 @@
                     <!-- Populated by JS -->
                 </div>
             </section>
+            
+            <!-- LinkedIn News -->
+            <section id="linkedin" class="content-section">
+                <div class="section-header">
+                    <h2>LinkedIn News Feed</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('linkedin')">
+                        <i class="fas fa-plus"></i> Add Post
+                    </button>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Manage LinkedIn post URNs that appear in your website's news feed.</p>
+                <div class="items-grid" id="linkedin-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
         </main>
     </div>
     
@@ -680,6 +695,7 @@
     <script src="assets/js/clients-data.js"></script>
     <script src="assets/js/success-stories-data.js"></script>
     <script src="assets/js/home-data.js"></script>
+    <script src="assets/js/news-data.js"></script>
     
     <!-- Map variable names for compatibility -->
     <script>
@@ -692,6 +708,9 @@
         }
         if (typeof SUCCESS_STORIES_DATA === 'undefined' && typeof successStoriesData !== 'undefined') {
             window.SUCCESS_STORIES_DATA = successStoriesData;
+        }
+        if (typeof LINKEDIN_POSTS === 'undefined' && typeof linkedInPosts !== 'undefined') {
+            window.LINKEDIN_POSTS = linkedInPosts;
         }
     </script>
     
@@ -1049,6 +1068,7 @@
             renderClients();
             renderStories();
             renderHome();
+            renderLinkedIn();
         }
         
         // Products
@@ -1174,6 +1194,30 @@
             `).join('');
         }
         
+        // LinkedIn Posts
+        function renderLinkedIn() {
+            if (typeof LINKEDIN_POSTS === 'undefined') return;
+            const grid = document.getElementById('linkedin-grid');
+            grid.innerHTML = LINKEDIN_POSTS.map((urn, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ${i + 1}</h3>
+                        </div>
+                    </div>
+                    <p style="font-family: monospace; font-size: 11px; word-break: break-all;">${urn}</p>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('linkedin', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('linkedin', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
         // Modal Functions
         function openAddModal(type) {
             currentEditType = type;
@@ -1205,6 +1249,7 @@
                 case 'clients': return CLIENTS_DATA;
                 case 'stories': return SUCCESS_STORIES_DATA;
                 case 'home': return HOME_CARDS_DATA;
+                case 'linkedin': return LINKEDIN_POSTS;
             }
         }
         
@@ -1309,21 +1354,43 @@
                             <input type="text" class="form-control" id="field-icon" value="${data.icon || ''}" placeholder="fas fa-cube">
                         </div>
                     `;
+                case 'linkedin':
+                    return `
+                        <div class="form-group">
+                            <label>LinkedIn Post URN</label>
+                            <input type="text" class="form-control" id="field-urn" value="${data || ''}" placeholder="urn:li:ugcPost:1234567890">
+                            <small style="color: var(--text-muted); display: block; margin-top: 8px;">
+                                <i class="fas fa-info-circle"></i> You can find the URN in the LinkedIn post URL or embed code.
+                            </small>
+                        </div>
+                    `;
             }
         }
         
         function saveItem() {
-            const data = {};
-            document.querySelectorAll('#modal-body .form-control').forEach(input => {
-                const key = input.id.replace('field-', '');
-                data[key] = input.value;
-            });
-            
             const arr = getDataArray(currentEditType);
-            if (currentEditIndex !== null) {
-                Object.assign(arr[currentEditIndex], data);
+            
+            // Special handling for LinkedIn (simple string array)
+            if (currentEditType === 'linkedin') {
+                const urn = document.getElementById('field-urn').value.trim();
+                if (currentEditIndex !== null) {
+                    arr[currentEditIndex] = urn;
+                } else {
+                    arr.push(urn);
+                }
             } else {
-                arr.push(data);
+                // Normal object-based data
+                const data = {};
+                document.querySelectorAll('#modal-body .form-control').forEach(input => {
+                    const key = input.id.replace('field-', '');
+                    data[key] = input.value;
+                });
+                
+                if (currentEditIndex !== null) {
+                    Object.assign(arr[currentEditIndex], data);
+                } else {
+                    arr.push(data);
+                }
             }
             
             // Save to server
