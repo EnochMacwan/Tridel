@@ -200,23 +200,6 @@ const PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/products/drifter-buoy/drifter-1.jpg",
-    "link": "product-detail.html?id=drifter-track",
-    "id": "drifter-track",
-    "category": "Software",
-    "description": "Web-based tracking interface for drifting buoys, providing real-time location and data visualization.",
-    "longDescription": "Web-based tracking interface for drifting buoys, providing real-time location and data visualization.",
-    "name": "Drifter Track",
-    "gallery": [
-      "assets/images/products/drifter-buoy/drifter-1.jpg"
-    ],
-    "features": [
-      "<strong> Visual Tracking: </strong> Live map visualization of drifter locations.",
-      "<strong> Data Analysis: </strong> Historical data review and export capabilities.",
-      "<strong> Accessibility: </strong> Web-based platform accessible from any device."
-    ]
-  },
-  {
     "image": "assets/images/Integrated Solutions/ECFS/ECFS.jpg",
     "link": "product-detail.html?id=ecfs",
     "id": "ecfs",
