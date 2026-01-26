@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
  * Renders the Mega Menu Columns
  */
 function renderMegaMenu(container) {
-    if (typeof productsData === 'undefined') return;
+    // Support both variable names
+    const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
+    if (!data) return;
 
     container.innerHTML = ''; // Clear existing
 
@@ -49,7 +51,7 @@ function renderMegaMenu(container) {
         colDiv.innerHTML = `<h4><i class="${col.icon}"></i> ${col.title}</h4>`;
 
         // Items - Case Insensitive Comparison
-        const items = productsData.filter(p => p.category.toLowerCase() === col.category.toLowerCase());
+        const items = data.filter(p => p.category.toLowerCase() === col.category.toLowerCase());
         
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {
@@ -96,7 +98,9 @@ function renderMegaMenu(container) {
  * and valid sub-containers for sections.
  */
 function renderProductsPage(container) {
-    if (typeof productsData === 'undefined') return;
+    // Support both variable names
+    const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
+    if (!data) return;
     
     container.innerHTML = '';
 
@@ -138,7 +142,7 @@ function renderProductsPage(container) {
         // Loop through categories in this section
         section.categories.forEach(catName => {
             // Find items - Case Insensitive
-            const items = productsData.filter(p => p.category.toLowerCase() === catName.toLowerCase());
+            const items = data.filter(p => p.category.toLowerCase() === catName.toLowerCase());
             if (items.length === 0) return;
 
             // Check if we need a subsection header (like "Buoys", "Vessels")
