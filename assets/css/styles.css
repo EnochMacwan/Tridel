@@ -3359,7 +3359,7 @@ body {
 
 /* Glass Mode Container Override */
 .mega-menu.glass-mode {
-    background: rgba(32, 33, 36, 0.95);
+    background: rgba(32, 33, 36, 1);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -4329,12 +4329,14 @@ body {
     transform: none !important;
 }
 
-/* --- FIX: Wide Menu Layout (Step 1700) --- */
-/* The mega menu is squeezed. We need to widen it significantly. */
+/* --- FIX: Wide Menu Layout (Step 1700 & 5230) --- */
+/* The mega menu positioning must be FIXED to viewport to ensure consistent placement across all pages */
 .mega-menu.glass-mode {
+    position: fixed !important; /* Fixed to viewport, not any ancestor */
     width: 90vw !important; /* Use 90% of viewport width */
     max-width: 1400px !important; /* Cap at reasonable max */
     left: 50% !important;
+    top: 80px !important; /* Position below header (adjust based on header height) */
     transform: translateX(-50%) !important; /* Center it */
     padding: 40px !important;
 }
@@ -4343,10 +4345,39 @@ body {
 .header__nav-list li {
     position: static !important; /* Allow menu to escape the li width */
 }
-
 /* Adjust grid gap for breathing room */
 .mm-products {
     gap: 30px !important;
+}
+
+/* --- FIX: Standardize Services Menu to Match Products (Step 5070 & 5105) --- */
+/* Enforce visually balanced grid layout while keeping Spotlight 1/6th width */
+/* Logic: Products has 6 cols (1fr each). Spotlight = 1/6.
+   Services has 3 cols + Spotlight.
+   To keep Spotlight 1/6 (3 units), remaining 15 units / 3 items = 5 units each.
+   Result: 5fr 5fr 5fr 3fr. Total 18fr. 3/18 = 1/6. */
+.mm-services {
+    grid-template-columns: 5fr 5fr 5fr 3fr !important;
+    gap: 20px !important;
+}
+
+/* Position Spotlight in the 4th column (Last position in this custom grid) */
+.mm-services .glass-spotlight {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+    min-height: 400px !important;
+}
+
+/* Ensure Hover Effects are identical */
+.mm-services .glass-spotlight:hover {
+    transform: none !important;
+    margin-top: 0 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.mm-services .glass-spotlight:hover img {
+    transform: none !important;
 }
 
 /* Ensure spotlight card has minimum width to not look squashed */
@@ -4383,30 +4414,86 @@ body {
     transform: none !important;
 }
 
-/* --- FIX: Services Menu Layout MATCHING Products (Step 1782) --- */
-/* User wants same 6-col massive layout structure */
+/* --- FIX: Services Menu Layout MATCHING Products (Step 1782 corrected) --- */
+/* User wants 4 columns for Services: 3x Content + 1x Spotlight */
+/* FIX: Flexbox Layout for Absolute Centering & Packing (Safest Fix) */
+
+/* --- FIX: Services Menu Layout MATCHING Products (Step 1782 corrected) --- */
+/* User wants 4 columns for Services: 3x Content + 1x Spotlight */
+/* FIX: Fluid Flexbox Layout (Guarantees Fit without Clipping) */
 
 .mm-services {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 20px !important;
-}
-
-/* Make the 2 service columns wider to fill the space better since we only have 2 */
-.mm-services .glass-col {
-    grid-column: span 2; /* Takes 2 slots (width of 2 product cols) */
-}
-
-/* Force the Spotlight to the far right (Col 6) */
-.mm-services .glass-spotlight {
-    grid-column: 6 !important;
-    grid-row: 1 !important;
-    min-height: 400px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Force single row */
+    justify-content: center !important; /* Center the cluster */
+    align-items: stretch !important;
+    gap: 15px !important;
     
-    /* Ensure all the stability fixes apply here too */
+    width: 100% !important; /* Fill available space, don't overflow */
+    max-width: 1400px !important; /* Cap at reasonable max */
+    margin: 0 auto !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    
+    /* CRITICAL FIX: Override mega-menu.css overflow:hidden which clips the Spotlight */
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 450px !important; /* Ensure height matches other menus */
+}
+
+/* Service Columns: Fluid shrinkable width */
+/* flex: 1 1 0 ensures they share space equally and shrink effectively */
+.mm-services .glass-col {
+    flex: 1 1 0 !important; 
+    min-width: 0 !important; /* Allow shrinking below content size if needed to save Layout */
+    max-width: 280px !important; /* Don't get too wide */
+    position: static !important; /* Clear any unwanted positioning */
+}
+
+/* Spotlight: Prioritize visibility */
+.mm-services .glass-spotlight {
+    display: flex !important; /* Ensure it's not hidden */
+    visibility: visible !important; 
+    opacity: 1 !important;
+    
+    /* RESET CLASHING PROPERTIES from Detail Page layout */
+    position: static !important; /* Don't be absolute/floating */
+    right: auto !important; 
+    bottom: auto !important;
+    left: auto !important;
     transform: none !important;
+    grid-column: auto !important;
+    
+    flex: 0 0 300px !important; /* Fixed width */
+    width: 300px !important;
     margin: 0 !important;
-    min-width: 250px !important;
+    min-width: 250px !important; /* Allow slight squeeze on tiny screens */
+    
+    /* Visual Parity */
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+}
+
+.mm-services .glass-spotlight:hover {
+    transform: none !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+}
+
+/* Responsive: Wrap ONLY if screen is mobile/vertical tablet */
+@media (max-width: 900px) {
+    .mm-services {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+    }
+    .mm-services .glass-col,
+    .mm-services .glass-spotlight {
+        flex: 1 1 45% !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
 }
 
 /* --- FIX: Products Page Subtitle (Step 1802) --- */

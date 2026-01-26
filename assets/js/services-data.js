@@ -193,3 +193,13 @@ const servicesData = [
     image: ""
   }
 ];
+
+// Spotlight/Featured Service Configuration (Added via Agent)
+const featuredService = {
+    title: 'Comprehensive Solutions',
+    description: 'End-to-end expertise from feasibility to real-time monitoring.',
+    link: 'services.html',
+    buttonText: 'View All Services',
+    image: 'assets/images/services/port-monitoring.png',
+    tag: 'Featured'
+};

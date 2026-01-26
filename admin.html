@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Tridel Content Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-input: #252525;
+            --border: #333;
+            --text: #fff;
+            --text-muted: #888;
+            --accent: #0099cc;
+            --accent-hover: #00b8e6;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, #0099cc 0%, #006699 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .admin-header h1 i {
+            font-size: 28px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* Layout */
+        .admin-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin: 4px 12px;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-nav a:hover {
+            background: var(--bg-input);
+            color: var(--text);
+        }
+        
+        .sidebar-nav a.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-icon {
+            padding: 8px 12px;
+        }
+        
+        /* Cards / Items */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .item-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        
+        .item-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .item-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .item-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .item-card .category {
+            font-size: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .item-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        
+        .item-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .item-card-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 153, 204, 0.2);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: var(--text);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .stat-card i {
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .label {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+        }
+        
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .admin-header {
+                padding: 16px 20px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div class="modal-overlay" id="login-overlay" style="display: flex;">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-lock"></i> Admin Login</h3>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Enter the admin password to access the Content Manager.</p>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="Enter password" onkeypress="if(event.key==='Enter') doLogin()">
+                </div>
+                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="doLogin()" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="admin-header">
+        <h1><i class="fas fa-cogs"></i> Tridel Content Manager <span style="font-size: 14px; opacity: 0.8;">(GitHub CMS)</span></h1>
+        <div class="header-actions">
+            <button type="button" class="btn btn-secondary" onclick="openGitHubConfig()" id="github-config-btn">
+                <i class="fab fa-github"></i> GitHub Settings
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="loadDataFromGitHub()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="exportAllData()">
+                <i class="fas fa-download"></i> Export
+            </button>
+            <button type="button" class="btn btn-danger" onclick="doLogout()" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <a href="index.html" class="btn btn-primary">
+                <i class="fas fa-external-link-alt"></i> View Site
+            </a>
+        </div>
+    </header>
+    
+    <div class="admin-container">
+        <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="#products" data-section="products"><i class="fas fa-cube"></i> Products</a></li>
+                <li><a href="#services" data-section="services"><i class="fas fa-layer-group"></i> Services</a></li>
+                <li><a href="#clients" data-section="clients"><i class="fas fa-building"></i> Clients</a></li>
+                <li><a href="#stories" data-section="stories"><i class="fas fa-trophy"></i> Success Stories</a></li>
+                <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
+            </ul>
+        </nav>
+        
+        <main class="main-content">
+            <!-- Dashboard -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                </div>
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="section-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="showSection('products'); openAddModal('products')">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('services'); openAddModal('services')">
+                        <i class="fas fa-plus"></i> Add Service
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('clients'); openAddModal('clients')">
+                        <i class="fas fa-plus"></i> Add Client
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('stories'); openAddModal('stories')">
+                        <i class="fas fa-plus"></i> Add Story
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Products -->
+            <section id="products" class="content-section">
+                <div class="section-header">
+                    <h2>Products</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('products')">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <div class="items-grid" id="products-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+            
+            <!-- Services -->
+            <section id="services" class="content-section">
+                <div class="section-header">
+                    <h2>Services</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('services')">
+                        <i class="fas fa-plus"></i> Add Service
+                    </button>
+                </div>
+                <div class="items-grid" id="services-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+            
+            <!-- Clients -->
+            <section id="clients" class="content-section">
+                <div class="section-header">
+                    <h2>Clients</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('clients')">
+                        <i class="fas fa-plus"></i> Add Client
+                    </button>
+                </div>
+                <div class="items-grid" id="clients-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+            
+            <!-- Stories -->
+            <section id="stories" class="content-section">
+                <div class="section-header">
+                    <h2>Success Stories</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('stories')">
+                        <i class="fas fa-plus"></i> Add Story
+                    </button>
+                </div>
+                <div class="items-grid" id="stories-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+            
+            <!-- Home Cards -->
+            <section id="home" class="content-section">
+                <div class="section-header">
+                    <h2>Home Page Cards</h2>
+                    <button class="btn btn-primary" onclick="openAddModal('home')">
+                        <i class="fas fa-plus"></i> Add Card
+                    </button>
+                </div>
+                <div class="items-grid" id="home-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Item</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Form populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveItem()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- GitHub Config Modal -->
+    <div class="modal-overlay" id="github-config-overlay">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fab fa-github"></i> GitHub Configuration</h3>
+                <button type="button" class="modal-close" onclick="closeGitHubConfig()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Configure GitHub API to save changes directly to your repository.
+                </p>
+                <div class="form-group">
+                    <label>GitHub Username/Owner</label>
+                    <input type="text" class="form-control" id="github-owner" placeholder="e.g. EnochMacwan" value="EnochMacwan">
+                </div>
+                <div class="form-group">
+                    <label>Repository Name</label>
+                    <input type="text" class="form-control" id="github-repo" placeholder="e.g. Tridel" value="Tridel">
+                </div>
+                <div class="form-group">
+                    <label>Branch</label>
+                    <input type="text" class="form-control" id="github-branch" placeholder="e.g. main" value="main">
+                </div>
+                <div class="form-group">
+                    <label>Personal Access Token</label>
+                    <input type="password" class="form-control" id="github-token" placeholder="ghp_xxxx or github_pat_xxxx">
+                    <small style="color: var(--text-muted); display: block; margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> Get token at: 
+                        <a href="https://github.com/settings/tokens" target="_blank" style="color: var(--accent);">github.com/settings/tokens</a>
+                    </small>
+                </div>
+                <div id="github-status" style="margin-top: 16px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeGitHubConfig()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="testGitHubConnection()">
+                    <i class="fas fa-plug"></i> Test Connection
+                </button>
+                <button type="button" class="btn btn-success" onclick="saveGitHubConfig()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Data Files -->
+    <script src="assets/js/products-data.js"></script>
+    <script src="assets/js/services-data.js"></script>
+    <script src="assets/js/clients-data.js"></script>
+    <script src="assets/js/success-stories-data.js"></script>
+    <script src="assets/js/home-data.js"></script>
+    
+    <script>
+        // Auth State
+        let authToken = sessionStorage.getItem('adminToken') || null;
+        
+        // State
+        let currentSection = 'dashboard';
+        let currentEditType = null;
+        let currentEditIndex = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            checkAuth();
+            initNavigation();
+            
+            // Try to load latest data from GitHub if configured
+            if (gitHubConfig.token && gitHubConfig.owner && gitHubConfig.repo) {
+                await loadDataFromGitHub();
+            }
+            
+            renderDashboard();
+            renderAllSections();
+        });
+        
+        // Load data from GitHub repository
+        async function loadDataFromGitHub() {
+            if (!gitHubConfig.token) {
+                showToast('GitHub not configured', 'error');
+                return;
+            }
+            
+            showToast('Loading data from GitHub...', 'success');
+            
+            const types = ['products', 'services', 'clients', 'stories', 'home'];
+            
+            for (const type of types) {
+                const filePath = GITHUB_DATA_FILES[type];
+                const varName = GITHUB_VAR_NAMES[type];
+                
+                try {
+                    const res = await fetch(
+                        `https://raw.githubusercontent.com/${gitHubConfig.owner}/${gitHubConfig.repo}/${gitHubConfig.branch}/${filePath}`
+                    );
+                    
+                    if (res.ok) {
+                        const content = await res.text();
+                        // Extract JSON from JS const declaration
+                        const match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+                        if (match) {
+                            const data = JSON.parse(match[1]);
+                            // Update global variable
+                            window[varName] = data;
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Could not load ${type} from GitHub:`, e.message);
+                }
+            }
+            
+            renderDashboard();
+            renderAllSections();
+            showToast('Data loaded from GitHub!', 'success');
+        }
+        
+        // Auth Functions
+        async function checkAuth() {
+            if (authToken) {
+                try {
+                    const res = await fetch('/api/check-auth', {
+                        headers: { 'X-Auth-Token': authToken }
+                    });
+                    const data = await res.json();
+                    if (data.authenticated) {
+                        hideLogin();
+                        return;
+                    }
+                } catch (e) {
+                    // Server not running, allow offline mode
+                    hideLogin();
+                    return;
+                }
+            }
+            showLogin();
+        }
+        
+        async function doLogin() {
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    authToken = data.token;
+                    sessionStorage.setItem('adminToken', authToken);
+                    hideLogin();
+                    showToast('Login successful!', 'success');
+                } else {
+                    errorEl.textContent = 'Invalid password. Please try again.';
+                    errorEl.style.display = 'block';
+                }
+            } catch (e) {
+                errorEl.textContent = 'Server not running. Start it with: npm start';
+                errorEl.style.display = 'block';
+            }
+        }
+        
+        async function doLogout() {
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': authToken }
+                });
+            } catch (e) {}
+            
+            authToken = null;
+            sessionStorage.removeItem('adminToken');
+            showLogin();
+            showToast('Logged out', 'success');
+        }
+        
+        function showLogin() {
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+        
+        function hideLogin() {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+        
+        // ==========================================
+        // GITHUB CMS FUNCTIONS
+        // ==========================================
+        
+        // GitHub Config State
+        let gitHubConfig = JSON.parse(localStorage.getItem('githubConfig')) || {
+            owner: 'EnochMacwan',
+            repo: 'Tridel',
+            branch: 'main',
+            token: ''
+        };
+        
+        // Data file paths for GitHub
+        const GITHUB_DATA_FILES = {
+            products: 'assets/js/products-data.js',
+            services: 'assets/js/services-data.js',
+            clients: 'assets/js/clients-data.js',
+            stories: 'assets/js/success-stories-data.js',
+            home: 'assets/js/home-data.js',
+            news: 'assets/js/news-data.js'
+        };
+        
+        const GITHUB_VAR_NAMES = {
+            products: 'PRODUCTS_DATA',
+            services: 'SERVICES_DATA',
+            clients: 'CLIENTS_DATA',
+            stories: 'SUCCESS_STORIES_DATA',
+            home: 'HOME_CARDS_DATA',
+            news: 'NEWS_DATA'
+        };
+        
+        function openGitHubConfig() {
+            document.getElementById('github-owner').value = gitHubConfig.owner || '';
+            document.getElementById('github-repo').value = gitHubConfig.repo || '';
+            document.getElementById('github-branch').value = gitHubConfig.branch || 'main';
+            document.getElementById('github-token').value = gitHubConfig.token || '';
+            document.getElementById('github-status').innerHTML = '';
+            document.getElementById('github-config-overlay').classList.add('active');
+        }
+        
+        function closeGitHubConfig() {
+            document.getElementById('github-config-overlay').classList.remove('active');
+        }
+        
+        function saveGitHubConfig() {
+            gitHubConfig = {
+                owner: document.getElementById('github-owner').value.trim(),
+                repo: document.getElementById('github-repo').value.trim(),
+                branch: document.getElementById('github-branch').value.trim() || 'main',
+                token: document.getElementById('github-token').value.trim()
+            };
+            localStorage.setItem('githubConfig', JSON.stringify(gitHubConfig));
+            closeGitHubConfig();
+            showToast('GitHub configuration saved!', 'success');
+        }
+        
+        async function testGitHubConnection() {
+            const owner = document.getElementById('github-owner').value.trim();
+            const repo = document.getElementById('github-repo').value.trim();
+            const token = document.getElementById('github-token').value.trim();
+            const statusEl = document.getElementById('github-status');
+            
+            if (!owner || !repo || !token) {
+                statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Please fill in all fields</div>';
+                return;
+            }
+            
+            statusEl.innerHTML = '<div style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Testing connection...</div>';
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    statusEl.innerHTML = `
+                        <div style="color: var(--success);">
+                            <i class="fas fa-check-circle"></i> Connected successfully!<br>
+                            <small style="color: var(--text-muted);">Repository: ${data.full_name}</small>
+                        </div>
+                    `;
+                } else if (res.status === 401) {
+                    statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Invalid token</div>';
+                } else if (res.status === 404) {
+                    statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Repository not found</div>';
+                } else {
+                    statusEl.innerHTML = `<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Error: ${res.status}</div>`;
+                }
+            } catch (e) {
+                statusEl.innerHTML = `<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Connection failed: ${e.message}</div>`;
+            }
+        }
+        
+        // Save to GitHub - commits file to repository
+        async function saveToGitHub(type, data) {
+            if (!gitHubConfig.token) {
+                showToast('GitHub not configured. Click "GitHub Settings" to set up.', 'error');
+                return;
+            }
+            
+            const filePath = GITHUB_DATA_FILES[type];
+            const varName = GITHUB_VAR_NAMES[type];
+            if (!filePath || !varName) return;
+            
+            const fileContent = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+            
+            try {
+                // First, get current file SHA (required for update)
+                const getRes = await fetch(
+                    `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}?ref=${gitHubConfig.branch}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${gitHubConfig.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                let sha = null;
+                if (getRes.ok) {
+                    const fileData = await getRes.json();
+                    sha = fileData.sha;
+                }
+                
+                // Now update/create the file
+                const body = {
+                    message: `Update ${type} data via Content Manager`,
+                    content: btoa(unescape(encodeURIComponent(fileContent))),
+                    branch: gitHubConfig.branch
+                };
+                if (sha) body.sha = sha;
+                
+                const putRes = await fetch(
+                    `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${gitHubConfig.token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    }
+                );
+                
+                if (putRes.ok) {
+                    showToast(`${type} committed to GitHub! (${data.length} items)`, 'success');
+                } else {
+                    const err = await putRes.json();
+                    showToast(`GitHub error: ${err.message}`, 'error');
+                }
+            } catch (e) {
+                showToast(`Failed to save to GitHub: ${e.message}`, 'error');
+            }
+        }
+        
+        // Navigation
+        function initNavigation() {
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.dataset.section;
+                    showSection(section);
+                });
+            });
+        }
+        
+        function showSection(section) {
+            // Update nav
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            
+            currentSection = section;
+        }
+        
+        // Dashboard
+        function renderDashboard() {
+            const stats = [
+                { icon: 'fa-cube', value: typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA.length : 0, label: 'Products' },
+                { icon: 'fa-layer-group', value: typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA.length : 0, label: 'Services' },
+                { icon: 'fa-building', value: typeof CLIENTS_DATA !== 'undefined' ? CLIENTS_DATA.length : 0, label: 'Clients' },
+                { icon: 'fa-trophy', value: typeof SUCCESS_STORIES_DATA !== 'undefined' ? SUCCESS_STORIES_DATA.length : 0, label: 'Stories' }
+            ];
+            
+            document.getElementById('stats-grid').innerHTML = stats.map(s => `
+                <div class="stat-card">
+                    <i class="fas ${s.icon}"></i>
+                    <div class="value">${s.value}</div>
+                    <div class="label">${s.label}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Render All Sections
+        function renderAllSections() {
+            renderProducts();
+            renderServices();
+            renderClients();
+            renderStories();
+            renderHome();
+        }
+        
+        // Products
+        function renderProducts() {
+            if (typeof PRODUCTS_DATA === 'undefined') return;
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = PRODUCTS_DATA.map((p, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${p.name}</h3>
+                            <span class="category">${p.category || 'Uncategorized'}</span>
+                        </div>
+                    </div>
+                    <p>${(p.description || '').substring(0, 100)}...</p>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('products', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('products', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Services
+        function renderServices() {
+            if (typeof SERVICES_DATA === 'undefined') return;
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = SERVICES_DATA.map((s, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${s.title || s.name}</h3>
+                            <span class="category">${s.category || 'Service'}</span>
+                        </div>
+                    </div>
+                    <p>${(s.description || '').substring(0, 100)}...</p>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('services', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('services', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Clients
+        function renderClients() {
+            if (typeof CLIENTS_DATA === 'undefined') return;
+            const grid = document.getElementById('clients-grid');
+            grid.innerHTML = CLIENTS_DATA.map((c, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${c.name}</h3>
+                            <span class="category">${c.category || 'Client'}</span>
+                        </div>
+                    </div>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('clients', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('clients', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Stories
+        function renderStories() {
+            if (typeof SUCCESS_STORIES_DATA === 'undefined') return;
+            const grid = document.getElementById('stories-grid');
+            grid.innerHTML = SUCCESS_STORIES_DATA.map((s, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${s.title}</h3>
+                            <span class="category">${s.category || 'Story'}</span>
+                        </div>
+                    </div>
+                    <p>${(s.description || '').substring(0, 100)}...</p>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('stories', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('stories', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Home Cards
+        function renderHome() {
+            if (typeof HOME_CARDS_DATA === 'undefined') return;
+            const grid = document.getElementById('home-grid');
+            grid.innerHTML = HOME_CARDS_DATA.map((h, i) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${h.title}</h3>
+                        </div>
+                    </div>
+                    <p>${(h.description || '').substring(0, 100)}...</p>
+                    <div class="item-card-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('home', ${i})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('home', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Modal Functions
+        function openAddModal(type) {
+            currentEditType = type;
+            currentEditIndex = null;
+            document.getElementById('modal-title').textContent = `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            document.getElementById('modal-body').innerHTML = getFormHTML(type, {});
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+        
+        function editItem(type, index) {
+            currentEditType = type;
+            currentEditIndex = index;
+            const data = getDataArray(type)[index];
+            document.getElementById('modal-title').textContent = `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            document.getElementById('modal-body').innerHTML = getFormHTML(type, data);
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            currentEditType = null;
+            currentEditIndex = null;
+        }
+        
+        function getDataArray(type) {
+            switch(type) {
+                case 'products': return PRODUCTS_DATA;
+                case 'services': return SERVICES_DATA;
+                case 'clients': return CLIENTS_DATA;
+                case 'stories': return SUCCESS_STORIES_DATA;
+                case 'home': return HOME_CARDS_DATA;
+            }
+        }
+        
+        function getFormHTML(type, data) {
+            switch(type) {
+                case 'products':
+                    return `
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" class="form-control" id="field-name" value="${data.name || ''}" placeholder="e.g. Coastal Buoy">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Buoys / Vessels / Equipment">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="field-description" placeholder="Product description...">${data.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image Path</label>
+                            <input type="text" class="form-control" id="field-image" value="${data.image || ''}" placeholder="assets/images/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Link</label>
+                            <input type="text" class="form-control" id="field-link" value="${data.link || ''}" placeholder="product-detail.html?id=...">
+                        </div>
+                    `;
+                case 'services':
+                    return `
+                        <div class="form-group">
+                            <label>Service Title</label>
+                            <input type="text" class="form-control" id="field-title" value="${data.title || data.name || ''}" placeholder="e.g. Hydrographic Surveys">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Environmental Monitoring">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="field-description" placeholder="Service description...">${data.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image Path</label>
+                            <input type="text" class="form-control" id="field-image" value="${data.image || ''}" placeholder="assets/images/services/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Link</label>
+                            <input type="text" class="form-control" id="field-link" value="${data.link || ''}" placeholder="service-detail.html?id=...">
+                        </div>
+                    `;
+                case 'clients':
+                    return `
+                        <div class="form-group">
+                            <label>Client Name</label>
+                            <input type="text" class="form-control" id="field-name" value="${data.name || ''}" placeholder="e.g. Saudi Aramco">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Government / Energy / Marine">
+                        </div>
+                        <div class="form-group">
+                            <label>Logo Path</label>
+                            <input type="text" class="form-control" id="field-logo" value="${data.logo || ''}" placeholder="assets/images/clients/...">
+                        </div>
+                    `;
+                case 'stories':
+                    return `
+                        <div class="form-group">
+                            <label>Project Title</label>
+                            <input type="text" class="form-control" id="field-title" value="${data.title || ''}" placeholder="e.g. Red Sea Environmental Monitoring">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Environmental / Surveying">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="field-description" placeholder="Project description...">${data.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image Path</label>
+                            <input type="text" class="form-control" id="field-image" value="${data.image || ''}" placeholder="assets/images/stories/...">
+                        </div>
+                    `;
+                case 'home':
+                    return `
+                        <div class="form-group">
+                            <label>Card Title</label>
+                            <input type="text" class="form-control" id="field-title" value="${data.title || ''}" placeholder="e.g. Our Products">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="field-description" placeholder="Card description...">${data.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Link</label>
+                            <input type="text" class="form-control" id="field-link" value="${data.link || ''}" placeholder="products.html">
+                        </div>
+                        <div class="form-group">
+                            <label>Icon (Font Awesome)</label>
+                            <input type="text" class="form-control" id="field-icon" value="${data.icon || ''}" placeholder="fas fa-cube">
+                        </div>
+                    `;
+            }
+        }
+        
+        function saveItem() {
+            const data = {};
+            document.querySelectorAll('#modal-body .form-control').forEach(input => {
+                const key = input.id.replace('field-', '');
+                data[key] = input.value;
+            });
+            
+            const arr = getDataArray(currentEditType);
+            if (currentEditIndex !== null) {
+                Object.assign(arr[currentEditIndex], data);
+            } else {
+                arr.push(data);
+            }
+            
+            // Save to server
+            saveToServer(currentEditType, arr);
+            
+            closeModal();
+            renderAllSections();
+            renderDashboard();
+        }
+        
+        function deleteItem(type, index) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            const arr = getDataArray(type);
+            arr.splice(index, 1);
+            
+            // Save to server
+            saveToServer(type, arr);
+            
+            renderAllSections();
+            renderDashboard();
+        }
+        
+        // Save to backend server or GitHub
+        async function saveToServer(type, data) {
+            // Try GitHub first if configured
+            if (gitHubConfig.token) {
+                await saveToGitHub(type, data);
+                return;
+            }
+            
+            // Fall back to local server
+            try {
+                const response = await fetch(`/api/data/${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-Token': authToken
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(`${type} saved to file! (${result.count} items)`, 'success');
+                } else if (response.status === 401) {
+                    showToast('Session expired - please login again', 'error');
+                    showLogin();
+                } else {
+                    const err = await response.json();
+                    showToast(`Failed to save: ${err.error}`, 'error');
+                }
+            } catch (err) {
+                // Server not running - suggest GitHub setup
+                showToast('Configure GitHub in Settings to save changes online', 'error');
+                console.log('No server available. Configure GitHub for online saving.');
+            }
+        }
+        
+        // Export
+        function exportAllData() {
+            const exports = [
+                { name: 'products-data.js', varName: 'PRODUCTS_DATA', data: PRODUCTS_DATA },
+                { name: 'services-data.js', varName: 'SERVICES_DATA', data: SERVICES_DATA },
+                { name: 'clients-data.js', varName: 'CLIENTS_DATA', data: CLIENTS_DATA },
+                { name: 'success-stories-data.js', varName: 'SUCCESS_STORIES_DATA', data: SUCCESS_STORIES_DATA },
+                { name: 'home-data.js', varName: 'HOME_CARDS_DATA', data: HOME_CARDS_DATA }
+            ];
+            
+            exports.forEach(exp => {
+                const content = `const ${exp.varName} = ${JSON.stringify(exp.data, null, 2)};`;
+                downloadFile(exp.name, content);
+            });
+            
+            showToast('All data files exported!', 'success');
+        }
+        
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-overlay') closeModal();
+        });
+    </script>
+</body>
+</html>

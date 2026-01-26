@@ -5,74 +5,119 @@
  * 2. Service Grid Content (on services.html)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Load Mega Menu
-    const megaMenuContainer = document.querySelector('.mm-services');
-    if (megaMenuContainer) {
-        renderServicesMegaMenu(megaMenuContainer);
-    }
+/**
+ * Helper: Get Icon Class for Category
+ */
+function getIconForCategory(category) {
+    const icons = {
+        'Environmental Monitoring': 'fas fa-satellite-dish',
+        'Environmental Surveying': 'fas fa-map-marked-alt',
+        'Geoscience Studies': 'fas fa-globe-americas'
+    };
+    return `<i class="${icons[category] || 'fas fa-cube'}"></i>`; 
+}
 
-    // 2. Load Services Page Grid
-    const serviceListContainer = document.getElementById('dynamic-services-container');
-    if (serviceListContainer) {
-        renderServicesPage(serviceListContainer);
-    }
-});
 
 /**
  * Renders the Mega Menu Columns for Services
  */
-function renderServicesMegaMenu(container) {
+function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     if (typeof servicesData === 'undefined') return;
 
-    container.innerHTML = ''; // Clear existing
+    // 1. First try to find the specific wrapper by ID (preferred)
+    // 2. If not found, fallback to the main .mm-services container class
+    // 3. If neither found, log error and exit
+    let container = containerElement || document.getElementById('services-dynamic-content');
+    
+    if (!container) {
+        // Fallback: Find any .mm-services container
+        container = document.querySelector('.mm-services');
+    }
+    
+    // Safety check: if nothing found, error
+    if (!container) {
+        console.error("Services Loader: No services mega menu container found!");
+        return;
+    }
 
-    // Define Columns
-    const columns = [
-        { title: 'Environmental Monitoring', icon: 'fas fa-satellite-dish', category: 'Environmental Monitoring' },
-        { title: 'Environmental Surveying', icon: 'fas fa-map-marked-alt', category: 'Environmental Surveying' },
-        { title: 'Geoscience Studies', icon: 'fas fa-globe-americas', category: 'Geoscience Studies' }
+
+    // Clear loading text (only clears the list area, not the spotlight)
+    container.innerHTML = '';
+
+    // Order: Monitoring -> Surveying -> Geoscience
+    /* 
+       Note: We are NOT generating the Spotlight dynamically anymore. 
+       It is statically hardcoded in index.html to ensure visibility.
+    */
+    const categories = [
+        "Environmental Monitoring",
+        "Environmental Surveying", 
+        "Geoscience Studies"
     ];
 
-    columns.forEach(col => {
+    categories.forEach(catName => {
+        // ... (same Column generation logic) ...
+        const catData = servicesData.filter(s => s.category === catName);
+        if (catData.length === 0) return;
+
         const colDiv = document.createElement('div');
         colDiv.className = 'glass-col';
-        colDiv.innerHTML = `<h4><i class="${col.icon}"></i> ${col.title}</h4>`;
-
-        const items = servicesData.filter(s => s.category === col.category);
         
-        items.forEach(item => {
-            const link = document.createElement('a');
-            link.href = item.link;
-            link.className = 'glass-link';
-            link.dataset.title = item.name;
-            link.dataset.desc = item.description;
-            link.dataset.img = item.image;
-            link.textContent = item.name;
-            colDiv.appendChild(link);
+        // Category Header
+        const h4 = document.createElement('h4');
+        // Assuming getIconForCategory is defined elsewhere or will be added.
+        // For now, just using the category name.
+        // If getIconForCategory is not defined, this will cause an error.
+        // The instruction implies it exists, so I'll keep the call.
+        h4.innerHTML = getIconForCategory(catName) + ' ' + catName; 
+        colDiv.appendChild(h4);
+
+        // Links
+        catData.forEach(service => {
+            const a = document.createElement('a');
+            a.className = 'glass-link';
+            a.href = service.link || '#';
+            a.textContent = service.name;
+            // Add data attributes for hover effects
+            a.dataset.title = service.name;
+            a.dataset.desc = service.description;
+            a.dataset.img = service.image;
+            colDiv.appendChild(a);
         });
 
+        // Append Column to the Dynamic Wrapper
         container.appendChild(colDiv);
     });
+    
 
-    // Spotlight Card (Column 3)
-    // We can define a featured service in services-data.js or hardcode it fallback
+    
+    // --- Dynamic Spotlight Generation (Restored) ---
+    // Uses 'featuredService' from services-data.js
     if (typeof featuredService !== 'undefined') {
         const spotlight = document.createElement('div');
         spotlight.className = 'glass-spotlight';
+        // Inherits CSS fixes (position: static, etc) from .mm-services .glass-spotlight
+        
         spotlight.innerHTML = `
             <div class="spotlight-content">
                 <span class="spotlight-tag">${featuredService.tag}</span>
-                <h3>${featuredService.title}</h3>
-                <p>${featuredService.description}</p>
-                <a href="${featuredService.link}" class="spotlight-btn">${featuredService.buttonText} <i class="fas fa-arrow-right"></i></a>
+                <h3 class="spotlight-title">${featuredService.title}</h3>
+                <p class="spotlight-desc">${featuredService.description}</p>
+                <a href="${featuredService.link}" class="spotlight-btn">
+                    ${featuredService.buttonText} <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
             <div class="spotlight-image">
                 <img src="${featuredService.image}" alt="${featuredService.title}">
             </div>
         `;
+        
         container.appendChild(spotlight);
+    } else {
+        console.warn("Featured Service data missing for Spotlight");
     }
+
+    console.log("Services Menu Loaded (Dynamic)");
 
     // Attach Hover Effects
     attachServicesHoverEffects(container);
@@ -185,3 +230,20 @@ function renderServicesPage(container) {
         container.appendChild(sectionEl);
     });
 }
+
+// --- Initialization Logic (Appended) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Mega Menu (Home Page)
+    const mmContainer = document.getElementById('services-dynamic-content');
+    if (mmContainer) {
+        renderServicesMegaMenu(mmContainer);
+        console.log('Initializing Services Mega Menu...');
+    }
+
+    // 2. Initialize Services Page Grid
+    const pageContainer = document.getElementById('dynamic-services-container');
+    if (pageContainer) {
+        renderServicesPage(pageContainer);
+        console.log('Initializing Services Page Grid...');
+    }
+});

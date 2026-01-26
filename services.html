@@ -58,73 +58,16 @@
                         <div style="grid-column: 1/-1; text-align: center; color: white;">Loading Products...</div>
                         <!-- Content loaded dynamically by assets/js/products-loader.js -->
                     </div>
+                </div>
             </li>
             <li>
                 <a class="header__nav-link" href="services.html">
                     Services <i class="fas fa-chevron-down nav-icon-small"></i>
                 </a>
                 <div class="mega-menu glass-mode">
-                    <div class="mm-glass-grid mm-services">
-                        <div class="glass-col">
-                            <h4><i class="fas fa-satellite-dish"></i> Environmental Monitoring</h4>
-                            <a href="services/hydrography.html#metocean" class="glass-link"
-                                data-title="MetOcean Monitoring"
-                                data-desc="Meteorological and oceanographic data collection."
-                                data-img="assets/images/services/met-ocean-study.png">MetOcean Monitoring</a>
-                            <a href="services/atmospheric-noise.html" class="glass-link"
-                                data-title="Atmospheric & Noise"
-                                data-desc="Ambient noise monitoring."
-                                data-img="assets/images/products/data-buoy/TDB3000 - PROFILLING BUOY/DataBuoy.png">Atmospheric &amp; Noise</a>
-                            <a href="services/air-quality.html" class="glass-link"
-                                data-title="Air Quality"
-                                data-desc="Precision air quality monitoring."
-                                data-img="assets/images/services/Eddy-Covariance-Flux-System.png">Air Quality</a>
-                            <a href="services/water-quality.html" class="glass-link"
-                                data-title="Water Quality"
-                                data-desc="Real-time water parameter tracking."
-                                data-img="assets/images/products/coastal-buoy/TCB1000- WAVE BUOY/TCB.jpg">Water Quality</a>
-                            <a href="services/ground-water.html" class="glass-link"
-                                data-title="Ground Water"
-                                data-desc="Subsurface water level monitoring."
-                                data-img="assets/images/services/geodatabase-illustration.png">Ground Water</a>
-                        </div>
-                        <div class="glass-col">
-                            <h4><i class="fas fa-map-marked-alt"></i> Environmental Surveying</h4>
-                            <a href="services/hydrography.html" class="glass-link"
-                                data-title="Bathymetric Surveys"
-                                data-desc="High-resolution seabed mapping."
-                                data-img="assets/images/services/port-monitoring.png">Bathymetric Surveys</a>
-                            <a href="services/uxo-survey.html" class="glass-link"
-                                data-title="UXO Survey"
-                                data-desc="Unexploded Ordnance detection."
-                                data-img="assets/images/services/electronic-maps.png">UXO Survey</a>
-                            <a href="services/geoengineering.html" class="glass-link"
-                                data-title="GeoTechnical Survey"
-                                data-desc="Soil analysis and sub-bottom profiling."
-                                data-img="assets/images/services/bm2s.png">GeoTechnical Survey</a>
-                            <a href="services/navigational-charting.html" class="glass-link"
-                                data-title="Navigational Charting"
-                                data-desc="Electronic navigation charts."
-                                data-img="assets/images/services/electronic-maps.png">Navigational Charting</a>
-                            <a href="services/hydrography.html#topographic" class="glass-link"
-                                data-title="Topographic Survey"
-                                data-desc="Land survey and mapping."
-                                data-img="assets/images/services/areal-mapping.png">Topographic Survey</a>
-                        </div>
-                        
-                        <!-- Spotlight Card (Column 3) -->
-                        <div class="glass-spotlight">
-                            <div class="spotlight-content">
-                                <span class="spotlight-tag">Featured</span>
-                                <h3>Comprehensive Solutions</h3>
-                                <p>End-to-end expertise from feasibility to real-time monitoring.</p>
-                                <a href="services.html" class="spotlight-btn">View All Services <i
-                                        class="fas fa-arrow-right"></i></a>
-                            </div>
-                            <div class="spotlight-image">
-                                <img src="assets/images/services/port-monitoring.png" alt="Port Monitoring">
-                            </div>
-                        </div>
+                    <!-- Standardized Dynamic Container (Loads via services-loader.js) -->
+                    <div class="mm-glass-grid mm-services" id="services-dynamic-content">
+                         <div style="grid-column: 1/-1; text-align: center; color: white;">Loading Services...</div>
                     </div>
                 </div>
             </li>
@@ -191,7 +134,7 @@
 </header>
 
 
-</header><main id="main-content">
+<main id="main-content">
         <section class="page-header section">
             <div class="hero__bg"><canvas id="hero-canvas"></canvas></div>
             <div class="container">
@@ -297,10 +240,13 @@
             </div>
         </div>
         <div class="footer__bottom">
-            <div class="container">
+            <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <p>
                     © 2025 Tridel Technologies. All Rights Reserved.
                 </p>
+                <a href="admin.html" style="color: #888; font-size: 12px; text-decoration: none;">
+                    <i class="fas fa-cog"></i> Admin
+                </a>
             </div>
         </div>
     </footer>
