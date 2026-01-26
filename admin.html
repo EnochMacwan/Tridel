@@ -681,6 +681,20 @@
     <script src="assets/js/success-stories-data.js"></script>
     <script src="assets/js/home-data.js"></script>
     
+    <!-- Map variable names for compatibility -->
+    <script>
+        // Map existing variable names to expected names
+        if (typeof SERVICES_DATA === 'undefined' && typeof servicesData !== 'undefined') {
+            window.SERVICES_DATA = servicesData;
+        }
+        if (typeof CLIENTS_DATA === 'undefined' && typeof clientsData !== 'undefined') {
+            window.CLIENTS_DATA = clientsData;
+        }
+        if (typeof SUCCESS_STORIES_DATA === 'undefined' && typeof successStoriesData !== 'undefined') {
+            window.SUCCESS_STORIES_DATA = successStoriesData;
+        }
+    </script>
+    
     <script>
         // Auth State
         let authToken = sessionStorage.getItem('adminToken') || null;
