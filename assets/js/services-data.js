@@ -1,4 +1,4 @@
-// Services Data
+﻿// Services Data
 // Auto-generated from extraction
 const servicesData = [
   {
@@ -183,15 +183,13 @@ const servicesData = [
       "Dredge Plume Monitoring"
     ],
     "link": "service-detail.html?id=water-quality"
+  },
+  {
+    title: "",
+    subtitle: "",
+    category: "",
+    description: "",
+    link: "",
+    image: ""
   }
 ];
-
-// Optional: Featured Service for Menu
-const featuredService = {
-    title: "Comprehensive Solutions",
-    description: "End-to-end expertise from feasibility to real-time monitoring.",
-    link: "services.html",
-    buttonText: "View All Services",
-    image: "assets/images/services/port-monitoring.png",
-    tag: "Featured"
-};

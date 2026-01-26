@@ -1,4 +1,4 @@
-const productsData = [
+﻿const productsData = [
     {
         "image":  "assets/images/Integrated Solutions/AQMS/aqms.png",
         "link":  "product-detail.html?id=aqms",
@@ -17,24 +17,7 @@ const productsData = [
                          "\u003cstrong\u003e Robust Design: \u003c/strong\u003e Built to withstand marine conditions."
                      ]
     },
-    {
-        "image":  "assets/images/Integrated Solutions/AQMS/aqms.png",
-        "link":  "product-detail.html?id=aqms1",
-        "id":  "aqms1",
-        "category":  "Vessels",
-        "description":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
-        "longDescription":  "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
-        "name":  "AQMS11 (VBS)",
-        "gallery":  [
-                        "assets/images/Integrated Solutions/AQMS/aqms.png"
-                    ],
-        "features":  [
-                         "\u003cstrong\u003e Vessel Based: \u003c/strong\u003e Optimized for deployment on vessels.",
-                         "\u003cstrong\u003e Comprehensive Monitoring: \u003c/strong\u003e Monitors key air quality indices.",
-                         "\u003cstrong\u003e Real-time Data: \u003c/strong\u003e Integration with TEMS for real-time reporting.",
-                         "\u003cstrong\u003e Robust Design: \u003c/strong\u003e Built to withstand marine conditions."
-                     ]
-    },
+    
     {
         "image":  "assets/images/products/aquilon-5600a/aquilon-5600-new.png",
         "link":  "product-detail.html?id=aquilon-5600a",
@@ -71,10 +54,10 @@ const productsData = [
                         "assets/images/products/aquilon-8000/aquilon-8000-04-new.png"
                     ],
         "features":  [
-                         "\u003cstrong\u003e Advanced Sensors: \u003c/strong\u003e Equipped with LiDAR, Radar, Forward Looking Sonar (FLS), and a 360° camera.",
+                         "\u003cstrong\u003e Advanced Sensors: \u003c/strong\u003e Equipped with LiDAR, Radar, Forward Looking Sonar (FLS), and a 360Â° camera.",
                          "\u003cstrong\u003e Hydrographic Suite: \u003c/strong\u003e Features a retractable MBES Gondola and MVP winch.",
                          "\u003cstrong\u003e Precision Navigation: \u003c/strong\u003e Integrated IMU and dual GPS for high-accuracy positioning.",
-                         "\u003cstrong\u003e High Performance: \u003c/strong\u003e Max speed of 10 knots with a survey speed of 4–6 knots.",
+                         "\u003cstrong\u003e High Performance: \u003c/strong\u003e Max speed of 10 knots with a survey speed of 4â€“6 knots.",
                          "\u003cstrong\u003e Seamless Integration: \u003c/strong\u003e Compatible with HYPACK \u0026amp; QINSy for efficient survey operations."
                      ]
     },
@@ -158,27 +141,7 @@ const productsData = [
                          "\u003cstrong\u003e Optimized Design: \u003c/strong\u003e Medium-sized profile providing excellent stability, visibility, and payload capacity."
                      ]
     },
-    {
-        "image":  "assets/images/products/tridel-data-buoy.jpg",
-        "link":  "product-detail.html?id=customized-met-ocean-buoy",
-        "id":  "customized-met-ocean-buoy",
-        "category":  "Uncategorized",
-        "description":  "[Full product description goes here. This text should be more detailed than the excerpt on the main products page.]",
-        "longDescription":  "[Full product description goes here. This text should be more detailed than the excerpt on the main products page.]",
-        "name":  "[Product Name]",
-        "gallery":  [
-                        "assets/images/products/tridel-data-buoy.jpg"
-                    ],
-        "features":  [
-                         "Feature one.",
-                         "Feature two.",
-                         "Feature three.",
-                         "Feature four. \u003c/div\u003e",
-                         "\u003ca class=\"footer__link\" href=\"../about.html\"\u003e About Us \u003c/a\u003e",
-                         "\u003ca class=\"footer__link\" href=\"../products.html\"\u003e Products \u003c/a\u003e",
-                         "\u003ca class=\"footer__link\" href=\"../services.html\"\u003e Services \u003c/a\u003e"
-                     ]
-    },
+    
     {
         "image":  "assets/images/products/data-buoy/data-buoy-1.png",
         "link":  "product-detail.html?id=data-buoy",
@@ -504,7 +467,7 @@ const productsData = [
                          "\u003cstrong\u003e Remote Capabilities: \u003c/strong\u003e Supports Over-the-air updates, precision GPS, and specialized Low Power Mode for extended deployment.",
                          "\u003cstrong\u003e Wireless Communication: \u003c/strong\u003e Integrated 802.11 b/g/n Wi-Fi and Bluetooth v4.2.",
                          "\u003cstrong\u003e Extensive Storage: \u003c/strong\u003e Includes 128 MB internal storage plus SD Card support up to 512 GB.",
-                         "\u003cstrong\u003e Rugged Design: \u003c/strong\u003e Wide temperature resistance from -20°C to 85°C."
+                         "\u003cstrong\u003e Rugged Design: \u003c/strong\u003e Wide temperature resistance from -20Â°C to 85Â°C."
                      ]
     },
     {
@@ -595,3 +558,5 @@ const featuredProduct = {
     image: 'assets/images/products/aquilon-8000/aquilon-8000-new.png',
     tag: 'Featured'
 };
+
+
