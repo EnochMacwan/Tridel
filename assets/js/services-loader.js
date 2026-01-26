@@ -22,7 +22,9 @@ function getIconForCategory(category) {
  * Renders the Mega Menu Columns for Services
  */
 function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
-    if (typeof servicesData === 'undefined') return;
+    // Support both variable names
+    const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
+    if (!data) return;
 
     // 1. First try to find the specific wrapper by ID (preferred)
     // 2. If not found, fallback to the main .mm-services container class
@@ -57,7 +59,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
 
     categories.forEach(catName => {
         // ... (same Column generation logic) ...
-        const catData = servicesData.filter(s => s.category === catName);
+        const catData = data.filter(s => s.category === catName);
         if (catData.length === 0) return;
 
         const colDiv = document.createElement('div');
@@ -166,7 +168,9 @@ function attachServicesHoverEffects(container) {
  * Renders the Services Page Grid
  */
 function renderServicesPage(container) {
-    if (typeof servicesData === 'undefined') return;
+    // Support both variable names
+    const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
+    if (!data) return;
     
     container.innerHTML = '';
 
@@ -204,7 +208,7 @@ function renderServicesPage(container) {
                 <div class="product-list-grid">
         `;
 
-        const items = servicesData.filter(s => s.category === section.category);
+        const items = data.filter(s => s.category === section.category);
         
         items.forEach(item => {
             sectionContent += `

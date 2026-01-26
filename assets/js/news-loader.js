@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('news-feed-container');
 
-    if (!container || typeof linkedInPosts === 'undefined') {
+    // Support both variable names
+    const data = typeof LINKEDIN_POSTS !== 'undefined' ? LINKEDIN_POSTS : (typeof linkedInPosts !== 'undefined' ? linkedInPosts : null);
+    
+    if (!container || !data) {
         console.error('News Feed Error: Container not found or data missing.');
         return;
     }
@@ -9,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear existing content (fallback content)
     container.innerHTML = '';
 
-    linkedInPosts.forEach((urn, index) => {
+    data.forEach((urn, index) => {
         // Create Card
         const card = document.createElement('div');
         card.className = 'news-card';

@@ -11,11 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderHomeCards(container) {
-    if (typeof homeCardsData === 'undefined') return;
+    // Support both variable names
+    const data = typeof HOME_CARDS_DATA !== 'undefined' ? HOME_CARDS_DATA : (typeof homeCardsData !== 'undefined' ? homeCardsData : null);
+    if (!data) return;
 
     container.innerHTML = '';
     
-    homeCardsData.forEach(card => {
+    data.forEach(card => {
         const cardLink = document.createElement('a');
         cardLink.className = 'grid-card-wrapper';
         cardLink.href = card.link || '#';

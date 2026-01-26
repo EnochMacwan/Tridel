@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('dynamic-success-stories');
-    if (!container || typeof successStoriesData === 'undefined') return;
+    
+    // Support both variable names
+    const data = typeof SUCCESS_STORIES_DATA !== 'undefined' ? SUCCESS_STORIES_DATA : (typeof successStoriesData !== 'undefined' ? successStoriesData : null);
+    if (!container || !data) return;
 
     container.innerHTML = '';
 
     // Group by category
     const categories = {};
-    successStoriesData.forEach(story => {
+    data.forEach(story => {
         if (!categories[story.category]) {
             categories[story.category] = [];
         }

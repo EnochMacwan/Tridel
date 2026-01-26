@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('.client-logo-track');
-    if (!track || typeof clientsData === 'undefined') return;
+    
+    // Support both variable names
+    const data = typeof CLIENTS_DATA !== 'undefined' ? CLIENTS_DATA : (typeof clientsData !== 'undefined' ? clientsData : null);
+    if (!track || !data) return;
 
     // Clear existing static content
     track.innerHTML = '';
@@ -14,19 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 1. Render Original Set
-    clientsData.forEach(client => {
+    data.forEach(client => {
         track.appendChild(createLogo(client));
     });
 
     // 2. Render Duplicate Set (for seamless scroll)
     // We typically duplicate the list enough times to fill the specific width.
     // For CSS infinite scroll, we usually need at least 2 sets.
-    clientsData.forEach(client => {
+    data.forEach(client => {
         track.appendChild(createLogo(client));
     });
     
     // 3. Triplicate (as in original HTML for wide screens)
-    clientsData.forEach(client => {
+    data.forEach(client => {
         track.appendChild(createLogo(client));
     });
 });
