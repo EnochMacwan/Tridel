@@ -3,12 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const serviceId = params.get('id');
     const container = document.getElementById('service-detail-container');
 
-    if (!serviceId || typeof servicesData === 'undefined') {
+    // Support both variable names
+    const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
+
+    if (!serviceId || !data) {
         container.innerHTML = '<div style="text-align:center;"><h2>Service Not Found</h2><a href="services.html" class="button button--primary">View All Services</a></div>';
         return;
     }
 
-    const service = servicesData.find(s => s.id === serviceId);
+    const service = data.find(s => s.id === serviceId);
 
     if (!service) {
         container.innerHTML = '<div style="text-align:center;"><h2>Service Not Found</h2><p>The requested service ID does not exist.</p><a href="services.html" class="button button--primary">View All Services</a></div>';

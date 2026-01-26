@@ -3,12 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const productId = params.get('id');
     const container = document.getElementById('product-detail-container');
 
-    if (!productId || typeof productsData === 'undefined') {
+    // Support both variable names
+    const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
+
+    if (!productId || !data) {
         container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><a href="products.html" class="button button--primary">View All Products</a></div>';
         return;
     }
 
-    const product = productsData.find(p => p.id === productId);
+    const product = data.find(p => p.id === productId);
 
     if (!product) {
         container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="products.html" class="button button--primary">View All Products</a></div>';
