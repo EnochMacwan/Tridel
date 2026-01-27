@@ -155,7 +155,7 @@ function renderProductsPage(container) {
             sectionContent += `<div class="product-category">`;
             
             if (showSubSelect) {
-                sectionContent += `<h3 class="product-category__title">${catName}</h3>`;
+                sectionContent += `<h3 class="product-category__title">${getIconForProductCategory(catName)} ${catName}</h3>`;
             }
 
             sectionContent += `<div class="product-list-grid">`;
@@ -182,4 +182,18 @@ function renderProductsPage(container) {
         sectionEl.innerHTML = sectionContent;
         container.appendChild(sectionEl);
     });
+}
+
+/**
+ * Helper: Get Icon for Product Category
+ */
+function getIconForProductCategory(category) {
+    const icons = {
+        'buoys': 'fas fa-life-ring',
+        'vessels': 'fas fa-ship',
+        'equipment': 'fas fa-screwdriver-wrench',
+        'software': 'fas fa-laptop-code',
+        'integrated solutions': 'fas fa-layer-group'
+    };
+    return `<i class="${icons[category.toLowerCase()] || 'fas fa-cube'}"></i>`;
 }
