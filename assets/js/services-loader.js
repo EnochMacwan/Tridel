@@ -252,12 +252,11 @@ function renderServicesPage(container) {
             const subItems = items.filter(s => s.subcategory === subcat);
             
             sectionContent += `
-                <div class="section__subheader" style="margin-top: 3rem;">
-                    <h3 class="section__subtitle" style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent, #00aae7); margin-bottom: 1rem;">
+                <div class="product-category">
+                    <h3 class="product-category__title">
                         <i class="fas fa-globe-americas"></i> ${subcat}
                     </h3>
-                </div>
-                <div class="product-list-grid">
+                    <div class="product-list-grid">
             `;
 
             subItems.forEach(item => {
@@ -276,6 +275,7 @@ function renderServicesPage(container) {
             });
 
             sectionContent += `
+                    </div>
                 </div>
             `;
         });
