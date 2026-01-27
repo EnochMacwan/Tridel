@@ -4538,10 +4538,9 @@ body {
     margin-bottom: 60px; /* Optional: add spacing if needed since 32px is large */
 }
 
-/* Match Highlights Visual to LinkedIn Card Height */
+/* Match Highlights Visual to Product Card Dimensions */
 .highlights-grid .grid-card-visual {
-    aspect-ratio: auto;
-    height: 500px;
+    aspect-ratio: 4/3; /* Same as product cards */
 }
 
 
