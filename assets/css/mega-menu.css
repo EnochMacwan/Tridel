@@ -34,8 +34,8 @@
 /* Glass Grid Container */
 .mm-glass-grid {
     display: grid;
-    /* 3 Content Columns + 1 Spotlight Column */
-    grid-template-columns: repeat(3, 1fr) 350px; 
+    /* Default: 5 Content Columns + 1 Spotlight Column */
+    grid-template-columns: repeat(5, 1fr) 280px; 
     gap: 0; 
     background: rgba(255, 255, 255, 0.95); /* High contrast glass */
     backdrop-filter: blur(25px) saturate(180%);

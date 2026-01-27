@@ -3605,13 +3605,10 @@ body {
     padding: 30px;
 }
 
-/* Products Grid: 5 Columns + Bottom Spotlight */
+/* Products Grid: 5 Content Columns + 1 Spotlight Column = 6 Total */
 .mm-products {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-areas:
-        "col1 col2 col3 col4 col5"
-        ".    spot .    .    .";
-    /* Fallback if we don't use direct child indexing */
+    grid-template-columns: repeat(5, 1fr) 280px;
+    /* 5 columns: Buoys, Vessels, Equipment, Software, Integrated Solutions + Spotlight */
 }
 
 /* Force the 6th child (Spotlight) to bottom center */
@@ -4061,16 +4058,15 @@ body {
     padding: 40px;
 }
 
-/* Products Grid: 4 Columns + Bottom Spotlight */
-/* Products Grid: 5 Columns (Spotlight takes 5th) */
+/* Products Grid: 5 Content Columns + 1 Spotlight Column = 6 Total */
 .mm-products {
-    grid-template-columns: repeat(5, 1fr);
-    /* 5 columns: Buoys, Vessels, Equipment, Software, SPOTLIGHT */
+    grid-template-columns: repeat(5, 1fr) 280px;
+    /* 5 cols: Buoys, Vessels, Equipment, Software, Integrated Solutions + Spotlight */
 }
 
-/* Force the Spotlight (Column 5) */
+/* Force the Spotlight (Column 6) */
 .mm-products .glass-spotlight {
-    grid-column: 5;
+    grid-column: 6;
     grid-row: 1; /* Sit in the first row alongside lists */
     margin-top: 0;
     text-align: center;
