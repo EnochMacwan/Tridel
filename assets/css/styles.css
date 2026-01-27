@@ -3495,9 +3495,9 @@ body {
     object-fit: cover;
 }
 
-/* Mega Menu Base Wrapper - relative positioning for mega menu */
+/* Mega Menu Base Wrapper - static so li hover includes mega menu area */
 .header__nav-list li {
-    position: relative;
+    position: static;
 }
 
 /* Base Mega Menu Container  */
@@ -3511,10 +3511,10 @@ body {
     max-width: 1200px;
     background: var(--color-surface-pure);
     border-radius: 20px;
-    /* Use display:none to completely remove from hover detection */
-    display: none;
     opacity: 0;
-    pointer-events: none;
+    visibility: hidden;
+    pointer-events: none; /* CRITICAL: Prevents hidden menu from capturing hover */
+    transition: opacity 0.25s ease, visibility 0.25s ease;
     box-shadow: var(--shadow-float);
     color: var(--color-text-main);
     overflow: visible;
@@ -3523,12 +3523,12 @@ body {
 }
 
 .header__nav-list li:hover .mega-menu {
-    display: block;
     opacity: 1;
-    pointer-events: auto;
+    visibility: visible;
+    pointer-events: auto; /* Enable interactions when visible */
 }
 
-/* Invisible bridge above mega menu to maintain hover connection */
+/* Bridge to help hover transition from nav item to menu */
 .mega-menu::before {
     content: '';
     position: absolute;
@@ -4348,9 +4348,9 @@ body {
     padding: 40px !important;
 }
 
-/* Position relative for mega menu positioning */
+/* Static position so li hover zone includes mega menu */
 .header__nav-list li {
-    position: relative !important;
+    position: static !important;
 }
 /* Adjust Products Menu to fit all 5 categories + spotlight (6 columns total) */
 /* Using FLEXBOX instead of GRID for better column shrinking */
