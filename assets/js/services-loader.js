@@ -11,8 +11,7 @@
 function getIconForCategory(category) {
     const icons = {
         'Environmental Monitoring': 'fas fa-satellite-dish',
-        'Environmental Surveying': 'fas fa-map-marked-alt',
-        'Geoscience Studies': 'fas fa-globe-americas'
+        'Environmental Surveying': 'fas fa-map-marked-alt'
     };
     return `<i class="${icons[category] || 'fas fa-cube'}"></i>`; 
 }
@@ -53,8 +52,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     */
     const categories = [
         "Environmental Monitoring",
-        "Environmental Surveying", 
-        "Geoscience Studies"
+        "Environmental Surveying"
     ];
 
     categories.forEach(catName => {
