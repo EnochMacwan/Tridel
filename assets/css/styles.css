@@ -3605,18 +3605,17 @@ body {
     padding: 30px;
 }
 
-/* Products Grid: 5 Content Columns + 1 Spotlight Column = 6 Total */
+/* Products Menu: 5 Content Columns + 1 Spotlight = 6 Flex Items */
 .mm-products {
-    grid-template-columns: repeat(5, 1fr) 280px;
-    /* 5 columns: Buoys, Vessels, Equipment, Software, Integrated Solutions + Spotlight */
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
 }
 
-/* Force the 6th child (Spotlight) to bottom center */
-.mm-products>.glass-col:last-child {
-    grid-column: 2 / span 3;
-    /* Span middle 3 columns */
-    margin-top: 20px;
-    text-align: center;
+/* All flex items in products menu */
+.mm-products > * {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 /* Services Grid: 3 Columns Simple */
@@ -4058,16 +4057,18 @@ body {
     padding: 40px;
 }
 
-/* Products Grid: 5 Content Columns + 1 Spotlight Column = 6 Total */
+/* Products Menu: Flexbox Layout */
 .mm-products {
-    grid-template-columns: repeat(5, 1fr) 280px;
-    /* 5 cols: Buoys, Vessels, Equipment, Software, Integrated Solutions + Spotlight */
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 15px;
 }
 
-/* Force the Spotlight (Column 6) */
+/* Spotlight styling in flexbox layout */
 .mm-products .glass-spotlight {
-    grid-column: 6;
-    grid-row: 1; /* Sit in the first row alongside lists */
+    flex: 0 0 250px;
     margin-top: 0;
     text-align: center;
     max-width: none;
@@ -4076,8 +4077,7 @@ body {
     background: rgba(255, 255, 255, 0.4); 
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    height: 100%; /* Fill height */
-    min-height: 350px; /* Ensure visual presence */
+    min-height: 350px;
 }
 
 /* Services Grid: 3 Columns Simple */
@@ -4288,17 +4288,16 @@ body {
       margin-bottom: 12px;
  }
 
-/* --- FIX: 6 Column Upgrade (Step 1612) --- */
-/* Overriding the previous 5-column rule */
-
+/* --- FIX: Flexbox Layout for Products Menu (replaces 6-column grid) --- */
 .mm-products {
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 20px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 15px !important;
 }
 
 .mm-products .glass-spotlight {
-    grid-column: 6 !important;
-    grid-row: 1 !important;
+    flex: 0 0 240px !important;
+    order: 6 !important; /* Ensure spotlight appears last */
     min-height: 400px !important;
 }
 
@@ -4342,16 +4341,35 @@ body {
     position: static !important; /* Allow menu to escape the li width */
 }
 /* Adjust Products Menu to fit all 5 categories + spotlight (6 columns total) */
+/* Using FLEXBOX instead of GRID for better column shrinking */
 .mm-products {
-    display: grid !important;
-    grid-template-columns: repeat(5, 1fr) 260px !important; /* 5 category cols + spotlight */
-    gap: 20px !important;
-    width: 98% !important;
-    max-width: 1600px !important; /* Wider to fit all 6 columns */
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Force single row */
+    justify-content: center !important;
+    align-items: stretch !important;
+    gap: 15px !important;
+    width: 100% !important;
+    max-width: 1600px !important;
     margin: 0 auto !important;
-    padding: 30px !important;
-    overflow: visible !important; /* Prevent clipping */
+    padding: 25px !important;
+    overflow: visible !important;
     box-sizing: border-box !important;
+    min-height: 400px !important;
+}
+
+/* Product Category Columns: Fluid shrinkable width */
+.mm-products .glass-col {
+    flex: 1 1 0 !important;
+    min-width: 0 !important; /* Allow shrinking */
+    max-width: 200px !important;
+    padding: 20px !important;
+}
+
+/* Spotlight: Fixed width */
+.mm-products .glass-spotlight {
+    flex: 0 0 240px !important;
+    min-width: 200px !important;
+    max-width: 280px !important;
 }
 
 /* --- FIX: Standardize Services Menu to Match Products (Step 5070 & 5105) --- */
