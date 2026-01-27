@@ -21,7 +21,7 @@ const PRODUCTS_DATA = [
     "image": "assets/images/products/aquilon-5600a/aquilon-5600-new.png",
     "link": "product-detail.html?id=aquilon-5600a",
     "id": "aquilon-5600a",
-    "category": "Integrated Solutions",
+    "category": "Vessels",
     "description": "The Tridel Aquilon 5600A Carbon Fiber Hybrid USV is designed for shallow to medium-depth coastal and offshore surveys. Its streamlined catamaran hull features rotatable pods for precise maneuvering.",
     "longDescription": "The Tridel Aquilon 5600A Carbon Fiber Hybrid USV is designed for shallow to medium-depth coastal and offshore surveys. Its streamlined catamaran hull features rotatable pods for precise maneuvering.",
     "name": "Tridel Aquilon 5600A",
