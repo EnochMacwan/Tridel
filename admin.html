@@ -971,7 +971,21 @@
             const varName = GITHUB_VAR_NAMES[type];
             if (!filePath || !varName) return;
             
-            const fileContent = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+            // Generate file content
+            let fileContent = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+            
+            // For products, also include the featuredProduct for the Spotlight card
+            if (type === 'products') {
+                const featuredProductData = {
+                    tag: "Featured",
+                    title: "Tridel Aquilon 8000",
+                    description: "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
+                    link: "product-detail.html?id=aquilon-8000",
+                    buttonText: "Learn More",
+                    image: "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
+                };
+                fileContent += `\n\n// Featured Product for Spotlight Card in Mega Menu\nconst featuredProduct = ${JSON.stringify(featuredProductData, null, 2)};`;
+            }
             
             try {
                 // First, get current file SHA (required for update)
