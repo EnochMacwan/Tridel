@@ -3495,9 +3495,9 @@ body {
     object-fit: cover;
 }
 
-/* Mega Menu Base Wrapper needs to be relative to LI */
+/* Mega Menu Base Wrapper - relative positioning for mega menu */
 .header__nav-list li {
-    position: static;
+    position: relative;
 }
 
 /* Base Mega Menu Container  */
@@ -4351,9 +4351,9 @@ body {
     padding: 40px !important;
 }
 
-/* Ensure the parent nav item doesn't constrain it */
+/* Position relative for mega menu positioning */
 .header__nav-list li {
-    position: static !important; /* Allow menu to escape the li width */
+    position: relative !important;
 }
 /* Adjust Products Menu to fit all 5 categories + spotlight (6 columns total) */
 /* Using FLEXBOX instead of GRID for better column shrinking */
