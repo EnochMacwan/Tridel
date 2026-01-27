@@ -4647,3 +4647,11 @@ html.lenis {
     color: var(--color-text-muted);
     line-height: 1.5;
 }
+
+/* Wide Container Utility */
+.container--wide {
+    max-width: 95vw; /* Much wider container for highlights */
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
