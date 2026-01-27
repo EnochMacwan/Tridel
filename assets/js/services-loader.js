@@ -56,7 +56,6 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     ];
 
     categories.forEach(catName => {
-        // ... (same Column generation logic) ...
         const catData = data.filter(s => s.category === catName);
         if (catData.length === 0) return;
 
@@ -65,24 +64,45 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
         
         // Category Header
         const h4 = document.createElement('h4');
-        // Assuming getIconForCategory is defined elsewhere or will be added.
-        // For now, just using the category name.
-        // If getIconForCategory is not defined, this will cause an error.
-        // The instruction implies it exists, so I'll keep the call.
         h4.innerHTML = getIconForCategory(catName) + ' ' + catName; 
         colDiv.appendChild(h4);
 
-        // Links
-        catData.forEach(service => {
+        // Separate services: without subcategory first, then grouped by subcategory
+        const mainServices = catData.filter(s => !s.subcategory);
+        const subcategories = [...new Set(catData.filter(s => s.subcategory).map(s => s.subcategory))];
+
+        // Render main services (no subcategory)
+        mainServices.forEach(service => {
             const a = document.createElement('a');
             a.className = 'glass-link';
             a.href = service.link || '#';
             a.textContent = service.name;
-            // Add data attributes for hover effects
             a.dataset.title = service.name;
             a.dataset.desc = service.description;
             a.dataset.img = service.image;
             colDiv.appendChild(a);
+        });
+
+        // Render subcategories with their services
+        subcategories.forEach(subcat => {
+            // Subcategory header
+            const subHeader = document.createElement('h5');
+            subHeader.className = 'glass-subheader';
+            subHeader.innerHTML = '<i class="fas fa-globe-americas"></i> ' + subcat;
+            colDiv.appendChild(subHeader);
+
+            // Subcategory services
+            const subServices = catData.filter(s => s.subcategory === subcat);
+            subServices.forEach(service => {
+                const a = document.createElement('a');
+                a.className = 'glass-link glass-link--sub';
+                a.href = service.link || '#';
+                a.textContent = service.name;
+                a.dataset.title = service.name;
+                a.dataset.desc = service.description;
+                a.dataset.img = service.image;
+                colDiv.appendChild(a);
+            });
         });
 
         // Append Column to the Dynamic Wrapper

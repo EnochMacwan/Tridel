@@ -132,6 +132,7 @@ const servicesData = [
     "id": "navigational-charting",
     "name": "Navigational Charting",
     "category": "Environmental Surveying",
+    "subcategory": "Geoscience Studies",
     "description": "Production of electronic navigation charts and publications. We create accurate, up-to-date navigational products compliant with international standards to ensure safety of life at sea.",
     "image": "assets/images/services/electronic-maps.png",
     "features": [
@@ -146,6 +147,7 @@ const servicesData = [
     "id": "uxo-survey",
     "name": "UXO Survey",
     "category": "Environmental Surveying",
+    "subcategory": "Geoscience Studies",
     "description": "Unexploded Ordnance (UXO) detection and risk assessment. Utilizing magnetometer and gradiometer arrays, we locate ferromagnetic threats on the seabed to clear safe corridors for development.",
     "image": "assets/images/services/electronic-maps.png",
     "features": [
@@ -160,6 +162,7 @@ const servicesData = [
     "id": "vibro-coring",
     "name": "Vibro Coring",
     "category": "Environmental Surveying",
+    "subcategory": "Geoscience Studies",
     "description": "Sediment sampling using vibrocoring technology. Ideal for unconsolidated sediments, obtaining continuous samples for pre-dredging assessments and environmental characterization.",
     "image": "assets/images/services/bm2s.png",
     "features": [

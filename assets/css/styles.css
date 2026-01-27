@@ -3399,6 +3399,28 @@ body {
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
+/* Subcategory header styling */
+.glass-subheader {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-accent, #00aae7);
+    margin: 12px 0 6px 0;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.glass-subheader i {
+    font-size: 0.8rem;
+}
+
+/* Indented child links under subcategory */
+.glass-link--sub {
+    padding-left: 16px;
+    font-size: 0.9rem;
+}
+
 .glass-link:hover {
     opacity: 1;
     transform: translateX(5px);
