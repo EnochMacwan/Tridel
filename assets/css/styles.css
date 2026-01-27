@@ -3522,10 +3522,20 @@ body {
     padding-top: 15px;
 }
 
-.header__nav-list li:hover .mega-menu {
+/* JavaScript-controlled visibility (desktop) */
+.mega-menu.is-visible {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto; /* Enable interactions when visible */
+    pointer-events: auto;
+}
+
+/* CSS hover fallback for mobile/touch devices */
+@media (max-width: 1024px) {
+    .header__nav-list li:hover .mega-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
 }
 
 /* Bridge to help hover transition from nav item to menu */

@@ -30,6 +30,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Desktop Mega Menu Hover Control (JavaScript-based) ---
+    // Only run on desktop
+    if (window.innerWidth > 1024) {
+        const megaMenuLinks = document.querySelectorAll('.header__nav-list > li');
+        
+        megaMenuLinks.forEach(li => {
+            const megaMenu = li.querySelector('.mega-menu');
+            if (!megaMenu) return;
+            
+            const link = li.querySelector('.header__nav-link');
+            let hideTimeout = null;
+            let showTimeout = null;
+            
+            // Show menu only when hovering the nav link
+            link.addEventListener('mouseenter', () => {
+                clearTimeout(hideTimeout);
+                clearTimeout(showTimeout);
+                // Small delay to prevent accidental triggers
+                showTimeout = setTimeout(() => {
+                    megaMenu.classList.add('is-visible');
+                }, 50);
+            });
+            
+            // Keep menu open when hovering the menu itself
+            megaMenu.addEventListener('mouseenter', () => {
+                clearTimeout(hideTimeout);
+                clearTimeout(showTimeout);
+            });
+            
+            // Hide menu when leaving the link (with delay to allow moving to menu)
+            link.addEventListener('mouseleave', () => {
+                clearTimeout(showTimeout);
+                hideTimeout = setTimeout(() => {
+                    megaMenu.classList.remove('is-visible');
+                }, 150); // Small delay to allow mouse to reach menu
+            });
+            
+            // Hide menu when leaving the menu
+            megaMenu.addEventListener('mouseleave', () => {
+                clearTimeout(showTimeout);
+                hideTimeout = setTimeout(() => {
+                    megaMenu.classList.remove('is-visible');
+                }, 100);
+            });
+        });
+    }
+
     // --- Interactive Testimonial Slider ---
     const sliderContainer = document.querySelector('.testimonial-slider-container');
     if (sliderContainer) {
