@@ -204,12 +204,6 @@ function renderServicesPage(container) {
             subtitle: 'Comprehensive hydrographic and geophysical survey services.',
             category: 'Environmental Surveying', 
             bgClass: 'section' // White bg
-        },
-        { 
-            title: 'Geoscience Studies', 
-            subtitle: 'Comprehensive geological and geophysical studies.',
-            category: 'Geoscience Studies', 
-            bgClass: 'section--light-bg' // Light bg
         }
     ];
 
