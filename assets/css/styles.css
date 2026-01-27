@@ -3514,6 +3514,7 @@ body {
     border-radius: 20px;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none; /* Prevent invisible menu from capturing hover */
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--shadow-float);
     color: var(--color-text-main);
@@ -3524,6 +3525,7 @@ body {
 .header__nav-list li:hover .mega-menu {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto; /* Enable interactions when visible */
     transform: translateX(-50%) translateY(0);
 }
 
