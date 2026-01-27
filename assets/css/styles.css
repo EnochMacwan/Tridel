@@ -3507,38 +3507,35 @@ body {
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    width: fit-content; /* Start small - prevents invisible wide hover area */
-    min-width: 200px;
+    width: 90vw;
     max-width: 1200px;
-    /* Default background is white, Glass Mode overrides it */
     background: var(--color-surface-pure);
     border-radius: 20px;
+    /* Use display:none to completely remove from hover detection */
+    display: none;
     opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s, width 0s 0.3s;
+    pointer-events: none;
     box-shadow: var(--shadow-float);
     color: var(--color-text-main);
     overflow: visible;
     z-index: 1100;
-    padding-top: 20px;
+    padding-top: 15px;
 }
 
 .header__nav-list li:hover .mega-menu {
+    display: block;
     opacity: 1;
-    visibility: visible;
-    width: 90vw; /* Expand to full width when visible */
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s, width 0s;
+    pointer-events: auto;
 }
 
 /* Invisible bridge above mega menu to maintain hover connection */
 .mega-menu::before {
     content: '';
     position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px; /* Limited bridge width centered on nav item */
-    height: 40px;
+    top: -15px;
+    left: 0;
+    right: 0;
+    height: 30px;
     background: transparent;
 }
 
