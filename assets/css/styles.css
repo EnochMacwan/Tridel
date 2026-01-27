@@ -3506,7 +3506,7 @@ body {
     position: absolute;
     top: 100%;
     left: 50%;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateX(-50%);
     width: 90vw;
     max-width: 1200px;
     /* Default background is white, Glass Mode overrides it */
@@ -3514,26 +3514,26 @@ body {
     border-radius: 20px;
     opacity: 0;
     visibility: hidden;
-    pointer-events: none; /* Prevent invisible menu from capturing hover */
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
     box-shadow: var(--shadow-float);
     color: var(--color-text-main);
-    overflow: hidden;
+    overflow: visible; /* Allow pseudo-element to extend above */
     z-index: 1100;
+    /* Add padding-top to create hover zone, compensate with negative margin */
+    padding-top: 20px;
+    margin-top: -10px;
 }
 
 .header__nav-list li:hover .mega-menu {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto; /* Enable interactions when visible */
-    transform: translateX(-50%) translateY(0);
 }
 
-/* Invisible bridge to maintain hover when moving from nav to mega menu */
+/* Invisible bridge above mega menu to maintain hover connection */
 .mega-menu::before {
     content: '';
     position: absolute;
-    top: -30px; /* Extend above the menu to bridge the gap */
+    top: -10px;
     left: 0;
     right: 0;
     height: 30px;
