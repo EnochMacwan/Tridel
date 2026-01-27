@@ -225,7 +225,7 @@ const PRODUCTS_DATA = [
     "category": "Software",
     "description": "An efficient platform for collating and managing environmental and ecological data, selected for monitoring systems in protected areas like Sir Bo Naair Island.[...]",
     "longDescription": "An efficient platform for collating and managing environmental and ecological data, selected for monitoring systems in protected areas like Sir Bo Naair Island.[...]",
-    "name": "eSpecia GIS Application",
+    "name": "eSpecia",
     "gallery": [
       "assets/images/software/especia.png"
     ],
