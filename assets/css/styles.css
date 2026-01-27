@@ -3529,6 +3529,17 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
+/* Invisible bridge to maintain hover when moving from nav to mega menu */
+.mega-menu::before {
+    content: '';
+    position: absolute;
+    top: -30px; /* Extend above the menu to bridge the gap */
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: transparent;
+}
+
 /* ---------------------------------- */
 /* 5. Utility Classes                 */
 /* ---------------------------------- */
