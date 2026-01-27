@@ -211,6 +211,13 @@ function renderServicesPage(container) {
         const sectionEl = document.createElement('section');
         sectionEl.className = `section ${section.bgClass || ''}`;
 
+        // Get all items for this category
+        const items = data.filter(s => s.category === section.category);
+        
+        // Separate: main services first, then grouped by subcategory
+        const mainItems = items.filter(s => !s.subcategory);
+        const subcategories = [...new Set(items.filter(s => s.subcategory).map(s => s.subcategory))];
+
         let sectionContent = `
             <div class="container">
                 <div class="section__header">
@@ -220,9 +227,8 @@ function renderServicesPage(container) {
                 <div class="product-list-grid">
         `;
 
-        const items = data.filter(s => s.category === section.category);
-        
-        items.forEach(item => {
+        // Render main services (without subcategory)
+        mainItems.forEach(item => {
             sectionContent += `
                 <a href="${item.link}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;">
                     <div class="product-card-visual">
@@ -239,6 +245,42 @@ function renderServicesPage(container) {
 
         sectionContent += `
                 </div>
+        `;
+
+        // Render subcategories with their services
+        subcategories.forEach(subcat => {
+            const subItems = items.filter(s => s.subcategory === subcat);
+            
+            sectionContent += `
+                <div class="section__subheader" style="margin-top: 3rem;">
+                    <h3 class="section__subtitle" style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent, #00aae7); margin-bottom: 1rem;">
+                        <i class="fas fa-globe-americas"></i> ${subcat}
+                    </h3>
+                </div>
+                <div class="product-list-grid">
+            `;
+
+            subItems.forEach(item => {
+                sectionContent += `
+                    <a href="${item.link}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;">
+                        <div class="product-card-visual">
+                            <img loading="lazy" alt="${item.name}" class="product-item__image product-image-style" src="${item.image}">
+                        </div>
+                        <div class="product-content-outside">
+                            <h4>${item.name}</h4>
+                            <p class="product-item__excerpt">${item.description}</p>
+                            <span class="button button--secondary">View Details</span>
+                        </div>
+                    </a>
+                `;
+            });
+
+            sectionContent += `
+                </div>
+            `;
+        });
+
+        sectionContent += `
             </div>
         `;
 
