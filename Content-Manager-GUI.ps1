@@ -2005,6 +2005,9 @@ function Save-DetailBlock {
     $Q = [char]34 # Double Quote
     
     # 2. Find Block
+    # Fix: Unescape unicode sequences if present (e.g. \u0026amp;)
+    $Id = [System.Text.RegularExpressions.Regex]::Unescape($Id)
+    
     $EscId = [regex]::Escape($Id)
     $BlockMatch = [regex]::Match($Raw, "\{\s*[$q$Q]?id[$q$Q]?\s*:\s*[$q$Q]$EscId[$q$Q][\s\S]*?\}")
     
