@@ -530,3 +530,13 @@ const PRODUCTS_DATA = [
     ]
   }
 ];
+
+// Featured Product for Spotlight Card in Mega Menu
+const featuredProduct = {
+  tag: "Featured",
+  title: "Tridel Aquilon 8000",
+  description: "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
+  link: "product-detail.html?id=aquilon-8000",
+  buttonText: "Learn More",
+  image: "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
+};
