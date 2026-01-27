@@ -1,6 +1,4 @@
-﻿// Services Data
-// Auto-generated from extraction
-const servicesData = [
+const SERVICES_DATA = [
   {
     "id": "air-quality",
     "name": "Air Quality Monitoring",
@@ -42,20 +40,6 @@ const servicesData = [
       "Foundation Design Support"
     ],
     "link": "service-detail.html?id=geoengineering"
-  },
-  {
-    "id": "geoinformatics",
-    "name": "Geoinformatics",
-    "category": "Environmental Surveying",
-    "description": "Advanced spatial data processing and management. We turn complex survey data into actionable insights through custom GIS solutions, mapping, and database management.",
-    "image": "assets/images/services/electronic-maps.png",
-    "features": [
-      "GIS Data Management",
-      "Custom Mapping Solutions",
-      "Spatial Analysis & Modelling",
-      "Web-GIS Implementation"
-    ],
-    "link": "service-detail.html?id=geoinformatics"
   },
   {
     "id": "geoscience",
@@ -188,21 +172,21 @@ const servicesData = [
     "link": "service-detail.html?id=water-quality"
   },
   {
-    title: "",
-    subtitle: "",
-    category: "",
-    description: "",
-    link: "",
-    image: ""
+    "title": "",
+    "subtitle": "",
+    "category": "",
+    "description": "",
+    "link": "",
+    "image": ""
   }
 ];
 
-// Spotlight/Featured Service Configuration (Added via Agent)
+// Featured Service for Spotlight Card in Mega Menu
 const featuredService = {
-    title: 'Comprehensive Solutions',
-    description: 'End-to-end expertise from feasibility to real-time monitoring.',
-    link: 'services.html',
-    buttonText: 'View All Services',
-    image: 'assets/images/services/port-monitoring.png',
-    tag: 'Featured'
+  "tag": "Featured",
+  "title": "Comprehensive Solutions",
+  "description": "End-to-end expertise from feasibility to real-time monitoring.",
+  "link": "services.html",
+  "buttonText": "View All Services",
+  "image": "assets/images/services/port-monitoring.png"
 };
