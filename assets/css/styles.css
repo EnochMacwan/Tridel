@@ -4341,9 +4341,17 @@ body {
 .header__nav-list li {
     position: static !important; /* Allow menu to escape the li width */
 }
-/* Adjust grid gap for breathing room */
+/* Adjust Products Menu to fit all 5 categories + spotlight (6 columns total) */
 .mm-products {
-    gap: 30px !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) 260px !important; /* 5 category cols + spotlight */
+    gap: 20px !important;
+    width: 98% !important;
+    max-width: 1600px !important; /* Wider to fit all 6 columns */
+    margin: 0 auto !important;
+    padding: 30px !important;
+    overflow: visible !important; /* Prevent clipping */
+    box-sizing: border-box !important;
 }
 
 /* --- FIX: Standardize Services Menu to Match Products (Step 5070 & 5105) --- */
