@@ -333,6 +333,18 @@ h6 {
     padding-top: 60px;
 }
 
+.container--wide {
+    max-width: 95vw; /* Much wider container for highlights */
+    width: 95%;
+    margin: 0 auto;
+}
+
+.container--wide {
+    max-width: 1400px; /* Wider container for highlights */
+    width: 90%;
+    margin: 0 auto;
+}
+
 .hero__title {
     font-size: clamp(3.5rem, 7vw, 6rem);
     font-weight: 800;
