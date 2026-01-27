@@ -987,6 +987,19 @@
                 fileContent += `\n\n// Featured Product for Spotlight Card in Mega Menu\nconst featuredProduct = ${JSON.stringify(featuredProductData, null, 2)};`;
             }
             
+            // For services, also include the featuredService for the Spotlight card
+            if (type === 'services') {
+                const featuredServiceData = {
+                    tag: "Featured",
+                    title: "Comprehensive Solutions",
+                    description: "End-to-end expertise from feasibility to real-time monitoring.",
+                    link: "services.html",
+                    buttonText: "View All Services",
+                    image: "assets/images/services/port-monitoring.png"
+                };
+                fileContent += `\n\n// Featured Service for Spotlight Card in Mega Menu\nconst featuredService = ${JSON.stringify(featuredServiceData, null, 2)};`;
+            }
+            
             try {
                 // First, get current file SHA (required for update)
                 const getRes = await fetch(
