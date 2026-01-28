@@ -660,9 +660,12 @@
                 </div>
                 <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;"></p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="flex-direction: column; gap: 10px;">
                 <button type="button" class="btn btn-success" onclick="doLogin()" style="width: 100%;">
                     <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="enableOfflineMode()" style="width: 100%; opacity: 0.8;">
+                    <i class="fab fa-github"></i> Work Offline / GitHub Mode
                 </button>
             </div>
         </div>
@@ -1176,6 +1179,20 @@
             } catch (e) {
                 errorEl.textContent = 'Server not running. Start it with: npm start';
                 errorEl.style.display = 'block';
+            }
+        }
+        
+        function enableOfflineMode() {
+            hideLogin();
+            showToast('Running in Offline / GitHub Mode', 'info');
+            
+            // Check if GitHub config is set, if not prompt
+            if (!gitHubConfig.token) {
+                 setTimeout(() => {
+                    if (confirm('GitHub is not configured. Do you want to configure it now?')) {
+                        openGitHubConfig();
+                    }
+                 }, 1000);
             }
         }
         
