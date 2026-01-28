@@ -436,6 +436,115 @@
             }
         }
         
+        /* Gallery Upload Component */
+        .gallery-upload {
+            background: var(--bg-input);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            min-height: 60px;
+        }
+        
+        .gallery-thumb {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: grab;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .gallery-thumb:hover {
+            border-color: var(--accent);
+        }
+        
+        .gallery-thumb.dragging {
+            opacity: 0.5;
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .gallery-thumb.drag-over {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-thumb .thumb-delete {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: var(--danger);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .gallery-thumb:hover .thumb-delete {
+            opacity: 1;
+        }
+        
+        .gallery-thumb .thumb-order {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .gallery-add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .gallery-add-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .gallery-empty {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -1286,6 +1395,7 @@
         function getFormHTML(type, data) {
             switch(type) {
                 case 'products':
+                    const productGallery = data.gallery || (data.image ? [data.image] : []);
                     return `
                         <div class="form-group">
                             <label>Product Name</label>
@@ -1300,8 +1410,22 @@
                             <textarea class="form-control" id="field-description" placeholder="Product description...">${data.description || ''}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Image Path</label>
-                            <input type="text" class="form-control" id="field-image" value="${data.image || ''}" placeholder="assets/images/...">
+                            <label>Gallery Images <small style="color: var(--text-muted);">(Drag to reorder)</small></label>
+                            <div class="gallery-upload">
+                                <div class="gallery-thumbnails" id="gallery-thumbs">
+                                    ${productGallery.length > 0 ? productGallery.map((img, i) => `
+                                        <div class="gallery-thumb" draggable="true" data-index="${i}">
+                                            <img src="${img}" alt="Image ${i+1}" onerror="this.src='assets/images/logo/tridel.png'">
+                                            <button type="button" class="thumb-delete" onclick="removeGalleryImage(${i})"><i class="fas fa-times"></i></button>
+                                            <span class="thumb-order">${i+1}</span>
+                                        </div>
+                                    `).join('') : '<div class="gallery-empty">No images added yet</div>'}
+                                </div>
+                                <div class="gallery-add-btn" onclick="addGalleryImage()">
+                                    <i class="fas fa-plus"></i> Add Image
+                                </div>
+                            </div>
+                            <input type="hidden" id="field-gallery" value='${JSON.stringify(productGallery)}'>
                         </div>
                         <div class="form-group">
                             <label>Link</label>
@@ -1309,6 +1433,7 @@
                         </div>
                     `;
                 case 'services':
+                    const serviceGallery = data.gallery || (data.image ? [data.image] : []);
                     return `
                         <div class="form-group">
                             <label>Service Title</label>
@@ -1323,8 +1448,22 @@
                             <textarea class="form-control" id="field-description" placeholder="Service description...">${data.description || ''}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Image Path</label>
-                            <input type="text" class="form-control" id="field-image" value="${data.image || ''}" placeholder="assets/images/services/...">
+                            <label>Gallery Images <small style="color: var(--text-muted);">(Drag to reorder)</small></label>
+                            <div class="gallery-upload">
+                                <div class="gallery-thumbnails" id="gallery-thumbs">
+                                    ${serviceGallery.length > 0 ? serviceGallery.map((img, i) => `
+                                        <div class="gallery-thumb" draggable="true" data-index="${i}">
+                                            <img src="${img}" alt="Image ${i+1}" onerror="this.src='assets/images/logo/tridel.png'">
+                                            <button type="button" class="thumb-delete" onclick="removeGalleryImage(${i})"><i class="fas fa-times"></i></button>
+                                            <span class="thumb-order">${i+1}</span>
+                                        </div>
+                                    `).join('') : '<div class="gallery-empty">No images added yet</div>'}
+                                </div>
+                                <div class="gallery-add-btn" onclick="addGalleryImage()">
+                                    <i class="fas fa-plus"></i> Add Image
+                                </div>
+                            </div>
+                            <input type="hidden" id="field-gallery" value='${JSON.stringify(serviceGallery)}'>
                         </div>
                         <div class="form-group">
                             <label>Link</label>
@@ -1415,6 +1554,20 @@
                     const key = input.id.replace('field-', '');
                     data[key] = input.value;
                 });
+                
+                // Handle gallery field (hidden input with JSON array)
+                const galleryField = document.getElementById('field-gallery');
+                if (galleryField) {
+                    try {
+                        data.gallery = JSON.parse(galleryField.value) || [];
+                        // Set image to first gallery item for backwards compatibility
+                        if (data.gallery.length > 0) {
+                            data.image = data.gallery[0];
+                        }
+                    } catch(e) {
+                        data.gallery = [];
+                    }
+                }
                 
                 if (currentEditIndex !== null) {
                     Object.assign(arr[currentEditIndex], data);
@@ -1526,6 +1679,117 @@
         document.getElementById('modal-overlay').addEventListener('click', (e) => {
             if (e.target.id === 'modal-overlay') closeModal();
         });
+        
+        // ========== GALLERY MANAGEMENT ==========
+        
+        // Add new image to gallery
+        function addGalleryImage() {
+            const path = prompt('Enter image path:', 'assets/images/');
+            if (!path || path.trim() === '') return;
+            
+            const galleryField = document.getElementById('field-gallery');
+            let images = [];
+            try {
+                images = JSON.parse(galleryField.value) || [];
+            } catch(e) { images = []; }
+            
+            images.push(path.trim());
+            galleryField.value = JSON.stringify(images);
+            
+            // Re-render gallery
+            renderGalleryThumbs(images);
+        }
+        
+        // Remove image from gallery
+        function removeGalleryImage(index) {
+            const galleryField = document.getElementById('field-gallery');
+            let images = [];
+            try {
+                images = JSON.parse(galleryField.value) || [];
+            } catch(e) { images = []; }
+            
+            images.splice(index, 1);
+            galleryField.value = JSON.stringify(images);
+            
+            // Re-render gallery
+            renderGalleryThumbs(images);
+        }
+        
+        // Render gallery thumbnails
+        function renderGalleryThumbs(images) {
+            const container = document.getElementById('gallery-thumbs');
+            if (!container) return;
+            
+            if (images.length === 0) {
+                container.innerHTML = '<div class="gallery-empty">No images added yet</div>';
+            } else {
+                container.innerHTML = images.map((img, i) => `
+                    <div class="gallery-thumb" draggable="true" data-index="${i}">
+                        <img src="${img}" alt="Image ${i+1}" onerror="this.src='assets/images/logo/tridel.png'">
+                        <button type="button" class="thumb-delete" onclick="removeGalleryImage(${i})"><i class="fas fa-times"></i></button>
+                        <span class="thumb-order">${i+1}</span>
+                    </div>
+                `).join('');
+                
+                // Initialize drag-drop
+                initGalleryDragDrop();
+            }
+        }
+        
+        // Initialize drag and drop for gallery
+        function initGalleryDragDrop() {
+            const thumbs = document.querySelectorAll('.gallery-thumb');
+            let draggedEl = null;
+            
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('dragstart', (e) => {
+                    draggedEl = thumb;
+                    thumb.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                thumb.addEventListener('dragend', () => {
+                    thumb.classList.remove('dragging');
+                    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('drag-over'));
+                    draggedEl = null;
+                });
+                
+                thumb.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (draggedEl && thumb !== draggedEl) {
+                        thumb.classList.add('drag-over');
+                    }
+                });
+                
+                thumb.addEventListener('dragleave', () => {
+                    thumb.classList.remove('drag-over');
+                });
+                
+                thumb.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    thumb.classList.remove('drag-over');
+                    
+                    if (!draggedEl || thumb === draggedEl) return;
+                    
+                    // Swap positions
+                    const galleryField = document.getElementById('field-gallery');
+                    let images = [];
+                    try {
+                        images = JSON.parse(galleryField.value) || [];
+                    } catch(e) { images = []; }
+                    
+                    const fromIndex = parseInt(draggedEl.dataset.index);
+                    const toIndex = parseInt(thumb.dataset.index);
+                    
+                    // Move the image
+                    const [moved] = images.splice(fromIndex, 1);
+                    images.splice(toIndex, 0, moved);
+                    
+                    galleryField.value = JSON.stringify(images);
+                    renderGalleryThumbs(images);
+                });
+            });
+        }
     </script>
 </body>
 </html>
