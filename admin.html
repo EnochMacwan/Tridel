@@ -566,6 +566,65 @@
             50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
         }
         
+        /* Preview Card Styles */
+        .preview-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .preview-image {
+            position: relative;
+            height: 250px;
+            background: #1a1a2e;
+        }
+        
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-gallery-count {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .preview-content {
+            padding: 20px;
+        }
+        
+        .preview-category {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .preview-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        
+        .preview-description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -767,6 +826,9 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="showPreview()" id="preview-btn">
+                    <i class="fas fa-eye"></i> Preview
+                </button>
                 <button class="btn btn-success" onclick="saveItem()">
                     <i class="fas fa-save"></i> Save
                 </button>
@@ -776,6 +838,22 @@
     
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="preview-overlay">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Preview</h3>
+                <button type="button" class="modal-close" onclick="closePreview()">&times;</button>
+            </div>
+            <div class="modal-body" id="preview-body" style="padding: 0;">
+                <!-- Preview populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePreview()">Close Preview</button>
+            </div>
+        </div>
+    </div>
     
     <!-- GitHub Config Modal -->
     <div class="modal-overlay" id="github-config-overlay">
@@ -1778,6 +1856,55 @@
             if (e.target.id === 'modal-overlay') closeModal();
         });
         
+        // ========== PREVIEW MODE ==========
+        
+        // Show preview of current item
+        function showPreview() {
+            if (!currentEditType || !['products', 'services'].includes(currentEditType)) {
+                showToast('Preview only available for Products and Services', 'error');
+                return;
+            }
+            
+            // Get current form values
+            const name = document.getElementById('field-name')?.value || 'Untitled';
+            const category = document.getElementById('field-category')?.value || '';
+            const description = document.getElementById('field-description')?.value || '';
+            let gallery = [];
+            try {
+                gallery = JSON.parse(document.getElementById('field-gallery')?.value || '[]');
+            } catch(e) { gallery = []; }
+            
+            const mainImage = gallery[0] || 'assets/images/logo/tridel.png';
+            
+            // Build preview HTML
+            const previewHTML = `
+                <div class="preview-card">
+                    <div class="preview-image">
+                        <img src="${mainImage}" alt="${name}" onerror="this.src='assets/images/logo/tridel.png'">
+                        ${gallery.length > 1 ? `<span class="preview-gallery-count"><i class="fas fa-images"></i> ${gallery.length} images</span>` : ''}
+                    </div>
+                    <div class="preview-content">
+                        <span class="preview-category">${category}</span>
+                        <h3 class="preview-title">${name}</h3>
+                        <p class="preview-description">${description}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('preview-body').innerHTML = previewHTML;
+            document.getElementById('preview-overlay').style.display = 'flex';
+        }
+        
+        // Close preview modal
+        function closePreview() {
+            document.getElementById('preview-overlay').style.display = 'none';
+        }
+        
+        // Close preview on overlay click
+        document.getElementById('preview-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'preview-overlay') closePreview();
+        });
+        
         // ========== GALLERY MANAGEMENT ==========
         
         // Add new image to gallery
@@ -1798,7 +1925,7 @@
             renderGalleryThumbs(images);
         }
         
-        // Handle file upload from desktop - converts to base64
+        // Handle file upload from desktop - converts to compressed base64
         function handleFileUpload(input) {
             const files = input.files;
             const fileCount = files.length;
@@ -1821,13 +1948,10 @@
             
             let processed = 0;
             
-            // Process each file - convert to base64
+            // Process each file - compress and convert to base64
             Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    // Add base64 data URL to gallery
-                    images.push(e.target.result);
+                compressImage(file, 800, 0.7).then(compressedBase64 => {
+                    images.push(compressedBase64);
                     processed++;
                     
                     // When all files processed, update gallery
@@ -1835,15 +1959,57 @@
                         galleryField.value = JSON.stringify(images);
                         renderGalleryThumbs(images);
                         input.value = '';
-                        showToast(`${fileCount} image(s) uploaded successfully!`, 'success');
+                        showToast(`${fileCount} image(s) compressed & uploaded!`, 'success');
                     }
-                };
-                
-                reader.onerror = function() {
+                }).catch(err => {
                     processed++;
-                    showToast(`Error reading ${file.name}`, 'error');
+                    showToast(`Error compressing ${file.name}`, 'error');
+                });
+            });
+        }
+        
+        // Compress image using canvas
+        function compressImage(file, maxSize = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Calculate new dimensions
+                        if (width > height) {
+                            if (width > maxSize) {
+                                height = Math.round((height * maxSize) / width);
+                                width = maxSize;
+                            }
+                        } else {
+                            if (height > maxSize) {
+                                width = Math.round((width * maxSize) / height);
+                                height = maxSize;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert to compressed base64
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
+                    };
+                    
+                    img.onerror = () => reject(new Error('Image load failed'));
+                    img.src = e.target.result;
                 };
                 
+                reader.onerror = () => reject(new Error('File read failed'));
                 reader.readAsDataURL(file);
             });
         }
