@@ -411,23 +411,6 @@ const PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/software/tems.png",
-    "link": "product-detail.html?id=tacs-software",
-    "id": "tacs-software",
-    "category": "Software",
-    "description": "Advanced Command and control software for autonomous vessels, ensuring reliable navigation and operations.",
-    "longDescription": "Advanced Command and control software for autonomous vessels, ensuring reliable navigation and operations.",
-    "name": "TACS Software",
-    "gallery": [
-      "assets/images/software/tems.png"
-    ],
-    "features": [
-      "<strong> Control: </strong> Precise vessel control and telemetry.",
-      "<strong> Reliability: </strong> Robust failsafe mechanisms.",
-      "<strong> Integration: </strong> Seamlessly integrates with Aquilon USVs."
-    ]
-  },
-  {
     "image": "assets/images/products/tdl720/tdl720-new.png",
     "link": "product-detail.html?id=tdl720",
     "id": "tdl720",
