@@ -1489,6 +1489,31 @@
                             <label>Description</label>
                             <textarea class="form-control" id="field-description" placeholder="Product description...">${data.description || ''}</textarea>
                         </div>
+                        
+                        <!-- Features Editor -->
+                        <div class="form-group">
+                            <label>Key Features</label>
+                            <div id="features-container">
+                                ${(data.features || []).map(f => {
+                                    const match = f.match(/<strong>(.*?)<\/strong>(.*)/);
+                                    const title = match ? match[1] : '';
+                                    const desc = match ? match[2] : f;
+                                    return `
+                                        <div class="feature-row" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: start;">
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                                                <input type="text" class="form-control feature-title" value="${title.replace(/"/g, '&quot;')}" placeholder="Title (e.g. Dimensions:)">
+                                                <input type="text" class="form-control feature-desc" value="${desc.trim().replace(/"/g, '&quot;')}" placeholder="Description">
+                                            </div>
+                                            <button type="button" class="btn btn-danger" style="height: fit-content; padding: 5px 10px;" onclick="this.closest('.feature-row').remove()"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <button type="button" class="btn btn-secondary" style="font-size: 0.9em; padding: 5px 10px;" onclick="addFeature()">
+                                <i class="fas fa-plus"></i> Add Feature
+                            </button>
+                        </div>
+
                         <div class="form-group">
                             <label>Gallery Images <small style="color: var(--text-muted);">(Drag to reorder)</small></label>
                             <div class="gallery-upload">
@@ -1624,6 +1649,25 @@
             }
         }
         
+        // Helper to add a feature row
+        function addFeature() {
+             const container = document.getElementById('features-container');
+             const div = document.createElement('div');
+             div.className = 'feature-row';
+             div.style.display = 'flex';
+             div.style.gap = '10px';
+             div.style.marginBottom = '10px';
+             div.style.alignItems = 'start';
+             div.innerHTML = `
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                    <input type="text" class="form-control feature-title" placeholder="Title (e.g. Dimensions:)">
+                    <input type="text" class="form-control feature-desc" placeholder="Description">
+                </div>
+                <button type="button" class="btn btn-danger" style="height: fit-content; padding: 5px 10px;" onclick="this.closest('.feature-row').remove()"><i class="fas fa-times"></i></button>
+             `;
+             container.appendChild(div);
+        }
+
         function saveItem() {
             const arr = getDataArray(currentEditType);
             
@@ -1639,9 +1683,26 @@
                 // Normal object-based data
                 const data = {};
                 document.querySelectorAll('#modal-body .form-control').forEach(input => {
+                    // Skip feature inputs as they are handled separately
+                    if (input.classList.contains('feature-title') || input.classList.contains('feature-desc')) return;
+                    
                     const key = input.id.replace('field-', '');
                     data[key] = input.value;
                 });
+                
+                // Handle Features Collection (Products)
+                if (currentEditType === 'products') {
+                    const features = [];
+                    document.querySelectorAll('#features-container .feature-row').forEach(row => {
+                        const title = row.querySelector('.feature-title').value.trim();
+                        const desc = row.querySelector('.feature-desc').value.trim();
+                        if (title || desc) {
+                             // Reconstruct HTML string
+                             features.push(`<strong>${title}</strong> ${desc}`);
+                        }
+                    });
+                    if (features.length > 0) data.features = features;
+                }
                 
                 // Handle gallery field (hidden input with JSON array)
                 const galleryField = document.getElementById('field-gallery');
