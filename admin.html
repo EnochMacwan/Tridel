@@ -657,8 +657,8 @@
             <button type="button" class="btn btn-secondary" onclick="loadDataFromGitHub()">
                 <i class="fas fa-sync-alt"></i> Refresh
             </button>
-            <button type="button" class="btn btn-success" onclick="publishAllChanges()" id="publish-btn" style="display: none;">
-                <i class="fas fa-cloud-upload-alt"></i> Publish All <span id="pending-count" class="pending-badge"></span>
+            <button type="button" class="btn btn-secondary" onclick="publishAllChanges()" id="publish-btn" title="No pending changes" style="opacity: 0.7;">
+                <i class="fas fa-cloud-upload-alt"></i> Publish All <span id="pending-count" class="pending-badge" style="display: none;"></span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="exportAllData()">
                 <i class="fas fa-download"></i> Export
@@ -1923,38 +1923,64 @@
             const badge = document.getElementById('pending-count');
             
             if (pendingChanges.size > 0) {
-                btn.style.display = 'inline-flex';
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-success');
+                btn.style.opacity = '1';
+                badge.style.display = 'inline-flex';
                 badge.textContent = pendingChanges.size;
+                btn.title = "Save pending changes";
             } else {
-                btn.style.display = 'none';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-secondary');
+                btn.style.opacity = '0.7';
+                badge.style.display = 'none';
+                btn.title = "No pending changes";
             }
         }
         
-        // Publish all pending changes to GitHub
+        // Publish all pending changes to GitHub or Local Server
         async function publishAllChanges() {
             if (pendingChanges.size === 0) {
-                showToast('No pending changes to publish', 'error');
-                return;
-            }
-            
-            if (!gitHubConfig.token) {
-                showToast('Please configure GitHub settings first', 'error');
-                openGitHubConfig();
+                showToast('No pending changes to save', 'info');
                 return;
             }
             
             const btn = document.getElementById('publish-btn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
             
             try {
                 let successCount = 0;
                 const types = Array.from(pendingChanges);
                 
+                // Determine save mode (GitHub or Local)
+                const useGitHub = !!(gitHubConfig.token && gitHubConfig.owner && gitHubConfig.repo);
+                
                 for (const type of types) {
                     const data = getDataArray(type);
-                    await saveToGitHub(type, data);
+                    
+                    if (useGitHub) {
+                        await saveToGitHub(type, data);
+                    } else {
+                        // Local Server Fallback
+                        try {
+                            const res = await fetch(`/api/save-all`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ [type]: data }) // Save one by one or batch
+                            });
+                            if (!res.ok) throw new Error('Local server error');
+                        } catch (e) {
+                             // Fallback to individual save endpoint if save-all fails or not exists
+                             const res = await fetch(`/api/data/${type}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(data)
+                            });
+                            if (!res.ok) throw new Error('Failed to save to local server. Is it running?');
+                        }
+                    }
                     successCount++;
                 }
                 
@@ -1962,9 +1988,11 @@
                 pendingChanges.clear();
                 updatePublishButton();
                 
-                showToast(`Successfully published ${successCount} update(s) to GitHub!`, 'success');
+                const mode = useGitHub ? 'GitHub' : 'Local Server';
+                showToast(`Successfully saved ${successCount} update(s) to ${mode}!`, 'success');
             } catch (error) {
-                showToast(`Error publishing: ${error.message}`, 'error');
+                showToast(`Error saving: ${error.message}`, 'error');
+                console.error(error);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
