@@ -1968,11 +1968,11 @@
                             const res = await fetch(`/api/save-all`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ [type]: data }) // Save one by one or batch
+                                body: JSON.stringify({ [type]: data })
                             });
                             if (!res.ok) throw new Error('Local server error');
                         } catch (e) {
-                             // Fallback to individual save endpoint if save-all fails or not exists
+                             // Fallback to individual save endpoint
                              const res = await fetch(`/api/data/${type}`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
