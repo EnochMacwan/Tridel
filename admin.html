@@ -1836,11 +1836,11 @@
                             if (!res.ok) throw new Error('Failed to save to local server. Is it running?');
                         }
                     }
+                    
+                    pendingChanges.delete(type);
+                    updatePublishButton();
                     successCount++;
                 }
-                
-                // Clear pending changes
-                pendingChanges.clear();
                 updatePublishButton();
                 
                 const mode = useGitHub ? 'GitHub' : 'Local Server';
