@@ -1708,11 +1708,10 @@
             renderGalleryThumbs(images);
         }
         
-        // Handle file upload from desktop
+        // Handle file upload from desktop - converts to base64
         function handleFileUpload(input) {
             const files = input.files;
             const fileCount = files.length;
-            console.log('Files selected:', fileCount, files);
             
             if (!fileCount) {
                 showToast('No files selected', 'error');
@@ -1730,24 +1729,33 @@
                 images = JSON.parse(galleryField.value) || [];
             } catch(e) { images = []; }
             
-            // Determine folder based on current edit type
-            const folder = currentEditType === 'services' ? 'services' : 'products';
+            let processed = 0;
             
-            // Process each file - auto-generate path
-            for (let i = 0; i < fileCount; i++) {
-                const file = files[i];
-                const autoPath = `assets/images/${folder}/${file.name}`;
-                images.push(autoPath);
-                console.log('Added:', autoPath);
-            }
-            
-            galleryField.value = JSON.stringify(images);
-            renderGalleryThumbs(images);
-            
-            // Reset file input
-            input.value = '';
-            
-            showToast(`${fileCount} image(s) added to assets/images/${folder}/`, 'success');
+            // Process each file - convert to base64
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Add base64 data URL to gallery
+                    images.push(e.target.result);
+                    processed++;
+                    
+                    // When all files processed, update gallery
+                    if (processed === fileCount) {
+                        galleryField.value = JSON.stringify(images);
+                        renderGalleryThumbs(images);
+                        input.value = '';
+                        showToast(`${fileCount} image(s) uploaded successfully!`, 'success');
+                    }
+                };
+                
+                reader.onerror = function() {
+                    processed++;
+                    showToast(`Error reading ${file.name}`, 'error');
+                };
+                
+                reader.readAsDataURL(file);
+            });
         }
         
         // Remove image from gallery
