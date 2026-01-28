@@ -7,9 +7,7 @@ const PRODUCTS_DATA = [
     "description": "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
     "longDescription": "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
     "name": "AQMS (VBS)",
-    "gallery": [
-      "assets/images/Integrated Solutions/AQMS/aqms.png"
-    ],
+    "gallery": [],
     "features": [
       "<strong> Vessel Based: </strong> Optimized for deployment on vessels.",
       "<strong> Comprehensive Monitoring: </strong> Monitors key air quality indices.",
@@ -49,8 +47,7 @@ const PRODUCTS_DATA = [
     "gallery": [
       "assets/images/products/aquilon-8000/aquilon-8000-new.png",
       "assets/images/products/aquilon-8000/aquilon-8000-02-new.png",
-      "assets/images/products/aquilon-8000/aquilon-8000-03-new.png",
-      "assets/images/products/aquilon-8000/aquilon-8000-04-new.png"
+      "assets/images/products/aquilon-8000/aquilon-8000-03-new.png"
     ],
     "features": [
       "<strong> Advanced Sensors: </strong> Equipped with LiDAR, Radar, Forward Looking Sonar (FLS), and a 360Â° camera.",
