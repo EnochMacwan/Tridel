@@ -1422,8 +1422,12 @@
                                     `).join('') : '<div class="gallery-empty">No images added yet</div>'}
                                 </div>
                                 <div class="gallery-add-btn" onclick="addGalleryImage()">
-                                    <i class="fas fa-plus"></i> Add Image
+                                    <i class="fas fa-plus"></i> Add Path
                                 </div>
+                                <div class="gallery-add-btn" onclick="document.getElementById('file-upload-input').click()">
+                                    <i class="fas fa-upload"></i> Upload
+                                </div>
+                                <input type="file" id="file-upload-input" accept="image/*" multiple style="display:none" onchange="handleFileUpload(this)">
                             </div>
                             <input type="hidden" id="field-gallery" value='${JSON.stringify(productGallery)}'>
                         </div>
@@ -1460,8 +1464,12 @@
                                     `).join('') : '<div class="gallery-empty">No images added yet</div>'}
                                 </div>
                                 <div class="gallery-add-btn" onclick="addGalleryImage()">
-                                    <i class="fas fa-plus"></i> Add Image
+                                    <i class="fas fa-plus"></i> Add Path
                                 </div>
+                                <div class="gallery-add-btn" onclick="document.getElementById('file-upload-input').click()">
+                                    <i class="fas fa-upload"></i> Upload
+                                </div>
+                                <input type="file" id="file-upload-input" accept="image/*" multiple style="display:none" onchange="handleFileUpload(this)">
                             </div>
                             <input type="hidden" id="field-gallery" value='${JSON.stringify(serviceGallery)}'>
                         </div>
@@ -1698,6 +1706,42 @@
             
             // Re-render gallery
             renderGalleryThumbs(images);
+        }
+        
+        // Handle file upload from desktop
+        function handleFileUpload(input) {
+            const files = input.files;
+            if (!files.length) return;
+            
+            const galleryField = document.getElementById('field-gallery');
+            let images = [];
+            try {
+                images = JSON.parse(galleryField.value) || [];
+            } catch(e) { images = []; }
+            
+            // Process each file
+            Array.from(files).forEach(file => {
+                // Generate suggested path based on file name
+                const suggestedPath = `assets/images/products/${file.name}`;
+                
+                // Prompt user for the path where they'll save the file
+                const path = prompt(
+                    `File: ${file.name}\n\nEnter the path where you will save this image:\n(Copy the file to this location in your project)`,
+                    suggestedPath
+                );
+                
+                if (path && path.trim()) {
+                    images.push(path.trim());
+                }
+            });
+            
+            galleryField.value = JSON.stringify(images);
+            renderGalleryThumbs(images);
+            
+            // Reset file input
+            input.value = '';
+            
+            showToast(`${files.length} image(s) added. Remember to copy files to the specified paths!`, 'success');
         }
         
         // Remove image from gallery
