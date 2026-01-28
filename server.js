@@ -25,15 +25,10 @@ function generateToken() {
 }
 
 // Auth middleware - protects API routes
+// Auth middleware - protects API routes
 function requireAuth(req, res, next) {
-    const token = req.headers['x-auth-token'];
-    if (token && sessions.has(token)) {
-        // Refresh session expiry
-        sessions.set(token, Date.now() + 3600000); // 1 hour
-        next();
-    } else {
-        res.status(401).json({ error: 'Unauthorized - Please login' });
-    }
+    // Auth disabled by user request
+    next();
 }
 
 // Middleware

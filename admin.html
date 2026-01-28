@@ -646,30 +646,7 @@
     </style>
 </head>
 <body>
-    <!-- Login Overlay -->
-    <div class="modal-overlay" id="login-overlay" style="display: flex;">
-        <div class="modal" style="max-width: 400px;">
-            <div class="modal-header">
-                <h3><i class="fas fa-lock"></i> Admin Login</h3>
-            </div>
-            <div class="modal-body">
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Enter the admin password to access the Content Manager.</p>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" id="login-password" placeholder="Enter password" onkeypress="if(event.key==='Enter') doLogin()">
-                </div>
-                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;"></p>
-            </div>
-            <div class="modal-footer" style="flex-direction: column; gap: 10px;">
-                <button type="button" class="btn btn-success" onclick="doLogin()" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="enableOfflineMode()" style="width: 100%; opacity: 0.8;">
-                    <i class="fab fa-github"></i> Work Offline / GitHub Mode
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Login Overlay Removed -->
 
     <header class="admin-header">
         <h1><i class="fas fa-cogs"></i> Tridel Content Manager <span style="font-size: 14px; opacity: 0.8;">(GitHub CMS)</span></h1>
@@ -964,7 +941,7 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            checkAuth();
+            // checkAuth(); - Auth Disabled
             initNavigation();
             
             // Try to load latest data from GitHub if configured
