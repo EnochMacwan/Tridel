@@ -61,11 +61,11 @@ const PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/software/attide.png",
+    "image": "assets/images/software/ATtide/ATtide.jpg",
     "link": "product-detail.html?id=attide",
     "id": "attide",
     "category": "Software",
-    "description": "A hand-crafted, custom software for complex tidal analysis. We automate the process to minimize user error and provide the most reliable results on the market.&lt;[...]",
+    "description": "A hand-crafted, custom software for complex tidal analysis. We automate the process to minimize user error and provide the most reliable results on the market.<[...]",
     "longDescription": "A hand-crafted, custom software for complex tidal analysis. We automate the process to minimize user error and provide the most reliable results on the market.&lt;[...]",
     "name": "ATtide - Tidal Analysis Software",
     "gallery": [
