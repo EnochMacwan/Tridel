@@ -932,6 +932,25 @@
         // Auth State
         let authToken = sessionStorage.getItem('adminToken') || null;
         
+        // GitHub Configuration
+        const gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+        const GITHUB_DATA_FILES = {
+            'products': 'assets/js/products-data.js',
+            'services': 'assets/js/services-data.js',
+            'clients': 'assets/js/clients-data.js',
+            'stories': 'assets/js/success-stories-data.js',
+            'home': 'assets/js/home-data.js',
+            'news': 'assets/js/news-data.js'
+        };
+        const GITHUB_VAR_NAMES = {
+            'products': 'PRODUCTS_DATA',
+            'services': 'SERVICES_DATA',
+            'clients': 'CLIENTS_DATA',
+            'stories': 'SUCCESS_STORIES_DATA',
+            'home': 'HOME_CARDS_DATA',
+            'news': 'LINKEDIN_POSTS'
+        };
+        
         // State
         let currentSection = 'dashboard';
         let currentEditType = null;
@@ -992,6 +1011,113 @@
             renderDashboard();
             renderAllSections();
             showToast('Data loaded from GitHub!', 'success');
+        }
+        
+        // Save data to GitHub repository
+        async function saveToGitHub(type, data) {
+            const filePath = GITHUB_DATA_FILES[type];
+            const varName = GITHUB_VAR_NAMES[type];
+            
+            if (!filePath || !varName) return;
+            
+            // 1. Get current SHA
+            const apiUrl = `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}`;
+            
+            let sha = null;
+            try {
+                const getRes = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `token ${gitHubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (getRes.ok) {
+                    const fileData = await getRes.json();
+                    sha = fileData.sha;
+                }
+            } catch(e) { console.log('File not found, creating new...'); }
+            
+            // 2. Prepare content
+            const content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+            // UTF-8 base64 encoding
+            const encodedContent = btoa(unescape(encodeURIComponent(content)));
+            
+            // 3. Update file
+            const body = {
+                message: `Update ${type} via Admin Panel`,
+                content: encodedContent,
+                branch: gitHubConfig.branch
+            };
+            if (sha) body.sha = sha;
+            
+            const putRes = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${gitHubConfig.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            });
+            
+            if (!putRes.ok) {
+                const err = await putRes.json();
+                throw new Error(err.message || putRes.statusText);
+            }
+        }
+        
+        // GitHub Config Functions
+        function openGitHubConfig() {
+            document.getElementById('github-config-overlay').style.display = 'flex';
+        }
+        
+        function closeGitHubConfig() {
+            document.getElementById('github-config-overlay').style.display = 'none';
+        }
+        
+        function saveGitHubConfig() {
+            const owner = document.getElementById('github-owner').value.trim();
+            const repo = document.getElementById('github-repo').value.trim();
+            const branch = document.getElementById('github-branch').value.trim();
+            const token = document.getElementById('github-token').value.trim();
+            
+            if (!owner || !repo || !branch || !token) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const config = { owner, repo, branch, token };
+            localStorage.setItem('tridel_github_config', JSON.stringify(config));
+            
+            alert('Settings saved! Page will reload.');
+            location.reload();
+        }
+        
+        async function testGitHubConnection() {
+            const owner = document.getElementById('github-owner').value.trim();
+            const repo = document.getElementById('github-repo').value.trim();
+            const token = document.getElementById('github-token').value.trim();
+            const statusEl = document.getElementById('github-status');
+            
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            statusEl.style.color = 'var(--text)';
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                
+                if (res.ok) {
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection Successful!';
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.innerHTML = '<i class="fas fa-times-circle"></i> Connection Failed';
+                    statusEl.style.color = 'var(--danger)';
+                }
+            } catch (e) {
+                statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Error: ${e.message}`;
+                statusEl.style.color = 'var(--danger)';
+            }
         }
         
         // Auth Functions
