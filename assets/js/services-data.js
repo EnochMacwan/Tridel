@@ -170,14 +170,6 @@ const SERVICES_DATA = [
       "Dredge Plume Monitoring"
     ],
     "link": "service-detail.html?id=water-quality"
-  },
-  {
-    "title": "",
-    "subtitle": "",
-    "category": "",
-    "description": "",
-    "link": "",
-    "image": ""
   }
 ];
 
