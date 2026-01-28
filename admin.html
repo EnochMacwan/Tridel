@@ -913,7 +913,7 @@
         let authToken = sessionStorage.getItem('adminToken') || null;
         
         // GitHub Configuration
-        const gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+        let gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
         const GITHUB_DATA_FILES = {
             'products': 'assets/js/products-data.js',
             'services': 'assets/js/services-data.js',
@@ -995,10 +995,44 @@
         
         // Save data to GitHub repository
         async function saveToGitHub(type, data) {
+            if (!gitHubConfig.token) {
+                showToast('GitHub not configured', 'error');
+                return;
+            }
+            
             const filePath = GITHUB_DATA_FILES[type];
             const varName = GITHUB_VAR_NAMES[type];
             
             if (!filePath || !varName) return;
+            
+            // Generate file content
+            let fileContent = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+
+            // For products, also include the featuredProduct for the Spotlight card
+            if (type === 'products') {
+                const featuredProductData = {
+                    tag: "Featured",
+                    title: "Tridel Aquilon 8000",
+                    description: "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
+                    link: "product-detail.html?id=aquilon-8000",
+                    buttonText: "Learn More",
+                    image: "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
+                };
+                fileContent += `\n\n// Featured Product for Spotlight Card in Mega Menu\nconst featuredProduct = ${JSON.stringify(featuredProductData, null, 2)};`;
+            }
+            
+            // For services, also include the featuredService for the Spotlight card
+            if (type === 'services') {
+                const featuredServiceData = {
+                    tag: "Featured",
+                    title: "Comprehensive Solutions",
+                    description: "End-to-end expertise from feasibility to real-time monitoring.",
+                    link: "services.html",
+                    buttonText: "View All Services",
+                    image: "assets/images/services/port-monitoring.png"
+                };
+                fileContent += `\n\n// Featured Service for Spotlight Card in Mega Menu\nconst featuredService = ${JSON.stringify(featuredServiceData, null, 2)};`;
+            }
             
             // 1. Get current SHA
             const apiUrl = `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}`;
@@ -1018,15 +1052,10 @@
                 }
             } catch(e) { console.log('File not found, creating new...'); }
             
-            // 2. Prepare content
-            const content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
-            // UTF-8 base64 encoding
-            const encodedContent = btoa(unescape(encodeURIComponent(content)));
-            
-            // 3. Update file
+            // 2. Update file
             const body = {
                 message: `Update ${type} via Admin Panel`,
-                content: encodedContent,
+                content: btoa(unescape(encodeURIComponent(fileContent))),
                 branch: gitHubConfig.branch
             };
             if (sha) body.sha = sha;
@@ -1048,6 +1077,14 @@
         
         // GitHub Config Functions
         function openGitHubConfig() {
+            document.getElementById('github-owner').value = gitHubConfig.owner || '';
+            document.getElementById('github-repo').value = gitHubConfig.repo || '';
+            document.getElementById('github-branch').value = gitHubConfig.branch || 'main';
+            document.getElementById('github-token').value = gitHubConfig.token || '';
+            
+            const statusEl = document.getElementById('github-status');
+            if (statusEl) statusEl.innerHTML = '';
+            
             document.getElementById('github-config-overlay').style.display = 'flex';
         }
         
@@ -1066,11 +1103,12 @@
                 return;
             }
             
-            const config = { owner, repo, branch, token };
-            localStorage.setItem('tridel_github_config', JSON.stringify(config));
+            gitHubConfig = { owner, repo, branch, token };
+            localStorage.setItem('tridel_github_config', JSON.stringify(gitHubConfig));
             
-            alert('Settings saved! Page will reload.');
-            location.reload();
+            closeGitHubConfig();
+            showToast('Settings saved. Reloading...', 'success');
+            setTimeout(() => location.reload(), 1000);
         }
         
         async function testGitHubConnection() {
@@ -1198,191 +1236,8 @@
         }
         
         // ==========================================
-        // GITHUB CMS FUNCTIONS
+        // UI & NAVIGATION
         // ==========================================
-        
-        // GitHub Config State
-        let gitHubConfig = JSON.parse(localStorage.getItem('githubConfig')) || {
-            owner: 'EnochMacwan',
-            repo: 'Tridel',
-            branch: 'main',
-            token: ''
-        };
-        
-        // Data file paths for GitHub
-        const GITHUB_DATA_FILES = {
-            products: 'assets/js/products-data.js',
-            services: 'assets/js/services-data.js',
-            clients: 'assets/js/clients-data.js',
-            stories: 'assets/js/success-stories-data.js',
-            home: 'assets/js/home-data.js',
-            linkedin: 'assets/js/news-data.js'
-        };
-        
-        const GITHUB_VAR_NAMES = {
-            products: 'PRODUCTS_DATA',
-            services: 'SERVICES_DATA',
-            clients: 'CLIENTS_DATA',
-            stories: 'SUCCESS_STORIES_DATA',
-            home: 'homeCardsData',
-            linkedin: 'linkedInPosts'
-        };
-        
-        function openGitHubConfig() {
-            document.getElementById('github-owner').value = gitHubConfig.owner || '';
-            document.getElementById('github-repo').value = gitHubConfig.repo || '';
-            document.getElementById('github-branch').value = gitHubConfig.branch || 'main';
-            document.getElementById('github-token').value = gitHubConfig.token || '';
-            document.getElementById('github-status').innerHTML = '';
-            document.getElementById('github-config-overlay').classList.add('active');
-        }
-        
-        function closeGitHubConfig() {
-            document.getElementById('github-config-overlay').classList.remove('active');
-        }
-        
-        function saveGitHubConfig() {
-            gitHubConfig = {
-                owner: document.getElementById('github-owner').value.trim(),
-                repo: document.getElementById('github-repo').value.trim(),
-                branch: document.getElementById('github-branch').value.trim() || 'main',
-                token: document.getElementById('github-token').value.trim()
-            };
-            localStorage.setItem('githubConfig', JSON.stringify(gitHubConfig));
-            closeGitHubConfig();
-            showToast('GitHub configuration saved!', 'success');
-        }
-        
-        async function testGitHubConnection() {
-            const owner = document.getElementById('github-owner').value.trim();
-            const repo = document.getElementById('github-repo').value.trim();
-            const token = document.getElementById('github-token').value.trim();
-            const statusEl = document.getElementById('github-status');
-            
-            if (!owner || !repo || !token) {
-                statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Please fill in all fields</div>';
-                return;
-            }
-            
-            statusEl.innerHTML = '<div style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Testing connection...</div>';
-            
-            try {
-                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    statusEl.innerHTML = `
-                        <div style="color: var(--success);">
-                            <i class="fas fa-check-circle"></i> Connected successfully!<br>
-                            <small style="color: var(--text-muted);">Repository: ${data.full_name}</small>
-                        </div>
-                    `;
-                } else if (res.status === 401) {
-                    statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Invalid token</div>';
-                } else if (res.status === 404) {
-                    statusEl.innerHTML = '<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Repository not found</div>';
-                } else {
-                    statusEl.innerHTML = `<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Error: ${res.status}</div>`;
-                }
-            } catch (e) {
-                statusEl.innerHTML = `<div style="color: var(--danger);"><i class="fas fa-times-circle"></i> Connection failed: ${e.message}</div>`;
-            }
-        }
-        
-        // Save to GitHub - commits file to repository
-        async function saveToGitHub(type, data) {
-            if (!gitHubConfig.token) {
-                showToast('GitHub not configured. Click "GitHub Settings" to set up.', 'error');
-                return;
-            }
-            
-            const filePath = GITHUB_DATA_FILES[type];
-            const varName = GITHUB_VAR_NAMES[type];
-            if (!filePath || !varName) return;
-            
-            // Generate file content
-            let fileContent = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
-            
-            // For products, also include the featuredProduct for the Spotlight card
-            if (type === 'products') {
-                const featuredProductData = {
-                    tag: "Featured",
-                    title: "Tridel Aquilon 8000",
-                    description: "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
-                    link: "product-detail.html?id=aquilon-8000",
-                    buttonText: "Learn More",
-                    image: "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
-                };
-                fileContent += `\n\n// Featured Product for Spotlight Card in Mega Menu\nconst featuredProduct = ${JSON.stringify(featuredProductData, null, 2)};`;
-            }
-            
-            // For services, also include the featuredService for the Spotlight card
-            if (type === 'services') {
-                const featuredServiceData = {
-                    tag: "Featured",
-                    title: "Comprehensive Solutions",
-                    description: "End-to-end expertise from feasibility to real-time monitoring.",
-                    link: "services.html",
-                    buttonText: "View All Services",
-                    image: "assets/images/services/port-monitoring.png"
-                };
-                fileContent += `\n\n// Featured Service for Spotlight Card in Mega Menu\nconst featuredService = ${JSON.stringify(featuredServiceData, null, 2)};`;
-            }
-            
-            try {
-                // First, get current file SHA (required for update)
-                const getRes = await fetch(
-                    `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}?ref=${gitHubConfig.branch}`,
-                    {
-                        headers: {
-                            'Authorization': `token ${gitHubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    }
-                );
-                
-                let sha = null;
-                if (getRes.ok) {
-                    const fileData = await getRes.json();
-                    sha = fileData.sha;
-                }
-                
-                // Now update/create the file
-                const body = {
-                    message: `Update ${type} data via Content Manager`,
-                    content: btoa(unescape(encodeURIComponent(fileContent))),
-                    branch: gitHubConfig.branch
-                };
-                if (sha) body.sha = sha;
-                
-                const putRes = await fetch(
-                    `https://api.github.com/repos/${gitHubConfig.owner}/${gitHubConfig.repo}/contents/${filePath}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${gitHubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    }
-                );
-                
-                if (putRes.ok) {
-                    showToast(`${type} committed to GitHub! (${data.length} items)`, 'success');
-                } else {
-                    const err = await putRes.json();
-                    showToast(`GitHub error: ${err.message}`, 'error');
-                }
-            } catch (e) {
-                showToast(`Failed to save to GitHub: ${e.message}`, 'error');
-            }
-        }
         
         // Navigation
         function initNavigation() {
