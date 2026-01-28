@@ -82,7 +82,7 @@ const PRODUCTS_DATA = [
     "link": "product-detail.html?id=beach-ms",
     "id": "beach-ms",
     "category": "Integrated Solutions",
-    "description": "Tridel's Beach Monitoring System is a fully automated, non-intrusive solution for real-time coastal monitoring, delivering high-resolution insights into shoreline dynamics, wave behaviour, and beach morphology.\n\nIt uses tactically positioned IP based video cameras and automated image processing to monitor and analyse dynamic shoreline environments, by combining photogrammetric techniques with intelligent algorithms for shoreline extraction.\n\nKey applications:\nQuantification of storm-driven shoreline changes\nProvides Intertidal Morphological Changes in a nourished beach\nQuantification of wave run-up on coastal structures\nIdentifies currents for Beach Safe Access\n",
+    "description": "Tridel's Beach Monitoring System is a fully automated, non-intrusive solution for real-time coastal monitoring, delivering high-resolution insights into shoreline dynamics, wave behaviour, and beach morphology.\n",
     "longDescription": "Beach Monitoring System employed for coastal usage and erosion monitoring.",
     "name": "Beach Monitoring System",
     "gallery": [
