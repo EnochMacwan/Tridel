@@ -1719,20 +1719,13 @@
                 images = JSON.parse(galleryField.value) || [];
             } catch(e) { images = []; }
             
-            // Process each file
+            // Determine folder based on current edit type
+            const folder = currentEditType === 'services' ? 'services' : 'products';
+            
+            // Process each file - auto-generate path
             Array.from(files).forEach(file => {
-                // Generate suggested path based on file name
-                const suggestedPath = `assets/images/products/${file.name}`;
-                
-                // Prompt user for the path where they'll save the file
-                const path = prompt(
-                    `File: ${file.name}\n\nEnter the path where you will save this image:\n(Copy the file to this location in your project)`,
-                    suggestedPath
-                );
-                
-                if (path && path.trim()) {
-                    images.push(path.trim());
-                }
+                const autoPath = `assets/images/${folder}/${file.name}`;
+                images.push(autoPath);
             });
             
             galleryField.value = JSON.stringify(images);
@@ -1741,7 +1734,7 @@
             // Reset file input
             input.value = '';
             
-            showToast(`${files.length} image(s) added. Remember to copy files to the specified paths!`, 'success');
+            showToast(`${files.length} image(s) added to assets/images/${folder}/`, 'success');
         }
         
         // Remove image from gallery
