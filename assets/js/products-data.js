@@ -8,7 +8,8 @@ const PRODUCTS_DATA = [
     "longDescription": "Our Air Quality Monitoring System (Vessel Based System) is designed for continuous monitoring of air quality parameters in marine environments.",
     "name": "AQMS (VBS)",
     "gallery": [
-      "assets/images/Integrated Solutions/AQMS/aqms.png"
+      "assets/images/Integrated Solutions/AQMS/aqms.png",
+      "assets/images/products/WhatsApp Image 2026-01-16 at 4.23.31 AM.jpeg"
     ],
     "features": [
       "<strong> Vessel Based: </strong> Optimized for deployment on vessels.",
