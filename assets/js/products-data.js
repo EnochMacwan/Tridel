@@ -61,7 +61,7 @@ const PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/software/ATtide/ATtide.jpg",
+    "image": "assets/images/software/aattide/attide_logo.png",
     "link": "product-detail.html?id=attide",
     "id": "attide",
     "category": "Software",
