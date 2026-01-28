@@ -1711,9 +1711,20 @@
         // Handle file upload from desktop
         function handleFileUpload(input) {
             const files = input.files;
-            if (!files.length) return;
+            const fileCount = files.length;
+            console.log('Files selected:', fileCount, files);
+            
+            if (!fileCount) {
+                showToast('No files selected', 'error');
+                return;
+            }
             
             const galleryField = document.getElementById('field-gallery');
+            if (!galleryField) {
+                showToast('Gallery field not found', 'error');
+                return;
+            }
+            
             let images = [];
             try {
                 images = JSON.parse(galleryField.value) || [];
@@ -1723,10 +1734,12 @@
             const folder = currentEditType === 'services' ? 'services' : 'products';
             
             // Process each file - auto-generate path
-            Array.from(files).forEach(file => {
+            for (let i = 0; i < fileCount; i++) {
+                const file = files[i];
                 const autoPath = `assets/images/${folder}/${file.name}`;
                 images.push(autoPath);
-            });
+                console.log('Added:', autoPath);
+            }
             
             galleryField.value = JSON.stringify(images);
             renderGalleryThumbs(images);
@@ -1734,7 +1747,7 @@
             // Reset file input
             input.value = '';
             
-            showToast(`${files.length} image(s) added to assets/images/${folder}/`, 'success');
+            showToast(`${fileCount} image(s) added to assets/images/${folder}/`, 'success');
         }
         
         // Remove image from gallery
