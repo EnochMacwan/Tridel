@@ -42,7 +42,45 @@ const SERVICES_DATA = [
       "Soil Strength Analysis",
       "Foundation Design Support"
     ],
-    "link": "service-detail.html?id=geoengineering"
+    "link": "service-detail.html?id=geoengineering",
+    "subServices": [
+      {
+        "id": "navigational-charting",
+        "name": "Navigational Charting",
+        "description": "Production of electronic navigation charts and publications. We create accurate, up-to-date navigational products compliant with international standards to ensure safety of life at sea.",
+        "image": "assets/images/services/electronic-maps.png",
+        "features": [
+          "ENC Production (S-57/S-63)",
+          "Paper Chart Digitization",
+          "Bathymetric Data Processing",
+          "Notice to Mariners Updates"
+        ]
+      },
+      {
+        "id": "uxo-survey",
+        "name": "UXO Survey",
+        "description": "Unexploded Ordnance (UXO) detection and risk assessment. Utilizing magnetometer and gradiometer arrays, we locate ferromagnetic threats on the seabed to clear safe corridors for development.",
+        "image": "assets/images/services/electronic-maps.png",
+        "features": [
+          "Magnetometer & Gradiometer Surveys",
+          "Target Identification & classification",
+          "Risk Assessment & Mitigation",
+          "Safe Corridor Clearance"
+        ]
+      },
+      {
+        "id": "vibro-coring",
+        "name": "Vibro Coring",
+        "description": "Sediment sampling using vibrocoring technology. Ideal for unconsolidated sediments, obtaining continuous samples for pre-dredging assessments and environmental characterization.",
+        "image": "assets/images/services/bm2s.png",
+        "features": [
+          "Continuous Sediment Sampling",
+          "Pre-Dredge Characterization",
+          "Pollution Assessment",
+          "Rapid Deployment System"
+        ]
+      }
+    ]
   },
   {
     "id": "geoscience",

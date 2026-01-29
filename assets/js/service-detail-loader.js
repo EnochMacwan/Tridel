@@ -62,6 +62,34 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         </div>
+        
+        <!-- Sub-Services Section -->
+        ${service.subServices ? `
+            <div class="sub-services-section" style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border);">
+                <h2 style="margin-bottom: 2rem;">Related Services</h2>
+                ${service.subServices.map(sub => `
+                    <div class="detail-layout" style="margin-bottom: 4rem;">
+                        <div class="detail-layout__content">
+                            <h3 style="font-size: 1.75rem; margin-bottom: 1rem;">${sub.name}</h3>
+                            <p class="detail-layout__description">${sub.description}</p>
+                            ${sub.features ? `
+                                <h4 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem;">Key Capabilities</h4>
+                                <ul class="detail-layout__list">
+                                    ${sub.features.map(f => `<li>${f}</li>`).join('')}
+                                </ul>
+                            ` : ''}
+                        </div>
+                        <div class="detail-layout__image">
+                             <div class="product-gallery">
+                               <div class="gallery-main" onclick="openLightbox(this)">
+                                 <img loading="lazy" src="${sub.image || service.image}" alt="${sub.name}" class="product-image-style">
+                               </div>
+                             </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
     `;
 });
 
