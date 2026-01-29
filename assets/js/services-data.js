@@ -8,7 +8,8 @@ const SERVICES_DATA = [
     "features": [
       "Real-time Pollutant Tracking (NOx, SOx, PM)",
       "Meteorological Integration",
-      "Regulatory Compliance Reporting"
+      "Regulatory Compliance Reporting",
+      "Vessel-Based & Stationary Deployment"
     ],
     "link": "service-detail.html?id=air-quality",
     "title": "Air Quality Monitoring",
