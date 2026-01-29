@@ -128,7 +128,7 @@ const SERVICES_DATA = [
       "Bathymetric Data Processing",
       "Notice to Mariners Updates"
     ],
-    "link": "service-detail.html?id=geoscience"
+    "link": "service-detail.html?id=navigational-charting"
   },
   {
     "id": "uxo-survey",
@@ -143,7 +143,7 @@ const SERVICES_DATA = [
       "Risk Assessment & Mitigation",
       "Safe Corridor Clearance"
     ],
-    "link": "service-detail.html?id=geoscience"
+    "link": "service-detail.html?id=uxo-survey"
   },
   {
     "id": "vibro-coring",
@@ -158,7 +158,7 @@ const SERVICES_DATA = [
       "Pollution Assessment",
       "Rapid Deployment System"
     ],
-    "link": "service-detail.html?id=geoscience"
+    "link": "service-detail.html?id=vibro-coring"
   },
   {
     "id": "water-quality",
