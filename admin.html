@@ -717,9 +717,14 @@
             <section id="products" class="content-section">
                 <div class="section-header">
                     <h2>Products</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('products')">
-                        <i class="fas fa-plus"></i> Add Product
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('products')" id="undo-btn-products" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('products')">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
                 </div>
                 <div class="items-grid" id="products-grid">
                     <!-- Populated by JS -->
@@ -730,9 +735,14 @@
             <section id="services" class="content-section">
                 <div class="section-header">
                     <h2>Services</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('services')">
-                        <i class="fas fa-plus"></i> Add Service
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('services')" id="undo-btn-services" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('services')">
+                            <i class="fas fa-plus"></i> Add Service
+                        </button>
+                    </div>
                 </div>
                 <div class="items-grid" id="services-grid">
                     <!-- Populated by JS -->
@@ -743,9 +753,14 @@
             <section id="clients" class="content-section">
                 <div class="section-header">
                     <h2>Clients</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('clients')">
-                        <i class="fas fa-plus"></i> Add Client
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('clients')" id="undo-btn-clients" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('clients')">
+                            <i class="fas fa-plus"></i> Add Client
+                        </button>
+                    </div>
                 </div>
                 <div class="items-grid" id="clients-grid">
                     <!-- Populated by JS -->
@@ -756,9 +771,14 @@
             <section id="stories" class="content-section">
                 <div class="section-header">
                     <h2>Success Stories</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('stories')">
-                        <i class="fas fa-plus"></i> Add Story
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('stories')" id="undo-btn-stories" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('stories')">
+                            <i class="fas fa-plus"></i> Add Story
+                        </button>
+                    </div>
                 </div>
                 <div class="items-grid" id="stories-grid">
                     <!-- Populated by JS -->
@@ -769,9 +789,14 @@
             <section id="home" class="content-section">
                 <div class="section-header">
                     <h2>Home Page Cards</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('home')">
-                        <i class="fas fa-plus"></i> Add Card
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('home')" id="undo-btn-home" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('home')">
+                            <i class="fas fa-plus"></i> Add Card
+                        </button>
+                    </div>
                 </div>
                 <div class="items-grid" id="home-grid">
                     <!-- Populated by JS -->
@@ -782,9 +807,14 @@
             <section id="linkedin" class="content-section">
                 <div class="section-header">
                     <h2>LinkedIn News Feed</h2>
-                    <button class="btn btn-primary" onclick="openAddModal('linkedin')">
-                        <i class="fas fa-plus"></i> Add Post
-                    </button>
+                    <div>
+                        <button class="btn btn-secondary" onclick="undoChanges('linkedin')" id="undo-btn-linkedin" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal('linkedin')">
+                            <i class="fas fa-plus"></i> Add Post
+                        </button>
+                    </div>
                 </div>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">Manage LinkedIn post URNs that appear in your website's news feed.</p>
                 <div class="items-grid" id="linkedin-grid">
@@ -1862,10 +1892,69 @@
         
         // ========== PENDING CHANGES & PUBLISH ALL ==========
         
+        // Reload data for a specific section (Undo)
+        async function reloadSectionData(type) {
+             const filePath = GITHUB_DATA_FILES[type];
+             const varName = GITHUB_VAR_NAMES[type];
+             if (!filePath || !varName) return;
+             
+             try {
+                 let content = '';
+                 // Cache busting
+                 const t = Date.now();
+                 
+                 if (gitHubConfig.token) {
+                     // GitHub Mode
+                     const res = await fetch(`https://raw.githubusercontent.com/${gitHubConfig.owner}/${gitHubConfig.repo}/${gitHubConfig.branch}/${filePath}?t=${t}`);
+                     if (res.ok) content = await res.text();
+                 } else {
+                     // Local Mode
+                     const res = await fetch(`${filePath}?t=${t}`);
+                     if (res.ok) content = await res.text();
+                 }
+                 
+                 if (content) {
+                     const match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+                     if (match) {
+                         window[varName] = JSON.parse(match[1]);
+                         if (type === 'products') renderProducts();
+                         else if (type === 'services') renderServices();
+                         else if (type === 'clients') renderClients();
+                         else if (type === 'stories') renderStories();
+                         else if (type === 'home') renderHome();
+                         else if (type === 'linkedin' || type === 'news') renderLinkedIn(); // 'news' in map, 'linkedin' in type?
+                     }
+                 }
+             } catch(e) {
+                 console.error('Error reloading data:', e);
+             }
+        }
+
+        async function undoChanges(type) {
+            if (!pendingChanges.has(type)) return;
+            
+            if (confirm(`Discard all unsaved changes for ${type}?`)) {
+                await reloadSectionData(type);
+                pendingChanges.delete(type);
+                
+                // Update UI
+                updatePublishButton();
+                const undoBtn = document.getElementById(`undo-btn-${type}`);
+                if (undoBtn) undoBtn.style.display = 'none';
+                
+                showToast(`${type} changes discarded.`, 'info');
+            }
+        }
+
         // Mark a data type as having pending changes
         function markAsPending(type) {
             pendingChanges.add(type);
             updatePublishButton();
+            
+            // Show undo button
+            const undoBtn = document.getElementById(`undo-btn-${type}`);
+            if (undoBtn) undoBtn.style.display = 'inline-block';
+            
             showToast(`Changes saved locally. Click "Publish All" to push to GitHub.`, 'success');
         }
         
@@ -1944,6 +2033,11 @@
                     
                     pendingChanges.delete(type);
                     updatePublishButton();
+                    
+                    // Hide undo button
+                    const undoBtn = document.getElementById(`undo-btn-${type}`);
+                    if (undoBtn) undoBtn.style.display = 'none';
+
                     successCount++;
                 }
                 updatePublishButton();
