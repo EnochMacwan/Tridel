@@ -75,6 +75,38 @@ document.addEventListener('DOMContentLoaded', () => {
             ${galleryHtml}
           </div>
         </div>
+        
+        <!-- Sub-Products Section (Grid Layout) -->
+        ${product.subProducts ? `
+            <div class="sub-products-section" style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border);">
+                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Related Systems / Products</h2>
+                
+                <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                    ${product.subProducts.map(subItem => {
+                         // Resolve full object if it's just a reference
+                        const sub = (typeof subItem === 'object' && subItem.name) ? subItem : data.find(p => p.id === (subItem.id || subItem));
+                        if (!sub) return '';
+                        
+                        return `
+                        <a href="product-detail.html?id=${sub.id}" class="service-card" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                            <div class="service-card__image-container" style="position: relative; height: 200px; overflow: hidden;">
+                                <img src="${sub.image || product.image}" alt="${sub.name}" class="service-card__image" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" loading="lazy">
+                                <div class="service-card__overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;">
+                                    <span class="service-card__icon" style="color: white; font-size: 2rem;"><i class="fas fa-arrow-right"></i></span>
+                                </div>
+                            </div>
+                            <div class="service-card__content" style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 class="service-card__title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">${sub.name}</h3>
+                                <p class="service-card__description" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1;">${(sub.description || '').substring(0, 100)}...</p>
+                                <span class="service-card__link" style="color: var(--accent); font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    View Product <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </div>
+                        </a>
+                    `}).join('')}
+                </div>
+            </div>
+        ` : ''}
     `;
 });
 

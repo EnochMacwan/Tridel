@@ -69,7 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h2 style="margin-bottom: 2rem; font-size: 2rem;">Related Services</h2>
                 
                 <div class="services-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
-                    ${service.subServices.map(sub => `
+                <div class="services-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                    ${service.subServices.map(subItem => {
+                        // Resolve full object if it's just a reference or if we want to ensure latest data
+                        const sub = (typeof subItem === 'object' && subItem.name) ? subItem : data.find(s => s.id === (subItem.id || subItem));
+                        if (!sub) return '';
+                        
+                        return `
                         <a href="service-detail.html?id=${sub.id}" class="service-card" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                             <div class="service-card__image-container" style="position: relative; height: 200px; overflow: hidden;">
                                 <img src="${sub.image || service.image}" alt="${sub.name}" class="service-card__image" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" loading="lazy">
@@ -79,13 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="service-card__content" style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
                                 <h3 class="service-card__title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">${sub.name}</h3>
-                                <p class="service-card__description" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1;">${sub.description.substring(0, 100)}...</p>
+                                <p class="service-card__description" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1;">${(sub.description || '').substring(0, 100)}...</p>
                                 <span class="service-card__link" style="color: var(--accent); font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
                                     Read More <i class="fas fa-arrow-right"></i>
                                 </span>
                             </div>
                         </a>
-                    `).join('')}
+                    `}).join('')}
+                </div>
                 </div>
             </div>
         ` : ''}

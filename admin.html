@@ -1550,6 +1550,36 @@
             `;
         }
 
+        // Helper to get options for "Nest under..." dropdown
+        function getParentOptions(type, currentId) {
+            const arr = getDataArray(type);
+            if (!arr) return '<option value="">(None)</option>';
+            
+            // Find current parent if any
+            let currentParentId = '';
+            // We search which parent contains this child
+            if (currentId) {
+                 const parent = arr.find(p => {
+                     const subs = type === 'products' ? p.subProducts : p.subServices;
+                     return subs && subs.some(s => (s.id || s) === currentId);
+                 });
+                 if (parent) currentParentId = parent.id;
+            }
+
+            let options = '<option value="">(None)</option>';
+            arr.forEach(item => {
+                // Prevent self-selection
+                if (item.id === currentId) return;
+                // Prevent selecting a nested item as parent (1 level deep only for simplicity)
+                if (item.isNested) return;
+
+                const selected = item.id === currentParentId ? 'selected' : '';
+                const name = item.name || item.title || 'Untitled';
+                options += `<option value="${item.id}" ${selected}>${name}</option>`;
+            });
+            return options;
+        }
+
         function getFormHTML(type, data) {
             switch(type) {
                 case 'products':
@@ -1562,6 +1592,13 @@
                         <div class="form-group">
                             <label>Category</label>
                             <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Buoys / Vessels / Equipment">
+                        </div>
+                        <div class="form-group">
+                            <label>Nest under Parent (Optional)</label>
+                            <select class="form-control" id="field-parent">
+                                ${getParentOptions('products', data.id)}
+                            </select>
+                            <small style="color:var(--text-muted)">If selected, this product will appear inside the parent's page.</small>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -1609,6 +1646,13 @@
                         <div class="form-group">
                             <label>Category</label>
                             <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="e.g. Environmental Monitoring">
+                        </div>
+                        <div class="form-group">
+                            <label>Nest under Parent (Optional)</label>
+                            <select class="form-control" id="field-parent">
+                                ${getParentOptions('services', data.id)}
+                            </select>
+                            <small style="color:var(--text-muted)">If selected, this service will appear inside the parent's page.</small>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -1790,6 +1834,47 @@
                         data.gallery = [];
                     }
                 }
+            
+            // Handle Nesting Logic (if supported field exists)
+            const parentField = document.getElementById('field-parent');
+            if (parentField && (currentEditType === 'products' || currentEditType === 'services')) {
+                const parentId = parentField.value;
+                const dataObj = currentEditIndex !== null ? arr[currentEditIndex] : arr[arr.length - 1]; // get the object we just saved/updated
+                
+                // 1. Clean up OLD relationships (remove this Child from ALL parents)
+                arr.forEach(p => {
+                    if (currentEditType === 'products') {
+                        if (p.subProducts) {
+                             p.subProducts = p.subProducts.filter(ref => (ref.id || ref) !== dataObj.id);
+                             if (p.subProducts.length === 0) delete p.subProducts;
+                        }
+                    } else {
+                        if (p.subServices) {
+                             p.subServices = p.subServices.filter(ref => (ref.id || ref) !== dataObj.id);
+                             if (p.subServices.length === 0) delete p.subServices;
+                        }
+                    }
+                });
+
+                // 2. Establish NEW relationship
+                if (parentId) {
+                    dataObj.isNested = true;
+                    // Find new parent
+                    const newParent = arr.find(p => p.id === parentId);
+                    if (newParent) {
+                        if (currentEditType === 'products') {
+                            if (!newParent.subProducts) newParent.subProducts = [];
+                            newParent.subProducts.push({ id: dataObj.id }); // Store ID reference
+                        } else {
+                            if (!newParent.subServices) newParent.subServices = [];
+                            newParent.subServices.push({ id: dataObj.id }); // Store ID reference
+                        }
+                    }
+                } else {
+                    // Un-nested
+                    dataObj.isNested = false;
+                }
+            }
 
                 // Handle Clients (logo field)
                 if (currentEditType === 'clients' && data.gallery && data.gallery.length > 0) {
