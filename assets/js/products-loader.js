@@ -50,8 +50,8 @@ function renderMegaMenu(container) {
         // Header
         colDiv.innerHTML = `<h4><i class="${col.icon}"></i> ${col.title}</h4>`;
 
-        // Items - Case Insensitive Comparison
-        const items = data.filter(p => p.category.toLowerCase() === col.category.toLowerCase());
+        // Items - Case Insensitive Comparison, filtering out nested items
+        const items = data.filter(p => p.category.toLowerCase() === col.category.toLowerCase() && !p.isNested);
         
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {

@@ -44,18 +44,44 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
 
     container.innerHTML = '';
 
-    // Order: Monitoring -> Surveying -> Geoscience
-    /* 
-       Note: We are NOT generating the Spotlight dynamically anymore. 
-       The HTML structure in services.html handles the spotlight layout.
-       We are only injecting the list items into the respective columns.
-    */
-    // Uses 'featuredService' from services-data.js
+    // Define Columns with Filter (!s.isNested)
+    const columns = {
+        'Environmental Monitoring': data.filter(s => s.category === 'Environmental Monitoring' && !s.isNested),
+        'Environmental Surveying': data.filter(s => s.category === 'Environmental Surveying' && s.subcategory !== 'Geoscience Studies' && !s.isNested),
+        'Geoscience Studies': data.filter(s => (s.category === 'Geoscience Studies' || s.subcategory === 'Geoscience Studies') && !s.isNested)
+    };
+
+    // 1. Environmental Monitoring
+    const col1 = document.createElement('div');
+    col1.className = 'glass-col';
+    col1.innerHTML = `<h4>${getIconForCategory('Environmental Monitoring')} Environmental Monitoring</h4>`;
+    columns['Environmental Monitoring'].forEach(s => {
+        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
+    });
+    container.appendChild(col1);
+
+    // 2. Environmental Surveying
+    const col2 = document.createElement('div');
+    col2.className = 'glass-col';
+    col2.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Environmental Surveying</h4>`;
+    columns['Environmental Surveying'].forEach(s => {
+        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
+    });
+    container.appendChild(col2);
+
+    // 3. Geoscience Studies
+    const col3 = document.createElement('div');
+    col3.className = 'glass-col';
+    col3.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Geoscience Studies</h4>`;
+    columns['Geoscience Studies'].forEach(s => {
+        col3.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
+    });
+    container.appendChild(col3);
+
+    // Spotlight Card (Column 4)
     if (typeof featuredService !== 'undefined') {
         const spotlight = document.createElement('div');
         spotlight.className = 'glass-spotlight';
-        // Inherits CSS fixes (position: static, etc) from .mm-services .glass-spotlight
-        
         spotlight.innerHTML = `
             <div class="spotlight-content">
                 <span class="spotlight-tag">${featuredService.tag}</span>
@@ -69,10 +95,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
                 <img src="${featuredService.image}" alt="${featuredService.title}">
             </div>
         `;
-        
         container.appendChild(spotlight);
-    } else {
-        console.warn("Featured Service data missing for Spotlight");
     }
 
     console.log("Services Menu Loaded (Dynamic)");
@@ -149,8 +172,8 @@ function renderServicesPage(container) {
         const sectionEl = document.createElement('section');
         sectionEl.className = `section ${section.bgClass || ''}`;
 
-        // Get all items for this category
-        const items = data.filter(s => s.category === section.category);
+        // Get all items for this category, excluding nested items
+        const items = data.filter(s => s.category === section.category && !s.isNested);
         
         // Separate: main services first, then grouped by subcategory
         const mainItems = items.filter(s => !s.subcategory);

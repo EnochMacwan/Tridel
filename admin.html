@@ -1320,54 +1320,74 @@
             renderLinkedIn();
         }
         
-        // Products
-        function renderProducts() {
-            if (typeof PRODUCTS_DATA === 'undefined') return;
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = PRODUCTS_DATA.map((p, i) => `
-                <div class="item-card">
+        // Generic Render with Nesting
+        function renderWithNesting(type, data, gridId) {
+            if (!data) return;
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+            
+            let html = '';
+            
+            data.forEach((item, index) => {
+                // Skip if this is a nested item (it will be rendered by its parent)
+                if (item.isNested) return;
+                
+                // Render Parent
+                html += renderItemCard(type, item, index);
+                
+                // Check for Children (Sub-services or Sub-products)
+                const children = item.subServices || item.subProducts;
+                if (children && children.length > 0) {
+                     html += `<div class="nested-items-container" style="margin-left: 40px; border-left: 2px solid var(--border); padding-left: 20px;">`;
+                     children.forEach(childRef => {
+                         // Find the actual child item in the main data array to get its real index
+                         const childIndex = data.findIndex(d => d.id === childRef.id);
+                         if (childIndex !== -1) {
+                             const childItem = data[childIndex];
+                             html += renderItemCard(type, childItem, childIndex, true);
+                         }
+                     });
+                     html += `</div>`;
+                }
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        function renderItemCard(type, item, index, isChild = false) {
+             const title = item.title || item.name;
+             const category = item.category || (type === 'products' ? 'Uncategorized' : 'Service');
+             const badge = isChild ? '<span class="badge" style="background:var(--accent); color:white; font-size:10px; margin-left:10px;">NESTED</span>' : '';
+             
+             return `
+                <div class="item-card" ${isChild ? 'style="background: rgba(255,255,255,0.03); border: 1px dashed var(--border);"' : ''}>
                     <div class="item-card-header">
                         <div>
-                            <h3>${p.name}</h3>
-                            <span class="category">${p.category || 'Uncategorized'}</span>
+                            <h3>${title} ${badge}</h3>
+                            <span class="category">${category}</span>
                         </div>
                     </div>
-                    <p>${(p.description || '').substring(0, 100)}...</p>
+                    <p>${(item.description || '').substring(0, 100)}...</p>
                     <div class="item-card-actions">
-                        <button class="btn btn-secondary btn-icon" onclick="editItem('products', ${i})">
+                        <button class="btn btn-secondary btn-icon" onclick="editItem('${type}', ${index})">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-danger btn-icon" onclick="deleteItem('products', ${i})">
+                        <button class="btn btn-danger btn-icon" onclick="deleteItem('${type}', ${index})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+        }
+
+        // Products
+        function renderProducts() {
+            renderWithNesting('products', typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : [], 'products-grid');
         }
         
         // Services
         function renderServices() {
-            if (typeof SERVICES_DATA === 'undefined') return;
-            const grid = document.getElementById('services-grid');
-            grid.innerHTML = SERVICES_DATA.map((s, i) => `
-                <div class="item-card">
-                    <div class="item-card-header">
-                        <div>
-                            <h3>${s.title || s.name}</h3>
-                            <span class="category">${s.category || 'Service'}</span>
-                        </div>
-                    </div>
-                    <p>${(s.description || '').substring(0, 100)}...</p>
-                    <div class="item-card-actions">
-                        <button class="btn btn-secondary btn-icon" onclick="editItem('services', ${i})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-danger btn-icon" onclick="deleteItem('services', ${i})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+             renderWithNesting('services', typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : [], 'services-grid');
         }
         
         // Clients
