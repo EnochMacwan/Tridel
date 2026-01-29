@@ -1,4 +1,4 @@
-const TESTIMONIALS_DATA = [
+window.TESTIMONIALS_DATA = [
   { lat: 19.0760, lng: 72.8777, name: "Shankar Surveys", location: "Navi Mumbai, India", logo: "testimonial-01.png", quote: "The assistance provided by the team helped us initiate the field programs at Adani Vizhinjam Port with a complete success. We value the support and look forward to our cooperation with Tridel.", author: "Sreenivasan Shankar", role: "Founder & Director" },
   { lat: 46.8139, lng: -71.2080, name: "Probiosphere", location: "Quebec, Canada", logo: "testimonial-02.png", quote: "The environmental services you are providing are more than essential. If you cannot measure it, you cannot improve it. That is exactly where your collaboration is crucial for us.", author: "Dr. Pierre Naider Fanfan", role: "President and CEO" },
   { lat: 63.4305, lng: 10.3951, name: "Norseatech", location: "TRØNDELAG, Norway", logo: "testimonial-03.png", quote: "We see potential in our partnership with Tridel Technologies for jointly delivering value added services to the growing aquaculture market in Middle East.", author: "Dr. Rahman Mankettikkara", role: "Director" },

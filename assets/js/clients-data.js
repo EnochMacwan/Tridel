@@ -1,4 +1,4 @@
-const clientsData = [
+window.clientsData = [
   // Government & Public Sector
   { name: "Dubai Municipality", logo: "assets/images/clients/client-1.png", category: "Government" },
   { name: "MOCCAE", logo: "assets/images/clients/client-2.png", category: "Government" },

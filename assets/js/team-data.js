@@ -1,4 +1,4 @@
-const TEAM_DATA = [
+window.TEAM_DATA = [
   {
     "name": "Shaijan Baby",
     "role": "Founder & Managing Director",

@@ -1,10 +1,10 @@
-const SERVICES_DATA = [
+window.SERVICES_DATA = [
   {
     "id": "air-quality",
     "name": "Air Quality Monitoring",
     "category": "Environmental Monitoring",
     "description": "Precision air quality monitoring for offshore and coastal projects. Our setups measure key pollutants and meteorological parameters to ensure compliance with environmental regulations and safeguard operational health.",
-    "image": "assets/images/services/Eddy-Covariance-Flux-System.png",
+    "image": "assets/images/services/eddy-covariance-flux-system.png",
     "features": [
       "Real-time Pollutant Tracking (NOx, SOx, PM)",
       "Meteorological Integration",
@@ -218,7 +218,7 @@ const SERVICES_DATA = [
 ];
 
 // Featured Service for Spotlight Card in Mega Menu
-const featuredService = {
+window.featuredService = {
   "tag": "Featured",
   "title": "Comprehensive Solutions",
   "description": "End-to-end expertise from feasibility to real-time monitoring.",

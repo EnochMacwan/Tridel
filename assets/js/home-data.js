@@ -1,4 +1,4 @@
-const homeCardsData = [
+window.homeCardsData = [
   {
     title: "Survey & Monitoring Platforms",
     excerpt: "Developing robust platforms like our custom Buoys for efficient and safe remote data collection in marine environments.",
@@ -11,7 +11,7 @@ const homeCardsData = [
     excerpt: "Our real-time, instrument-independent TEMS data platform for integrated environmental monitoring.",
     link: "products.html",
     linkText: "Explore Softwares",
-    image: "assets/images/products/tems/TEMS.jpg"
+    image: "assets/images/software/tems.png",
   },
   {
     title: "Environmental Surveying & Monitoring Services",

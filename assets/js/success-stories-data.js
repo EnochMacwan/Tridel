@@ -1,4 +1,4 @@
-const SUCCESS_STORIES_DATA = [
+window.SUCCESS_STORIES_DATA = [
   {
     "id": "odor-monitoring-enoc",
     "title": "Odor Monitoring System for ENOC",
