@@ -1874,19 +1874,27 @@
             const btn = document.getElementById('publish-btn');
             const badge = document.getElementById('pending-count');
             
+            if (!btn) return;
+
             if (pendingChanges.size > 0) {
                 btn.classList.remove('btn-secondary');
                 btn.classList.add('btn-success');
                 btn.style.opacity = '1';
-                badge.style.display = 'inline-flex';
-                badge.textContent = pendingChanges.size;
                 btn.title = "Save pending changes";
+                
+                if (badge) {
+                     badge.style.display = 'inline-flex';
+                     badge.textContent = pendingChanges.size;
+                }
             } else {
                 btn.classList.remove('btn-success');
                 btn.classList.add('btn-secondary');
                 btn.style.opacity = '0.7';
-                badge.style.display = 'none';
                 btn.title = "No pending changes";
+                
+                if (badge) {
+                    badge.style.display = 'none';
+                }
             }
         }
         
