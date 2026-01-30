@@ -1,4 +1,5 @@
-const CONTACT_DATA = {
+if (typeof window.CONTACT_DATA === 'undefined') {
+    window.CONTACT_DATA = {
     address: "Tridel Technologies, Vadodara, Gujarat, India",
     phone: "+91 98765 43210",
     email: "info@trideltechnologies.com",
@@ -7,4 +8,5 @@ const CONTACT_DATA = {
         youtube: "https://www.youtube.com/@TridelTechnologies",
         instagram: "https://www.instagram.com/tridel_tech/"
     }
-};
+    };
+}

@@ -1,4 +1,4 @@
-window.homeCardsData = [
+window.HOME_CARDS_DATA = [
   {
     title: "Survey & Monitoring Platforms",
     excerpt: "Developing robust platforms like our custom Buoys for efficient and safe remote data collection in marine environments.",

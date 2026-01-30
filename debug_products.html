@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Products Data</title>
+</head>
+<body>
+    <h1>Products Data Debugger</h1>
+    <div id="result">Loading...</div>
+    
+    <script>
+        window.onerror = function(msg, url, line) {
+            document.getElementById('result').innerHTML += '<br><span style="color:red">Error: ' + msg + ' at ' + url + ':' + line + '</span>';
+        };
+    </script>
+    <script src="assets/js/products-data.js"></script>
+    <script>
+        const result = document.getElementById('result');
+        if (typeof window.PRODUCTS_DATA === 'undefined') {
+            result.innerHTML += '<br><strong>Status:</strong> window.PRODUCTS_DATA is UNDEFINED.';
+        } else {
+            result.innerHTML += '<br><strong>Status:</strong> window.PRODUCTS_DATA is DEFINED.';
+            result.innerHTML += '<br><strong>Is Array:</strong> ' + Array.isArray(window.PRODUCTS_DATA);
+            result.innerHTML += '<br><strong>Length:</strong> ' + (window.PRODUCTS_DATA ? window.PRODUCTS_DATA.length : 'N/A');
+        }
+    </script>
+</body>
+</html>

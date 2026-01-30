@@ -852,6 +852,7 @@
                 <li><a href="#team" data-section="team"><i class="fas fa-users"></i> Team</a></li>
                 <li><a href="#stories" data-section="stories"><i class="fas fa-trophy"></i> Success Stories</a></li>
                 <li><a href="#testimonials" data-section="testimonials"><i class="fas fa-comment-alt"></i> Testimonials</a></li>
+                <li><a href="#" data-section="locations"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
                 <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
                 <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
                 <li><a href="#health" data-section="health"><i class="fas fa-heartbeat"></i> System Health</a></li>
@@ -995,6 +996,24 @@
                 </div>
             </section>
             
+            <!-- Locations -->
+            <section id="locations" class="content-section">
+                <div class="section-header">
+                    <h2>Global Locations</h2>
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="undoChanges('locations')" id="undo-btn-locations" style="display:none; margin-right: 8px;">
+                            <i class="fas fa-undo"></i> Undo Changes
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="openAddModal('locations')">
+                            <i class="fas fa-plus"></i> Add Location
+                        </button>
+                    </div>
+                </div>
+                <div class="items-grid" id="locations-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
             <!-- Home Cards -->
             <section id="home" class="content-section">
                 <div class="section-header">
@@ -1036,18 +1055,18 @@
             <section id="health" class="content-section">
                 <div class="section-header">
                     <h2>System Health & Broken Links</h2>
-                    <button type="button" class="btn btn-primary" onclick="runHealthScan()">
+                    <button type="button" class="btn btn-primary" id="run-scan-btn" onclick="runHealthScan()">
                         <i class="fas fa-search"></i> Run Scan
                     </button>
                 </div>
-                
-                <div id="health-results">
-                    <div class="empty-state">
-                        <i class="fas fa-user-md" style="font-size: 48px; margin-bottom: 20px; color: var(--accent);"></i>
-                        <p>Click "Run Scan" to check for broken images and missing links across all your data.</p>
+                <div id="health-results" style="margin-top: 20px;">
+                    <div class="toast info" style="position:static; transform:none; max-width:100%; text-align:center;">
+                        Click "Run Scan" to check for broken links and data issues.
                     </div>
                 </div>
             </section>
+
+
 
             <!-- Global Settings -->
             <section id="settings" class="content-section">
@@ -1182,23 +1201,58 @@
     <!-- Load Data Files -->
     <script src="assets/js/products-data.js"></script>
     <script src="assets/js/services-data.js"></script>
+    <script src="assets/js/team-data.js"></script>
+    <script src="assets/js/testimonials-data.js"></script>
+    <script src="assets/js/locations-data.js"></script>
+    <script src="assets/js/contact-data.js"></script>
+    <script src="assets/js/news-data.js"></script>
     <script src="assets/js/clients-data.js"></script>
     <script src="assets/js/success-stories-data.js"></script>
     <script src="assets/js/home-data.js"></script>
-    <script src="assets/js/news-data.js"></script>
-    <script src="assets/js/team-data.js"></script>
-    <script src="assets/js/testimonials-data.js"></script>
+    <script src="assets/js/linkedin-data.js"></script>
 
     
     <!-- Map variable names for compatibility -->
     <script>
         // Explicitly map local variables to global window properties
         // This is necessary because 'const' declarations in scripts don't automatically attach to window
-        try { if (typeof productsData !== 'undefined') window.PRODUCTS_DATA = productsData; } catch(e){}
+        // try { if (typeof productsData !== 'undefined') window.PRODUCTS_DATA = productsData; } catch(e){} // REMOVED: Redundant, products-data.js sets window.PRODUCTS_DATA directly
         try { if (typeof servicesData !== 'undefined') window.SERVICES_DATA = servicesData; } catch(e){}
         try { if (typeof clientsData !== 'undefined') window.CLIENTS_DATA = clientsData; } catch(e){}
+        try { if (typeof teamData !== 'undefined') window.TEAM_DATA = teamData; } catch(e){}
         try { if (typeof successStoriesData !== 'undefined') window.SUCCESS_STORIES_DATA = successStoriesData; } catch(e){}
         try { if (typeof homeCardsData !== 'undefined') window.HOME_CARDS_DATA = homeCardsData; } catch(e){}
+        try { if (typeof locationsData !== 'undefined') window.LOCATIONS_DATA = locationsData; } catch(e){}
+        
+        console.log('DEBUG: PRODUCTS_DATA status:', {
+            defined: typeof window.PRODUCTS_DATA !== 'undefined',
+            isArray: Array.isArray(window.PRODUCTS_DATA),
+            length: window.PRODUCTS_DATA ? window.PRODUCTS_DATA.length : 0,
+            value: window.PRODUCTS_DATA
+        });
+        
+        // Fix LinkedIn Mapping
+        if (typeof linkedInPosts !== 'undefined') window.LINKEDIN_POSTS = linkedInPosts;
+        
+        // Helper: Get Data Array by Type (Crucial for generic functions)
+        function getDataArray(type) {
+            let data = [];
+            switch(type) {
+                case 'products': data = window.PRODUCTS_DATA; break;
+                case 'services': data = window.SERVICES_DATA; break;
+                case 'clients': data = window.CLIENTS_DATA; break;
+                case 'stories': data = window.SUCCESS_STORIES_DATA; break;
+                case 'home': data = window.HOME_CARDS_DATA; break;
+                case 'linkedin': data = window.LINKEDIN_POSTS || window.linkedInPosts; break;
+                case 'team': data = window.TEAM_DATA; break;
+                case 'testimonials': data = window.TESTIMONIALS_DATA; break;
+                case 'locations': data = window.LOCATIONS_DATA; break;
+                case 'settings': return [window.CONTACT_DATA || {}];
+                default: return [];
+            }
+            // Strict array check to prevent "undefined" length errors
+            return Array.isArray(data) ? data : [];
+        }
         try { if (typeof linkedInPosts !== 'undefined') window.LINKEDIN_POSTS = linkedInPosts; } catch(e){}
         try { if (typeof teamData !== 'undefined') window.TEAM_DATA = teamData; } catch(e){}
         // TEAM_DATA might already be uppercase in file, but we ensure consistency
@@ -1256,7 +1310,13 @@
         let authToken = sessionStorage.getItem('adminToken') || null;
         
         // GitHub Configuration
-        let gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+        let gitHubConfig = {};
+        try {
+            gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+        } catch (e) {
+            console.error('Error parsing GitHub config from localStorage:', e);
+            gitHubConfig = {};
+        }
         const GITHUB_DATA_FILES = {
             'products': 'assets/js/products-data.js',
             'services': 'assets/js/services-data.js',
@@ -1334,12 +1394,18 @@
                     
                     if (res.ok) {
                         const content = await res.text();
-                        // Extract JSON from JS const declaration
-                        const match = content.match(/const\s+\w+\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
+                        // Extract JSON/JS Object from const declaration
+                        // Extract JSON/JS Object from const declaration or window assignment
+                        const match = content.match(/(?:const\s+\w+|window\.\w+)\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
                         if (match) {
-                            const data = JSON.parse(match[1]);
-                            // Update global variable
-                            window[varName] = data;
+                            try {
+                                // Use Function to parse JS object literal (handles unquoted keys)
+                                const data = new Function('return ' + match[1])();
+                                // Update global variable
+                                window[varName] = data;
+                            } catch (parseErr) {
+                                console.error(`Error parsing data for ${type}:`, parseErr);
+                            }
                         }
                     }
                 } catch (e) {
@@ -1617,24 +1683,41 @@
         function showSection(section) {
             // Update nav
             document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+            const activeLink = document.querySelector(`[data-section="${section}"]`);
+            if (activeLink) activeLink.classList.add('active');
             
             // Update content
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(section).classList.add('active');
+            const activeSection = document.getElementById(section);
+            if (activeSection) {
+                activeSection.classList.add('active');
+            } else {
+                console.error(`Section not found: ${section}`);
+            }
             
             currentSection = section;
         }
         
         // Dashboard
         function renderDashboard() {
+            console.log('DEBUG: Rendering Dashboard');
+            const products = getDataArray('products');
+            console.log('DEBUG: products raw:', window.PRODUCTS_DATA);
+            console.log('DEBUG: products array:', products);
+            console.log('DEBUG: isArray:', Array.isArray(products));
+            
+            // Force update title for visual confirmation
+            const header = document.querySelector('#dashboard .section-header h2');
+            if(header) header.textContent = 'Dashboard (Debug v2)';
+
             const stats = [
-                { icon: 'fa-cube', value: typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA.length : 0, label: 'Products' },
-                { icon: 'fa-layer-group', value: typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA.length : 0, label: 'Services' },
-                { icon: 'fa-building', value: typeof CLIENTS_DATA !== 'undefined' ? CLIENTS_DATA.length : 0, label: 'Clients' },
-                { icon: 'fa-trophy', value: typeof SUCCESS_STORIES_DATA !== 'undefined' ? SUCCESS_STORIES_DATA.length : 0, label: 'Stories' },
-                { icon: 'fa-comment-alt', value: typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA.length : 0, label: 'Testimonials' },
-                { icon: 'fa-users', value: typeof TEAM_DATA !== 'undefined' ? TEAM_DATA.length : 0, label: 'Team' }
+                { icon: 'fa-cube', value: products ? products.length : 0, label: 'Products' },
+                { icon: 'fa-layer-group', value: (getDataArray('services') || []).length, label: 'Services' },
+                { icon: 'fa-building', value: (getDataArray('clients') || []).length, label: 'Clients' },
+                { icon: 'fa-trophy', value: (getDataArray('stories') || []).length, label: 'Stories' },
+                { icon: 'fa-comment-alt', value: (getDataArray('testimonials') || []).length, label: 'Testimonials' },
+                { icon: 'fa-map-marker-alt', value: (getDataArray('locations') || []).length, label: 'Locations' },
+                { icon: 'fa-users', value: (getDataArray('team') || []).length, label: 'Team' }
             ];
             
             document.getElementById('stats-grid').innerHTML = stats.map(s => `
@@ -1648,14 +1731,17 @@
         
         // Render All Sections
         function renderAllSections() {
+            renderDashboard();
             renderProducts();
             renderServices();
             renderClients();
-            renderStories();
-            renderHome();
             renderTeam();
+            renderStories();
             renderTestimonials();
+            renderLocations();
+            renderHomeCards();
             renderLinkedIn();
+            renderHealthCheck();
         }
 
         // Initialize Selection State
@@ -1715,7 +1801,7 @@
         // Render Search & Filter Controls
         function renderFilters(type) {
             const arr = getDataArray(type);
-            if (!arr) return '';
+            if (!arr || !Array.isArray(arr)) return '';
             
             // Get unique categories
             const categories = [...new Set(arr.map(i => i.category).filter(Boolean))].sort();
@@ -1742,7 +1828,7 @@
 
         // Generic Render with Nesting & Filtering
         function renderWithNesting(type, data, gridId) {
-            if (!data) return;
+            if (!data || !Array.isArray(data)) return;
             const grid = document.getElementById(gridId);
             if (!grid) return;
             
@@ -1904,26 +1990,28 @@
 
         // Products
         function renderProducts() {
-            renderWithNesting('products', typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : [], 'products-grid');
+            renderWithNesting('products', getDataArray('products'), 'products-grid');
         }
         
         // Services
         function renderServices() {
-             renderWithNesting('services', typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : [], 'services-grid');
+             renderWithNesting('services', getDataArray('services'), 'services-grid');
         }
         
         // Clients
         function renderClients() {
-            if (typeof CLIENTS_DATA === 'undefined') return;
+            const data = getDataArray('clients');
             const grid = document.getElementById('clients-grid');
             
-            if (CLIENTS_DATA.length === 0) {
+            if (!grid) return;
+            
+            if (data.length === 0) {
                 grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No clients found.</div>';
                 return;
             }
 
             grid.innerHTML = '<div class="items-grid">' + 
-                CLIENTS_DATA.map((item, i) => renderItemCard('clients', item, i)).join('') + 
+                data.map((item, i) => renderItemCard('clients', item, i)).join('') + 
                 '</div>';
 
             if (typeof Sortable !== 'undefined') {
@@ -1936,8 +2024,8 @@
                             const oldIndex = evt.oldIndex;
                             const newIndex = evt.newIndex;
                             if (oldIndex !== newIndex) {
-                                const item = CLIENTS_DATA.splice(oldIndex, 1)[0];
-                                CLIENTS_DATA.splice(newIndex, 0, item);
+                                const item = data.splice(oldIndex, 1)[0];
+                                data.splice(newIndex, 0, item);
                                 markAsPending('clients');
                             }
                         }
@@ -1948,9 +2036,12 @@
         
         // Stories
         function renderStories() {
-            if (typeof SUCCESS_STORIES_DATA === 'undefined') return;
+            const data = getDataArray('stories');
+            if (!data) return;
             const grid = document.getElementById('stories-grid');
-            grid.innerHTML = SUCCESS_STORIES_DATA.map((s, i) => `
+            if (!grid) return;
+            
+            grid.innerHTML = data.map((s, i) => `
                 <div class="item-card">
                     <div class="item-card-header">
                         <div>
@@ -1971,45 +2062,73 @@
             `).join('');
         }
         
-        // Home Cards
-        function renderHome() {
-            if (typeof HOME_CARDS_DATA === 'undefined') return;
-            const grid = document.getElementById('home-grid');
-            grid.innerHTML = HOME_CARDS_DATA.map((h, i) => `
-                <div class="item-card">
-                    <div class="item-card-header">
-                        <div>
-                            <h3>${h.title}</h3>
+        // Locations
+        function renderLocations() {
+            const grid = document.getElementById('locations-grid');
+            const locations = getDataArray('locations');
+
+            if (!grid) return;
+
+            grid.innerHTML = locations.map((item, index) => `
+                <div class="card">
+                    <div class="card-header">
+                        <h4>${item.name}</h4>
+                        <div class="card-actions">
+                            <button type="button" class="btn-icon" onclick="editItem('locations', ${index})"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn-icon delete" onclick="deleteItem('locations', ${index})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                    <p>${(h.description || '').substring(0, 100)}...</p>
-                    <div class="item-card-actions">
-                        <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('home', ${i})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('home', ${i})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <div class="card-body">
+                        <p><strong>Country:</strong> ${item.country}</p>
+                        <p><strong>Type:</strong> ${item.type}</p>
+                        <p><strong>Address:</strong><br> ${item.address}</p>
                     </div>
                 </div>
             `).join('');
         }
+
+        // Home Cards
+        function renderHomeCards() {
+            const data = getDataArray('home');
+            const grid = document.getElementById('home-grid');
+            if (grid) {
+                grid.innerHTML = data.map((h, i) => `
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <div>
+                                <h3>${h.title}</h3>
+                            </div>
+                        </div>
+                        <p>${(h.description || '').substring(0, 100)}...</p>
+                        <div class="item-card-actions">
+                            <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('home', ${i})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('home', ${i})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
         
         // LinkedIn Posts
         function renderLinkedIn() {
-            if (typeof LINKEDIN_POSTS === 'undefined') return;
+            const data = getDataArray('linkedin');
             const grid = document.getElementById('linkedin-grid');
-            grid.innerHTML = LINKEDIN_POSTS.map((urn, i) => `
-                <div class="item-card">
-                    <div class="item-card-header">
-                        <div>
-                            <h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ${i + 1}</h3>
+            if(grid) {
+                grid.innerHTML = data.map((urn, i) => `
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <div>
+                                <h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ${i + 1}</h3>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs font-mono break-all">${urn}</p>
-                    <div class="item-card-actions">
-                        <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('linkedin', ${i})">
-                            <i class="fas fa-edit"></i> Edit
+                        <p class="text-xs font-mono break-all">${urn}</p>
+                        <div class="item-card-actions">
+                            <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('linkedin', ${i})">
+                                <i class="fas fa-edit"></i> Edit
                         </button>
                         <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('linkedin', ${i})">
                             <i class="fas fa-trash"></i>
@@ -2017,6 +2136,7 @@
                     </div>
                 </div>
             `).join('');
+            }
         }
         
         // Team
@@ -2138,19 +2258,7 @@
             currentEditIndex = null;
         }
         
-        function getDataArray(type) {
-            switch(type) {
-                case 'products': return PRODUCTS_DATA;
-                case 'services': return SERVICES_DATA;
-                case 'clients': return CLIENTS_DATA;
-                case 'stories': return SUCCESS_STORIES_DATA;
-                case 'home': return HOME_CARDS_DATA;
-                case 'team': return TEAM_DATA;
-                case 'testimonials': return TESTIMONIALS_DATA;
-                case 'linkedin': return LINKEDIN_POSTS;
-                default: return [];
-            }
-        }
+
         
         function getSingleImageFieldHTML(label, fieldId, value) {
             return `
@@ -2210,7 +2318,7 @@
         // Helper to get options for "Nest under..." dropdown
         function getParentOptions(type, currentId) {
             const arr = getDataArray(type);
-            if (!arr) return '<option value="">(None)</option>';
+            if (!arr || !Array.isArray(arr)) return '<option value="">(None)</option>';
             
             // Find current parent if any
             let currentParentId = '';
@@ -2986,6 +3094,147 @@
         // Close preview modal
         function closePreview() {
             document.getElementById('preview-overlay').style.display = 'none';
+        }
+
+        // ========== SYSTEM HEALTH CHECK ==========
+        
+        async function runHealthScan() {
+            const btn = document.getElementById('run-scan-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+            btn.disabled = true;
+            
+            const results = {
+                brokenImages: [],
+                missingFields: [],
+                totalItems: 0
+            };
+            
+            const types = ['products', 'services', 'clients', 'stories', 'home', 'team', 'testimonials'];
+            
+            for (const type of types) {
+                const arr = getDataArray(type);
+                if (!arr || !Array.isArray(arr)) continue;
+                
+                results.totalItems += arr.length;
+                
+                // Check each item
+                for (let i = 0; i < arr.length; i++) {
+                    const item = arr[i];
+                    
+                    // Check Images (Internal only)
+                    const img = item.image || item.logo || (item.gallery && item.gallery[0]);
+                    if (img && !img.startsWith('http')) {
+                         try {
+                             const res = await fetch(img, { method: 'HEAD' });
+                             if (!res.ok) {
+                                 results.brokenImages.push({
+                                     type,
+                                     index: i,
+                                     name: item.name || item.title || `Item ${i}`,
+                                     path: img
+                                 });
+                             }
+                         } catch (e) {
+                             results.brokenImages.push({
+                                 type,
+                                 index: i,
+                                  name: item.name || item.title || `Item ${i}`,
+                                 path: img
+                             });
+                         }
+                    }
+                    
+                    // Check Critical Fields
+                    if (type === 'products' && !item.name) results.missingFields.push(`${type} #${i+1}: Missing Name`);
+                    if (type === 'services' && (!item.title && !item.name)) results.missingFields.push(`${type} #${i+1}: Missing Title`);
+                }
+            }
+            
+            renderHealthResults(results);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        
+        function renderHealthResults(results) {
+            const container = document.getElementById('health-results');
+            
+            if (results.brokenImages.length === 0 && results.missingFields.length === 0) {
+                 container.innerHTML = `
+                    <div class="toast success" style="position:static; transform:none; max-width:100%; text-align:center;">
+                        <i class="fas fa-check-circle"></i> Sytem Healthy! Scanned ${results.totalItems} items.
+                    </div>
+                 `;
+                 return;
+            }
+            
+            let html = `<div style="display:flex; flex-direction:column; gap:10px;">`;
+            
+            if (results.brokenImages.length > 0) {
+                html += `
+                    <div class="alert alert-danger" style="background:#ffebee; border:1px solid #ffcdd2; padding:10px; border-radius:4px;">
+                        <h4 style="color:#c62828; margin-top:0;"><i class="fas fa-broken-image"></i> Broken Images (${results.brokenImages.length})</h4>
+                        <ul style="margin-bottom:0; padding-left:20px;">
+                            ${results.brokenImages.map(err => `<li><strong>${err.type}</strong>: ${err.name} (<span style="font-family:monospace">${err.path}</span>)</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (results.missingFields.length > 0) {
+                 html += `
+                    <div class="alert alert-warning" style="background:#fff3e0; border:1px solid #ffe0b2; padding:10px; border-radius:4px;">
+                        <h4 style="color:#ef6c00; margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Data Issues (${results.missingFields.length})</h4>
+                         <ul style="margin-bottom:0; padding-left:20px;">
+                            ${results.missingFields.map(err => `<li>${err}</li>`).join('')}
+                        </ul>
+                    </div>
+                 `;
+            }
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // ========== GLOBAL BUSINESS SETTINGS ==========
+        
+        function loadSettingsToForm() {
+            if (typeof CONTACT_DATA === 'undefined') return;
+            
+            document.getElementById('contact-address').value = CONTACT_DATA.address || '';
+            document.getElementById('contact-phone').value = CONTACT_DATA.phone || '';
+            document.getElementById('contact-email').value = CONTACT_DATA.email || '';
+            
+            if (CONTACT_DATA.social) {
+                document.getElementById('social-linkedin').value = CONTACT_DATA.social.linkedin || '';
+                document.getElementById('social-youtube').value = CONTACT_DATA.social.youtube || '';
+                document.getElementById('social-instagram').value = CONTACT_DATA.social.instagram || '';
+            }
+        }
+        
+        async function saveGlobalSettings() {
+            const newSettings = {
+                address: document.getElementById('contact-address').value.trim(),
+                phone: document.getElementById('contact-phone').value.trim(),
+                email: document.getElementById('contact-email').value.trim(),
+                social: {
+                    linkedin: document.getElementById('social-linkedin').value.trim(),
+                    youtube: document.getElementById('social-youtube').value.trim(),
+                    instagram: document.getElementById('social-instagram').value.trim()
+                }
+            };
+            
+            // Validate
+            if (!newSettings.address || !newSettings.phone || !newSettings.email) {
+                showToast('Address, Phone, and Email are required', 'error');
+                return;
+            }
+            
+            // Update global variable
+            window.CONTACT_DATA = newSettings;
+            
+            // Mark as pending
+            markAsPending('settings');
         }
         
         // Close preview on overlay click

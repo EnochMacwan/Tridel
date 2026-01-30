@@ -190,6 +190,27 @@
                   </option>
                 </select>
               </div>
+              <!-- Dynamic Data Loading -->
+    <script src="assets/js/testimonials-data.js"></script>
+    <script src="assets/js/locations-data.js"></script>
+    <script src="assets/js/locations-loader.js"></script>
+    <script>
+        // Load Testimonials
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('testimonials-container');
+            if (container && typeof TESTIMONIALS_DATA !== 'undefined') {
+                container.innerHTML = TESTIMONIALS_DATA.map(t => `
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"${t.quote}"</p>
+                        <div class="testimonial-author">
+                            <h4>${t.author}</h4>
+                            <p>${t.role}, ${t.location}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+    </script>
               <div class="form-group">
                 <label class="form-label" for="message">
                   Message
@@ -216,63 +237,13 @@
         <div class="map-layout">
           <div class="map-canvas" id="map">
           </div>
-          <div class="contact-details">
-            <div class="section__header" style="text-align: left;">
-              <h2 class="section__title">
-                Our Offices
-              </h2>
+            <div class="contact-details">
+                <!-- Locations will be dynamically loaded here by locations-loader.js -->
+                 <div class="section__header" style="text-align: left;">
+                    <h2 class="section__title">Our Offices</h2>
+                </div>
+                <div class="loading-spinner">Loading office locations...</div>
             </div>
-            <div id="location-details-uae" class="contact-location-group">
-              <h4>
-                UAE
-              </h4>
-              <p class="contact-location-address">
-                Tridel Technologies FZCO, QD01, DAFZA Industrial Park, Qusais, Dubai, UAE
-              </p>
-            </div>
-
-            <h4 style="margin-top: 16px; color: var(--color-accent);">
-              India
-            </h4>
-
-            <!-- Chennai -->
-            <div id="location-details-india" class="contact-location-group">
-              <p class="contact-location-label">Registered Office (Chennai)</p>
-              <p class="contact-location-address">
-                Tridel Technologies Pvt Ltd<br>
-                No 10/1, 2nd Street, Thirumurugan Nagar,<br>
-                Arcot Road, Porur, Chennai, TN 600116
-              </p>
-            </div>
-
-            <!-- Vadodara Factory & Office Combined Click Target -->
-            <div id="location-details-india-vadodara" class="contact-location-group">
-              <p class="contact-location-label">Factory Address (Vadodara)</p>
-              <p class="contact-location-address" style="margin-bottom: 16px;">
-                Tridel Technologies Pvt Ltd<br>
-                Block No. 680 / Plot No. 2, Shah Industrial Estate-2,<br>
-                Lamdapura Road, Manjusar, Savli,<br>
-                Vadodara, Gujarat – 390025
-              </p>
-
-              <p class="contact-location-label">Office Address (Vadodara)</p>
-              <p class="contact-location-address">
-                Tridel Technologies Pvt Ltd<br>
-                76, Swaminarayan Nagar, Nizampura,<br>
-                Vadodara, Gujarat – 390002
-              </p>
-            </div>
-
-            <div id="location-details-australia" class="contact-location-group">
-              <h4 style="margin-top: 8px;">
-                Australia
-              </h4>
-              <p class="contact-location-address">
-                Tridel Technologies Pty Ltd<br>
-                Eden Hills, Adelaide, SA
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>

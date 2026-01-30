@@ -169,8 +169,8 @@ window.TEAM_DATA = [
   },
   {
     "name": "Khushbu",
-    "role": "Assitant Manager-Business Development",
-    "image": "assets/images/team/khushbu.jpg",
+    "role": "HR Manager",
+    "image": "",
     "bio": "Brief Bio"
   }
 ];
