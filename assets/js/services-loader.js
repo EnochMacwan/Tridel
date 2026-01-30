@@ -47,8 +47,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     // Define Columns with Filter (!s.isNested)
     const columns = {
         'Environmental Monitoring': data.filter(s => s.category === 'Environmental Monitoring' && !s.isNested),
-        'Environmental Surveying': data.filter(s => s.category === 'Environmental Surveying' && s.subcategory !== 'Geoscience Studies' && !s.isNested),
-        'Geoscience Studies': data.filter(s => (s.category === 'Geoscience Studies' || s.subcategory === 'Geoscience Studies') && !s.isNested)
+        'Environmental Surveying': data.filter(s => s.category === 'Environmental Surveying' && s.subcategory !== 'Geoscience Studies' && !s.isNested)
     };
 
     // 1. Environmental Monitoring
@@ -68,15 +67,6 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
         col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
     });
     container.appendChild(col2);
-
-    // 3. Geoscience Studies
-    const col3 = document.createElement('div');
-    col3.className = 'glass-col';
-    col3.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Geoscience Studies</h4>`;
-    columns['Geoscience Studies'].forEach(s => {
-        col3.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
-    });
-    container.appendChild(col3);
 
     // Spotlight Card (Column 4)
     if (typeof featuredService !== 'undefined') {

@@ -151,7 +151,7 @@ window.PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/products/data-buoy/data-buoy-1.png",
+    "image": "assets/images/products/data-buoy/data-buoy-1.jpg",
     "link": "product-detail.html?id=data-buoy",
     "id": "data-buoy",
     "category": "Buoys",
@@ -159,7 +159,7 @@ window.PRODUCTS_DATA = [
     "longDescription": "Our TDBs (Tridel Data Buoys) are bespoke-design buoy platforms built for advanced marine monitoring and research applications. They are designed for sensor-agnostic, autonomous operation in demanding environments.",
     "name": "Data Buoys",
     "gallery": [
-      "assets/images/products/data-buoy/data-buoy-1.png",
+      "assets/images/products/data-buoy/data-buoy-1.jpg",
       "assets/images/products/data-buoy/data-buoy-new.png"
     ],
     "features": [

@@ -854,6 +854,8 @@
                 <li><a href="#testimonials" data-section="testimonials"><i class="fas fa-comment-alt"></i> Testimonials</a></li>
                 <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
                 <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
+                <li><a href="#health" data-section="health"><i class="fas fa-heartbeat"></i> System Health</a></li>
+                <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Global Settings</a></li>
             </ul>
         </nav>
         
@@ -1029,6 +1031,65 @@
                     <!-- Populated by JS -->
                 </div>
             </section>
+
+            <!-- System Health -->
+            <section id="health" class="content-section">
+                <div class="section-header">
+                    <h2>System Health & Broken Links</h2>
+                    <button type="button" class="btn btn-primary" onclick="runHealthScan()">
+                        <i class="fas fa-search"></i> Run Scan
+                    </button>
+                </div>
+                
+                <div id="health-results">
+                    <div class="empty-state">
+                        <i class="fas fa-user-md" style="font-size: 48px; margin-bottom: 20px; color: var(--accent);"></i>
+                        <p>Click "Run Scan" to check for broken images and missing links across all your data.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Global Settings -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>Global Business Settings</h2>
+                    <button type="button" class="btn btn-primary" onclick="saveGlobalSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+                
+                <div class="item-card" style="max-width: 800px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Contact Information</h3>
+                    <div class="form-group">
+                        <label>Company Address</label>
+                        <textarea class="form-control" id="setting-address" placeholder="Full address..."></textarea>
+                    </div>
+                     <div class="form-group" style="display:flex; gap:15px;">
+                        <div style="flex:1">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" id="setting-phone" placeholder="+91 ...">
+                        </div>
+                        <div style="flex:1">
+                            <label>Email Address</label>
+                            <input type="text" class="form-control" id="setting-email" placeholder="info@tridel...or sales@tridel...">
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px;">Social Media Links</h3>
+                    <div class="form-group">
+                        <label><i class="fab fa-linkedin" style="color:#0077b5;"></i> LinkedIn URL</label>
+                        <input type="text" class="form-control" id="setting-linkedin" placeholder="https://linkedin.com/company/...">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube URL</label>
+                        <input type="text" class="form-control" id="setting-youtube" placeholder="https://youtube.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-instagram" style="color:#e4405f;"></i> Instagram URL</label>
+                        <input type="text" class="form-control" id="setting-instagram" placeholder="https://instagram.com/...">
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
     
@@ -1189,6 +1250,7 @@
 
     </script>
     
+    <script src="assets/js/contact-data.js"></script>
     <script>
         // Auth State
         let authToken = sessionStorage.getItem('adminToken') || null;
@@ -1203,7 +1265,8 @@
             'home': 'assets/js/home-data.js',
             'news': 'assets/js/news-data.js',
             'team': 'assets/js/team-data.js',
-            'testimonials': 'assets/js/testimonials-data.js'
+            'testimonials': 'assets/js/testimonials-data.js',
+            'settings': 'assets/js/contact-data.js'
         };
         const GITHUB_VAR_NAMES = {
             'products': 'PRODUCTS_DATA',
@@ -1213,7 +1276,8 @@
             'home': 'HOME_CARDS_DATA',
             'news': 'LINKEDIN_POSTS',
             'team': 'TEAM_DATA',
-            'testimonials': 'TESTIMONIALS_DATA'
+            'testimonials': 'TESTIMONIALS_DATA',
+            'settings': 'CONTACT_DATA'
         };
         
         // State
@@ -1245,6 +1309,7 @@
             
             renderDashboard();
             renderAllSections();
+            loadSettingsToForm();
         });
         
         // Load data from GitHub repository
@@ -1256,7 +1321,7 @@
             
             showToast('Loading data from GitHub...', 'success');
             
-            const types = ['products', 'services', 'clients', 'stories', 'home', 'team', 'testimonials'];
+            const types = ['products', 'services', 'clients', 'stories', 'home', 'team', 'testimonials', 'settings'];
             
             for (const type of types) {
                 const filePath = GITHUB_DATA_FILES[type];
@@ -1270,7 +1335,7 @@
                     if (res.ok) {
                         const content = await res.text();
                         // Extract JSON from JS const declaration
-                        const match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+                        const match = content.match(/const\s+\w+\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
                         if (match) {
                             const data = JSON.parse(match[1]);
                             // Update global variable
@@ -2178,7 +2243,7 @@
                     const productGallery = data.gallery || (data.image ? [data.image] : []);
                     return `
                         <div class="form-group">
-                            <label>Product Name</label>
+                            <label>Product Name <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-name" value="${data.name || ''}" placeholder="e.g. Coastal Buoy">
                         </div>
                         <div class="form-group">
@@ -2232,7 +2297,7 @@
                     const serviceGallery = data.gallery || (data.image ? [data.image] : []);
                     return `
                         <div class="form-group">
-                            <label>Service Title</label>
+                            <label>Service Title <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-title" value="${data.title || data.name || ''}" placeholder="e.g. Hydrographic Surveys">
                         </div>
                         <div class="form-group">
@@ -2302,10 +2367,10 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Quote</label>
+                            <label>Quote <span style="color:red">*</span></label>
                             <textarea class="form-control" id="field-quote" placeholder="Testimonial text...">${data.quote || ''}</textarea>
                         </div>
-                        ${getSingleImageFieldHTML('Logo / Client Image', 'field-logo', data.logo)}
+                        ${getSingleImageFieldHTML('Logo / Client Image <span style="color:red">*</span>', 'field-logo', data.logo)}
                         <small style="color: var(--text-muted); display: block; margin-top: -10px; margin-bottom: 20px;">
                             <i class="fas fa-info-circle"></i> Place files in <code>assets/images/testimonials/</code>. For shared logos, you can use <code>../clients/filename.png</code>.
                         </small>
@@ -2313,19 +2378,19 @@
                 case 'clients':
                     return `
                         <div class="form-group">
-                            <label>Client Name</label>
+                            <label>Client Name <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-name" value="${data.name || ''}" placeholder="Saudi Aramco">
                         </div>
                         <div class="form-group">
                             <label>Category</label>
                             <input type="text" class="form-control" id="field-category" value="${data.category || ''}" placeholder="Government / Energy / Marine">
                         </div>
-                        ${getSingleImageFieldHTML('Client Logo', 'field-logo', data.logo)}
+                        ${getSingleImageFieldHTML('Client Logo <span style="color:red">*</span>', 'field-logo', data.logo)}
                     `;
                 case 'stories':
                     return `
                         <div class="form-group">
-                            <label>Project Title</label>
+                            <label>Project Title <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-title" value="${data.title || ''}" placeholder="e.g. Red Sea Environmental Monitoring">
                         </div>
                         <div class="form-group">
@@ -2336,12 +2401,12 @@
                             <label>Description</label>
                             <textarea class="form-control" id="field-description" placeholder="Project description...">${data.description || ''}</textarea>
                         </div>
-                        ${getSingleImageFieldHTML('Project Image', 'field-image', data.image)}
+                        ${getSingleImageFieldHTML('Project Image <span style="color:red">*</span>', 'field-image', data.image)}
                     `;
                 case 'home':
                     return `
                         <div class="form-group">
-                            <label>Card Title</label>
+                            <label>Card Title <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-title" value="${data.title || ''}" placeholder="e.g. Our Products">
                         </div>
                         <div class="form-group">
@@ -2352,12 +2417,12 @@
                             <label>Link</label>
                             <input type="text" class="form-control" id="field-link" value="${data.link || ''}" placeholder="products.html">
                         </div>
-                        ${getSingleImageFieldHTML('Card Image', 'field-image', data.image)}
+                        ${getSingleImageFieldHTML('Card Image <span style="color:red">*</span>', 'field-image', data.image)}
                     `;
                 case 'linkedin':
                     return `
                         <div class="form-group">
-                            <label>LinkedIn Post URN</label>
+                            <label>LinkedIn Post URN <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-urn" value="${data || ''}" placeholder="urn:li:ugcPost:1234567890">
                             <small style="color: var(--text-muted); display: block; margin-top: 8px;">
                                 <i class="fas fa-info-circle"></i> You can find the URN in the LinkedIn post URL or embed code.
@@ -2368,7 +2433,7 @@
                 case 'team':
                     return `
                         <div class="form-group">
-                            <label>Name</label>
+                            <label>Name <span style="color:red">*</span></label>
                             <input type="text" class="form-control" id="field-name" value="${data.name || ''}" placeholder="e.g. John Doe">
                         </div>
                         <div class="form-group">
@@ -2379,7 +2444,7 @@
                             <label>Bio</label>
                             <textarea class="form-control" id="field-bio" placeholder="Brief biography...">${data.bio || ''}</textarea>
                         </div>
-                        ${getSingleImageFieldHTML('Member Photo', 'field-image', data.image)}
+                        ${getSingleImageFieldHTML('Member Photo <span style="color:red">*</span>', 'field-image', data.image)}
                     `;
             }
         }
@@ -2418,7 +2483,70 @@
              container.appendChild(div);
         }
 
+        // Helper: Validate Form Data
+        function validateForm(type) {
+            const errors = [];
+            
+            // Limit checks to the current modal type logic
+            // Required fields mapping
+            const requiredFields = {
+                products: ['field-name', 'field-image'],
+                services: ['field-title', 'field-image'],
+                clients: ['field-name', 'field-logo'],
+                stories: ['field-title', 'field-image'],
+                home: ['field-title', 'field-image'], // Home cards need image + title
+                team: ['field-name', 'field-image'],
+                testimonials: ['field-quote', 'field-logo'] // Quote is essential
+            };
+            
+            const fieldsToCheck = requiredFields[type] || [];
+            
+            fieldsToCheck.forEach(id => {
+                const el = document.getElementById(id);
+                // Check direct value or hidden gallery value if it's an image field
+                if (!el) {
+                    // It might be a gallery/image which has a different ID structure or hidden input
+                    if (id.includes('image') || id.includes('logo')) {
+                         // Check if we have at least one image in gallery input OR single input
+                         const singleInput = document.getElementById(id);
+                         const galleryInput = document.getElementById('field-gallery');
+                         
+                         const hasSingle = singleInput && singleInput.value.trim().length > 0;
+                         const hasGallery = galleryInput && JSON.parse(galleryInput.value || '[]').length > 0;
+                         
+                         if (!hasSingle && !hasGallery) {
+                             errors.push(`Image/Logo is required`);
+                         }
+                    }
+                    return;
+                }
+                
+                if (!el.value || el.value.trim() === '') {
+                    // Get label text
+                    const label = el.previousElementSibling ? el.previousElementSibling.textContent : id;
+                    errors.push(`${label} is required`);
+                }
+            });
+            
+            return errors;
+        }
+
         function saveItem() {
+            // 1. Validation Step
+            if (currentEditType !== 'linkedin') { // LinkedIn validation is unique/simple
+                const validationErrors = validateForm(currentEditType);
+                if (validationErrors.length > 0) {
+                    showToast(`Validation Error: ${validationErrors[0]}`, 'error');
+                    return; // Stop saving
+                }
+            } else {
+                 const urn = document.getElementById('field-urn').value.trim();
+                 if (!urn) {
+                     showToast('Validation Error: LinkedIn URN is required', 'error');
+                     return;
+                 }
+            }
+
             const arr = getDataArray(currentEditType);
             
             // Special handling for LinkedIn (simple string array)
