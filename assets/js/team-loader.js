@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="grid-card-wrapper">
                 <div class="grid-card-visual">
                     <img loading="lazy" alt="${member.name}" class="team-member__photo-full" 
-                        src="${member.photo ? (member.photo.startsWith('http') ? member.photo : 'assets/images/team/' + member.photo) : 'assets/images/team/team.jpg'}">
+                        src="${member.image ? member.image : 'assets/images/logo/tridel.png'}"
+                        style="object-position: center;"
+                        onerror="this.src='assets/images/logo/tridel.png'">
                 </div>
                 <div class="grid-content-outside">
                     <h3 class="team-member__name">${member.name}</h3>

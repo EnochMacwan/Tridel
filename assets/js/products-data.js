@@ -62,7 +62,7 @@ window.PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/software/aattide/attide_logo.png",
+    "image": "assets/images/logo/tridel.png",
     "link": "product-detail.html?id=attide",
     "id": "attide",
     "category": "Software",
@@ -323,7 +323,7 @@ window.PRODUCTS_DATA = [
     ]
   },
   {
-    "image": "assets/images/products/mooring-frame/Mooring-Frames.png",
+    "image": "assets/images/logo/tridel.png",
     "link": "product-detail.html?id=mooring-frame",
     "id": "mooring-frame",
     "category": "Equipment",

@@ -753,6 +753,7 @@ h6 {
     transition: transform 0.6s ease;
     padding: 0;
     /* Remove padding to fully match card edges */
+    object-position: center;
 }
 
 /* Fix for Product Images to fit perfectly in cards */

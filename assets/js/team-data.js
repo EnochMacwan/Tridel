@@ -14,13 +14,13 @@ window.TEAM_DATA = [
   {
     "name": "Sharon Philip",
     "role": "Director-Operations",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Leading oceanographic and geophysical projects with proficiency. Interpretation of bathymetric, geological, oceanographic, and geophysical data."
   },
   {
     "name": "Balakrishna M",
     "role": "Director-Business Development",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Securing opportunities and driving business growth. Driving revenue growth for the organization."
   },
   {
@@ -32,7 +32,7 @@ window.TEAM_DATA = [
   {
     "name": "Anoop Panicker, IN Retd.",
     "role": "Director-India",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Leading India office operations. Managing Hardware and Software Product Development Initiatives"
   },
   {
@@ -44,13 +44,13 @@ window.TEAM_DATA = [
   {
     "name": "D.K. Sinha",
     "role": "Lead-Strategic Initiatives",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Leads strategic initiatives, driving development and execution of key projects. Retired DG at Directorate General of Lighthouses and Lightships/Ex-Councillor IALA"
   },
   {
     "name": "Jojo Scaria George",
     "role": "Vice President- Marine Construction",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Manage marine construction projects including ports, harbours, and offshore platforms. Ensuring compliance with marine regulations and safety standards."
   },
   {
@@ -62,115 +62,115 @@ window.TEAM_DATA = [
   {
     "name": "Azza Elbadri Mohamed Ismail",
     "role": "Manager- HSE & Compliance",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Implementation of ISO standard requirements; ISO9001, ISO 14001 and ISO 45001Promoting culture of safety and quality."
   },
   {
     "name": "Gordon Bisset",
     "role": "Manager- Business Development",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Harold Pieters",
     "role": "Manager- Survey Operations",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Prabhu K",
     "role": "Manager-Software Development",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Rajam Alwan",
     "role": "Finance Controller",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Raju K N",
     "role": "Manager-Construction",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Prakash Nair",
     "role": "Manager-Production",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Shaji Jacob",
     "role": "Manager-Logistics",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Srinivasan Radhakrishnan",
     "role": "Manager-Engineering",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Deepika Nair",
     "role": "Manager-Accounts",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Jisha Kalluravi",
     "role": "Senior Software Developer",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Dr. Shajen Azeem",
     "role": "Marine Ecologist",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Dr. Deljo Davis",
     "role": "Environmental Specialist",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Stan Soman",
     "role": "Manager-Operations",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Sajith Kurup",
     "role": "Manager-Projects",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Haneema Varghese",
     "role": "Assistant Manager-Projects",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Asif M",
     "role": "Assistant Manager- HR & Admin",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Komal Digrani",
     "role": "Assistant Manager-Business Development",
-    "image": "assets/images/team/team.jpg",
+    "image": "",
     "bio": "Brief Bio"
   },
   {
     "name": "Khushbu",
     "role": "HR Manager",
-    "image": "",
+    "image": "assets/images/logo/tridel.png",
     "bio": "Brief Bio"
   }
 ];
