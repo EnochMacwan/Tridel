@@ -1,4 +1,4 @@
-window.SUCCESS_STORIES_DATA = [
+const SUCCESS_STORIES_DATA = [
   {
     "id": "odor-monitoring-enoc",
     "title": "Odor Monitoring System for ENOC",
@@ -33,11 +33,5 @@ window.SUCCESS_STORIES_DATA = [
     "category": "Integrated Solutions",
     "image": "assets/images/clients/client-3.png",
     "description": "A compact, vehicle-based monitoring system for Dubai Municipality, integrating sensors for air pollutants, noise, electromagnetic radiation, and weather parameters with real-time tracking."
-  },
-  {
-    "title": "abcd",
-    "category": "Environmental ai",
-    "description": "Ai",
-    "image": ""
   }
 ];
