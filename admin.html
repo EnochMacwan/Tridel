@@ -80,7 +80,7 @@
         
         /* Layout */
         .admin-container {
-            display: flex;
+            display: none; /* Security: Hidden by default, shown by admin-auth.js */
             min-height: calc(100vh - 80px);
         }
         
@@ -815,6 +815,15 @@
     </div>
 
     <!-- Login Overlay Removed -->
+    
+    <noscript>
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f0f0f; color:white; display:flex; justify-content:center; align-items:center; z-index:10000; text-align:center;">
+            <div>
+                <h1>JavaScript Required</h1>
+                <p>This Admin Panel requires JavaScript to function securely.</p>
+            </div>
+        </div>
+    </noscript>
 
     <header class="admin-header">
         <h1><i class="fas fa-rocket"></i> Tridel Admin</h1>
@@ -1079,7 +1088,19 @@
                 </div>
                 
                 <div class="item-card" style="max-width: 800px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Contact Information</h3>
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Form Destinations</h3>
+                    <div class="form-group">
+                        <label>General Enquiries Email (Contact Form)</label>
+                        <input type="text" class="form-control" id="form-contact-email" placeholder="geminibaba1@gmail.com">
+                        <small class="text-muted-sm"><i class="fas fa-info-circle"></i> Destination for contact.html form.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Careers Email (Job Application Form)</label>
+                        <input type="text" class="form-control" id="form-careers-email" placeholder="geminibaba1@gmail.com">
+                        <small class="text-muted-sm"><i class="fas fa-info-circle"></i> Destination for careers.html form.</small>
+                    </div>
+
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px;">Contact Information</h3>
                     <div class="form-group">
                         <label>Company Address</label>
                         <textarea class="form-control" id="setting-address" placeholder="Full address..."></textarea>
@@ -1209,6 +1230,8 @@
     <script src="assets/js/news-data.js"></script>
     <script src="assets/js/clients-data.js"></script>
     <script src="assets/js/success-stories-data.js"></script>
+    <script src="assets/js/success-stories-data.js"></script>
+    <script src="assets/js/settings-data.js"></script>
     <script src="assets/js/home-data.js"></script>
     <script src="assets/js/linkedin-data.js"></script>
 
@@ -1260,6 +1283,19 @@
         try { if (typeof TEAM_DATA !== 'undefined' && typeof window.TEAM_DATA === 'undefined') window.TEAM_DATA = TEAM_DATA; } catch(e){}
         
         try { if (typeof testimonialsData !== 'undefined') window.TESTIMONIALS_DATA = testimonialsData; } catch(e){}
+
+        // Security: Prevent XSS
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag]));
+        }
 
         // Theme Toggle Logic
         function toggleTheme() {
@@ -1327,7 +1363,8 @@
             'news': 'assets/js/news-data.js',
             'team': 'assets/js/team-data.js',
             'testimonials': 'assets/js/testimonials-data.js',
-            'settings': 'assets/js/contact-data.js'
+            'settings': 'assets/js/contact-data.js',
+            'form_settings': 'assets/js/settings-data.js'
         };
         const GITHUB_VAR_NAMES = {
             'products': 'PRODUCTS_DATA',
@@ -1338,7 +1375,9 @@
             'news': 'LINKEDIN_POSTS',
             'team': 'TEAM_DATA',
             'testimonials': 'TESTIMONIALS_DATA',
-            'settings': 'CONTACT_DATA'
+            'testimonials': 'TESTIMONIALS_DATA',
+            'settings': 'CONTACT_DATA',
+            'form_settings': 'SETTINGS_DATA'
         };
         
         // State
@@ -1910,25 +1949,25 @@
         }
 
         function renderItemCard(type, item, index, isChild = false) {
-             let title = item.title || item.name;
-             let category = item.category || (type === 'products' ? 'Uncategorized' : 'Service');
+             let title = escapeHTML(item.title || item.name);
+             let category = escapeHTML(item.category || (type === 'products' ? 'Uncategorized' : 'Service'));
              
              // Handle Home Cards
              if (type === 'home' && !item.title) {
-                 title = item.tag || 'Untitled Card';
-                 category = item.link || 'No Link';
+                 title = escapeHTML(item.tag || 'Untitled Card');
+                 category = escapeHTML(item.link || 'No Link');
              }
              
              // Handle Team
               if (type === 'team') {
-                  title = item.name;
-                  category = item.role;
+                  title = escapeHTML(item.name);
+                  category = escapeHTML(item.role);
               }
 
               // Handle Testimonials
               if (type === 'testimonials') {
-                  title = item.name; // Company Name
-                  category = item.location;
+                  title = escapeHTML(item.name); // Company Name
+                  category = escapeHTML(item.location);
               }
              
              const badge = isChild ? '<span class="badge" style="background:var(--accent); color:white; font-size:10px; margin-left:10px;">NESTED</span>' : '';
@@ -1976,7 +2015,7 @@
                             </div>
                         </div>
                     </div>
-                    <p>${(item.description || '').substring(0, 100)}...</p>
+                    <p>${escapeHTML(item.description || '').substring(0, 100)}...</p>
                     <div class="item-card-actions">
                         <button class="btn btn-secondary btn-icon" onclick="editItem('${type}', ${index})">
                             <i class="fas fa-edit"></i> Edit
@@ -2046,11 +2085,11 @@
                 <div class="item-card">
                     <div class="item-card-header">
                         <div>
-                            <h3>${s.title}</h3>
-                            <span class="category">${s.category || 'Story'}</span>
+                            <h3>${escapeHTML(s.title)}</h3>
+                            <span class="category">${escapeHTML(s.category || 'Story')}</span>
                         </div>
                     </div>
-                    <p>${(s.description || '').substring(0, 100)}...</p>
+                    <p>${escapeHTML(s.description || '').substring(0, 100)}...</p>
                     <div class="item-card-actions">
                         <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('stories', ${i})">
                             <i class="fas fa-edit"></i> Edit
@@ -3200,22 +3239,30 @@
         // ========== GLOBAL BUSINESS SETTINGS ==========
         
         function loadSettingsToForm() {
-            if (typeof CONTACT_DATA === 'undefined') return;
-            
-            document.getElementById('contact-address').value = CONTACT_DATA.address || '';
-            document.getElementById('contact-phone').value = CONTACT_DATA.phone || '';
-            document.getElementById('contact-email').value = CONTACT_DATA.email || '';
-            
-            if (CONTACT_DATA.social) {
-                document.getElementById('social-linkedin').value = CONTACT_DATA.social.linkedin || '';
-                document.getElementById('social-youtube').value = CONTACT_DATA.social.youtube || '';
-                document.getElementById('social-instagram').value = CONTACT_DATA.social.instagram || '';
+            // Load Contact Data
+            if (typeof CONTACT_DATA !== 'undefined') {
+                document.getElementById('setting-address').value = CONTACT_DATA.address || '';
+                document.getElementById('contact-phone').value = CONTACT_DATA.phone || '';
+                document.getElementById('contact-email').value = CONTACT_DATA.email || '';
+                
+                if (CONTACT_DATA.social) {
+                    document.getElementById('social-linkedin').value = CONTACT_DATA.social.linkedin || '';
+                    document.getElementById('social-youtube').value = CONTACT_DATA.social.youtube || '';
+                    document.getElementById('social-instagram').value = CONTACT_DATA.social.instagram || '';
+                }
+            }
+
+            // Load Form Settings
+            if (typeof SETTINGS_DATA !== 'undefined') {
+                document.getElementById('form-contact-email').value = SETTINGS_DATA.contactEmail || '';
+                document.getElementById('form-careers-email').value = SETTINGS_DATA.careersEmail || '';
             }
         }
         
         async function saveGlobalSettings() {
-            const newSettings = {
-                address: document.getElementById('contact-address').value.trim(),
+            // 1. Save Contact Data
+            const newContactSettings = {
+                address: document.getElementById('setting-address').value.trim(),
                 phone: document.getElementById('contact-phone').value.trim(),
                 email: document.getElementById('contact-email').value.trim(),
                 social: {
@@ -3224,18 +3271,34 @@
                     instagram: document.getElementById('social-instagram').value.trim()
                 }
             };
+
+            // 2. Save Form Settings
+            const newFormSettings = {
+                contactEmail: document.getElementById('form-contact-email').value.trim(),
+                careersEmail: document.getElementById('form-careers-email').value.trim()
+            };
             
-            // Validate
-            if (!newSettings.address || !newSettings.phone || !newSettings.email) {
-                showToast('Address, Phone, and Email are required', 'error');
+            // Validate Contact Data
+            if (!newContactSettings.address || !newContactSettings.phone || !newContactSettings.email) {
+                showToast('Address, Phone, and Public Email are required in Contact Info', 'error');
+                return;
+            }
+
+            // Validate Form Settings
+             if (!newFormSettings.contactEmail || !newFormSettings.careersEmail) {
+                showToast('Both Form Destination Emails are required.', 'error');
                 return;
             }
             
-            // Update global variable
-            window.CONTACT_DATA = newSettings;
+            // Update global variables
+            window.CONTACT_DATA = newContactSettings;
+            window.SETTINGS_DATA = newFormSettings;
             
             // Mark as pending
-            markAsPending('settings');
+            markAsPending('settings');      // contact-data.js
+            markAsPending('form_settings'); // settings-data.js
+            
+            showToast('Settings saved! Remember to Publish All to apply changes.', 'success');
         }
         
         // Close preview on overlay click
@@ -3454,6 +3517,79 @@
                 });
             });
         }
+    </script>
+    <script src="assets/js/settings-data.js"></script>
+    <script>
+        // ... existing scripts ...
+
+        // --- Settings Logic ---
+        function renderSettings() {
+            if (typeof window.SETTINGS_DATA !== 'undefined') {
+                document.getElementById('setting-contact-email').value = window.SETTINGS_DATA.contactEmail || '';
+                document.getElementById('setting-careers-email').value = window.SETTINGS_DATA.careersEmail || '';
+            }
+        }
+
+        async function saveSettings() {
+            const contactEmail = document.getElementById('setting-contact-email').value.trim();
+            const careersEmail = document.getElementById('setting-careers-email').value.trim();
+
+            if (!contactEmail || !careersEmail) {
+                showToast('Please enter valid email addresses for both fields.', 'error');
+                return;
+            }
+
+            // Update local object
+            if (typeof window.SETTINGS_DATA === 'undefined') window.SETTINGS_DATA = {};
+            window.SETTINGS_DATA.contactEmail = contactEmail;
+            window.SETTINGS_DATA.careersEmail = careersEmail;
+
+            // Generate file content
+            const fileContent = `/**
+ * Global Settings Data
+ * MANAGED BY ADMIN PANEL - DO NOT EDIT MANUALLY
+ */
+window.SETTINGS_DATA = {
+    contactEmail: "${contactEmail}",
+    careersEmail: "${careersEmail}"
+};`;
+
+            try {
+                // In a real backend, this would be an API call. 
+                // Since this is a local file-based admin, we simulate the save 
+                // by offering to download or (if using the Node server) writing it.
+                // For this environment, we will simulate a success.
+                
+                // If using the local-server.js approach for file writing:
+                 await fetch('/api/save-file', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filePath: 'assets/js/settings-data.js',
+                        content: fileContent
+                    })
+                });
+
+                showToast('Settings saved successfully!', 'success');
+            } catch (error) {
+                console.error('Save failed:', error);
+                showToast('Error saving settings. Check console.', 'error');
+            }
+        }
+
+        // Add renderSettings to the main render loop if exists
+        const originalRenderAll = window.renderAllSections || function(){};
+        window.renderAllSections = function() {
+            originalRenderAll();
+            renderSettings();
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+             // ... existing init ...
+             if(window.location.hash === '#settings') showSection('settings');
+        });
+
     </script>
 </body>
 </html>

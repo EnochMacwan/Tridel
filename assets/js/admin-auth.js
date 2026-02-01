@@ -5,15 +5,17 @@
  */
 
 const AdminAuth = {
-    // Default password (change this!)
-    HASH: 'tridel2024', // In a real app, use a hash, not plain text
-    SESSION_KEY: 'tridel_admin_session',
+    // SHA-256 Hash of 'tridel2024'
+    HASH: 'd4fed39cb0abbea34b7ea3a23498c8eba704ad7b69b4d6dd4e7d395fff5073d0', 
+    SESSION_KEY: 'tridel_secure_session_v1',
 
     init() {
-        if (this.isAuthenticated()) {
-            this.showContent();
-        } else {
+        // Simple session check
+        const session = sessionStorage.getItem(this.SESSION_KEY);
+        if (!session || !session.startsWith('auth_')) {
             this.renderLoginModal();
+        } else {
+            this.showContent();
         }
     },
 
@@ -21,12 +23,26 @@ const AdminAuth = {
         return sessionStorage.getItem(this.SESSION_KEY) === 'true';
     },
 
-    login(password) {
-        if (password === this.HASH) {
-            sessionStorage.setItem(this.SESSION_KEY, 'true');
-            this.removeModal();
-            this.showContent();
-            return true;
+    async sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    },
+
+    async login(password) {
+        try {
+            const hash = await this.sha256(password);
+            if (hash === this.HASH) {
+                // Store a "token" (timestamp) instead of just true
+                sessionStorage.setItem(this.SESSION_KEY, 'auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+                this.removeModal();
+                this.showContent();
+                return true;
+            }
+        } catch (e) {
+            console.error("Auth Error:", e);
         }
         return false;
     },
@@ -65,14 +81,25 @@ const AdminAuth = {
         document.body.appendChild(modal);
     },
 
-    handleSubmit(e) {
+    async handleSubmit(e) {
         e.preventDefault();
         const input = document.getElementById('admin-pass');
         const error = document.getElementById('auth-error');
+        const btn = e.target.querySelector('button');
         
-        if (this.login(input.value)) {
+        // Show loading state
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
+        btn.disabled = true;
+
+        const success = await this.login(input.value);
+        
+        if (success) {
             // Success handled in login()
         } else {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+            
             error.classList.add('visible');
             input.value = '';
             input.focus();
@@ -96,7 +123,10 @@ const AdminAuth = {
     showContent() {
         document.body.style.overflow = '';
         const mainContainer = document.querySelector('.admin-container');
-        if(mainContainer) mainContainer.style.filter = 'none';
+        if(mainContainer) {
+            mainContainer.style.filter = 'none';
+            mainContainer.style.display = 'flex'; // Restore layout
+        }
         
         // Add Logout Button to Header if not exists
         this.addLogoutButton();
