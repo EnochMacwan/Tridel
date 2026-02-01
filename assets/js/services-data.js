@@ -65,18 +65,6 @@ const SERVICES_DATA = [
         ]
       },
       {
-        "id": "uxo-survey",
-        "name": "UXO Survey",
-        "description": "Unexploded Ordnance (UXO) detection and risk assessment. Utilizing magnetometer and gradiometer arrays, we locate ferromagnetic threats on the seabed to clear safe corridors for development.",
-        "image": "assets/images/services/electronic-maps.png",
-        "features": [
-          "Magnetometer & Gradiometer Surveys",
-          "Target Identification & classification",
-          "Risk Assessment & Mitigation",
-          "Safe Corridor Clearance"
-        ]
-      },
-      {
         "id": "vibro-coring",
         "name": "Vibro Coring",
         "description": "Sediment sampling using vibrocoring technology. Ideal for unconsolidated sediments, obtaining continuous samples for pre-dredging assessments and environmental characterization.",
@@ -87,6 +75,9 @@ const SERVICES_DATA = [
           "Pollution Assessment",
           "Rapid Deployment System"
         ]
+      },
+      {
+        "id": "uxo-survey"
       }
     ]
   },
@@ -182,7 +173,7 @@ const SERVICES_DATA = [
     "name": "UXO Survey",
     "category": "Environmental Surveying",
     "subcategory": "Geoscience Studies",
-    "description": "Unexploded Ordnance (UXO) detection and risk assessment. Utilizing magnetometer and gradiometer arrays, we locate ferromagnetic threats on the seabed to clear safe corridors for development.",
+    "description": "Unexploded Ordnance (UXO) detection and risk assessment. Utilizing magnetometer and gradiometer arrays, we locate ferromagnetic threats on the seabed to clear safe corridors for development",
     "image": "assets/images/services/electronic-maps.png",
     "features": [
       "Magnetometer & Gradiometer Surveys",
@@ -191,7 +182,12 @@ const SERVICES_DATA = [
       "Safe Corridor Clearance"
     ],
     "link": "service-detail.html?id=uxo-survey",
-    "isNested": true
+    "isNested": true,
+    "title": "UXO Survey",
+    "parent": "geoengineering",
+    "gallery": [
+      "assets/images/services/electronic-maps.png"
+    ]
   },
   {
     "id": "vibro-coring",
