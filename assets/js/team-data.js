@@ -48,12 +48,6 @@ const TEAM_DATA = [
     "bio": "Leads strategic initiatives, driving development and execution of key projects. Retired DG at Directorate General of Lighthouses and Lightships/Ex-Councillor IALA"
   },
   {
-    "name": "Jojo Scaria George",
-    "role": "Vice President- Marine Construction",
-    "image": "",
-    "bio": "Manage marine construction projects including ports, harbours, and offshore platforms. Ensuring compliance with marine regulations and safety standards."
-  },
-  {
     "name": "Shiyas P R",
     "role": "Senior Manager-Operations",
     "image": "assets/images/team/shiyas-pr.jpg",
