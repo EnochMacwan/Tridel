@@ -824,83 +824,180 @@ h6 {
 /* ---------------------------------- */
 .news-card {
     background: var(--color-surface-base);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 4px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     height: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    border: none;
+    border-left: 3px solid #0077b5;
 }
 
 .news-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    border-bottom-color: #FF7F00;
-    /* Tridel Orange */
-    border-top-color: rgba(0, 0, 0, 0.05);
-    /* Keep top/sides subtle */
-    border-left-color: rgba(0, 0, 0, 0.05);
-    border-right-color: rgba(0, 0, 0, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
-.news-card iframe {
-    width: 100%;
-    height: 500px;
-    /* Match iframe height */
-    border: none;
-    display: block;
-    background: #fff;
-    /* Ensure white bg while loading */
-}
-
-/* Dark Mode Adjustment */
+/* Dark Mode */
 [data-theme="dark"] .news-card {
-    background: #18191a;
-    border-color: rgba(255, 255, 255, 0.08);
-    border-bottom-color: #444;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background: #1b1f23;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    border-left-color: #0a97e8;
 }
 
 [data-theme="dark"] .news-card:hover {
-    border-bottom-color: #FF7F00;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-.news-card__footer {
-    padding: 16px;
-    background: #fff;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+/* --- Card Header (LinkedIn-style author bar) --- */
+.news-card__header {
     display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 0;
+}
+
+.news-card__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0077b5, #00a0dc);
+    display: flex;
+    align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+.news-card__avatar svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+}
+
+.news-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.news-card__author {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1.3;
+}
+
+.news-card__date {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    line-height: 1.3;
+}
+
+[data-theme="dark"] .news-card__author {
+    color: #e8eaed;
+}
+
+[data-theme="dark"] .news-card__date {
+    color: #9aa0a6;
+}
+
+/* --- Card Body --- */
+.news-card__body {
+    padding: 14px 20px 16px;
+    flex: 1;
+}
+
+.news-card__text {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+[data-theme="dark"] .news-card__text {
+    color: #d2d4d7;
+}
+
+/* --- Card Image (optional) --- */
+.news-card__image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.news-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-card__image img {
+    transform: scale(1.03);
+}
+
+/* --- Card Footer --- */
+.news-card__footer {
+    padding: 14px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: flex-start;
+    margin-top: auto;
 }
 
 [data-theme="dark"] .news-card__footer {
-    background: #18191a;
-    border-top-color: rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 .news-card__button {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    background: transparent;
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
+    gap: 6px;
+    padding: 8px 18px;
+    background: #0077b5;
+    border: none;
+    color: white;
     border-radius: 99px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     transition: all 0.2s ease;
     text-decoration: none;
+    letter-spacing: 0.01em;
 }
 
 .news-card__button:hover {
-    background: var(--color-accent);
+    background: #006097;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 170, 231, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 119, 181, 0.35);
     transform: translateY(-1px);
+}
+
+[data-theme="dark"] .news-card__button {
+    background: #0a97e8;
+}
+
+[data-theme="dark"] .news-card__button:hover {
+    background: #0077b5;
+    box-shadow: 0 4px 14px rgba(10, 151, 232, 0.3);
+}
+
+.news-card__li-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.news-card__ext-icon {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    opacity: 0.7;
 }
 
 .news-card__button svg {
@@ -4655,4 +4752,537 @@ html.lenis {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* ============================================ */
+/* BUG FIX: #2 — prefers-reduced-motion        */
+/* ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .client-logo-track {
+        animation: none !important;
+    }
+
+    .card__image-track {
+        animation: none !important;
+    }
+
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    .reveal.active {
+        opacity: 1;
+        transform: none;
+    }
+
+    .pin-dot {
+        animation: none !important;
+    }
+
+    .map-testimonial-display {
+        transition: none !important;
+    }
+}
+
+/* ============================================ */
+/* BUG FIX: #3 — :focus-visible styles          */
+/* ============================================ */
+.button--primary:focus-visible,
+.button--secondary:focus-visible,
+.button--large:focus-visible,
+.button--soft:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-accent-glow);
+}
+
+.header__nav-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    opacity: 1;
+}
+
+.header__menu-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.news-card__button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.bottom-nav-item:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    color: white;
+}
+
+.map-nav-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.lightbox-close:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+}
+
+.gallery-thumbs img:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    opacity: 1;
+}
+
+.glass-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    background: rgba(0, 50, 255, 0.05);
+    color: var(--color-accent);
+}
+
+.slider-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.footer__link:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+    color: white;
+}
+
+.footer__social-link:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.back-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.theme-toggle-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+#back-to-top:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.location-info:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-left-color: var(--color-accent);
+}
+
+.contact-location-group:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.gallery-main:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* ============================================ */
+/* BUG FIX: #6 — Print styles                  */
+/* ============================================ */
+@media print {
+    .header,
+    .footer,
+    .bottom-glass-nav,
+    #back-to-top,
+    .hero__bg,
+    #hero-canvas,
+    .lightbox-modal,
+    .mega-menu,
+    .mega-menu-container,
+    .header__menu-toggle {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    * {
+        background: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a, a:visited {
+        color: #333 !important;
+        text-decoration: underline;
+    }
+
+    .section {
+        padding: 20px 0 !important;
+    }
+
+    .container, .container--wide {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: black !important;
+        page-break-after: avoid;
+    }
+
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .client-logo-track {
+        animation: none !important;
+        flex-wrap: wrap;
+    }
+}
+
+/* ============================================ */
+/* BUG FIX: #9 — Hover-only → add focus-within */
+/* ============================================ */
+.header__nav-link:focus-within::after,
+.header__nav-link:focus-visible::after {
+    width: 100%;
+}
+
+.client-logos:focus-within .client-logo-track {
+    animation-play-state: paused;
+}
+
+.gallery-thumbs img:focus-visible {
+    opacity: 1;
+    border-color: var(--color-accent);
+}
+
+.pin-wrapper:focus-within .pin-text {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.news-card:focus-within {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.glass-spotlight:focus-within img {
+    transform: scale(1.02);
+}
+
+/* ============================================ */
+/* BUG FIX: #10 — Contrast fixes               */
+/* ============================================ */
+.header__nav-link {
+    opacity: 1;
+}
+
+@media (max-width: 1024px) {
+    .bottom-nav-item {
+        color: rgba(255, 255, 255, 0.85);
+    }
+}
+
+.footer__link {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* ============================================ */
+/* BUG FIX: #11 — Touch target minimum 44x44   */
+/* ============================================ */
+.slider-btn {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.pin-dot {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    background-clip: content-box;
+    padding: 14px;
+    margin: -14px;
+}
+
+.map-nav-btn {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* ============================================ */
+/* BUG FIX: #12 — Z-index system               */
+/* ============================================ */
+:root {
+    --z-back-to-top: 900;
+    --z-header: 1000;
+    --z-mega-menu: 1100;
+    --z-mobile-backdrop: 1500;
+    --z-lightbox: 2000;
+    --z-bottom-nav: 2500;
+    --z-mobile-menu: 2400;
+}
+
+#back-to-top {
+    z-index: var(--z-back-to-top);
+}
+
+@media (max-width: 1024px) {
+    .bottom-glass-nav {
+        z-index: var(--z-bottom-nav);
+    }
+
+    .header__nav.mobile-hud-menu {
+        z-index: var(--z-mobile-menu);
+    }
+}
+
+/* ============================================ */
+/* BUG FIX: #13 — Bottom nav content clearance  */
+/* ============================================ */
+@media (max-width: 1024px) {
+    body {
+        padding-bottom: 100px;
+    }
+
+    #back-to-top {
+        bottom: 110px;
+    }
+}
+
+/* ============================================ */
+/* BUG FIX: #17 — Dark mode hardcoded colors    */
+/* ============================================ */
+[data-theme="dark"] .map-header-content h3 {
+    color: #e8eaed;
+}
+
+[data-theme="dark"] .map-header-content p {
+    color: #9aa0a6;
+}
+
+[data-theme="dark"] .map-card-quote {
+    color: #e8eaed;
+}
+
+[data-theme="dark"] .map-card-role {
+    color: #9aa0a6;
+}
+
+[data-theme="dark"] .map-nav-btn {
+    background: #1e1e1e;
+    color: #e8eaed;
+    border-color: #444;
+}
+
+[data-theme="dark"] .map-nav-btn:hover {
+    background: #00AAE7;
+    color: white;
+    border-color: #00AAE7;
+}
+
+[data-theme="dark"] #map-sidebar {
+    background: rgba(18, 18, 18, 0.98);
+    color: #e8eaed;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] #map-container-section {
+    background: #121212;
+    color: #e8eaed;
+}
+
+[data-theme="dark"] .map-progress-bar {
+    background: #333;
+}
+
+[data-theme="dark"] .map-header-content {
+    border-bottom-color: #333;
+}
+
+/* ============================================ */
+/* BUG FIX: #23 — Disabled button styles        */
+/* ============================================ */
+.button--primary:disabled,
+.button--primary[disabled] {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.button--secondary:disabled,
+.button--secondary[disabled] {
+    background: rgba(0, 0, 0, 0.05);
+    color: #999;
+    cursor: not-allowed;
+}
+
+.button--large:disabled,
+.button--large[disabled] {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================ */
+/* BUG FIX: #24 — Active press state on buttons */
+/* ============================================ */
+.button--primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.2);
+}
+
+.button--secondary:active {
+    background: rgba(0, 113, 227, 0.2);
+}
+
+.button--large:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px var(--color-accent-glow);
+}
+
+.news-card__button:active {
+    transform: translateY(0);
+    background: #005a8c;
+    color: white;
+}
+
+/* ============================================ */
+/* BUG FIX: #27 — Text overflow handling        */
+/* ============================================ */
+.team-member__name,
+.footer__link,
+.news-card__button,
+.card__title,
+.story-card__title,
+.category-card__title,
+.product-content-outside h4,
+.grid-content-outside h3,
+.grid-content-outside h4 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-card-quote {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+
+/* ============================================ */
+/* BUG FIX: #41 — Decorative quote opacity      */
+/* ============================================ */
+.map-card-quote::before {
+    opacity: 0.5;
+}
+
+/* ============================================ */
+/* BUG FIX: #39 — CSS class for inline styles  */
+/* ============================================ */
+.product-grid-wrapper {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ============================================ */
+/* BUG FIX: #20 — noscript fallback styling    */
+/* ============================================ */
+.noscript-message {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    margin: 40px auto;
+    max-width: 600px;
+}
+
+.noscript-message i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--color-accent);
+}
+
+/* ============================================ */
+/* BUG FIX: #33 — Footer logo uniform style    */
+/* ============================================ */
+.footer-logo-style {
+    height: 32px;
+    filter: brightness(0) invert(1);
+}
+
+/* ============================================ */
+/* BUG FIX: #36 — Additional responsive breaks */
+/* ============================================ */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1200px;
+    }
+
+    .container--wide {
+        max-width: 1320px;
+    }
+}
+
+@media (max-width: 375px) {
+    .hero__title,
+    .page-header__title {
+        font-size: 1.75rem;
+    }
+
+    .hero__subtitle,
+    .page-header__subtitle {
+        font-size: 0.95rem;
+    }
+
+    .section__title {
+        font-size: 1.5rem;
+    }
+
+    .bottom-glass-nav {
+        width: 98%;
+        gap: 2px;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.6rem;
+    }
+
+    .button--primary,
+    .button--large {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
 }

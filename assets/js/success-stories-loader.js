@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Support both variable names
     const data = typeof SUCCESS_STORIES_DATA !== 'undefined' ? SUCCESS_STORIES_DATA : (typeof successStoriesData !== 'undefined' ? successStoriesData : null);
-    if (!container || !data) return;
+    if (!data) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
+    if (!container) return;
 
     container.innerHTML = '';
 
@@ -23,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let html = `
             <div class="container">
-                <h2 class="product-category__title">${categoryName}</h2>
+                <h2 class="product-category__title">${escapeHtml(categoryName)}</h2>
                 <div class="product-list-grid">
         `;
 
@@ -31,15 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="grid-card-wrapper">
                     <div class="grid-card-visual">
-                        <img loading="lazy" alt="${story.title}" class="story-card__image"
+                        <img loading="lazy" alt="${escapeHtml(story.title)}" class="story-card__image"
                             src="${story.image}">
                     </div>
                     <div class="grid-content-outside">
                         <h3 class="story-card__title">
-                            ${story.title}
+                            ${escapeHtml(story.title)}
                         </h3>
                         <p>
-                            ${story.description}
+                            ${escapeHtml(story.description)}
                         </p>
                     </div>
                 </div>

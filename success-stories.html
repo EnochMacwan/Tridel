@@ -26,6 +26,11 @@
 </head>
 
 <body class="page-success-stories">
+    <noscript>
+        <div class="noscript-message">
+            <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to continue.</p>
+        </div>
+    </noscript>
     <header class="header">
 <div class="container header__container">
     <a class="header__logo" href="index.html">
@@ -121,6 +126,7 @@
         </a>
     </nav>
 </div>
+<script defer src="assets/js/utils.js"></script>
 <script defer src="assets/js/products-data.js"></script>
 <script defer src="assets/js/products-loader.js"></script>
 <script defer src="assets/js/services-data.js"></script>
@@ -145,7 +151,7 @@
         <div id="dynamic-success-stories">
             <!-- Dynamic Content Loaded by success-stories-loader.js -->
              <div style="text-align: center; padding: 100px; color: var(--color-text-muted);">
-                <i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading Success Stories...
+                <span role="status" aria-live="polite"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading Success Stories...
             </div>
         </div>
         
@@ -215,17 +221,22 @@
                 </h3>
                 <a aria-label="LinkedIn" class="footer__social-link"
                     href="https://www.linkedin.com/company/tridel-technologies/">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-                <a aria-label="Twitter" class="footer__social-link" href="#">
-                    <i class="fab fa-twitter"></i>
+                    <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
+                        </path>
+                        <rect height="12" width="4" x="2" y="9">
+                        </rect>
+                        <circle cx="4" cy="4" r="2">
+                        </circle>
+                    </svg>
                 </a>
             </div>
         </div>
         <div class="footer__bottom">
             <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <p>
-                    © 2025 Tridel Technologies. All Rights Reserved.
+                    © 2026 Tridel Technologies. All Rights Reserved.
                 </p>
                 <a href="admin.html" style="color: #888; font-size: 12px; text-decoration: none;">
                     <i class="fas fa-cog"></i> Admin

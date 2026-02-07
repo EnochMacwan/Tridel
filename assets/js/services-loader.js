@@ -23,7 +23,10 @@ function getIconForCategory(category) {
 function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     // Support both variable names
     const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
-    if (!data) return;
+    if (!data) {
+        if (containerElement) containerElement.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
 
     // 1. First try to find the specific wrapper by ID (preferred)
     // 2. If not found, fallback to the main .mm-services container class
@@ -55,7 +58,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     col1.className = 'glass-col';
     col1.innerHTML = `<h4>${getIconForCategory('Environmental Monitoring')} Environmental Monitoring</h4>`;
     columns['Environmental Monitoring'].forEach(s => {
-        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
+        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(s.name)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(s.name)}</a>`;
     });
     container.appendChild(col1);
 
@@ -64,7 +67,7 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     col2.className = 'glass-col';
     col2.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Environmental Surveying</h4>`;
     columns['Environmental Surveying'].forEach(s => {
-        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${s.name}" data-desc="${s.description}" data-img="${s.image}">${s.name}</a>`;
+        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(s.name)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(s.name)}</a>`;
     });
     container.appendChild(col2);
 
@@ -74,21 +77,19 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
         spotlight.className = 'glass-spotlight';
         spotlight.innerHTML = `
             <div class="spotlight-content">
-                <span class="spotlight-tag">${featuredService.tag}</span>
-                <h3 class="spotlight-title">${featuredService.title}</h3>
-                <p class="spotlight-desc">${featuredService.description}</p>
+                <span class="spotlight-tag">${escapeHtml(featuredService.tag)}</span>
+                <h3 class="spotlight-title">${escapeHtml(featuredService.title)}</h3>
+                <p class="spotlight-desc">${escapeHtml(featuredService.description)}</p>
                 <a href="${featuredService.link}" class="spotlight-btn">
-                    ${featuredService.buttonText} <i class="fas fa-arrow-right"></i>
+                    ${escapeHtml(featuredService.buttonText)} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             <div class="spotlight-image">
-                <img src="${featuredService.image}" alt="${featuredService.title}">
+                <img src="${featuredService.image}" alt="${escapeHtml(featuredService.title)}">
             </div>
         `;
         container.appendChild(spotlight);
     }
-
-    console.log("Services Menu Loaded (Dynamic)");
 
     // Attach Hover Effects
     attachServicesHoverEffects(container);
@@ -139,8 +140,11 @@ function attachServicesHoverEffects(container) {
 function renderServicesPage(container) {
     // Support both variable names
     const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
-    if (!data) return;
-    
+    if (!data) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
+
     container.innerHTML = '';
 
     const sections = [
@@ -181,13 +185,13 @@ function renderServicesPage(container) {
         // Render main services (without subcategory)
         mainItems.forEach(item => {
             sectionContent += `
-                <a href="${item.link}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;">
+                <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
                     <div class="product-card-visual">
-                        <img loading="lazy" alt="${item.name}" class="product-item__image product-image-style" src="${item.image}">
+                        <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image product-image-style" src="${item.image}">
                     </div>
                     <div class="product-content-outside">
-                        <h4>${item.name}</h4>
-                        <p class="product-item__excerpt">${item.description}</p>
+                        <h4>${escapeHtml(item.name)}</h4>
+                        <p class="product-item__excerpt">${escapeHtml(item.description)}</p>
                         <span class="button button--secondary">View Details</span>
                     </div>
                 </a>
@@ -212,7 +216,7 @@ function renderServicesPage(container) {
 
             subItems.forEach(item => {
                 sectionContent += `
-                    <a href="${item.link}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;">
+                    <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
                         <div class="product-card-visual">
                             <img loading="lazy" alt="${item.name}" class="product-item__image product-image-style" src="${item.image}">
                         </div>
@@ -246,13 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const mmContainer = document.getElementById('services-dynamic-content');
     if (mmContainer) {
         renderServicesMegaMenu(mmContainer);
-        console.log('Initializing Services Mega Menu...');
     }
 
     // 2. Initialize Services Page Grid
     const pageContainer = document.getElementById('dynamic-services-container');
     if (pageContainer) {
         renderServicesPage(pageContainer);
-        console.log('Initializing Services Page Grid...');
     }
 });

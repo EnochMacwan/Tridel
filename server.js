@@ -16,7 +16,8 @@ const PORT = 3000;
 // ============================================
 // SECURITY CONFIGURATION - CHANGE THIS PASSWORD!
 // ============================================
-const ADMIN_PASSWORD = 'tridel2026';  // Change this to your secure password!
+// NOTE: In production, set the TRIDEL_ADMIN_PASSWORD environment variable
+const ADMIN_PASSWORD = process.env.TRIDEL_ADMIN_PASSWORD || 'tridel2026';
 const sessions = new Map();  // In-memory session store
 
 // Generate session token
@@ -25,14 +26,18 @@ function generateToken() {
 }
 
 // Auth middleware - protects API routes
-// Auth middleware - protects API routes
 function requireAuth(req, res, next) {
-    // Auth disabled by user request
-    next();
+    const token = req.headers['x-auth-token'];
+    if (token && sessions.has(token) && sessions.get(token) > Date.now()) {
+        next();
+    } else {
+        if (token) sessions.delete(token);
+        res.status(401).json({ error: 'Authentication required' });
+    }
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: `http://localhost:${PORT}` }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('.'));  // Serve static files from current directory
 
@@ -64,9 +69,10 @@ app.post('/api/logout', (req, res) => {
 // Check if authenticated
 app.get('/api/check-auth', (req, res) => {
     const token = req.headers['x-auth-token'];
-    if (token && sessions.has(token)) {
+    if (token && sessions.has(token) && sessions.get(token) > Date.now()) {
         res.json({ authenticated: true });
     } else {
+        if (token) sessions.delete(token);
         res.json({ authenticated: false });
     }
 });
@@ -88,7 +94,12 @@ const DATA_FILES = {
     clients: 'assets/js/clients-data.js',
     stories: 'assets/js/success-stories-data.js',
     home: 'assets/js/home-data.js',
-    news: 'assets/js/news-data.js'
+    news: 'assets/js/news-data.js',
+    team: 'assets/js/team-data.js',
+    testimonials: 'assets/js/testimonials-data.js',
+    locations: 'assets/js/locations-data.js',
+    contact: 'assets/js/contact-data.js',
+    settings: 'assets/js/settings-data.js'
 };
 
 const VAR_NAMES = {
@@ -97,7 +108,12 @@ const VAR_NAMES = {
     clients: 'CLIENTS_DATA',
     stories: 'SUCCESS_STORIES_DATA',
     home: 'HOME_CARDS_DATA',
-    news: 'NEWS_DATA'
+    news: 'NEWS_DATA',
+    team: 'TEAM_DATA',
+    testimonials: 'TESTIMONIALS_DATA',
+    locations: 'LOCATIONS_DATA',
+    contact: 'CONTACT_DATA',
+    settings: 'SETTINGS_DATA'
 };
 
 // ============================================
@@ -115,8 +131,8 @@ app.get('/api/data/:type', requireAuth, (req, res) => {
     
     try {
         const content = fs.readFileSync(filePath, 'utf8');
-        // Extract JSON from JS const declaration
-        const match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+        // Extract JSON from JS const declaration (arrays or objects)
+        const match = content.match(/const\s+\w+\s*=\s*([\[{][\s\S]*[\]}]);?/);
         if (match) {
             const data = JSON.parse(match[1]);
             res.json(data);
@@ -143,8 +159,9 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
         const data = req.body;
         const content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
         fs.writeFileSync(filePath, content, 'utf8');
-        console.log(`✅ Saved ${type} (${data.length} items)`);
-        res.json({ success: true, message: `${type} saved successfully`, count: data.length });
+        const count = Array.isArray(data) ? data.length : 1;
+        console.log(`✅ Saved ${type} (${count} items)`);
+        res.json({ success: true, message: `${type} saved successfully`, count });
     } catch (err) {
         console.error(`Error saving ${type}:`, err.message);
         res.status(500).json({ error: err.message });

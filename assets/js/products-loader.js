@@ -29,7 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderMegaMenu(container) {
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
-    if (!data) return;
+    if (!data) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
 
     container.innerHTML = ''; // Clear existing
 
@@ -62,7 +65,7 @@ function renderMegaMenu(container) {
             link.dataset.desc = item.description;
             link.dataset.img = item.image;
             
-            let html = item.name;
+            let html = escapeHtml(item.name);
             if (item.isNew) {
                 html += ` <span class="badge-new">New</span>`;
             }
@@ -79,13 +82,13 @@ function renderMegaMenu(container) {
         spotlight.className = 'glass-spotlight';
         spotlight.innerHTML = `
             <div class="spotlight-content">
-                <span class="spotlight-tag">${featuredProduct.tag}</span>
-                <h3>${featuredProduct.title}</h3>
-                <p>${featuredProduct.description}</p>
-                <a href="${featuredProduct.link}" class="spotlight-btn">${featuredProduct.buttonText} <i class="fas fa-arrow-right"></i></a>
+                <span class="spotlight-tag">${escapeHtml(featuredProduct.tag)}</span>
+                <h3>${escapeHtml(featuredProduct.title)}</h3>
+                <p>${escapeHtml(featuredProduct.description)}</p>
+                <a href="${featuredProduct.link}" class="spotlight-btn">${escapeHtml(featuredProduct.buttonText)} <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="spotlight-image">
-                <img src="${featuredProduct.image}" alt="${featuredProduct.title}">
+                <img src="${featuredProduct.image}" alt="${escapeHtml(featuredProduct.title)}">
             </div>
         `;
         container.appendChild(spotlight);
@@ -100,8 +103,11 @@ function renderMegaMenu(container) {
 function renderProductsPage(container) {
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
-    if (!data) return;
-    
+    if (!data) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
+
     container.innerHTML = '';
 
     // Define Sections corresponding to the page layout
@@ -162,13 +168,13 @@ function renderProductsPage(container) {
 
             items.forEach(item => {
                 sectionContent += `
-                    <a href="${item.link}" class="product-grid-wrapper" style="text-decoration: none; color: inherit;">
+                    <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
                         <div class="product-card-visual">
-                            <img loading="lazy" alt="${item.name}" class="product-item__image" src="${item.image}">
+                            <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image" src="${item.image}">
                         </div>
                         <div class="product-content-outside">
-                            <h4>${item.name}</h4>
-                            <p class="product-item__excerpt">${item.description}</p>
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p class="product-item__excerpt">${escapeHtml(item.description)}</p>
                             <span class="button button--secondary">View Details</span>
                         </div>
                     </a>

@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderHomeCards(container) {
     // Support both variable names
     const data = typeof HOME_CARDS_DATA !== 'undefined' ? HOME_CARDS_DATA : (typeof homeCardsData !== 'undefined' ? homeCardsData : null);
-    if (!data) return;
+    if (!data) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
 
     container.innerHTML = '';
     
@@ -24,17 +27,17 @@ function renderHomeCards(container) {
         
         cardLink.innerHTML = `
             <div class="grid-card-visual">
-              <img loading="lazy" alt="${card.title}" src="${card.image}">
+              <img loading="lazy" alt="${escapeHtml(card.title)}" src="${card.image}">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">
-                ${card.title}
+                ${escapeHtml(card.title)}
               </h3>
               <p class="card__excerpt">
-                ${card.excerpt}
+                ${escapeHtml(card.excerpt)}
               </p>
               <span class="card__link">
-                ${card.linkText}
+                ${escapeHtml(card.linkText)}
               </span>
             </div>
         `;

@@ -120,6 +120,7 @@
         </a>
     </nav>
 </div>
+<script defer src="assets/js/utils.js"></script>
 <script defer src="assets/js/products-data.js"></script>
 <script defer src="assets/js/products-loader.js"></script>
 <script defer src="assets/js/services-data.js"></script>
@@ -157,7 +158,7 @@
                         <label class="form-label" for="name">
                             Full Name
                         </label>
-                        <input class="form-control" id="name" name="name" required type="text">
+                        <input class="form-control" id="name" name="name" required aria-required="true" placeholder="Enter your full name" type="text">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="dob">
@@ -213,8 +214,9 @@
                         <label class="form-label" for="resume">
                             Upload Resume
                         </label>
-                        <input accept=".pdf,.doc,.docx" class="form-control" id="resume" name="attachment" required
+                        <input accept=".pdf,.doc,.docx" class="form-control" id="resume" name="attachment" required aria-required="true"
                             type="file">
+                        <small style="color: var(--color-text-muted); font-size: 0.85rem; margin-top: 4px; display: block;">Accepted formats: PDF, DOC, DOCX. Max size: 5MB.</small>
                     </div>
                     <div style="text-align: center;">
                         <button class="button button--large" type="submit">
@@ -229,8 +231,7 @@
         <div class="container footer__container">
             <div class="footer__brand">
                 <a class="footer__logo" href="index.html">
-                    <img alt="Tridel Logo" src="assets/images/logo/tridel1.png"
-                        style="height: 32px; filter: brightness(0) invert(1);">
+                    <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" class="footer-logo-style">
                 </a>
                 <p class="footer__tagline">
                     Connecting Environmental Science, Engineering, and Technology
@@ -298,20 +299,13 @@
                         </circle>
                     </svg>
                 </a>
-                <a aria-label="Twitter" class="footer__social-link" href="#">
-                    <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-                        </path>
-                    </svg>
-                </a>
+                
             </div>
         </div>
         <div class="footer__bottom">
             <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <p>
-                    © 2025 Tridel Technologies. All Rights Reserved.
+                    © 2026 Tridel Technologies. All Rights Reserved.
                 </p>
                 <a href="admin.html" style="color: #888; font-size: 12px; text-decoration: none;">
                     <i class="fas fa-cog"></i> Admin

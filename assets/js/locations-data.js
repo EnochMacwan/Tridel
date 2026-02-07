@@ -1,4 +1,4 @@
-window.LOCATIONS_DATA = [
+const LOCATIONS_DATA = [
     {
         id: "uae",
         country: "UAE",

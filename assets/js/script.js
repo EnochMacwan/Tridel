@@ -30,49 +30,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Desktop Mega Menu Hover Control (JavaScript-based) ---
+    // --- Desktop Mega Menu Hover + Keyboard Control ---
     // Only run on desktop
     if (window.innerWidth > 1024) {
         const megaMenuLinks = document.querySelectorAll('.header__nav-list > li');
-        
+
+        function closeAllMegaMenus() {
+            megaMenuLinks.forEach(li => {
+                const mm = li.querySelector('.mega-menu');
+                const lk = li.querySelector('.header__nav-link');
+                if (mm) {
+                    mm.classList.remove('is-visible');
+                    if (lk) lk.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
         megaMenuLinks.forEach(li => {
             const megaMenu = li.querySelector('.mega-menu');
             if (!megaMenu) return;
-            
+
             const link = li.querySelector('.header__nav-link');
             let hideTimeout = null;
             let showTimeout = null;
-            
+
+            // Set initial aria-expanded
+            link.setAttribute('aria-expanded', 'false');
+
+            function showMenu() {
+                megaMenu.classList.add('is-visible');
+                link.setAttribute('aria-expanded', 'true');
+            }
+
+            function hideMenu() {
+                megaMenu.classList.remove('is-visible');
+                link.setAttribute('aria-expanded', 'false');
+            }
+
             // Show menu only when hovering the nav link
             link.addEventListener('mouseenter', () => {
                 clearTimeout(hideTimeout);
                 clearTimeout(showTimeout);
-                // Small delay to prevent accidental triggers
-                showTimeout = setTimeout(() => {
-                    megaMenu.classList.add('is-visible');
-                }, 50);
+                showTimeout = setTimeout(showMenu, 50);
             });
-            
+
             // Keep menu open when hovering the menu itself
             megaMenu.addEventListener('mouseenter', () => {
                 clearTimeout(hideTimeout);
                 clearTimeout(showTimeout);
             });
-            
-            // Hide menu when leaving the link (with delay to allow moving to menu)
+
+            // Hide menu when leaving the link
             link.addEventListener('mouseleave', () => {
                 clearTimeout(showTimeout);
-                hideTimeout = setTimeout(() => {
-                    megaMenu.classList.remove('is-visible');
-                }, 150); // Small delay to allow mouse to reach menu
+                hideTimeout = setTimeout(hideMenu, 150);
             });
-            
+
             // Hide menu when leaving the menu
             megaMenu.addEventListener('mouseleave', () => {
                 clearTimeout(showTimeout);
-                hideTimeout = setTimeout(() => {
-                    megaMenu.classList.remove('is-visible');
-                }, 100);
+                hideTimeout = setTimeout(hideMenu, 100);
+            });
+
+            // Keyboard: Enter/Space/ArrowDown opens menu, Escape closes
+            link.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    closeAllMegaMenus();
+                    showMenu();
+                    // Focus first link inside mega menu
+                    const firstLink = megaMenu.querySelector('a, button');
+                    if (firstLink) firstLink.focus();
+                }
+            });
+
+            // Escape key inside mega menu closes it and returns focus
+            megaMenu.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    hideMenu();
+                    link.focus();
+                }
             });
         });
     }
@@ -85,12 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevButton = sliderContainer.querySelector('.slider-btn--prev');
         const nextButton = sliderContainer.querySelector('.slider-btn--next');
 
+        // Add aria-live for screen readers
+        slider.setAttribute('aria-live', 'polite');
+
         if (slides.length > 0) {
             let currentSlide = 0;
             let slideInterval;
+            let isPlaying = true;
 
             function showSlide(index) {
                 slider.style.transform = `translateX(-${index * 100}%)`;
+                // Update aria-current on slides
+                slides.forEach((slide, i) => {
+                    slide.setAttribute('aria-current', i === index ? 'true' : 'false');
+                });
             }
 
             function nextSlide() {
@@ -104,14 +150,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function startSlider() {
-                // Autoplay every 5 seconds
                 slideInterval = setInterval(nextSlide, 5000);
+                isPlaying = true;
+                if (pauseBtn) pauseBtn.setAttribute('aria-label', 'Pause slideshow');
+                if (pauseBtn) pauseBtn.textContent = '⏸';
+            }
+
+            function stopSlider() {
+                clearInterval(slideInterval);
+                isPlaying = false;
+                if (pauseBtn) pauseBtn.setAttribute('aria-label', 'Play slideshow');
+                if (pauseBtn) pauseBtn.textContent = '▶';
             }
 
             function resetSlider() {
                 clearInterval(slideInterval);
                 startSlider();
             }
+
+            // Create pause/play button
+            const pauseBtn = document.createElement('button');
+            pauseBtn.className = 'slider-btn slider-btn--pause';
+            pauseBtn.setAttribute('aria-label', 'Pause slideshow');
+            pauseBtn.textContent = '⏸';
+            pauseBtn.addEventListener('click', () => {
+                if (isPlaying) stopSlider();
+                else startSlider();
+            });
+            sliderContainer.appendChild(pauseBtn);
 
             if (nextButton && prevButton) {
                 nextButton.addEventListener('click', () => {
@@ -136,7 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Map JS ---
     // This logic runs only if a div with id="map" is on the page
-    if (document.getElementById('map') && typeof L !== 'undefined') {
+    // Skip if locations-loader.js will handle the map (has LOCATIONS_DATA)
+    if (document.getElementById('map') && typeof L !== 'undefined' && typeof window.LOCATIONS_DATA === 'undefined') {
         const LOCATIONS = [
             {
                 id: 'uae',
@@ -211,155 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 /* ---------------------------------- */
-/* 13. Accessible Modal Logic       */
+/* 14. Accessible Modal & Carousel    */
 /* ---------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-
-    const modal = document.getElementById('product-modal');
-    if (!modal) return; // Do nothing if the modal isn't on the page
-
-    const modalTitleEl = document.getElementById('product-modal-title');
-    const modalContentEl = document.getElementById('product-modal-content');
-    const openButtons = document.querySelectorAll('[data-modal-trigger]');
-    const closeButtons = modal.querySelectorAll('[data-modal-close]');
-    let lastFocusedElement;
-
-    // --- Focus Tabbing ---
-    // Get all focusable elements inside the modal
-    const focusableEls = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstFocusableEl = focusableEls[0];
-    const lastFocusableEl = focusableEls[focusableEls.length - 1];
-
-    function openModal(triggerButton) {
-        lastFocusedElement = triggerButton; // Save the element that opened the modal
-        const contentId = triggerButton.getAttribute('data-modal-trigger');
-        const contentSource = document.getElementById(`modal-content-${contentId}`);
-        const titleSource = document.getElementById(`modal-title-${contentId}`);
-
-        if (contentSource) {
-            // Inject content
-            modalContentEl.innerHTML = contentSource.innerHTML;
-
-            // Inject title (if it exists, otherwise use default)
-            if (titleSource) {
-                modalTitleEl.textContent = titleSource.textContent;
-            } else {
-                modalTitleEl.textContent = 'Product Details';
-            }
-
-            // Show modal
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-
-            // Set focus inside the modal
-            firstFocusableEl.focus();
-
-            // Add event listeners
-            // Product Modal Functionality (Only on Products Page)
-            const modal = document.getElementById('product-modal');
-            if (modal) {
-                const modalTitle = document.getElementById('modal-title');
-                const modalDesc = document.getElementById('modal-description');
-                const modalSpecs = document.getElementById('modal-specs');
-                const closeModal = document.querySelector('.close-modal');
-
-                document.querySelectorAll('.view-details-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const card = btn.closest('.product-card');
-                        const title = card.querySelector('h3').textContent;
-                        const desc = card.querySelector('p').textContent;
-                        // In a real app, specs would come from a data attribute or API
-                        const specs = "<strong>Specifications:</strong><br>High-grade sensors<br>Real-time telemetry<br>Solar powered option available.";
-
-                        modalTitle.textContent = title;
-                        modalDesc.textContent = desc;
-                        modalSpecs.innerHTML = specs;
-
-                        modal.style.display = 'block';
-                        document.body.style.overflow = 'hidden';
-                    });
-                });
-
-                closeModal.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                });
-
-                window.addEventListener('click', (e) => {
-                    if (e.target == modal) {
-                        modal.style.display = 'none';
-                        document.body.style.overflow = 'auto';
-                    }
-                });
-            } modal.addEventListener('keydown', trapFocus);
-            modal.addEventListener('keydown', closeOnEscape);
-            closeButtons.forEach(btn => btn.addEventListener('click', closeModal));
-            modal.querySelector('.modal__backdrop').addEventListener('click', closeModal);
-
-        } else {
-            console.error('Modal content source not found:', `modal-content-${contentId}`);
-        }
-    }
-
-    function closeModal() {
-        // Hide modal
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = ''; // Restore background scrolling
-
-        // Clear content
-        modalContentEl.innerHTML = '';
-        modalTitleEl.textContent = 'Product Details';
-
-        // Remove event listeners
-        modal.removeEventListener('keydown', trapFocus);
-        modal.removeEventListener('keydown', closeOnEscape);
-        closeButtons.forEach(btn => btn.removeEventListener('click', closeModal));
-        modal.querySelector('.modal__backdrop').removeEventListener('click', closeModal);
-
-        // Restore focus to the element that opened the modal
-        if (lastFocusedElement) {
-            lastFocusedElement.focus();
-        }
-    }
-
-    function closeOnEscape(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    }
-
-    function trapFocus(e) {
-        if (e.key !== 'Tab') return;
-
-        // If Shift + Tab are pressed
-        if (e.shiftKey) {
-            if (document.activeElement === firstFocusableEl) {
-                lastFocusableEl.focus(); // Go to last
-                e.preventDefault();
-            }
-        } else {
-            // If Tab is pressed
-            if (document.activeElement === lastFocusableEl) {
-                firstFocusableEl.focus(); // Go to first
-                e.preventDefault();
-            }
-        }
-    }
-
-    // Add click listener to all "View Details" buttons
-    openButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            openModal(e.currentTarget);
-        });
-    });
-});
-/* ---------------------------------- */
-/* 14. Accessible Modal & Carousel (DEBUG VERSION) */
-/* ---------------------------------- */
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("1. Script started. Looking for modal...");
-
     const modal = document.getElementById('product-modal');
 
     if (!modal) {
@@ -367,19 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    console.log("2. Modal found! Looking for buttons...");
-
     const modalTitleEl = document.getElementById('product-modal-title');
     const modalContentEl = document.getElementById('product-modal-content');
     const openButtons = document.querySelectorAll('[data-modal-trigger]');
     const closeButtons = modal.querySelectorAll('[data-modal-close]');
     let lastFocusedElement;
-
-    console.log(`3. Found ${openButtons.length} 'View Details' buttons.`);
-
-    if (openButtons.length === 0) {
-        console.warn("⚠️ No buttons found. Check that your buttons have 'data-modal-trigger' attributes.");
-    }
 
     // --- Focus Tabbing ---
     const focusableEls = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -387,18 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastFocusableEl = focusableEls[focusableEls.length - 1];
 
     function openModal(triggerButton) {
-        console.log("4. Button clicked! Opening modal...");
         lastFocusedElement = triggerButton;
         const contentId = triggerButton.getAttribute('data-modal-trigger');
         const contentSource = document.getElementById(`modal-content-${contentId}`);
 
         if (!contentSource) {
-            console.error(`❌ ERROR: Could not find hidden details for id: modal-content-${contentId}`);
-            console.error("Check that your hidden <div> has the correct ID.");
             return;
         }
-
-        console.log("5. Content found. Building carousel...");
 
         // --- 1. Find and Build Image Carousel ---
         const imageSourceDiv = contentSource.querySelector('.product-item__modal-images');
@@ -457,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeModal() {
-        console.log("Closing modal...");
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
         modalContentEl.innerHTML = '';
@@ -621,7 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Track last focused element for focus restoration
+let _lightboxTrigger = null;
+
 window.openLightbox = function (el) {
+    _lightboxTrigger = el;
     const src = el.querySelector('img') ? el.querySelector('img').src : el.src;
 
     // Create Modal if not exists
@@ -630,9 +541,12 @@ window.openLightbox = function (el) {
         modal = document.createElement('div');
         modal.id = 'lightbox-modal';
         modal.className = 'lightbox-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Image viewer');
         modal.innerHTML = `
-            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-            <img class="lightbox-content" id="lightbox-img" src="">
+            <button class="lightbox-close" aria-label="Close image viewer" onclick="closeLightbox()">&times;</button>
+            <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged product image">
         `;
         document.body.appendChild(modal);
 
@@ -650,12 +564,21 @@ window.openLightbox = function (el) {
     document.getElementById('lightbox-img').src = src;
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
+
+    // Focus the close button for keyboard users
+    const closeBtn = modal.querySelector('.lightbox-close');
+    if (closeBtn) closeBtn.focus();
 };
 
 window.closeLightbox = function () {
     const modal = document.getElementById('lightbox-modal');
     if (modal) {
         modal.classList.remove('is-open');
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
+    }
+    // Restore focus to the element that triggered the lightbox
+    if (_lightboxTrigger) {
+        _lightboxTrigger.focus();
+        _lightboxTrigger = null;
     }
 };

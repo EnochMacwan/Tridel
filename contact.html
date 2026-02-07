@@ -29,6 +29,11 @@
 </head>
 
 <body class="page-contact">
+    <noscript>
+        <div class="noscript-message">
+            <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to continue.</p>
+        </div>
+    </noscript>
   <header class="header">
 <div class="container header__container">
     <a class="header__logo" href="index.html">
@@ -124,6 +129,7 @@
         </a>
     </nav>
 </div>
+<script defer src="assets/js/utils.js"></script>
 <script defer src="assets/js/products-data.js"></script>
 <script defer src="assets/js/products-loader.js"></script>
 <script defer src="assets/js/services-data.js"></script>
@@ -157,13 +163,13 @@
                 <label class="form-label" for="contact-name">
                   Full Name
                 </label>
-                <input class="form-control" id="contact-name" name="name" required type="text">
+                <input class="form-control" id="contact-name" name="name" required aria-required="true" placeholder="Enter your full name" type="text">
               </div>
               <div class="form-group">
                 <label class="form-label" for="contact-email">
                   Email Address
                 </label>
-                <input class="form-control" id="contact-email" name="email" required type="email">
+                <input class="form-control" id="contact-email" name="email" required aria-required="true" placeholder="your@email.com" type="email">
               </div>
               <div class="form-group">
                 <label class="form-label" for="interest">
@@ -190,7 +196,21 @@
                   </option>
                 </select>
               </div>
-              <!-- Dynamic Data Loading -->
+              <div class="form-group">
+                <label class="form-label" for="message">
+                  Message
+                </label>
+                <textarea class="form-control" id="message" name="message" required aria-required="true" placeholder="How can we help you?" rows="5"></textarea>
+              </div>
+              <button class="button button--large" type="submit">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Dynamic Data Loading (moved outside form for valid HTML) -->
     <script src="assets/js/testimonials-data.js"></script>
     <script src="assets/js/locations-data.js"></script>
     <script src="assets/js/locations-loader.js"></script>
@@ -211,21 +231,7 @@
             }
         });
     </script>
-              <div class="form-group">
-                <label class="form-label" for="message">
-                  Message
-                </label>
-                <textarea class="form-control" id="message" name="message" required rows="5"></textarea>
-              </div>
-              <button class="button button--large" type="submit">
-                Send Message
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- MAP SECTION -->
+
     <!-- MAP SECTION -->
     <section class="section section--light-bg" id="map-section">
       <div class="container">
@@ -235,7 +241,7 @@
           </h2>
         </div>
         <div class="map-layout">
-          <div class="map-canvas" id="map">
+          <div class="map-canvas" id="map" role="region" aria-label="Interactive map showing Tridel office locations">
           </div>
             <div class="contact-details">
                 <!-- Locations will be dynamically loaded here by locations-loader.js -->
@@ -254,8 +260,7 @@
     <div class="container footer__container">
       <div class="footer__brand">
         <a class="footer__logo" href="index.html">
-          <img alt="Tridel Logo" src="assets/images/logo/tridel1.png"
-            style="height: 32px; filter: brightness(0) invert(1);">
+          <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" class="footer-logo-style">
         </a>
         <p class="footer__tagline">
           Connecting Environmental Science, Engineering, and Technology
@@ -323,20 +328,13 @@
             </circle>
           </svg>
         </a>
-        <a aria-label="Twitter" class="footer__social-link" href="#">
-          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-            </path>
-          </svg>
-        </a>
+        
       </div>
     </div>
     <div class="footer__bottom">
       <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <p>
-          © 2025 Tridel Technologies. All Rights Reserved.
+          © 2026 Tridel Technologies. All Rights Reserved.
         </p>
         <a href="admin.html" style="color: #888; font-size: 12px; text-decoration: none;">
           <i class="fas fa-cog"></i> Admin

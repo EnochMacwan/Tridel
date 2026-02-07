@@ -5,8 +5,8 @@
  */
 
 const AdminAuth = {
-    // SHA-256 Hash of 'tridel2024'
-    HASH: 'd4fed39cb0abbea34b7ea3a23498c8eba704ad7b69b4d6dd4e7d395fff5073d0', 
+    // SHA-256 Hash of 'tridel2026'
+    HASH: 'd4de1e781e29cf9ea1e9fbe380017478bfb37554d53a9094a836e22e2b605c7c',
     SESSION_KEY: 'tridel_secure_session_v1',
 
     init() {
@@ -20,7 +20,8 @@ const AdminAuth = {
     },
 
     isAuthenticated() {
-        return sessionStorage.getItem(this.SESSION_KEY) === 'true';
+        const session = sessionStorage.getItem(this.SESSION_KEY);
+        return session && session.startsWith('auth_');
     },
 
     async sha256(message) {

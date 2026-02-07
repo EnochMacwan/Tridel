@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Support both variable names
     const data = typeof CLIENTS_DATA !== 'undefined' ? CLIENTS_DATA : (typeof clientsData !== 'undefined' ? clientsData : null);
-    if (!track || !data) return;
+    if (!data) {
+        if (track) track.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
+    if (!track) return;
 
     // Clear existing static content
     track.innerHTML = '';
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const createLogo = (client) => {
         const div = document.createElement('div');
         div.className = 'client-logo';
-        div.innerHTML = `<img loading="lazy" alt="${client.name}" src="${client.logo}">`;
+        div.innerHTML = `<img loading="lazy" alt="${escapeHtml(client.name)}" src="${client.logo}">`;
         return div;
     };
 

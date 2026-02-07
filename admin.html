@@ -814,7 +814,25 @@
         </button>
     </div>
 
-    <!-- Login Overlay Removed -->
+    <!-- Login Overlay -->
+    <div id="login-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:10000; justify-content:center; align-items:center;">
+        <div style="background:var(--bg-card); border-radius:16px; padding:40px; max-width:400px; width:90%; border:1px solid var(--border);">
+            <div style="text-align:center; margin-bottom:24px;">
+                <img src="assets/images/logo/tridel.png" alt="Tridel" style="width:60px; margin-bottom:12px;">
+                <h2 style="color:var(--text); font-size:1.4rem;">Admin Login</h2>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Enter your password to continue</p>
+            </div>
+            <div id="login-error" style="display:none; background:var(--danger); color:white; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:0.85rem;">
+                Invalid password. Please try again.
+            </div>
+            <input type="password" id="login-password" placeholder="Password"
+                style="width:100%; padding:12px 16px; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:1rem; margin-bottom:16px; outline:none;"
+                onkeydown="if(event.key==='Enter') attemptLogin()">
+            <button onclick="attemptLogin()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">
+                Login
+            </button>
+        </div>
+    </div>
     
     <noscript>
         <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f0f0f; color:white; display:flex; justify-content:center; align-items:center; z-index:10000; text-align:center;">
@@ -894,6 +912,15 @@
                     </button>
                     <button class="btn btn-primary" onclick="showSection('stories'); openAddModal('stories')">
                         <i class="fas fa-plus"></i> Add Story
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('team'); openAddModal('team')">
+                        <i class="fas fa-plus"></i> Add Team Member
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('testimonials'); openAddModal('testimonials')">
+                        <i class="fas fa-plus"></i> Add Testimonial
+                    </button>
+                    <button class="btn btn-primary" onclick="showSection('locations'); openAddModal('locations')">
+                        <i class="fas fa-plus"></i> Add Location
                     </button>
                 </div>
             </section>
@@ -1055,7 +1082,7 @@
                         </button>
                     </div>
                 </div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Manage LinkedIn post URNs that appear in your website's news feed.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Manage LinkedIn posts that appear in your website's news feed. Each post includes text, date, image, and a link to LinkedIn.</p>
                 <div class="items-grid" id="linkedin-grid">
                     <!-- Populated by JS -->
                 </div>
@@ -1230,10 +1257,9 @@
     <script src="assets/js/news-data.js"></script>
     <script src="assets/js/clients-data.js"></script>
     <script src="assets/js/success-stories-data.js"></script>
-    <script src="assets/js/success-stories-data.js"></script>
     <script src="assets/js/settings-data.js"></script>
     <script src="assets/js/home-data.js"></script>
-    <script src="assets/js/linkedin-data.js"></script>
+    <!-- linkedin-data.js removed: NEWS_DATA in news-data.js is the single source of truth -->
 
     
     <!-- Map variable names for compatibility -->
@@ -1242,11 +1268,11 @@
         // This is necessary because 'const' declarations in scripts don't automatically attach to window
         // try { if (typeof productsData !== 'undefined') window.PRODUCTS_DATA = productsData; } catch(e){} // REMOVED: Redundant, products-data.js sets window.PRODUCTS_DATA directly
         try { if (typeof servicesData !== 'undefined') window.SERVICES_DATA = servicesData; } catch(e){}
-        try { if (typeof clientsData !== 'undefined') window.CLIENTS_DATA = clientsData; } catch(e){}
+        try { if (typeof CLIENTS_DATA !== 'undefined') window.CLIENTS_DATA = CLIENTS_DATA; } catch(e){}
         try { if (typeof teamData !== 'undefined') window.TEAM_DATA = teamData; } catch(e){}
         try { if (typeof successStoriesData !== 'undefined') window.SUCCESS_STORIES_DATA = successStoriesData; } catch(e){}
         try { if (typeof homeCardsData !== 'undefined') window.HOME_CARDS_DATA = homeCardsData; } catch(e){}
-        try { if (typeof locationsData !== 'undefined') window.LOCATIONS_DATA = locationsData; } catch(e){}
+        try { if (typeof LOCATIONS_DATA !== 'undefined') window.LOCATIONS_DATA = LOCATIONS_DATA; } catch(e){}
         
         console.log('DEBUG: PRODUCTS_DATA status:', {
             defined: typeof window.PRODUCTS_DATA !== 'undefined',
@@ -1255,8 +1281,11 @@
             value: window.PRODUCTS_DATA
         });
         
-        // Fix LinkedIn Mapping
-        if (typeof linkedInPosts !== 'undefined') window.LINKEDIN_POSTS = linkedInPosts;
+        // Fix News Data Mapping
+        if (typeof NEWS_DATA !== 'undefined') window.NEWS_DATA = NEWS_DATA;
+        // Backward compat for legacy variable names
+        if (typeof linkedInPosts !== 'undefined' && typeof window.NEWS_DATA === 'undefined') window.NEWS_DATA = linkedInPosts;
+        if (typeof LINKEDIN_POSTS !== 'undefined' && typeof window.NEWS_DATA === 'undefined') window.NEWS_DATA = LINKEDIN_POSTS;
         
         // Helper: Get Data Array by Type (Crucial for generic functions)
         function getDataArray(type) {
@@ -1267,7 +1296,7 @@
                 case 'clients': data = window.CLIENTS_DATA; break;
                 case 'stories': data = window.SUCCESS_STORIES_DATA; break;
                 case 'home': data = window.HOME_CARDS_DATA; break;
-                case 'linkedin': data = window.LINKEDIN_POSTS || window.linkedInPosts; break;
+                case 'linkedin': data = window.NEWS_DATA; break;
                 case 'team': data = window.TEAM_DATA; break;
                 case 'testimonials': data = window.TESTIMONIALS_DATA; break;
                 case 'locations': data = window.LOCATIONS_DATA; break;
@@ -1277,7 +1306,7 @@
             // Strict array check to prevent "undefined" length errors
             return Array.isArray(data) ? data : [];
         }
-        try { if (typeof linkedInPosts !== 'undefined') window.LINKEDIN_POSTS = linkedInPosts; } catch(e){}
+        try { if (typeof NEWS_DATA !== 'undefined' && typeof window.NEWS_DATA === 'undefined') window.NEWS_DATA = NEWS_DATA; } catch(e){}
         try { if (typeof teamData !== 'undefined') window.TEAM_DATA = teamData; } catch(e){}
         // TEAM_DATA might already be uppercase in file, but we ensure consistency
         try { if (typeof TEAM_DATA !== 'undefined' && typeof window.TEAM_DATA === 'undefined') window.TEAM_DATA = TEAM_DATA; } catch(e){}
@@ -1328,7 +1357,7 @@
             'CLIENTS_DATA': 'clientsData',
             'SUCCESS_STORIES_DATA': 'successStoriesData',
             'HOME_CARDS_DATA': 'homeCardsData',
-            'LINKEDIN_POSTS': 'linkedInPosts',
+            'NEWS_DATA': 'NEWS_DATA',
             'TESTIMONIALS_DATA': 'testimonialsData'
         };
 
@@ -1341,7 +1370,6 @@
 
     </script>
     
-    <script src="assets/js/contact-data.js"></script>
     <script>
         // Auth State
         let authToken = sessionStorage.getItem('adminToken') || null;
@@ -1372,7 +1400,7 @@
             'clients': 'CLIENTS_DATA',
             'stories': 'SUCCESS_STORIES_DATA',
             'home': 'HOME_CARDS_DATA',
-            'news': 'LINKEDIN_POSTS',
+            'news': 'NEWS_DATA',
             'team': 'TEAM_DATA',
             'testimonials': 'TESTIMONIALS_DATA',
             'testimonials': 'TESTIMONIALS_DATA',
@@ -1748,7 +1776,7 @@
             
             // Force update title for visual confirmation
             const header = document.querySelector('#dashboard .section-header h2');
-            if(header) header.textContent = 'Dashboard (Debug v2)';
+            if(header) header.textContent = 'Dashboard';
 
             const stats = [
                 { icon: 'fa-cube', value: products ? products.length : 0, label: 'Products' },
@@ -1781,7 +1809,6 @@
             renderLocations();
             renderHomeCards();
             renderLinkedIn();
-            renderHealthCheck();
         }
 
         // Initialize Selection State
@@ -2015,7 +2042,7 @@
                             </div>
                         </div>
                     </div>
-                    <p>${escapeHTML(item.description || '').substring(0, 100)}...</p>
+                    <p>${escapeHTML(item.description || item.quote || item.text || (item.items ? item.items.join(', ') : '') || '').substring(0, 100)}${(item.description || item.quote || item.text || (item.items ? item.items.join(', ') : '')) ? '...' : ''}</p>
                     <div class="item-card-actions">
                         <button class="btn btn-secondary btn-icon" onclick="editItem('${type}', ${index})">
                             <i class="fas fa-edit"></i> Edit
@@ -2109,22 +2136,25 @@
 
             if (!grid) return;
 
-            grid.innerHTML = locations.map((item, index) => `
-                <div class="card">
-                    <div class="card-header">
-                        <h4>${item.name}</h4>
-                        <div class="card-actions">
-                            <button type="button" class="btn-icon" onclick="editItem('locations', ${index})"><i class="fas fa-edit"></i></button>
-                            <button type="button" class="btn-icon delete" onclick="deleteItem('locations', ${index})"><i class="fas fa-trash"></i></button>
+            grid.innerHTML = '<div class="items-grid">' + locations.map((item, index) => `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div>
+                            <h3>${escapeHTML(item.name)}</h3>
+                            <span class="category">${escapeHTML(item.country)} · ${escapeHTML(item.type)}</span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <p><strong>Country:</strong> ${item.country}</p>
-                        <p><strong>Type:</strong> ${item.type}</p>
-                        <p><strong>Address:</strong><br> ${item.address}</p>
+                    <p><strong>Address:</strong><br>${item.address}</p>
+                    <div class="item-card-actions">
+                        <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('locations', ${index})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('locations', ${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
-            `).join('');
+            `).join('') + '</div>';
         }
 
         // Home Cards
@@ -2139,7 +2169,7 @@
                                 <h3>${h.title}</h3>
                             </div>
                         </div>
-                        <p>${(h.description || '').substring(0, 100)}...</p>
+                        <p>${escapeHTML(h.description || (h.items ? h.items.join(', ') : '') || '').substring(0, 100)}${(h.description || h.items) ? '...' : ''}</p>
                         <div class="item-card-actions">
                             <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('home', ${i})">
                                 <i class="fas fa-edit"></i> Edit
@@ -2158,24 +2188,35 @@
             const data = getDataArray('linkedin');
             const grid = document.getElementById('linkedin-grid');
             if(grid) {
-                grid.innerHTML = data.map((urn, i) => `
+                grid.innerHTML = data.map((post, i) => {
+                    // Backward compat: handle legacy string items
+                    const item = typeof post === 'string'
+                        ? { urn: post, text: '', date: '', image: '', url: '' }
+                        : post;
+                    const displayText = item.text
+                        ? (item.text.length > 80 ? escapeHTML(item.text.substring(0, 77)) + '...' : escapeHTML(item.text))
+                        : '<em style="opacity:0.5;">(No text)</em>';
+                    return `
                     <div class="item-card">
                         <div class="item-card-header">
                             <div>
                                 <h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ${i + 1}</h3>
+                                ${item.date ? `<small style="color:var(--text-muted);">${escapeHTML(item.date)}</small>` : ''}
                             </div>
                         </div>
-                        <p class="text-xs font-mono break-all">${urn}</p>
+                        <p style="margin-bottom:6px;">${displayText}</p>
+                        <p class="text-xs font-mono break-all" style="opacity:0.5;">${escapeHTML(item.urn || '')}</p>
+                        ${item.image ? `<img src="${escapeHTML(item.image)}" style="max-width:100%;max-height:80px;border-radius:4px;margin-top:8px;" alt="Post image">` : ''}
                         <div class="item-card-actions">
                             <button type="button" class="btn btn-secondary btn-icon" onclick="editItem('linkedin', ${i})">
                                 <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('linkedin', ${i})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-icon" onclick="deleteItem('linkedin', ${i})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `}).join('');
             }
         }
         
@@ -2568,14 +2609,31 @@
                         ${getSingleImageFieldHTML('Card Image <span style="color:red">*</span>', 'field-image', data.image)}
                     `;
                 case 'linkedin':
+                    // data is now an object (or empty object for new posts)
+                    const liData = typeof data === 'string' ? { urn: data } : (data || {});
                     return `
                         <div class="form-group">
                             <label>LinkedIn Post URN <span style="color:red">*</span></label>
-                            <input type="text" class="form-control" id="field-urn" value="${data || ''}" placeholder="urn:li:ugcPost:1234567890">
+                            <input type="text" class="form-control" id="field-urn" value="${liData.urn || ''}" placeholder="urn:li:ugcPost:1234567890">
                             <small style="color: var(--text-muted); display: block; margin-top: 8px;">
                                 <i class="fas fa-info-circle"></i> You can find the URN in the LinkedIn post URL or embed code.
                             </small>
                         </div>
+                        <div class="form-group">
+                            <label>Post Text <span style="color:red">*</span></label>
+                            <textarea class="form-control" id="field-text" rows="3" placeholder="Summary of the LinkedIn post...">${liData.text || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="text" class="form-control" id="field-date" value="${liData.date || ''}" placeholder="e.g. 2025-05-15 or 2 days ago">
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" class="form-control" id="field-image-url" value="${liData.image || ''}" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <input type="text" class="form-control" id="field-url" value="${liData.url || ''}" placeholder="Auto-generated from URN if left empty">
                         </div>
                     `;
                 case 'team':
@@ -2681,7 +2739,7 @@
 
         function saveItem() {
             // 1. Validation Step
-            if (currentEditType !== 'linkedin') { // LinkedIn validation is unique/simple
+            if (currentEditType !== 'linkedin') { // LinkedIn validation is handled separately
                 const validationErrors = validateForm(currentEditType);
                 if (validationErrors.length > 0) {
                     showToast(`Validation Error: ${validationErrors[0]}`, 'error');
@@ -2689,21 +2747,38 @@
                 }
             } else {
                  const urn = document.getElementById('field-urn').value.trim();
+                 const text = document.getElementById('field-text').value.trim();
                  if (!urn) {
                      showToast('Validation Error: LinkedIn URN is required', 'error');
+                     return;
+                 }
+                 if (!text) {
+                     showToast('Validation Error: Post text is required', 'error');
                      return;
                  }
             }
 
             const arr = getDataArray(currentEditType);
             
-            // Special handling for LinkedIn (simple string array)
+            // Special handling for LinkedIn (rich post objects)
             if (currentEditType === 'linkedin') {
                 const urn = document.getElementById('field-urn').value.trim();
+                const text = document.getElementById('field-text').value.trim();
+                const date = document.getElementById('field-date').value.trim();
+                const image = document.getElementById('field-image-url').value.trim();
+                let url = document.getElementById('field-url').value.trim();
+
+                // Auto-generate LinkedIn URL from URN if not provided
+                if (!url && urn) {
+                    url = `https://www.linkedin.com/feed/update/${urn}`;
+                }
+
+                const postObj = { urn, text, date, image, url };
+
                 if (currentEditIndex !== null) {
-                    arr[currentEditIndex] = urn;
+                    arr[currentEditIndex] = postObj;
                 } else {
-                    arr.push(urn);
+                    arr.push(postObj);
                 }
             } else {
                 // Normal object-based data
@@ -3202,7 +3277,7 @@
             if (results.brokenImages.length === 0 && results.missingFields.length === 0) {
                  container.innerHTML = `
                     <div class="toast success" style="position:static; transform:none; max-width:100%; text-align:center;">
-                        <i class="fas fa-check-circle"></i> Sytem Healthy! Scanned ${results.totalItems} items.
+                        <i class="fas fa-check-circle"></i> System Healthy! Scanned ${results.totalItems} items.
                     </div>
                  `;
                  return;
@@ -3212,10 +3287,10 @@
             
             if (results.brokenImages.length > 0) {
                 html += `
-                    <div class="alert alert-danger" style="background:#ffebee; border:1px solid #ffcdd2; padding:10px; border-radius:4px;">
-                        <h4 style="color:#c62828; margin-top:0;"><i class="fas fa-broken-image"></i> Broken Images (${results.brokenImages.length})</h4>
-                        <ul style="margin-bottom:0; padding-left:20px;">
-                            ${results.brokenImages.map(err => `<li><strong>${err.type}</strong>: ${err.name} (<span style="font-family:monospace">${err.path}</span>)</li>`).join('')}
+                    <div class="alert alert-danger" style="background:#2d1518; border:1px solid #5c2b2e; padding:15px; border-radius:8px; color:#f8d7da;">
+                        <h4 style="color:#ef4444; margin-top:0;"><i class="fas fa-broken-image"></i> Broken Images (${results.brokenImages.length})</h4>
+                        <ul style="margin-bottom:0; padding-left:20px; color:#fca5a5;">
+                            ${results.brokenImages.map(err => `<li><strong>${err.type}</strong>: ${err.name} (<span style="font-family:monospace; color:#fecaca;">${err.path}</span>)</li>`).join('')}
                         </ul>
                     </div>
                 `;
@@ -3223,8 +3298,8 @@
             
             if (results.missingFields.length > 0) {
                  html += `
-                    <div class="alert alert-warning" style="background:#fff3e0; border:1px solid #ffe0b2; padding:10px; border-radius:4px;">
-                        <h4 style="color:#ef6c00; margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Data Issues (${results.missingFields.length})</h4>
+                    <div class="alert alert-warning" style="background:#2d2518; border:1px solid #5c4b2e; padding:15px; border-radius:8px; color:#fef3c7;">
+                        <h4 style="color:#f59e0b; margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Data Issues (${results.missingFields.length})</h4>
                          <ul style="margin-bottom:0; padding-left:20px;">
                             ${results.missingFields.map(err => `<li>${err}</li>`).join('')}
                         </ul>
@@ -3242,13 +3317,13 @@
             // Load Contact Data
             if (typeof CONTACT_DATA !== 'undefined') {
                 document.getElementById('setting-address').value = CONTACT_DATA.address || '';
-                document.getElementById('contact-phone').value = CONTACT_DATA.phone || '';
-                document.getElementById('contact-email').value = CONTACT_DATA.email || '';
-                
+                document.getElementById('setting-phone').value = CONTACT_DATA.phone || '';
+                document.getElementById('setting-email').value = CONTACT_DATA.email || '';
+
                 if (CONTACT_DATA.social) {
-                    document.getElementById('social-linkedin').value = CONTACT_DATA.social.linkedin || '';
-                    document.getElementById('social-youtube').value = CONTACT_DATA.social.youtube || '';
-                    document.getElementById('social-instagram').value = CONTACT_DATA.social.instagram || '';
+                    document.getElementById('setting-linkedin').value = CONTACT_DATA.social.linkedin || '';
+                    document.getElementById('setting-youtube').value = CONTACT_DATA.social.youtube || '';
+                    document.getElementById('setting-instagram').value = CONTACT_DATA.social.instagram || '';
                 }
             }
 
@@ -3263,12 +3338,12 @@
             // 1. Save Contact Data
             const newContactSettings = {
                 address: document.getElementById('setting-address').value.trim(),
-                phone: document.getElementById('contact-phone').value.trim(),
-                email: document.getElementById('contact-email').value.trim(),
+                phone: document.getElementById('setting-phone').value.trim(),
+                email: document.getElementById('setting-email').value.trim(),
                 social: {
-                    linkedin: document.getElementById('social-linkedin').value.trim(),
-                    youtube: document.getElementById('social-youtube').value.trim(),
-                    instagram: document.getElementById('social-instagram').value.trim()
+                    linkedin: document.getElementById('setting-linkedin').value.trim(),
+                    youtube: document.getElementById('setting-youtube').value.trim(),
+                    instagram: document.getElementById('setting-instagram').value.trim()
                 }
             };
 
@@ -3517,79 +3592,6 @@
                 });
             });
         }
-    </script>
-    <script src="assets/js/settings-data.js"></script>
-    <script>
-        // ... existing scripts ...
-
-        // --- Settings Logic ---
-        function renderSettings() {
-            if (typeof window.SETTINGS_DATA !== 'undefined') {
-                document.getElementById('setting-contact-email').value = window.SETTINGS_DATA.contactEmail || '';
-                document.getElementById('setting-careers-email').value = window.SETTINGS_DATA.careersEmail || '';
-            }
-        }
-
-        async function saveSettings() {
-            const contactEmail = document.getElementById('setting-contact-email').value.trim();
-            const careersEmail = document.getElementById('setting-careers-email').value.trim();
-
-            if (!contactEmail || !careersEmail) {
-                showToast('Please enter valid email addresses for both fields.', 'error');
-                return;
-            }
-
-            // Update local object
-            if (typeof window.SETTINGS_DATA === 'undefined') window.SETTINGS_DATA = {};
-            window.SETTINGS_DATA.contactEmail = contactEmail;
-            window.SETTINGS_DATA.careersEmail = careersEmail;
-
-            // Generate file content
-            const fileContent = `/**
- * Global Settings Data
- * MANAGED BY ADMIN PANEL - DO NOT EDIT MANUALLY
- */
-window.SETTINGS_DATA = {
-    contactEmail: "${contactEmail}",
-    careersEmail: "${careersEmail}"
-};`;
-
-            try {
-                // In a real backend, this would be an API call. 
-                // Since this is a local file-based admin, we simulate the save 
-                // by offering to download or (if using the Node server) writing it.
-                // For this environment, we will simulate a success.
-                
-                // If using the local-server.js approach for file writing:
-                 await fetch('/api/save-file', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filePath: 'assets/js/settings-data.js',
-                        content: fileContent
-                    })
-                });
-
-                showToast('Settings saved successfully!', 'success');
-            } catch (error) {
-                console.error('Save failed:', error);
-                showToast('Error saving settings. Check console.', 'error');
-            }
-        }
-
-        // Add renderSettings to the main render loop if exists
-        const originalRenderAll = window.renderAllSections || function(){};
-        window.renderAllSections = function() {
-            originalRenderAll();
-            renderSettings();
-        };
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-             // ... existing init ...
-             if(window.location.hash === '#settings') showSection('settings');
-        });
-
     </script>
 </body>
 </html>

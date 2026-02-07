@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         featuresHtml = `
             <h3>Key Features</h3>
             <ul class="detail-layout__list">
-                ${product.features.map(f => `<li>${f}</li>`).join('')}
+                ${product.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
             </ul>
         `;
     }
@@ -38,14 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let galleryHtml = '';
     if (product.gallery && product.gallery.length > 0) {
         const mainImage = product.gallery[0];
-        const thumbsHtml = product.gallery.map(img => `
-            <img loading="lazy" src="${img}" onclick="changeImage('${img}')" ${img === mainImage ? 'class="active"' : ''} alt="${product.name}">
+        const thumbsHtml = product.gallery.map((img, index) => `
+            <img loading="lazy" src="${img}" onclick="changeImage('${img}')" onkeydown="if(event.key==='Enter')changeImage('${img}')" tabindex="0" role="button" ${img === mainImage ? 'class="active"' : ''} alt="${escapeHtml(product.name)} - Image ${index + 1}">
         `).join('');
 
         galleryHtml = `
             <div class="product-gallery">
-                <div class="gallery-main" onclick="openLightbox(this)">
-                    <img loading="lazy" id="main-product-image" src="${mainImage}" alt="${product.name}">
+                <div class="gallery-main" onclick="openLightbox(this)" onkeydown="if(event.key==='Enter')openLightbox(this)" tabindex="0" role="button">
+                    <img loading="lazy" id="main-product-image" src="${mainImage}" alt="${escapeHtml(product.name)}">
                     <div class="enlarge-hint">
                         <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg>
                         Click to Enlarge
@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     container.innerHTML = `
         <div class="detail-layout">
           <div class="detail-layout__content">
-            <h1 class="detail-layout__title">${product.name}</h1>
-            <p class="detail-layout__description">${product.longDescription || product.description}</p>
+            <h1 class="detail-layout__title">${escapeHtml(product.name)}</h1>
+            <p class="detail-layout__description">${escapeHtml(product.longDescription || product.description)}</p>
             ${featuresHtml}
             
             <div class="product-actions" style="margin-top: 2rem;">
@@ -88,13 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!sub) return '';
                         
                         return `
-                        <a href="product-detail.html?id=${sub.id}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;">
+                        <a href="product-detail.html?id=${sub.id}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;" aria-label="View details about ${escapeHtml(sub.name)}">
                             <div class="product-card-visual">
-                                <img loading="lazy" alt="${sub.name}" class="product-item__image product-image-style" src="${sub.image || product.image}">
+                                <img loading="lazy" alt="${escapeHtml(sub.name)}" class="product-item__image product-image-style" src="${sub.image || product.image}">
                             </div>
                             <div class="product-content-outside">
-                                <h4>${sub.name}</h4>
-                                <p class="product-item__excerpt">${(sub.description || '').substring(0, 100)}...</p>
+                                <h4>${escapeHtml(sub.name)}</h4>
+                                <p class="product-item__excerpt">${escapeHtml((sub.description || '').substring(0, 100))}...</p>
                                 <span class="button button--secondary">View Details</span>
                             </div>
                         </a>
@@ -105,24 +105,4 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 });
 
-// Helper for gallery
-window.changeImage = function(src) {
-    document.getElementById('main-product-image').src = src;
-    document.querySelectorAll('.gallery-thumbs img').forEach(img => {
-        img.classList.remove('active');
-        if(img.src.includes(src)) img.classList.add('active');
-    });
-}
-window.openLightbox = function(el) {
-    // Optional: Implement lightbox or just a simple alert for now if no lightbox lib
-    // The previous code had a lightbox? Let's assume it's global or handled elsewhere.
-    // We will just let the user zoom in if they have browser zoom.
-    // Or we could implement a simple modal here.
-    const img = el.querySelector('img');
-    // Implement simple full screen overlay
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;justify-content:center;align-items:center;cursor:zoom-out;';
-    overlay.innerHTML = `<img src="${img.src}" style="max-width:90%;max-height:90%;border-radius:8px;">`;
-    overlay.onclick = () => overlay.remove();
-    document.body.appendChild(overlay);
-}
+// changeImage and openLightbox are defined globally in script.js

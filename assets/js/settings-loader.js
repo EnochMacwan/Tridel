@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isContactPage && contactForm) {
         if (config.contactEmail) {
             contactForm.action = formSubmitBase + config.contactEmail;
-            console.log('Contact form configured for:', config.contactEmail);
         }
     }
 
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const careersForm = document.querySelector('form[action*="formsubmit.co"]');
         if (careersForm && config.careersEmail) {
             careersForm.action = formSubmitBase + config.careersEmail;
-            console.log('Careers form configured for:', config.careersEmail);
         }
     }
 });

@@ -8,12 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderGlobalPresence() {
-    const locations = typeof window.LOCATIONS_DATA !== 'undefined' ? window.LOCATIONS_DATA : [];
-    
+    const locations = typeof window.LOCATIONS_DATA !== 'undefined' ? window.LOCATIONS_DATA : null;
+
     // We need to render the list of offices in the sidebar/list container
     // Target container: .contact-details (or a specific ID if we add one)
     const container = document.querySelector('.contact-details');
-    
+
+    if (!locations || locations.length === 0) {
+        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        return;
+    }
     if (!container) return; // Exit if container not found
     
     // Keep the header
@@ -45,22 +49,22 @@ function renderGlobalPresence() {
              // UAE usually has a specific style in the original
              groupedLocations[country].forEach(loc => {
                  listHTML += `
-                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})">
-                      <h4>${loc.country}</h4>
-                      <p class="contact-location-address">${loc.address}</p>
+                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})" onkeydown="if(event.key==='Enter')focusMap(${loc.lat}, ${loc.lng})" tabindex="0" role="button">
+                      <h4>${escapeHtml(loc.country)}</h4>
+                      <p class="contact-location-address">${escapeHtml(loc.address)}</p>
                     </div>
                  `;
              });
         } else {
             // Header for other countries
-            listHTML += `<h4 class="contact-location-label" style="margin-top: 16px; color: var(--color-accent);">${country}</h4>`;
+            listHTML += `<h4 class="contact-location-label">${escapeHtml(country)}</h4>`;
             
             groupedLocations[country].forEach(loc => {
                 listHTML += `
-                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})" style="margin-bottom: 16px;">
-                      ${loc.type !== 'Office' && loc.type !== 'Factory' ? '' : `<p style="margin-bottom: 8px;"><strong>${loc.name}</strong></p>`}
-                      ${loc.type === 'Registered Office' ? `<p class="contact-location-label">${loc.name}</p>` : ''} 
-                      <p class="contact-location-address">${loc.address}</p>
+                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})" onkeydown="if(event.key==='Enter')focusMap(${loc.lat}, ${loc.lng})" tabindex="0" role="button">
+                      ${loc.type !== 'Office' && loc.type !== 'Factory' ? '' : `<p><strong>${escapeHtml(loc.name)}</strong></p>`}
+                      ${loc.type === 'Registered Office' ? `<p class="contact-location-label">${escapeHtml(loc.name)}</p>` : ''}
+                      <p class="contact-location-address">${escapeHtml(loc.address)}</p>
                     </div>
                 `;
             });
@@ -119,7 +123,7 @@ function initMap(locations) {
     locations.forEach(loc => {
         if (loc.lat && loc.lng) {
             const marker = L.marker([loc.lat, loc.lng], { icon: iconNormal }).addTo(map);
-            marker.bindPopup(`<b>${loc.name}</b><br>${loc.address}`);
+            marker.bindPopup(`<b>${escapeHtml(loc.name)}</b><br>${escapeHtml(loc.address)}`);
             markers.push(marker);
         }
     });
@@ -131,8 +135,12 @@ function focusMap(lat, lng) {
             animate: true,
             duration: 1.5
         });
-        
-        // Find marker and open popup
-        // This is a simple implementation; strict matching might be needed
+
+        markers.forEach(function(marker) {
+            var pos = marker.getLatLng();
+            if (pos.lat === lat && pos.lng === lng) {
+                marker.openPopup();
+            }
+        });
     }
 }

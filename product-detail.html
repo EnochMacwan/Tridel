@@ -25,6 +25,11 @@
 </head>
 
 <body>
+    <noscript>
+        <div class="noscript-message">
+            <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to continue.</p>
+        </div>
+    </noscript>
   <!-- Dynamic Header Injection -->
   <div id="header-placeholder"></div>
   <script>
@@ -102,11 +107,11 @@
 
     <!-- Bottom Glass Navigation (Mobile Only) -->
     <nav class="bottom-glass-nav" aria-label="Mobile Navigation">
-        <a href="index.html" class="bottom-nav-item active">
+        <a href="index.html" class="bottom-nav-item">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="products.html" class="bottom-nav-item">
+        <a href="products.html" class="bottom-nav-item active">
             <i class="fas fa-cube"></i>
             <span>Products</span>
         </a>
@@ -130,6 +135,7 @@
     </nav>
 </div>
 <!-- Essential Scripts for Data & Loader -->
+<script defer src="assets/js/utils.js"></script>
 <script defer src="assets/js/products-data.js"></script>
 <script defer src="assets/js/products-loader.js"></script>
 <script defer src="assets/js/services-data.js"></script>
@@ -143,7 +149,7 @@
         <!-- Dynamic Content Loader -->
         <div id="product-detail-container">
             <div style="text-align: center; padding: 100px;">
-                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <span role="status" aria-live="polite"><i class="fas fa-spinner fa-spin fa-3x"></i>
                 <p>Loading Product Details...</p>
             </div>
         </div>
@@ -155,7 +161,7 @@
     <div class="container footer__container">
       <div class="footer__brand">
         <a class="footer__logo" href="index.html">
-          <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" style="height: 32px; filter: brightness(0) invert(1);">
+          <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" class="footer-logo-style">
         </a>
         <p class="footer__tagline">Connecting Environmental Science, Engineering, and Technology</p>
       </div>
@@ -180,12 +186,12 @@
       <div class="footer__social">
         <h3 class="footer__heading">Connect</h3>
         <a aria-label="LinkedIn" class="footer__social-link" href="https://www.linkedin.com/company/tridel-technologies/"><i class="fab fa-linkedin"></i></a>
-        <a aria-label="Twitter" class="footer__social-link" href="#"><i class="fab fa-twitter"></i></a>
+        
       </div>
     </div>
     <div class="footer__bottom">
       <div class="container">
-        <p>© 2025 Tridel Technologies. All Rights Reserved.</p>
+        <p>© 2026 Tridel Technologies. All Rights Reserved.</p>
       </div>
     </div>
   </footer>
