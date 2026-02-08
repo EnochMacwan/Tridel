@@ -214,8 +214,9 @@ h6 {
 /* 3. Clean Tech Header               */
 /* ---------------------------------- */
 .header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     z-index: 1000;
     background: rgba(255, 255, 255, 0.8);
@@ -229,6 +230,12 @@ h6 {
     box-shadow: none;
     /* Removed shadow for cleaner look */
     transition: background 0.3s ease;
+}
+
+/* Offset body content below fixed header */
+#header-root + #main-content,
+#header-root + main {
+    padding-top: 89px;
 }
 
 .header__container {
