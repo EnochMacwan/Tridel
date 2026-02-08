@@ -24,6 +24,7 @@
     try { if (typeof ABOUT_DATA !== 'undefined') window.ABOUT_DATA = ABOUT_DATA; } catch(e){}
     try { if (typeof CONTACT_INFO_CARDS !== 'undefined') window.CONTACT_INFO_CARDS = CONTACT_INFO_CARDS; } catch(e){}
     try { if (typeof CONTACT_FAQ_DATA !== 'undefined') window.CONTACT_FAQ_DATA = CONTACT_FAQ_DATA; } catch(e){}
+    try { if (typeof CONTACT_PAGE_CONFIG !== 'undefined') window.CONTACT_PAGE_CONFIG = CONTACT_PAGE_CONFIG; } catch(e){}
     try { if (typeof NAV_LINKS !== 'undefined') window.NAV_LINKS = NAV_LINKS; } catch(e){}
     try { if (typeof FOOTER_DATA !== 'undefined') window.FOOTER_DATA = FOOTER_DATA; } catch(e){}
     try { if (typeof PAGE_META !== 'undefined') window.PAGE_META = PAGE_META; } catch(e){}
@@ -1721,7 +1722,8 @@ async function publishAllChanges() {
             } else if (type === 'contact_content') {
                 data = {
                     CONTACT_INFO_CARDS: window.CONTACT_INFO_CARDS || [],
-                    CONTACT_FAQ_DATA: window.CONTACT_FAQ_DATA || []
+                    CONTACT_FAQ_DATA: window.CONTACT_FAQ_DATA || [],
+                    CONTACT_PAGE_CONFIG: window.CONTACT_PAGE_CONFIG || {}
                 };
             } else if (type === 'layout') {
                 data = {
@@ -2600,6 +2602,7 @@ function serializeAboutPageData() {
 function loadContactContentToForm() {
     renderContactInfoCards();
     renderContactFaqRows();
+    renderContactConfigEditor();
 }
 
 function renderContactInfoCards() {
@@ -2663,6 +2666,97 @@ function removeContactFaq(index) {
     renderContactFaqRows();
 }
 
+// ── Dynamic Config Editor (auto-generates fields from CONTACT_PAGE_CONFIG) ──
+
+function formatConfigLabel(key) {
+    // camelCase → Title Case with spaces
+    return key.replace(/([A-Z])/g, ' $1').replace(/^./, function (s) { return s.toUpperCase(); });
+}
+
+function renderContactConfigEditor() {
+    var container = document.getElementById('contact-config-editor');
+    if (!container) return;
+    var config = window.CONTACT_PAGE_CONFIG || {};
+    var html = '';
+    var keys = Object.keys(config);
+
+    keys.forEach(function (key) {
+        // Skip offices — managed by Locations tab
+        if (key === 'offices') return;
+
+        var val = config[key];
+        var label = formatConfigLabel(key);
+
+        if (Array.isArray(val)) {
+            // Array of strings → textarea, one per line
+            html += '<div style="margin-bottom:16px;">' +
+                '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">' + escapeHTML(label) + '</label>' +
+                '<textarea class="form-control" id="cfg-' + escapeHTML(key) + '" rows="4" ' +
+                    'placeholder="One item per line" style="font-size:13px;">' + escapeHTML(val.join('\n')) + '</textarea>' +
+                '<small style="color:var(--text-secondary);">One item per line</small>' +
+            '</div>';
+        } else if (typeof val === 'object' && val !== null) {
+            // Object → bordered sub-card with fields for each sub-key
+            html += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;">' +
+                '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:8px;">' + escapeHTML(label) + '</label>';
+            var subKeys = Object.keys(val);
+            subKeys.forEach(function (sk) {
+                var sv = val[sk];
+                var fieldId = 'cfg-' + key + '-' + sk;
+                html += '<div style="margin-bottom:8px;">' +
+                    '<label style="font-size:12px;color:var(--text-secondary);">' + escapeHTML(formatConfigLabel(sk)) + '</label>' +
+                    '<input type="text" class="form-control" id="' + escapeHTML(fieldId) + '" value="' + escapeHTML(String(sv || '')) + '">' +
+                '</div>';
+            });
+            html += '</div>';
+        } else {
+            // String / number → simple text input
+            html += '<div style="margin-bottom:16px;">' +
+                '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">' + escapeHTML(label) + '</label>' +
+                '<input type="text" class="form-control" id="cfg-' + escapeHTML(key) + '" value="' + escapeHTML(String(val || '')) + '">' +
+            '</div>';
+        }
+    });
+
+    if (!html) {
+        html = '<p style="color:var(--text-secondary);font-size:13px;">No page configuration found.</p>';
+    }
+    container.innerHTML = html;
+}
+
+function readContactConfigFromForm() {
+    var config = window.CONTACT_PAGE_CONFIG || {};
+    var keys = Object.keys(config);
+
+    keys.forEach(function (key) {
+        if (key === 'offices') return; // preserve as-is
+
+        var val = config[key];
+
+        if (Array.isArray(val)) {
+            var ta = document.getElementById('cfg-' + key);
+            if (ta) {
+                config[key] = ta.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
+            }
+        } else if (typeof val === 'object' && val !== null) {
+            var subKeys = Object.keys(val);
+            subKeys.forEach(function (sk) {
+                var input = document.getElementById('cfg-' + key + '-' + sk);
+                if (input) {
+                    config[key][sk] = input.value;
+                }
+            });
+        } else {
+            var input = document.getElementById('cfg-' + key);
+            if (input) {
+                config[key] = input.value;
+            }
+        }
+    });
+
+    window.CONTACT_PAGE_CONFIG = config;
+}
+
 function saveContactContent() {
     // Read info cards from form
     var cards = window.CONTACT_INFO_CARDS || [];
@@ -2679,6 +2773,8 @@ function saveContactContent() {
         faqs[j].answer = (document.getElementById('faq-a-' + j) || {}).value || '';
     }
     window.CONTACT_FAQ_DATA = faqs;
+    // Read page config from dynamic form
+    readContactConfigFromForm();
     markAsPending('contact_content');
 }
 
@@ -2701,17 +2797,51 @@ function parseContactPageContent(content) {
             window.CONTACT_FAQ_DATA = JSON.parse(raw2);
         } catch (e) { console.warn('Could not parse CONTACT_FAQ_DATA:', e.message); }
     }
+    // Parse CONTACT_PAGE_CONFIG
+    var match3 = content.match(/var\s+CONTACT_PAGE_CONFIG\s*=\s*(\{[\s\S]*?\});/);
+    if (match3) {
+        try {
+            var raw3 = match3[1];
+            // Remove LOCATIONS_DATA reference (not JSON-safe), replace with empty array
+            raw3 = raw3.replace(/\(typeof\s+LOCATIONS_DATA\s*!==\s*['"]undefined['"]\)\s*\?\s*LOCATIONS_DATA\s*:\s*\[\]/g, '[]');
+            // Strip comments and trailing commas
+            raw3 = raw3.replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            // Quote unquoted keys
+            raw3 = raw3.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            // Remove unicode escapes in strings that break JSON (e.g., \u2013)
+            raw3 = raw3.replace(/\\u([\da-fA-F]{4})/g, function (m, hex) {
+                return String.fromCharCode(parseInt(hex, 16));
+            });
+            var parsed = JSON.parse(raw3);
+            // Restore offices.locations to reference LOCATIONS_DATA
+            if (parsed.offices) {
+                parsed.offices.locations = (typeof LOCATIONS_DATA !== 'undefined') ? LOCATIONS_DATA : [];
+            }
+            window.CONTACT_PAGE_CONFIG = parsed;
+        } catch (e) { console.warn('Could not parse CONTACT_PAGE_CONFIG:', e.message); }
+    }
 }
 
 function serializeContactPageData() {
     var lines = [];
     lines.push('/**');
     lines.push(' * Contact Page Data');
-    lines.push(' * Contact info cards and FAQ data');
+    lines.push(' * Contact info cards, FAQ data, and page configuration');
     lines.push(' */');
     lines.push('var CONTACT_INFO_CARDS = ' + JSON.stringify(window.CONTACT_INFO_CARDS || [], null, 2) + ';');
     lines.push('');
     lines.push('var CONTACT_FAQ_DATA = ' + JSON.stringify(window.CONTACT_FAQ_DATA || [], null, 2) + ';');
+    lines.push('');
+    // Serialize CONTACT_PAGE_CONFIG with special handling for offices.locations
+    var configCopy = JSON.parse(JSON.stringify(window.CONTACT_PAGE_CONFIG || {}));
+    // Replace offices.locations array with placeholder
+    if (configCopy.offices) {
+        configCopy.offices.locations = '__LOCATIONS_DATA_REF__';
+    }
+    var configStr = JSON.stringify(configCopy, null, 2);
+    // Replace placeholder with actual code reference
+    configStr = configStr.replace('"__LOCATIONS_DATA_REF__"', "(typeof LOCATIONS_DATA !== 'undefined') ? LOCATIONS_DATA : []");
+    lines.push('var CONTACT_PAGE_CONFIG = ' + configStr + ';');
     lines.push('');
     return lines.join('\n');
 }

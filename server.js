@@ -344,16 +344,18 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
             aboutLines.push('');
             content = aboutLines.join('\n');
         } else if (type === 'contact_content') {
-            // Multi-var: CONTACT_INFO_CARDS + CONTACT_FAQ_DATA
+            // Multi-var: CONTACT_INFO_CARDS + CONTACT_FAQ_DATA + CONTACT_PAGE_CONFIG
             const contactLines = [
                 '/**',
                 ' * Contact Page Data',
-                ' * Contact info cards and FAQ data',
+                ' * Contact info cards, FAQ data, and page configuration',
                 ' */',
             ];
             contactLines.push(`var CONTACT_INFO_CARDS = ${JSON.stringify(data.CONTACT_INFO_CARDS || [], null, 2)};`);
             contactLines.push('');
             contactLines.push(`var CONTACT_FAQ_DATA = ${JSON.stringify(data.CONTACT_FAQ_DATA || [], null, 2)};`);
+            contactLines.push('');
+            contactLines.push(`var CONTACT_PAGE_CONFIG = ${JSON.stringify(data.CONTACT_PAGE_CONFIG || {}, null, 2)};`);
             contactLines.push('');
             content = contactLines.join('\n');
         } else if (type === 'layout') {

@@ -1,6 +1,6 @@
 /**
  * Contact Page Data
- * Contact info cards and FAQ data
+ * Contact info cards, FAQ data, and page configuration
  */
 var CONTACT_INFO_CARDS = [
   {
@@ -42,3 +42,31 @@ var CONTACT_FAQ_DATA = [
     answer: 'Absolutely. We offer comprehensive training programs for all our products and systems, including on-site installation support, operator training, and ongoing technical assistance through our global support network.'
   }
 ];
+
+var CONTACT_PAGE_CONFIG = {
+  hero: {
+    label: 'Get in Touch',
+    title: "Let's Work Together",
+    subtitle: "Have a project in mind? We'd love to hear about it. Reach out and let's explore how we can help."
+  },
+  enquiry: {
+    email: 'info@trideltechnologies.com',
+    linkedin: 'Tridel Technologies'
+  },
+  phone: '+971 4 609 1461',
+  responseGuarantee: {
+    title: 'Quick Response',
+    desc: 'Our team responds to all project enquiries within 24\u201348 business hours.'
+  },
+  offices: {
+    label: 'Our Offices',
+    locations: (typeof LOCATIONS_DATA !== 'undefined') ? LOCATIONS_DATA : []
+  },
+  sectorOptions: [
+    'Product Enquiry',
+    'Service Enquiry',
+    'Custom Solution',
+    'Partnership',
+    'General Question'
+  ]
+};

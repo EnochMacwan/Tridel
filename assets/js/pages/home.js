@@ -215,6 +215,9 @@
       html += buildCtaHtml(cta);
     }
 
+    // Testimonial Map (Global Client Stories)
+    html += '<div id="testimonial-map-root"></div>';
+
     mainEl.innerHTML = html;
 
     // Initialize stats counter animation
@@ -231,6 +234,9 @@
       renderClientLogos();
     }
 
+    // Lazy-load Leaflet and testimonial map
+    loadTestimonialMap();
+
     // Initialize scroll reveal
     if (typeof window.initScrollReveal === 'function') {
       window.initScrollReveal();
@@ -240,6 +246,45 @@
     if (typeof window.initHeroCanvas === 'function') {
       window.initHeroCanvas();
     }
+
+    // Return cleanup function for SPA router
+    return function () {
+      if (typeof window.cleanupTestimonialMap === 'function') {
+        window.cleanupTestimonialMap();
+      }
+    };
+  }
+
+  function loadTestimonialMap() {
+    // Check if Leaflet is already loaded
+    if (typeof L !== 'undefined') {
+      if (typeof renderTestimonialMap === 'function') {
+        renderTestimonialMap();
+      }
+      return;
+    }
+
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet"]')) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+    }
+
+    // Load Leaflet JS
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+    script.crossOrigin = '';
+    script.onload = function () {
+      if (typeof renderTestimonialMap === 'function') {
+        renderTestimonialMap();
+      }
+    };
+    document.head.appendChild(script);
   }
 
   window.registerRoute('/', {
