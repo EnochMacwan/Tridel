@@ -92,6 +92,8 @@
                 <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
                 <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
                 <li><a href="#content" data-section="content"><i class="fas fa-file-alt"></i> Page Content</a></li>
+                <li><a href="#navigation" data-section="navigation"><i class="fas fa-bars"></i> Navigation</a></li>
+                <li><a href="#visibility" data-section="visibility"><i class="fas fa-eye"></i> Visibility</a></li>
                 <li><a href="#health" data-section="health"><i class="fas fa-heartbeat"></i> System Health</a></li>
                 <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Global Settings</a></li>
             </ul>
@@ -281,123 +283,187 @@
             <section id="content" class="content-section">
                 <div class="section-header">
                     <h2>Page Content</h2>
-                    <button type="button" class="btn btn-primary" onclick="savePageContent()">
+                    <button type="button" class="btn btn-primary" onclick="savePageContentAll()">
                         <i class="fas fa-save"></i> Save Content
                     </button>
                 </div>
 
-                <!-- Home Page Hero -->
-                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-home"></i> Home Page Hero
-                    </h3>
-                    <div class="form-group">
-                        <label>Hero Title</label>
-                        <input type="text" class="form-control" id="content-hero-title">
+                <!-- Tab Bar -->
+                <div style="display:flex;gap:8px;margin-bottom:20px;">
+                    <button type="button" class="btn btn-primary content-tab" data-tab="home" onclick="switchContentTab('home')"><i class="fas fa-home"></i> Home</button>
+                    <button type="button" class="btn btn-secondary content-tab" data-tab="about" onclick="switchContentTab('about')"><i class="fas fa-building"></i> About</button>
+                    <button type="button" class="btn btn-secondary content-tab" data-tab="contact" onclick="switchContentTab('contact')"><i class="fas fa-envelope"></i> Contact</button>
+                </div>
+
+                <!-- HOME TAB -->
+                <div id="content-tab-home">
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-home"></i> Home Page Hero
+                        </h3>
+                        <div class="form-group">
+                            <label>Hero Title</label>
+                            <input type="text" class="form-control" id="content-hero-title">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero Subtitle</label>
+                            <textarea class="form-control" id="content-hero-subtitle" rows="3"></textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Hero Subtitle</label>
-                        <textarea class="form-control" id="content-hero-subtitle" rows="3"></textarea>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-chart-bar"></i> Stats Bar
+                        </h3>
+                        <div id="content-stats-list"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addStatRow()" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Add Stat
+                        </button>
+                    </div>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-tasks"></i> What We Do Section
+                        </h3>
+                        <div class="form-group">
+                            <label>Section Title</label>
+                            <input type="text" class="form-control" id="content-wwd-title">
+                        </div>
+                        <div class="form-group">
+                            <label>Section Subtitle</label>
+                            <input type="text" class="form-control" id="content-wwd-subtitle">
+                        </div>
+                        <div id="content-wwd-cards"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addWwdCard()" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Add Card
+                        </button>
+                    </div>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-project-diagram"></i> Featured Case Study
+                        </h3>
+                        <div class="form-group"><label>Label</label><input type="text" class="form-control" id="content-cs-label"></div>
+                        <div class="form-group"><label>Title</label><input type="text" class="form-control" id="content-cs-title"></div>
+                        <div class="form-group"><label>Description</label><textarea class="form-control" id="content-cs-desc" rows="3"></textarea></div>
+                        <div class="form-group" style="display:flex; gap:15px;">
+                            <div style="flex:1"><label>Image Path</label><input type="text" class="form-control" id="content-cs-image"></div>
+                            <div style="flex:1"><label>Link Text</label><input type="text" class="form-control" id="content-cs-link-text"></div>
+                        </div>
+                        <div class="form-group"><label>Link Href</label><input type="text" class="form-control" id="content-cs-link-href"></div>
+                    </div>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-bullhorn"></i> Call to Action
+                        </h3>
+                        <div class="form-group"><label>CTA Title</label><input type="text" class="form-control" id="content-cta-title"></div>
+                        <div class="form-group"><label>CTA Description</label><textarea class="form-control" id="content-cta-desc" rows="2"></textarea></div>
+                        <div class="form-group" style="display:flex; gap:15px;">
+                            <div style="flex:1"><label>Primary Button Text</label><input type="text" class="form-control" id="content-cta-primary-text"></div>
+                            <div style="flex:1"><label>Primary Button Link</label><input type="text" class="form-control" id="content-cta-primary-href"></div>
+                        </div>
+                        <div class="form-group" style="display:flex; gap:15px;">
+                            <div style="flex:1"><label>Secondary Button Text</label><input type="text" class="form-control" id="content-cta-secondary-text"></div>
+                            <div style="flex:1"><label>Secondary Button Link</label><input type="text" class="form-control" id="content-cta-secondary-href"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Home Stats -->
-                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-chart-bar"></i> Stats Bar
-                    </h3>
-                    <div id="content-stats-list"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addStatRow()" style="margin-top:10px;">
-                        <i class="fas fa-plus"></i> Add Stat
+                <!-- ABOUT TAB -->
+                <div id="content-tab-about" style="display:none">
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-heading"></i> About Page Header
+                        </h3>
+                        <div class="form-group"><label>Page Title</label><input type="text" class="form-control" id="about-header-title"></div>
+                        <div class="form-group"><label>Page Subtitle</label><textarea class="form-control" id="about-header-subtitle" rows="2"></textarea></div>
+                    </div>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-info-circle"></i> Who We Are
+                        </h3>
+                        <div class="form-group"><label>Section Title</label><input type="text" class="form-control" id="about-wwa-title"></div>
+                        <div class="form-group"><label>Description</label><textarea class="form-control" id="about-wwa-text" rows="6"></textarea></div>
+                        <div class="form-group" style="display:flex; gap:15px;">
+                            <div style="flex:1"><label>Image Path</label><input type="text" class="form-control" id="about-wwa-image"></div>
+                            <div style="flex:1"><label>Image Alt Text</label><input type="text" class="form-control" id="about-wwa-image-alt"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTACT TAB -->
+                <div id="content-tab-contact" style="display:none">
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-address-card"></i> Contact Info Cards
+                        </h3>
+                        <div id="contact-info-cards-list"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addContactInfoCard()" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Add Info Card
+                        </button>
+                    </div>
+                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            <i class="fas fa-question-circle"></i> FAQ
+                        </h3>
+                        <div id="contact-faq-list"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addContactFaq()" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Add FAQ
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation & Footer -->
+            <section id="navigation" class="content-section">
+                <div class="section-header">
+                    <h2>Navigation & Footer</h2>
+                    <button type="button" class="btn btn-primary" onclick="saveNavigation()">
+                        <i class="fas fa-save"></i> Save Navigation
                     </button>
                 </div>
-
-                <!-- What We Do -->
                 <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
                     <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-tasks"></i> What We Do Section
+                        <i class="fas fa-link"></i> Navigation Links
                     </h3>
-                    <div class="form-group">
-                        <label>Section Title</label>
-                        <input type="text" class="form-control" id="content-wwd-title">
-                    </div>
-                    <div class="form-group">
-                        <label>Section Subtitle</label>
-                        <input type="text" class="form-control" id="content-wwd-subtitle">
-                    </div>
-                    <div id="content-wwd-cards"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addWwdCard()" style="margin-top:10px;">
-                        <i class="fas fa-plus"></i> Add Card
+                    <div id="nav-links-list"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addNavLink()" style="margin-top:10px;">
+                        <i class="fas fa-plus"></i> Add Nav Link
                     </button>
                 </div>
-
-                <!-- Case Study -->
                 <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
                     <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-project-diagram"></i> Featured Case Study
+                        <i class="fas fa-columns"></i> Footer
                     </h3>
-                    <div class="form-group">
-                        <label>Label</label>
-                        <input type="text" class="form-control" id="content-cs-label">
-                    </div>
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" class="form-control" id="content-cs-title">
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea class="form-control" id="content-cs-desc" rows="3"></textarea>
-                    </div>
-                    <div class="form-group" style="display:flex; gap:15px;">
-                        <div style="flex:1">
-                            <label>Image Path</label>
-                            <input type="text" class="form-control" id="content-cs-image">
-                        </div>
-                        <div style="flex:1">
-                            <label>Link Text</label>
-                            <input type="text" class="form-control" id="content-cs-link-text">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Link Href</label>
-                        <input type="text" class="form-control" id="content-cs-link-href">
-                    </div>
+                    <div class="form-group"><label>Tagline</label><input type="text" class="form-control" id="footer-tagline"></div>
+                    <div class="form-group"><label>LinkedIn URL</label><input type="text" class="form-control" id="footer-linkedin"></div>
+                    <div class="form-group"><label>Copyright Text</label><input type="text" class="form-control" id="footer-copyright"></div>
+                    <h4 style="margin:20px 0 10px;font-size:14px;color:var(--text-muted);">Quick Links</h4>
+                    <div id="footer-quick-links-list"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addFooterLink('quick')" style="margin-top:10px;margin-bottom:20px;">
+                        <i class="fas fa-plus"></i> Add Quick Link
+                    </button>
+                    <h4 style="margin:20px 0 10px;font-size:14px;color:var(--text-muted);">Company Links</h4>
+                    <div id="footer-company-links-list"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addFooterLink('company')" style="margin-top:10px;">
+                        <i class="fas fa-plus"></i> Add Company Link
+                    </button>
                 </div>
-
-                <!-- CTA -->
                 <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
                     <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-bullhorn"></i> Call to Action
+                        <i class="fas fa-search"></i> Page SEO
                     </h3>
-                    <div class="form-group">
-                        <label>CTA Title</label>
-                        <input type="text" class="form-control" id="content-cta-title">
-                    </div>
-                    <div class="form-group">
-                        <label>CTA Description</label>
-                        <textarea class="form-control" id="content-cta-desc" rows="2"></textarea>
-                    </div>
-                    <div class="form-group" style="display:flex; gap:15px;">
-                        <div style="flex:1">
-                            <label>Primary Button Text</label>
-                            <input type="text" class="form-control" id="content-cta-primary-text">
-                        </div>
-                        <div style="flex:1">
-                            <label>Primary Button Link</label>
-                            <input type="text" class="form-control" id="content-cta-primary-href">
-                        </div>
-                    </div>
-                    <div class="form-group" style="display:flex; gap:15px;">
-                        <div style="flex:1">
-                            <label>Secondary Button Text</label>
-                            <input type="text" class="form-control" id="content-cta-secondary-text">
-                        </div>
-                        <div style="flex:1">
-                            <label>Secondary Button Link</label>
-                            <input type="text" class="form-control" id="content-cta-secondary-href">
-                        </div>
-                    </div>
+                    <div id="page-seo-list"></div>
                 </div>
+            </section>
+
+            <!-- Section Visibility -->
+            <section id="visibility" class="content-section">
+                <div class="section-header">
+                    <h2>Section Visibility</h2>
+                    <button type="button" class="btn btn-primary" onclick="saveVisibility()">
+                        <i class="fas fa-save"></i> Save Visibility
+                    </button>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Toggle page sections on or off without deleting content.</p>
+                <div id="visibility-editor"></div>
             </section>
 
             <!-- System Health -->
@@ -566,6 +632,9 @@
     <script src="assets/js/settings-data.js"></script>
     <script src="assets/js/home-data.js"></script>
     <script src="assets/js/index-page-data.js"></script>
+    <script src="assets/js/about-page-data.js"></script>
+    <script src="assets/js/contact-page-data.js"></script>
+    <script src="assets/js/layout-data.js"></script>
 
     <!-- Admin Logic -->
     <script src="assets/js/admin.js"></script>

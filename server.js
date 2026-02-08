@@ -241,7 +241,10 @@ const DATA_FILES = {
     locations: 'assets/js/locations-data.js',
     contact: 'assets/js/contact-data.js',
     settings: 'assets/js/settings-data.js',
-    index_content: 'assets/js/index-page-data.js'
+    index_content: 'assets/js/index-page-data.js',
+    about_content: 'assets/js/about-page-data.js',
+    contact_content: 'assets/js/contact-page-data.js',
+    layout: 'assets/js/layout-data.js'
 };
 
 const VAR_NAMES = {
@@ -256,7 +259,10 @@ const VAR_NAMES = {
     locations: 'LOCATIONS_DATA',
     contact: 'CONTACT_DATA',
     settings: 'SETTINGS_DATA',
-    index_content: 'INDEX_HERO'
+    index_content: 'INDEX_HERO',
+    about_content: 'ABOUT_DATA',
+    contact_content: 'CONTACT_INFO_CARDS',
+    layout: 'NAV_LINKS'
 };
 
 // ============================================
@@ -326,6 +332,44 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
             lines.push(`var INDEX_CTA = ${JSON.stringify(data.INDEX_CTA || {}, null, 2)};`);
             lines.push('');
             content = lines.join('\n');
+        } else if (type === 'about_content') {
+            // Single var file
+            const aboutLines = [
+                '/**',
+                ' * About Page Data',
+                ' * Content for the Who We Are section',
+                ' */',
+            ];
+            aboutLines.push(`var ABOUT_DATA = ${JSON.stringify(data, null, 2)};`);
+            aboutLines.push('');
+            content = aboutLines.join('\n');
+        } else if (type === 'contact_content') {
+            // Multi-var: CONTACT_INFO_CARDS + CONTACT_FAQ_DATA
+            const contactLines = [
+                '/**',
+                ' * Contact Page Data',
+                ' * Contact info cards and FAQ data',
+                ' */',
+            ];
+            contactLines.push(`var CONTACT_INFO_CARDS = ${JSON.stringify(data.CONTACT_INFO_CARDS || [], null, 2)};`);
+            contactLines.push('');
+            contactLines.push(`var CONTACT_FAQ_DATA = ${JSON.stringify(data.CONTACT_FAQ_DATA || [], null, 2)};`);
+            contactLines.push('');
+            content = contactLines.join('\n');
+        } else if (type === 'layout') {
+            // Multi-var: NAV_LINKS + FOOTER_DATA + PAGE_META
+            const layoutLines = [
+                '/**',
+                ' * Layout Data \u2014 Navigation links, footer data, and page metadata',
+                ' */',
+            ];
+            layoutLines.push(`var NAV_LINKS = ${JSON.stringify(data.NAV_LINKS || [], null, 2)};`);
+            layoutLines.push('');
+            layoutLines.push(`var FOOTER_DATA = ${JSON.stringify(data.FOOTER_DATA || {}, null, 2)};`);
+            layoutLines.push('');
+            layoutLines.push(`var PAGE_META = ${JSON.stringify(data.PAGE_META || {}, null, 2)};`);
+            layoutLines.push('');
+            content = layoutLines.join('\n');
         } else {
             content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
         }
