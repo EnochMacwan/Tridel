@@ -464,10 +464,10 @@ h6 {
 .section__title {
     text-align: center;
     /* Centered headings */
-    font-size: 3.5rem;
-    /* Huge impact */
+    font-size: clamp(1.75rem, 5vw, 3.5rem);
+    /* Huge impact, scales on mobile */
     font-weight: 700;
-    margin-bottom: 80px;
+    margin-bottom: clamp(32px, 6vw, 80px);
     color: var(--color-text-main);
     letter-spacing: -0.03em;
     position: relative;
@@ -730,9 +730,9 @@ h6 {
 }
 
 .product-category__title {
-    font-size: 2rem;
+    font-size: clamp(1.25rem, 3vw, 2rem);
     font-weight: 700;
-    margin-bottom: 40px;
+    margin-bottom: clamp(20px, 4vw, 40px);
     color: var(--color-text-main);
     letter-spacing: -0.01em;
     border-bottom: 2px solid #e2e8f0;
@@ -1085,10 +1085,9 @@ h6 {
 
 .product-list-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    /* Standardized 320px */
-    gap: 40px;
-    /* Standardized 40px */
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    /* Responsive: never exceeds viewport on small phones */
+    gap: clamp(20px, 4vw, 40px);
 }
 
 /* [chunk 1: Enable 3D Perspective] */
@@ -5824,5 +5823,102 @@ html.lenis {
         margin: 0 var(--space-md, 16px);
         padding: var(--space-2xl, 64px) var(--space-lg, 24px);
         border-radius: var(--radius-lg, 24px);
+    }
+}
+
+/* ---------------------------------------- */
+/* Mobile Responsive Improvements           */
+/* ---------------------------------------- */
+
+/* --- Tablet (768px) --- */
+@media (max-width: 768px) {
+    .hero {
+        min-height: 70vh;
+    }
+
+    .footer__container {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .footer__links {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .footer {
+        padding-top: 48px;
+    }
+
+    .footer__bottom {
+        margin-top: 32px;
+    }
+
+    .form-container {
+        padding: 24px 16px;
+    }
+
+    .form-control {
+        padding: 16px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+
+    .map-canvas {
+        min-height: 250px;
+    }
+
+    .map-details {
+        min-height: auto;
+    }
+
+    .page-header__title {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+}
+
+/* --- Small Phones (480px) --- */
+@media (max-width: 480px) {
+    .hero {
+        min-height: 60vh;
+    }
+
+    .hero__title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .map-canvas {
+        min-height: 200px;
+    }
+
+    .cta-banner {
+        margin: 0 8px;
+        padding: 40px 16px;
+    }
+
+    .cta-banner__btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* --- Extra Small (320px) --- */
+@media (max-width: 375px) {
+    .bottom-glass-nav {
+        padding: 6px 8px;
+    }
+
+    .bottom-nav-item {
+        padding: 6px 4px;
+    }
+
+    .bottom-nav-item i {
+        font-size: 1.1rem;
     }
 }
