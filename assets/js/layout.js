@@ -38,23 +38,13 @@
         '</li>';
     });
 
-    var bottomNavItems = '';
-    NAV_LINKS.forEach(function (link) {
-      var label = link.shortLabel || link.label;
-      bottomNavItems +=
-        '<a href="' + esc(link.href) + '" class="bottom-nav-item" data-route="' + esc(link.key) + '">' +
-          '<i class="fas ' + esc(link.icon) + '"></i>' +
-          '<span>' + esc(label) + '</span>' +
-        '</a>';
-    });
-
     root.innerHTML =
       '<header class="header">' +
         '<div class="container header__container">' +
           '<a class="header__logo" href="#/">' +
             '<img alt="Tridel Logo" src="assets/images/logo/tridel.png">' +
           '</a>' +
-          '<nav aria-label="Main Navigation" class="header__nav" id="main-nav">' +
+          '<nav aria-label="Main Navigation" class="header__nav mobile-hud-menu" id="main-nav">' +
             '<ul class="header__nav-list">' + navItems + '</ul>' +
           '</nav>' +
           '<div class="header__actions">' +
@@ -62,10 +52,11 @@
               '<i class="fas fa-moon"></i>' +
             '</button>' +
             '<a class="button button--primary" href="#/contact">Enquire Now</a>' +
+            '<button type="button" class="header__menu-toggle menu-trigger" aria-label="Open menu">' +
+              '<span class="icon-menu"><i class="fas fa-bars"></i></span>' +
+              '<span class="icon-close"><i class="fas fa-times"></i></span>' +
+            '</button>' +
           '</div>' +
-          '<nav class="bottom-glass-nav" aria-label="Mobile Navigation">' +
-            bottomNavItems +
-          '</nav>' +
         '</div>' +
       '</header>';
   }
@@ -141,13 +132,6 @@
       link.classList.toggle('active', isActive);
     });
 
-    // Bottom nav
-    document.querySelectorAll('.bottom-nav-item').forEach(function (item) {
-      var route = item.getAttribute('data-route');
-      var isActive = (path === route) ||
-        (route !== '/' && path.indexOf(route) === 0);
-      item.classList.toggle('active', isActive);
-    });
   };
 
   /**
@@ -170,6 +154,11 @@
     // Init mobile nav behavior
     if (typeof window.initMobileNav === 'function') {
       window.initMobileNav();
+    }
+
+    // Init hamburger menu toggle
+    if (typeof window.initMenuToggle === 'function') {
+      window.initMenuToggle();
     }
 
     // Load mega menu content

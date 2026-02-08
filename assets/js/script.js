@@ -4,25 +4,36 @@
  */
 
 /* ---------------------------------- */
+/* Hamburger Menu Toggle              */
+/* ---------------------------------- */
+window.initMenuToggle = function () {
+  var trigger = document.querySelector('.header__menu-toggle');
+  if (!trigger) return;
+
+  trigger.addEventListener('click', function () {
+    document.body.classList.toggle('nav-open');
+  });
+
+  // Close menu on hash change (i.e. page navigation happened)
+  window.addEventListener('hashchange', function () {
+    document.body.classList.remove('nav-open');
+  });
+
+  // Close menu on Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+      document.body.classList.remove('nav-open');
+      trigger.focus();
+    }
+  });
+};
+
+/* ---------------------------------- */
 /* Mobile Accordion Navigation        */
 /* ---------------------------------- */
 window.initMobileNav = function () {
-  var navLinks = document.querySelectorAll('.header__nav-list > li > a');
-  navLinks.forEach(function (link) {
-    var megaMenu = link.nextElementSibling;
-    if (megaMenu && megaMenu.classList.contains('mega-menu')) {
-      link.addEventListener('click', function (e) {
-        if (window.innerWidth <= 1024) {
-          e.preventDefault();
-          var parentLi = link.parentElement;
-          parentLi.classList.toggle('mobile-menu-open');
-          document.querySelectorAll('.header__nav-list > li').forEach(function (li) {
-            if (li !== parentLi) li.classList.remove('mobile-menu-open');
-          });
-        }
-      });
-    }
-  });
+  // On mobile, mega-menus are hidden — all links navigate directly.
+  // Accordion behavior removed for cleaner mobile UX.
 };
 
 /* ---------------------------------- */
@@ -189,7 +200,13 @@ window.initScrollReveal = function () {
   window.addEventListener('scroll', function () {
     if (window.scrollY > 500) btn.classList.add('visible');
     else btn.classList.remove('visible');
-  });
+
+    // Fade out hero scroll indicator on scroll
+    var indicator = document.querySelector('.hero__scroll-indicator');
+    if (indicator) {
+      indicator.style.opacity = window.scrollY > 50 ? '0' : '';
+    }
+  }, { passive: true });
 
   btn.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: 'smooth' });

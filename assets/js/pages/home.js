@@ -145,6 +145,9 @@
           '<h1 class="hero__title">' + esc(hero.title) + '</h1>' +
           '<p class="hero__subtitle">' + esc(hero.subtitle) + '</p>' +
         '</div>' +
+        '<div class="hero__scroll-indicator" aria-hidden="true">' +
+          '<div class="hero__scroll-mouse"><div class="hero__scroll-wheel"></div></div>' +
+        '</div>' +
       '</section>';
 
     // Stats Bar
