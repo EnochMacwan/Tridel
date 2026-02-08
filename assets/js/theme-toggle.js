@@ -1,47 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const toggleButton = document.getElementById('theme-toggle');
-    const htmlElement = document.documentElement;
-    const icon = toggleButton ? toggleButton.querySelector('i') : null;
+/**
+ * Theme Toggle
+ * Applies saved theme immediately on parse (prevents flash).
+ * Exports initThemeToggle() for layout.js to call after header is in DOM.
+ */
+(function () {
+  'use strict';
 
-    // Check for saved user preference, if any, on load of the website
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var htmlElement = document.documentElement;
 
-    if (savedTheme) {
-        htmlElement.setAttribute('data-theme', savedTheme);
-        updateIcon(savedTheme);
-    } else if (systemPrefersDark) {
-        htmlElement.setAttribute('data-theme', 'dark');
-        updateIcon('dark');
-    }
+  // Apply saved theme immediately (before paint)
+  var savedTheme = localStorage.getItem('theme');
+  var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    // Function to update the icon based on the current theme
-    function updateIcon(theme) {
-        if (!icon) return;
-        // Assuming we use a sun icon for light mode (to switch to dark) 
-        // and a moon icon for dark mode (to switch to light)
-        // OR standard practice: Show the icon of the mode you are IN or the mode you switch TO?
-        // Usually: Sun icon means "Switch to Light", Moon icon means "Switch to Dark".
+  if (savedTheme) {
+    htmlElement.setAttribute('data-theme', savedTheme);
+  } else if (systemPrefersDark) {
+    htmlElement.setAttribute('data-theme', 'dark');
+  }
 
-        if (theme === 'dark') {
-            icon.className = 'fas fa-sun'; // Show Sun to switch back to light
-        } else {
-            icon.className = 'fas fa-moon'; // Show Moon to switch to dark
-        }
-    }
+  function updateIcon(icon, theme) {
+    if (!icon) return;
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
 
-    // Toggle event listener
-    if (toggleButton) {
-        toggleButton.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  /**
+   * Bind the theme toggle button. Call after #theme-toggle is in the DOM.
+   */
+  window.initThemeToggle = function () {
+    var toggleButton = document.getElementById('theme-toggle');
+    if (!toggleButton) return;
 
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateIcon(newTheme);
-            
-            // Dispatch a custom event for other components (like the map) to listen to
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
-        });
-    }
-});
+    var icon = toggleButton.querySelector('i');
+    var currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+    updateIcon(icon, currentTheme);
+
+    toggleButton.addEventListener('click', function () {
+      var current = htmlElement.getAttribute('data-theme');
+      var newTheme = current === 'dark' ? 'light' : 'dark';
+
+      htmlElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateIcon(icon, newTheme);
+
+      window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+    });
+  };
+})();

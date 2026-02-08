@@ -1,20 +1,32 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const productId = params.get('id');
-    const container = document.getElementById('product-detail-container');
+/**
+ * Product Detail Loader
+ * Dynamically generates the product detail page content.
+ *
+ * Exports:
+ *   window.renderProductDetail(container, productId)
+ */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+/**
+ * Renders a Product Detail page into the given container.
+ * Exported as window.renderProductDetail for SPA router usage.
+ *
+ * @param {HTMLElement} container - The DOM element to render into
+ * @param {string} productId - The product ID to display
+ */
+window.renderProductDetail = function(container, productId) {
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
 
     if (!productId || !data) {
-        container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><a href="products.html" class="button button--primary">View All Products</a></div>';
+        container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><a href="#/products" class="button button--primary">View All Products</a></div>';
         return;
     }
 
     const product = data.find(p => p.id === productId);
 
     if (!product) {
-        container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="products.html" class="button button--primary">View All Products</a></div>';
+        container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="#/products" class="button button--primary">View All Products</a></div>';
         return;
     }
 
@@ -29,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         featuresHtml = `
             <h3>Key Features</h3>
             <ul class="detail-layout__list">
-                ${product.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+                ${product.features.map(f => `<li>${f}</li>`).join('')}
             </ul>
         `;
     }
@@ -65,30 +77,30 @@ document.addEventListener('DOMContentLoaded', () => {
             <h1 class="detail-layout__title">${escapeHtml(product.name)}</h1>
             <p class="detail-layout__description">${escapeHtml(product.longDescription || product.description)}</p>
             ${featuresHtml}
-            
-            <div class="product-actions" style="margin-top: 2rem;">
-              <a class="button button--primary" href="contact.html?subject=Quote for ${encodeURIComponent(product.name)}">Request Quote</a>
-              <a href="products.html" class="button button--soft">Back to Products</a>
+
+            <div class="product-actions">
+              <a class="button button--primary" href="#/contact?subject=Quote for ${encodeURIComponent(product.name)}">Request Quote</a>
+              <a href="#/products" class="button button--soft">Back to Products</a>
             </div>
           </div>
           <div class="detail-layout__image">
             ${galleryHtml}
           </div>
         </div>
-        
+
         <!-- Sub-Products Section (Grid Layout) -->
         ${product.subProducts ? `
-            <div class="sub-products-section" style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border);">
-                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Related Systems / Products</h2>
-                
+            <div class="sub-products-section" style="max-width: 1100px; margin: 2.5rem auto 0; padding-top: 2rem; border-top: 1px solid var(--border);">
+                <h2 style="margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: 600;">Related Systems / Products</h2>
+
                 <div class="product-list-grid">
                     ${product.subProducts.map(subItem => {
                          // Resolve full object if it's just a reference
                         const sub = (typeof subItem === 'object' && subItem.name) ? subItem : data.find(p => p.id === (subItem.id || subItem));
                         if (!sub) return '';
-                        
+
                         return `
-                        <a href="product-detail.html?id=${sub.id}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;" aria-label="View details about ${escapeHtml(sub.name)}">
+                        <a href="#/products/detail?id=${sub.id}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;" aria-label="View details about ${escapeHtml(sub.name)}">
                             <div class="product-card-visual">
                                 <img loading="lazy" alt="${escapeHtml(sub.name)}" class="product-item__image product-image-style" src="${sub.image || product.image}">
                             </div>
@@ -103,6 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         ` : ''}
     `;
+};
+
+// --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+    const container = document.getElementById('product-detail-container');
+
+    if (container) {
+        window.renderProductDetail(container, productId);
+    }
 });
 
 // changeImage and openLightbox are defined globally in script.js

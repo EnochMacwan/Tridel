@@ -3,34 +3,36 @@
  * Dynamically generates:
  * 1. Mega Menu Content for Products (on all pages)
  * 2. Product Grid Content (on products.html)
+ *
+ * Exports:
+ *   window.renderProductsMegaMenu(container)
+ *   window.renderProductsGrid(container)
  */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Load Mega Menu
-    const megaMenuContainer = document.querySelector('.mm-products');
-    if (megaMenuContainer) {
-        renderMegaMenu(megaMenuContainer);
-    }
-
-    // 2. Load Products Page Grid
-    // We look for specific section containers to inject into.
-    // However, existing HTML structure separates "Platforms", "Software", "Solutions".
-    // We will target specific IDs if they exist, or build a unified grid if we refactor.
-    // For now, let's look for a unified container OR separate ones if we change products.html
-    const productListContainer = document.getElementById('dynamic-products-container');
-    if (productListContainer) {
-        renderProductsPage(productListContainer);
-    }
-});
+/**
+ * Helper: Get Icon for Product Category
+ */
+function getIconForProductCategory(category) {
+    const icons = {
+        'buoys': 'fas fa-life-ring',
+        'vessels': 'fas fa-ship',
+        'equipment': 'fas fa-screwdriver-wrench',
+        'software': 'fas fa-laptop-code',
+        'integrated solutions': 'fas fa-layer-group'
+    };
+    return `<i class="${icons[category.toLowerCase()] || 'fas fa-cube'}"></i>`;
+}
 
 /**
  * Renders the Mega Menu Columns
+ * Exported as window.renderProductsMegaMenu for SPA router usage.
  */
-function renderMegaMenu(container) {
+window.renderProductsMegaMenu = function(container) {
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
     if (!data) {
-        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
 
@@ -55,7 +57,7 @@ function renderMegaMenu(container) {
 
         // Items - Case Insensitive Comparison, filtering out nested items
         const items = data.filter(p => p.category.toLowerCase() === col.category.toLowerCase() && !p.isNested);
-        
+
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {
             const link = document.createElement('a');
@@ -64,7 +66,7 @@ function renderMegaMenu(container) {
             link.dataset.title = item.name;
             link.dataset.desc = item.description;
             link.dataset.img = item.image;
-            
+
             let html = escapeHtml(item.name);
             if (item.isNew) {
                 html += ` <span class="badge-new">New</span>`;
@@ -93,18 +95,23 @@ function renderMegaMenu(container) {
         `;
         container.appendChild(spotlight);
     }
-}
+
+    // Initialize glass card hover effects
+    if (typeof window.initGlassCards === 'function') {
+        window.initGlassCards();
+    }
+};
 
 /**
  * Renders the Products Page Grid
- * This assumes we replace the complex sections in products.html with a single dynamic container
- * and valid sub-containers for sections.
+ * Exported as window.renderProductsGrid for SPA router usage.
  */
-function renderProductsPage(container) {
+window.renderProductsGrid = function(container) {
+    if (!container) container = document.getElementById('dynamic-products-container');
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
     if (!data) {
-        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
 
@@ -112,18 +119,18 @@ function renderProductsPage(container) {
 
     // Define Sections corresponding to the page layout
     const sections = [
-        { 
-            title: 'Survey & Monitoring Platforms', 
+        {
+            title: 'Survey & Monitoring Platforms',
             subtitle: 'Robust hardware solutions engineering for the marine environment.',
             categories: ['Buoys', 'Vessels', 'Equipment'] // Grouping hardware
         },
-        { 
-            title: 'Survey & Monitoring Softwares', 
+        {
+            title: 'Survey & Monitoring Softwares',
             subtitle: 'Advanced software platforms for data management and analysis.',
             categories: ['Software']
         },
-        { 
-            title: 'Integrated Solutions', 
+        {
+            title: 'Integrated Solutions',
             subtitle: 'Comprehensive solutions for environmental and operational intelligence.',
             categories: ['Integrated Solutions']
         }
@@ -155,11 +162,11 @@ function renderProductsPage(container) {
             // Only show sub-header if there are multiple categories in this section OR it's explicit
             // In the original file, "Buoys", "Vessels", "Winches" had headers.
             // "Software" categories didn't have sub-headers, just a grid.
-            
-            const showSubSelect = section.categories.length > 1; 
+
+            const showSubSelect = section.categories.length > 1;
 
             sectionContent += `<div class="product-category">`;
-            
+
             if (showSubSelect) {
                 sectionContent += `<h3 class="product-category__title">${getIconForProductCategory(catName)} ${catName}</h3>`;
             }
@@ -188,18 +195,19 @@ function renderProductsPage(container) {
         sectionEl.innerHTML = sectionContent;
         container.appendChild(sectionEl);
     });
-}
+};
 
-/**
- * Helper: Get Icon for Product Category
- */
-function getIconForProductCategory(category) {
-    const icons = {
-        'buoys': 'fas fa-life-ring',
-        'vessels': 'fas fa-ship',
-        'equipment': 'fas fa-screwdriver-wrench',
-        'software': 'fas fa-laptop-code',
-        'integrated solutions': 'fas fa-layer-group'
-    };
-    return `<i class="${icons[category.toLowerCase()] || 'fas fa-cube'}"></i>`;
-}
+// --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Load Mega Menu
+    const megaMenuContainer = document.querySelector('.mm-products');
+    if (megaMenuContainer) {
+        window.renderProductsMegaMenu(megaMenuContainer);
+    }
+
+    // 2. Load Products Page Grid
+    const productListContainer = document.getElementById('dynamic-products-container');
+    if (productListContainer) {
+        window.renderProductsGrid(productListContainer);
+    }
+});

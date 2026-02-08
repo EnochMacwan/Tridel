@@ -1,584 +1,264 @@
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Tridel SPA - Global Behaviors
+ * All functions exported as window.* for layout.js and page renderers to call.
+ */
 
-    // --- Mobile Navigation Logic Removed (Menu button removed) ---
-
-    // --- Mobile Accordion Logic ---
-    // Select nav links that have a mega menu sibling
-    const navLinks = document.querySelectorAll('.header__nav-list > li > a');
-
-    navLinks.forEach(link => {
-        // Check if this link has a mega menu sibling
-        const megaMenu = link.nextElementSibling;
-        if (megaMenu && megaMenu.classList.contains('mega-menu')) {
-            link.addEventListener('click', (e) => {
-                // Determine if we are on mobile (using the same breakpoint as CSS)
-                if (window.innerWidth <= 1024) {
-                    e.preventDefault(); // Prevent navigation
-
-                    // Toggle active class on parent li
-                    const parentLi = link.parentElement;
-                    parentLi.classList.toggle('mobile-menu-open');
-
-                    // Optional: Close other menus (accordion style)
-                    document.querySelectorAll('.header__nav-list > li').forEach(li => {
-                        if (li !== parentLi) {
-                            li.classList.remove('mobile-menu-open');
-                        }
-                    });
-                }
-            });
-        }
-    });
-
-    // --- Desktop Mega Menu Hover + Keyboard Control ---
-    // Only run on desktop
-    if (window.innerWidth > 1024) {
-        const megaMenuLinks = document.querySelectorAll('.header__nav-list > li');
-
-        function closeAllMegaMenus() {
-            megaMenuLinks.forEach(li => {
-                const mm = li.querySelector('.mega-menu');
-                const lk = li.querySelector('.header__nav-link');
-                if (mm) {
-                    mm.classList.remove('is-visible');
-                    if (lk) lk.setAttribute('aria-expanded', 'false');
-                }
-            });
-        }
-
-        megaMenuLinks.forEach(li => {
-            const megaMenu = li.querySelector('.mega-menu');
-            if (!megaMenu) return;
-
-            const link = li.querySelector('.header__nav-link');
-            let hideTimeout = null;
-            let showTimeout = null;
-
-            // Set initial aria-expanded
-            link.setAttribute('aria-expanded', 'false');
-
-            function showMenu() {
-                megaMenu.classList.add('is-visible');
-                link.setAttribute('aria-expanded', 'true');
-            }
-
-            function hideMenu() {
-                megaMenu.classList.remove('is-visible');
-                link.setAttribute('aria-expanded', 'false');
-            }
-
-            // Show menu only when hovering the nav link
-            link.addEventListener('mouseenter', () => {
-                clearTimeout(hideTimeout);
-                clearTimeout(showTimeout);
-                showTimeout = setTimeout(showMenu, 50);
-            });
-
-            // Keep menu open when hovering the menu itself
-            megaMenu.addEventListener('mouseenter', () => {
-                clearTimeout(hideTimeout);
-                clearTimeout(showTimeout);
-            });
-
-            // Hide menu when leaving the link
-            link.addEventListener('mouseleave', () => {
-                clearTimeout(showTimeout);
-                hideTimeout = setTimeout(hideMenu, 150);
-            });
-
-            // Hide menu when leaving the menu
-            megaMenu.addEventListener('mouseleave', () => {
-                clearTimeout(showTimeout);
-                hideTimeout = setTimeout(hideMenu, 100);
-            });
-
-            // Keyboard: Enter/Space/ArrowDown opens menu, Escape closes
-            link.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    closeAllMegaMenus();
-                    showMenu();
-                    // Focus first link inside mega menu
-                    const firstLink = megaMenu.querySelector('a, button');
-                    if (firstLink) firstLink.focus();
-                }
-            });
-
-            // Escape key inside mega menu closes it and returns focus
-            megaMenu.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    hideMenu();
-                    link.focus();
-                }
-            });
-        });
-    }
-
-    // --- Interactive Testimonial Slider ---
-    const sliderContainer = document.querySelector('.testimonial-slider-container');
-    if (sliderContainer) {
-        const slider = sliderContainer.querySelector('.testimonial-slider');
-        const slides = slider.querySelectorAll('.testimonial-slide');
-        const prevButton = sliderContainer.querySelector('.slider-btn--prev');
-        const nextButton = sliderContainer.querySelector('.slider-btn--next');
-
-        // Add aria-live for screen readers
-        slider.setAttribute('aria-live', 'polite');
-
-        if (slides.length > 0) {
-            let currentSlide = 0;
-            let slideInterval;
-            let isPlaying = true;
-
-            function showSlide(index) {
-                slider.style.transform = `translateX(-${index * 100}%)`;
-                // Update aria-current on slides
-                slides.forEach((slide, i) => {
-                    slide.setAttribute('aria-current', i === index ? 'true' : 'false');
-                });
-            }
-
-            function nextSlide() {
-                currentSlide = (currentSlide + 1) % slides.length;
-                showSlide(currentSlide);
-            }
-
-            function prevSlide() {
-                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-                showSlide(currentSlide);
-            }
-
-            function startSlider() {
-                slideInterval = setInterval(nextSlide, 5000);
-                isPlaying = true;
-                if (pauseBtn) pauseBtn.setAttribute('aria-label', 'Pause slideshow');
-                if (pauseBtn) pauseBtn.textContent = '⏸';
-            }
-
-            function stopSlider() {
-                clearInterval(slideInterval);
-                isPlaying = false;
-                if (pauseBtn) pauseBtn.setAttribute('aria-label', 'Play slideshow');
-                if (pauseBtn) pauseBtn.textContent = '▶';
-            }
-
-            function resetSlider() {
-                clearInterval(slideInterval);
-                startSlider();
-            }
-
-            // Create pause/play button
-            const pauseBtn = document.createElement('button');
-            pauseBtn.className = 'slider-btn slider-btn--pause';
-            pauseBtn.setAttribute('aria-label', 'Pause slideshow');
-            pauseBtn.textContent = '⏸';
-            pauseBtn.addEventListener('click', () => {
-                if (isPlaying) stopSlider();
-                else startSlider();
-            });
-            sliderContainer.appendChild(pauseBtn);
-
-            if (nextButton && prevButton) {
-                nextButton.addEventListener('click', () => {
-                    nextSlide();
-                    resetSlider();
-                });
-
-                prevButton.addEventListener('click', () => {
-                    prevSlide();
-                    resetSlider();
-                });
-            }
-
-            // Show the first slide and start autoplay
-            showSlide(currentSlide);
-            startSlider();
-        }
-    }
-
-    // --- Dynamic News Feed Logic Removed --- 
-    // Allowing static iframe in HTML to load instead.
-
-    // --- Map JS ---
-    // This logic runs only if a div with id="map" is on the page
-    // Skip if locations-loader.js will handle the map (has LOCATIONS_DATA)
-    if (document.getElementById('map') && typeof L !== 'undefined' && typeof window.LOCATIONS_DATA === 'undefined') {
-        const LOCATIONS = [
-            {
-                id: 'uae',
-                name: 'Tridel Technologies FZCO',
-                address: 'QD01, DAFZA Industrial Park, Qusais, Dubai, UAE',
-                coords: [25.2893458, 55.4034675]
-            },
-            {
-                id: 'india',
-                name: 'Tridel Technologies Pvt Ltd (Chennai)',
-                address: 'No 10/1, 2nd Street, Thirumurugan Nagar, Arcot Road, Porur, Chennai, TN 600116',
-                coords: [13.0371328, 80.1607926]
-            },
-            {
-                id: 'india-vadodara',
-                name: 'Tridel Vadodara',
-                address: '<strong>Vadodara Factory:</strong><br>Block No. 680 / Plot No. 2, Shah Industrial Estate-2, Lamdapura Road, Manjusar, Savli, Vadodara, Gujarat – 390025<br><br><strong>Vadodara Office:</strong><br>76, Swaminarayan Nagar, Nizampura, Vadodara, Gujarat – 390002',
-                coords: [22.3824, 73.2144]
-            },
-            {
-                id: 'australia',
-                name: 'Tridel Technologies Pty Ltd',
-                address: 'Eden Hills, Adelaide, SA',
-                coords: [-35.0240257, 138.5861123]
-            }
-        ];
-
-        const map = L.map('map', {
-            scrollWheelZoom: false,
-            zoomControl: false
-        });
-        L.control.zoom({
-            position: 'bottomright'
-        }).addTo(map);
-        // Using Esri World Imagery for premium Satellite/Marine look
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 19
-        }).addTo(map);
-
-        // Optional: Add labels on top (Stamen Toner Lite or Hybrid) - keeping it simple satellite for now or adding a hybrid reference layer would be ideal but simple satellite is "richer".
-
-
-        const group = L.featureGroup().addTo(map);
-
-        LOCATIONS.forEach(loc => {
-            // Create a custom icon that displays the name directly
-            const textIcon = L.divIcon({
-                className: 'custom-map-pin',
-                html: `<div class="pin-wrapper"><div class="pin-text">${loc.name}</div><div class="pin-dot"></div></div>`,
-                iconSize: null, // Let CSS handle sizing independent of content
-                iconAnchor: [0, 0] // We will translate using CSS relative to this point
-            });
-
-            const marker = L.marker(loc.coords, { icon: textIcon }).addTo(map);
-
-            // Keep full details in popup for click
-            marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.address}`);
-            group.addLayer(marker);
-
-            // Add click listener to text
-            const detailEl = document.getElementById(`location-details-${loc.id}`);
-            if (detailEl) {
-                detailEl.addEventListener('click', () => {
-                    map.flyTo(loc.coords, 13);
-                    marker.openPopup();
-                });
-            }
-        });
-
-        map.fitBounds(group.getBounds().pad(0.5));
-    }
-});
 /* ---------------------------------- */
-/* 14. Accessible Modal & Carousel    */
+/* Mobile Accordion Navigation        */
 /* ---------------------------------- */
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('product-modal');
-
-    if (!modal) {
-        // Modal is optional on pages other than products
-        return;
-    }
-
-    const modalTitleEl = document.getElementById('product-modal-title');
-    const modalContentEl = document.getElementById('product-modal-content');
-    const openButtons = document.querySelectorAll('[data-modal-trigger]');
-    const closeButtons = modal.querySelectorAll('[data-modal-close]');
-    let lastFocusedElement;
-
-    // --- Focus Tabbing ---
-    const focusableEls = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstFocusableEl = focusableEls[0];
-    const lastFocusableEl = focusableEls[focusableEls.length - 1];
-
-    function openModal(triggerButton) {
-        lastFocusedElement = triggerButton;
-        const contentId = triggerButton.getAttribute('data-modal-trigger');
-        const contentSource = document.getElementById(`modal-content-${contentId}`);
-
-        if (!contentSource) {
-            return;
+window.initMobileNav = function () {
+  var navLinks = document.querySelectorAll('.header__nav-list > li > a');
+  navLinks.forEach(function (link) {
+    var megaMenu = link.nextElementSibling;
+    if (megaMenu && megaMenu.classList.contains('mega-menu')) {
+      link.addEventListener('click', function (e) {
+        if (window.innerWidth <= 1024) {
+          e.preventDefault();
+          var parentLi = link.parentElement;
+          parentLi.classList.toggle('mobile-menu-open');
+          document.querySelectorAll('.header__nav-list > li').forEach(function (li) {
+            if (li !== parentLi) li.classList.remove('mobile-menu-open');
+          });
         }
-
-        // --- 1. Find and Build Image Carousel ---
-        const imageSourceDiv = contentSource.querySelector('.product-item__modal-images');
-        let carouselHTML = '';
-
-        if (imageSourceDiv) {
-            const images = imageSourceDiv.querySelectorAll('img');
-            if (images.length > 0) {
-                let slidesHTML = '';
-                images.forEach(img => {
-                    // Fix: Ensure we handle 404ing images gracefully in the carousel
-                    slidesHTML += `<div class="modal-carousel__slide"><img src="${img.src}" alt="${img.alt}"></div>`;
-                });
-
-                carouselHTML = `
-                    <div class="modal-carousel">
-                        <div class="modal-carousel__track" style="transform: translateX(0%)">
-                            ${slidesHTML}
-                        </div>
-                        ${images.length > 1 ? `
-                            <button class="modal-carousel__btn modal-carousel__btn--prev" aria-label="Previous image">&lt;</button>
-                            <button class="modal-carousel__btn modal-carousel__btn--next" aria-label="Next image">&gt;</button>
-                            <div class="modal-carousel__counter">1 / ${images.length}</div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-        }
-
-        // --- 2. Inject Content ---
-        const titleSource = contentSource.querySelector('h2');
-        modalTitleEl.textContent = titleSource ? titleSource.textContent : 'Product Details';
-
-        // Inject content
-        modalContentEl.innerHTML = carouselHTML + contentSource.innerHTML;
-
-        // Clean up duplicate image div
-        const dupImages = modalContentEl.querySelector('.product-item__modal-images');
-        if (dupImages) dupImages.remove();
-
-        // --- 3. Activate Carousel ---
-        const carousel = modal.querySelector('.modal-carousel');
-        if (carousel) initCarousel(carousel);
-
-        // --- 4. Show Modal ---
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        if (firstFocusableEl) firstFocusableEl.focus();
-
-        // Listeners
-        modal.addEventListener('keydown', trapFocus);
-        modal.addEventListener('keydown', closeOnEscape);
-        closeButtons.forEach(btn => btn.addEventListener('click', closeModal));
-        const backdrop = modal.querySelector('.modal__backdrop');
-        if (backdrop) backdrop.addEventListener('click', closeModal);
+      });
     }
-
-    function closeModal() {
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        modalContentEl.innerHTML = '';
-
-        modal.removeEventListener('keydown', trapFocus);
-        modal.removeEventListener('keydown', closeOnEscape);
-        closeButtons.forEach(btn => btn.removeEventListener('click', closeModal));
-        const backdrop = modal.querySelector('.modal__backdrop');
-        if (backdrop) backdrop.removeEventListener('click', closeModal);
-
-        if (lastFocusedElement) lastFocusedElement.focus();
-    }
-
-    function closeOnEscape(e) { if (e.key === 'Escape') closeModal(); }
-
-    function trapFocus(e) {
-        if (e.key !== 'Tab') return;
-        if (e.shiftKey) {
-            if (document.activeElement === firstFocusableEl) {
-                lastFocusableEl.focus();
-                e.preventDefault();
-            }
-        } else {
-            if (document.activeElement === lastFocusableEl) {
-                firstFocusableEl.focus();
-                e.preventDefault();
-            }
-        }
-    }
-
-    function initCarousel(carousel) {
-        const track = carousel.querySelector('.modal-carousel__track');
-        const slides = Array.from(track.children);
-        const nextBtn = carousel.querySelector('.modal-carousel__btn--next');
-        const prevBtn = carousel.querySelector('.modal-carousel__btn--prev');
-        const counter = carousel.querySelector('.modal-carousel__counter');
-        let currentIndex = 0;
-
-        if (slides.length <= 1) return;
-
-        function updateSlide(targetIndex) {
-            track.style.transform = `translateX(-${targetIndex * 100}%)`;
-            counter.textContent = `${targetIndex + 1} / ${slides.length}`;
-            currentIndex = targetIndex;
-        }
-
-        nextBtn.addEventListener('click', () => {
-            let nextIndex = currentIndex + 1;
-            if (nextIndex > slides.length - 1) nextIndex = 0;
-            updateSlide(nextIndex);
-        });
-
-        prevBtn.addEventListener('click', () => {
-            let prevIndex = currentIndex - 1;
-            if (prevIndex < 0) prevIndex = slides.length - 1;
-            updateSlide(prevIndex);
-        });
-    }
-
-});
-
-
-
-/* 17. Product Gallery Logic          */
-/* ---------------------------------- */
-
-// Global functions for inline HTML calls
-window.changeImage = function (src) {
-    const mainImage = document.getElementById('main-product-image');
-    if (mainImage) {
-        // Fade out
-        mainImage.style.opacity = '0';
-        setTimeout(() => {
-            mainImage.src = src;
-            mainImage.style.opacity = '1';
-        }, 200);
-    }
-
-    // Update active thumb
-    const thumbs = document.querySelectorAll('.gallery-thumbs img');
-    thumbs.forEach(img => {
-        if (img.src === src) img.classList.add('active');
-        else img.classList.remove('active');
-    });
+  });
 };
 
-// --- 22. Back to Top Button (Auto-Inject) ---
-document.addEventListener('DOMContentLoaded', () => {
-    const backToTopBtn = document.createElement('button');
-    backToTopBtn.id = 'back-to-top';
-    backToTopBtn.ariaLabel = 'Back to Top';
-    backToTopBtn.innerHTML = `
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-    `;
-    document.body.appendChild(backToTopBtn);
+/* ---------------------------------- */
+/* Desktop Mega Menu Hover + Keyboard */
+/* ---------------------------------- */
+window.initMegaMenu = function () {
+  if (window.innerWidth <= 1024) return;
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 500) {
-            backToTopBtn.classList.add('visible');
-        } else {
-            backToTopBtn.classList.remove('visible');
-        }
+  var megaMenuLinks = document.querySelectorAll('.header__nav-list > li');
+
+  function closeAllMegaMenus() {
+    megaMenuLinks.forEach(function (li) {
+      var mm = li.querySelector('.mega-menu');
+      var lk = li.querySelector('.header__nav-link');
+      if (mm) {
+        mm.classList.remove('is-visible');
+        if (lk) lk.setAttribute('aria-expanded', 'false');
+      }
     });
+  }
 
-    backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
+  megaMenuLinks.forEach(function (li) {
+    var megaMenu = li.querySelector('.mega-menu');
+    if (!megaMenu) return;
 
-    // --- Mega Menu Interaction (Glass Prism) ---
-    const glassLinks = document.querySelectorAll('.glass-link');
-    let updateTimeout;
+    var link = li.querySelector('.header__nav-link');
+    var hideTimeout = null;
+    var showTimeout = null;
 
-    function updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href) {
-        // 1. Fade out content slightly
-        card.style.opacity = '0.7';
-        if (imgEl) imgEl.style.transform = 'scale(0.95)';
+    link.setAttribute('aria-expanded', 'false');
 
-        // 2. Change content after short delay
-        clearTimeout(updateTimeout);
-        updateTimeout = setTimeout(() => {
-            if (imgEl && img) imgEl.src = img;
-            if (titleEl) titleEl.textContent = title;
-            if (descEl) descEl.textContent = desc;
-            if (btnEl) btnEl.href = href; // Sync the button link
-
-            // 3. Fade in and pop
-            card.style.opacity = '1';
-            if (imgEl) imgEl.style.transform = 'scale(1)';
-        }, 200);
+    function showMenu() {
+      megaMenu.classList.add('is-visible');
+      link.setAttribute('aria-expanded', 'true');
     }
 
-    glassLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-            // Find the parent grid and the spotlight card within it
-            const container = link.closest('.mm-glass-grid');
-            if (!container) return;
+    function hideMenu() {
+      megaMenu.classList.remove('is-visible');
+      link.setAttribute('aria-expanded', 'false');
+    }
 
-            const card = container.querySelector('.glass-spotlight');
-            if (!card) return;
-
-            const imgEl = card.querySelector('img');
-            const titleEl = card.querySelector('h5');
-            const descEl = card.querySelector('p');
-            const btnEl = card.querySelector('a'); // The "View Details" button
-
-            const title = link.getAttribute('data-title');
-            const desc = link.getAttribute('data-desc');
-            const img = link.getAttribute('data-img');
-            const href = link.getAttribute('href');
-
-            // Allow update if at least title is present. Image is optional.
-            if (title) {
-                updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href);
-            }
-        });
+    link.addEventListener('mouseenter', function () {
+      clearTimeout(hideTimeout);
+      clearTimeout(showTimeout);
+      showTimeout = setTimeout(showMenu, 50);
     });
-});
 
-// Track last focused element for focus restoration
-let _lightboxTrigger = null;
+    megaMenu.addEventListener('mouseenter', function () {
+      clearTimeout(hideTimeout);
+      clearTimeout(showTimeout);
+    });
+
+    link.addEventListener('mouseleave', function () {
+      clearTimeout(showTimeout);
+      hideTimeout = setTimeout(hideMenu, 150);
+    });
+
+    megaMenu.addEventListener('mouseleave', function () {
+      clearTimeout(showTimeout);
+      hideTimeout = setTimeout(hideMenu, 100);
+    });
+
+    link.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        closeAllMegaMenus();
+        showMenu();
+        var firstLink = megaMenu.querySelector('a, button');
+        if (firstLink) firstLink.focus();
+      }
+    });
+
+    megaMenu.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        hideMenu();
+        link.focus();
+      }
+    });
+  });
+};
+
+/* ---------------------------------- */
+/* Mega Menu Glass Card Interaction   */
+/* ---------------------------------- */
+window.initGlassCards = function () {
+  var glassLinks = document.querySelectorAll('.glass-link');
+  var updateTimeout;
+
+  function updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href) {
+    card.style.opacity = '0.7';
+    if (imgEl) imgEl.style.transform = 'scale(0.95)';
+
+    clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(function () {
+      if (imgEl && img) imgEl.src = img;
+      if (titleEl) titleEl.textContent = title;
+      if (descEl) descEl.textContent = desc;
+      if (btnEl) btnEl.href = href;
+      card.style.opacity = '1';
+      if (imgEl) imgEl.style.transform = 'scale(1)';
+    }, 200);
+  }
+
+  glassLinks.forEach(function (link) {
+    link.addEventListener('mouseenter', function () {
+      var container = link.closest('.mm-glass-grid');
+      if (!container) return;
+      var card = container.querySelector('.glass-spotlight');
+      if (!card) return;
+
+      var imgEl = card.querySelector('img');
+      var titleEl = card.querySelector('h5');
+      var descEl = card.querySelector('p');
+      var btnEl = card.querySelector('a');
+
+      var title = link.getAttribute('data-title');
+      var desc = link.getAttribute('data-desc');
+      var img = link.getAttribute('data-img');
+      var href = link.getAttribute('href');
+
+      if (title) {
+        updateGlassCard(card, titleEl, descEl, imgEl, btnEl, title, desc, img, href);
+      }
+    });
+  });
+};
+
+/* ---------------------------------- */
+/* Scroll Reveal - IntersectionObserver */
+/* ---------------------------------- */
+window.initScrollReveal = function () {
+  var revealElements = document.querySelectorAll('.reveal:not(.visible)');
+  if (!revealElements.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  revealElements.forEach(function (el) { observer.observe(el); });
+};
+
+/* ---------------------------------- */
+/* Back to Top Button                  */
+/* ---------------------------------- */
+(function () {
+  var btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.ariaLabel = 'Back to Top';
+  btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>';
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.body.appendChild(btn);
+  });
+
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 500) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+/* ---------------------------------- */
+/* Product Gallery (global)           */
+/* ---------------------------------- */
+window.changeImage = function (src) {
+  var mainImage = document.getElementById('main-product-image');
+  if (mainImage) {
+    mainImage.style.opacity = '0';
+    setTimeout(function () {
+      mainImage.src = src;
+      mainImage.style.opacity = '1';
+    }, 200);
+  }
+  document.querySelectorAll('.gallery-thumbs img').forEach(function (img) {
+    img.classList.toggle('active', img.src === src);
+  });
+};
+
+/* ---------------------------------- */
+/* Lightbox Modal (global)            */
+/* ---------------------------------- */
+var _lightboxTrigger = null;
 
 window.openLightbox = function (el) {
-    _lightboxTrigger = el;
-    const src = el.querySelector('img') ? el.querySelector('img').src : el.src;
+  _lightboxTrigger = el;
+  var src = el.querySelector('img') ? el.querySelector('img').src : el.src;
 
-    // Create Modal if not exists
-    let modal = document.getElementById('lightbox-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'lightbox-modal';
-        modal.className = 'lightbox-modal';
-        modal.setAttribute('role', 'dialog');
-        modal.setAttribute('aria-modal', 'true');
-        modal.setAttribute('aria-label', 'Image viewer');
-        modal.innerHTML = `
-            <button class="lightbox-close" aria-label="Close image viewer" onclick="closeLightbox()">&times;</button>
-            <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged product image">
-        `;
-        document.body.appendChild(modal);
+  var modal = document.getElementById('lightbox-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'lightbox-modal';
+    modal.className = 'lightbox-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Image viewer');
+    modal.innerHTML =
+      '<button class="lightbox-close" aria-label="Close image viewer" onclick="closeLightbox()">&times;</button>' +
+      '<img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged product image">';
+    document.body.appendChild(modal);
 
-        // Close on background click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeLightbox();
-        });
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  }
 
-        // Close on ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLightbox();
-        });
-    }
+  document.getElementById('lightbox-img').src = src;
+  modal.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
 
-    document.getElementById('lightbox-img').src = src;
-    modal.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-
-    // Focus the close button for keyboard users
-    const closeBtn = modal.querySelector('.lightbox-close');
-    if (closeBtn) closeBtn.focus();
+  var closeBtn = modal.querySelector('.lightbox-close');
+  if (closeBtn) closeBtn.focus();
 };
 
 window.closeLightbox = function () {
-    const modal = document.getElementById('lightbox-modal');
-    if (modal) {
-        modal.classList.remove('is-open');
-        document.body.style.overflow = '';
-    }
-    // Restore focus to the element that triggered the lightbox
-    if (_lightboxTrigger) {
-        _lightboxTrigger.focus();
-        _lightboxTrigger = null;
-    }
+  var modal = document.getElementById('lightbox-modal');
+  if (modal) {
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+  if (_lightboxTrigger) {
+    _lightboxTrigger.focus();
+    _lightboxTrigger = null;
+  }
 };

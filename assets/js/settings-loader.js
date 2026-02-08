@@ -2,6 +2,7 @@
  * Settings Loader
  * Applies global configuration from SETTINGS_DATA to the frontend.
  */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check if settings exist
@@ -21,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // On contact.html there is only one. On careers.html there is only one.
     // To be safer, we can check the page we are on.
     
-    const isContactPage = window.location.pathname.includes('contact.html') || document.querySelector('.page-contact');
-    const isCareersPage = window.location.pathname.includes('careers.html') || document.querySelector('.page-careers');
+    const isContactPage = window.location.pathname.includes('contact.html') || window.location.hash.includes('/contact') || document.querySelector('.page-contact');
+    const isCareersPage = window.location.pathname.includes('careers.html') || window.location.hash.includes('/careers') || document.querySelector('.page-careers');
 
     if (isContactPage && contactForm) {
         if (config.contactEmail) {
