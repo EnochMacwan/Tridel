@@ -64,6 +64,11 @@ window.renderTestimonialMap = function(container) {
 
   container.appendChild(section);
 
+  // Re-run scroll reveal to observe this newly added .reveal element
+  if (typeof window.initScrollReveal === 'function') {
+    window.initScrollReveal();
+  }
+
   // --- Wait for Leaflet ---
   function waitForLeaflet(cb) {
     if (typeof L !== 'undefined') return cb();
