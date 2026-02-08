@@ -113,6 +113,13 @@ window.initMegaMenu = function () {
         link.focus();
       }
     });
+
+    // Close mega menu when any link inside is clicked (delegated for dynamic content)
+    megaMenu.addEventListener('click', function (e) {
+      if (e.target.closest('a')) {
+        closeAllMegaMenus();
+      }
+    });
   });
 };
 

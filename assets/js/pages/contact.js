@@ -32,25 +32,38 @@
     html += '<div class="offices-map-wrapper"><div id="contact-offices-map" class="offices-map"></div></div>';
     html += '<div class="offices-card-list">';
 
+    // Group locations by country
+    var grouped = {};
     locations.forEach(function (loc) {
-      var iconClass = loc.type === 'Factory' ? 'fa-industry' :
-                      loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
-      // Strip HTML tags and company name prefix from address for cleaner display
-      var cleanAddr = (loc.address || '')
-        .replace(/<br\s*\/?>/gi, ', ')
-        .replace(/Tridel Technologies Pvt Ltd,?\s*/gi, '');
+      var country = loc.country || 'Other';
+      if (!grouped[country]) grouped[country] = [];
+      grouped[country].push(loc);
+    });
 
-      html +=
-        '<div class="office-card" data-location-id="' + esc(loc.id) + '" ' +
-             'data-lat="' + loc.lat + '" data-lng="' + loc.lng + '" tabindex="0" role="button">' +
-          '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
-          '<div class="office-card-body">' +
-            '<div class="office-card-name">' + esc(loc.name) + '</div>' +
-            '<div class="office-card-meta">' + esc(loc.country) + ' &middot; ' + esc(loc.type) + '</div>' +
-            '<div class="office-card-address">' + esc(cleanAddr) + '</div>' +
-          '</div>' +
-          '<div class="office-card-arrow"><i class="fas fa-chevron-right"></i></div>' +
-        '</div>';
+    Object.keys(grouped).forEach(function (country) {
+      html += '<div class="office-country-group">';
+      html += '<div class="office-country-label">' + esc(country) + '</div>';
+
+      grouped[country].forEach(function (loc) {
+        var iconClass = loc.type === 'Factory' ? 'fa-industry' :
+                        loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
+        var cleanAddr = (loc.address || '')
+          .replace(/<br\s*\/?>/gi, ', ')
+          .replace(/Tridel Technologies Pvt Ltd,?\s*/gi, '');
+
+        html +=
+          '<div class="office-card" data-location-id="' + esc(loc.id) + '" ' +
+               'data-lat="' + loc.lat + '" data-lng="' + loc.lng + '" tabindex="0" role="button">' +
+            '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
+            '<div class="office-card-body">' +
+              '<div class="office-card-name">' + esc(loc.name) + '</div>' +
+              '<div class="office-card-meta">' + esc(loc.type) + '</div>' +
+              '<div class="office-card-address">' + esc(cleanAddr) + '</div>' +
+            '</div>' +
+          '</div>';
+      });
+
+      html += '</div>';
     });
 
     html += '</div></div>';
@@ -181,13 +194,14 @@
         '</div>' +
       '</div>';
 
-    // Offices map card (interactive Apple-style map + office cards)
+    html += '</div>'; // end sidebar
+    html += '</div>'; // end contact-form-layout
+
+    // Offices map card — full-width below the form layout
     if (offices.locations.length) {
       html += buildOfficesMapCard(offices.label, offices.locations);
     }
 
-    html += '</div>'; // end sidebar
-    html += '</div>'; // end contact-form-layout
     html += '</div></section>'; // end section
 
     // ── FAQ Section ──
@@ -292,20 +306,12 @@
       _contactMapInstance = map;
       map.zoomControl.setPosition('bottomright');
 
-      // Theme-aware tiles
-      var lightTiles = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-      var darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      var tileLayer = L.tileLayer(isDark ? darkTiles : lightTiles, {
-        subdomains: 'abcd',
-        maxZoom: 18
+      // Satellite tiles (Esri World Imagery)
+      var satelliteTiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      var tileLayer = L.tileLayer(satelliteTiles, {
+        maxZoom: 18,
+        attribution: ''
       }).addTo(map);
-
-      // Theme change handler
-      function onThemeChange(e) {
-        tileLayer.setUrl(e.detail.theme === 'dark' ? darkTiles : lightTiles);
-      }
-      window.addEventListener('themeChanged', onThemeChange);
 
       // Apple-style circle pin markers
       function createPin(active) {

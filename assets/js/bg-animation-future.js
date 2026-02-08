@@ -301,11 +301,11 @@
       ctx.fill();
     });
 
-    // HUD
+    // HUD — subtle label, placed close to the boat so it doesn't overlap hero text
     if (boat.x > 0 && boat.x < w) {
-      ctx.fillStyle = 'white';
-      ctx.font = '12px monospace';
-      ctx.fillText('VEL: 6.0 KN', boat.x - 20, waveY - 80);
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = '10px monospace';
+      ctx.fillText('VEL: 6.0 KN', boat.x - 15, waveY - 30);
     }
 
     animationId = requestAnimationFrame(animateCyberWorld);

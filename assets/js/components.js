@@ -109,8 +109,7 @@
    * @returns {string} HTML string
    */
   window.renderForm = function (config) {
-    var fieldsHtml = '';
-    config.fields.forEach(function (field) {
+    function buildField(field) {
       var input = '';
       if (field.type === 'select') {
         var opts = '<option disabled selected value="">' + esc(field.placeholder || 'Select an option') + '</option>';
@@ -136,12 +135,24 @@
           (field.placeholder ? ' placeholder="' + esc(field.placeholder) + '"' : '') + '>';
       }
 
-      fieldsHtml +=
-        '<div class="form-group">' +
-          '<label class="form-label" for="' + esc(field.name) + '">' + esc(field.label) + '</label>' +
-          input +
-        '</div>';
-    });
+      return '<div class="form-group">' +
+        '<label class="form-label" for="' + esc(field.name) + '">' + esc(field.label) + '</label>' +
+        input +
+      '</div>';
+    }
+
+    var fieldsHtml = '';
+    var i = 0;
+    var fields = config.fields;
+    while (i < fields.length) {
+      if (fields[i].row && fields[i + 1] && fields[i + 1].row === fields[i].row) {
+        fieldsHtml += '<div class="form-row">' + buildField(fields[i]) + buildField(fields[i + 1]) + '</div>';
+        i += 2;
+      } else {
+        fieldsHtml += buildField(fields[i]);
+        i++;
+      }
+    }
 
     var method = config.method || 'POST';
 

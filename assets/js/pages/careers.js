@@ -39,27 +39,23 @@
           name: 'name',
           label: 'Full Name',
           required: true,
-          placeholder: 'Enter your full name'
+          placeholder: 'Enter your full name',
+          row: 'a'
         },
         {
           type: 'date',
           name: 'dob',
           label: 'Date of Birth',
-          required: true
+          required: true,
+          row: 'a'
         },
         {
           type: 'text',
           name: 'qualification',
           label: 'Highest Qualification',
           required: true,
-          placeholder: 'e.g., Master of Hydrography'
-        },
-        {
-          type: 'textarea',
-          name: 'interest',
-          label: 'Interested Areas & Position',
-          required: true,
-          placeholder: 'Tell us about the roles and fields you are interested in...'
+          placeholder: 'e.g., Master of Hydrography',
+          row: 'b'
         },
         {
           type: 'select',
@@ -72,14 +68,24 @@
             'UAE',
             'India',
             'Remote / Flexible'
-          ]
+          ],
+          row: 'b'
+        },
+        {
+          type: 'textarea',
+          name: 'interest',
+          label: 'Interested Areas & Position',
+          required: true,
+          placeholder: 'Tell us about the roles and fields you are interested in...',
+          rows: 3
         },
         {
           type: 'textarea',
           name: 'cover-letter',
           label: 'Cover Letter',
           required: false,
-          placeholder: 'Tell us why you\'d be a great fit for TRIDEL...'
+          placeholder: 'Tell us why you\'d be a great fit for TRIDEL...',
+          rows: 3
         },
         {
           type: 'file',

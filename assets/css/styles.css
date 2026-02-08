@@ -39,7 +39,7 @@
     --space-md: 20px;
     --space-lg: 40px;
     --space-xl: 80px;
-    --space-2xl: 120px;
+    --space-2xl: 72px;
 
     /* Shadows - Ultra Soft */
     --shadow-subtle: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
@@ -749,19 +749,22 @@ h6 {
 
 .page-header__title {
     color: var(--color-text-main);
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: var(--space-sm);
+    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
     position: relative;
     z-index: 1;
 }
 
 .page-header__subtitle {
     color: var(--color-text-muted);
-    font-size: clamp(1rem, 1.5vw, 1.2rem);
-    max-width: 60ch;
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    max-width: 55ch;
     margin: 0 auto;
-    font-weight: 300;
+    font-weight: 400;
+    line-height: 1.6;
     position: relative;
     z-index: 1;
 }
@@ -1597,18 +1600,26 @@ h6 {
 /* 12. Forms (Careers/Contact)        */
 /* ---------------------------------- */
 .form-container {
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
     background: var(--color-surface-pure);
     padding: 60px;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
-    /* Removed border-top */
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
 }
 
 @media (max-width: 768px) {
     .form-container {
         padding: 32px;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -4287,18 +4298,18 @@ body {
 /* Mega Menu Visibility & Themes      */
 /* ---------------------------------- */
 
-/* Explicit Glass Mode Backgrounds */
+/* Explicit Glass Mode Backgrounds — fully opaque to prevent content bleed-through */
 .mega-menu.glass-mode {
-    background: rgba(255, 255, 255, 0.85); /* Proper Translucent Glass */
+    background: #ffffff; /* Fully opaque white */
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 30px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.2) inset;
     padding: 0; /* Reset default padding, let grid handle it */
 }
 
 [data-theme="dark"] .mega-menu.glass-mode {
-    background: rgba(15, 15, 20, 0.85); /* Deep Dark Glass */
+    background: #0f0f14; /* Fully opaque dark */
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
 }
@@ -4428,35 +4439,7 @@ body {
     max-width: 280px !important;
 }
 
-/* --- FIX: Standardize Services Menu to Match Products (Step 5070 & 5105) --- */
-/* Enforce visually balanced grid layout while keeping Spotlight 1/6th width */
-/* Logic: Products has 6 cols (1fr each). Spotlight = 1/6.
-   Services has 3 cols + Spotlight.
-   To keep Spotlight 1/6 (3 units), remaining 15 units / 3 items = 5 units each.
-   Result: 5fr 5fr 5fr 3fr. Total 18fr. 3/18 = 1/6. */
-.mm-services {
-    grid-template-columns: 5fr 5fr 5fr 3fr !important;
-    gap: 20px !important;
-}
-
-/* Position Spotlight in the 4th column (Last position in this custom grid) */
-.mm-services .glass-spotlight {
-    grid-column: 4 !important;
-    grid-row: 1 !important;
-    min-height: 400px !important;
-}
-
-/* Ensure Hover Effects are identical */
-.mm-services .glass-spotlight:hover {
-    transform: none !important;
-    margin-top: 0 !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-.mm-services .glass-spotlight:hover img {
-    transform: none !important;
-}
+/* Old grid rules removed — services uses flexbox below to match products */
 
 /* Ensure spotlight card has minimum width to not look squashed */
 .mm-products .glass-spotlight {
@@ -4492,74 +4475,57 @@ body {
     transform: none !important;
 }
 
-/* --- FIX: Services Menu Layout MATCHING Products (Step 1782 corrected) --- */
-/* User wants 4 columns for Services: 3x Content + 1x Spotlight */
-/* FIX: Flexbox Layout for Absolute Centering & Packing (Safest Fix) */
-
-/* --- FIX: Services Menu Layout MATCHING Products (Step 1782 corrected) --- */
-/* User wants 4 columns for Services: 3x Content + 1x Spotlight */
-/* FIX: Fluid Flexbox Layout (Guarantees Fit without Clipping) */
-
+/* --- Services Mega Menu: Identical to Products --- */
 .mm-services {
     display: flex !important;
-    flex-wrap: nowrap !important; /* Force single row */
-    justify-content: center !important; /* Center the cluster */
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
     align-items: stretch !important;
     gap: 15px !important;
-    
-    width: 100% !important; /* Fill available space, don't overflow */
-    max-width: 1400px !important; /* Cap at reasonable max */
+    width: 100% !important;
+    max-width: none !important;
     margin: 0 auto !important;
-    padding: 20px !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
-    
-    /* CRITICAL FIX: Override mega-menu.css overflow:hidden which clips the Spotlight */
     overflow: visible !important;
-    height: auto !important;
-    min-height: 450px !important; /* Ensure height matches other menus */
 }
 
-/* Service Columns: Fluid shrinkable width */
-/* flex: 1 1 0 ensures they share space equally and shrink effectively */
 .mm-services .glass-col {
-    flex: 1 1 0 !important; 
-    min-width: 0 !important; /* Allow shrinking below content size if needed to save Layout */
-    max-width: 280px !important; /* Don't get too wide */
-    position: static !important; /* Clear any unwanted positioning */
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 200px !important;
+    padding: 20px !important;
 }
 
-/* Spotlight: Prioritize visibility */
 .mm-services .glass-spotlight {
-    display: flex !important; /* Ensure it's not hidden */
-    visibility: visible !important; 
-    opacity: 1 !important;
-    
-    /* RESET CLASHING PROPERTIES from Detail Page layout */
-    position: static !important; /* Don't be absolute/floating */
-    right: auto !important; 
-    bottom: auto !important;
-    left: auto !important;
-    transform: none !important;
-    grid-column: auto !important;
-    
-    flex: 0 0 300px !important; /* Fixed width */
-    width: 300px !important;
-    margin: 0 !important;
-    min-width: 250px !important; /* Allow slight squeeze on tiny screens */
-    
-    /* Visual Parity */
-    background: rgba(255, 255, 255, 0.4); 
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex: 0 0 240px !important;
+    min-width: 200px !important;
+    max-width: 280px !important;
+    align-self: stretch !important;
     text-align: center;
 }
 
+.mm-services .glass-spotlight,
 .mm-services .glass-spotlight:hover {
     transform: none !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    translate: 0 0 !important;
+    margin: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    position: relative !important;
+    width: auto !important;
 }
 
-/* Responsive: Wrap ONLY if screen is mobile/vertical tablet */
+.mm-services .glass-spotlight:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.mm-services .glass-spotlight:hover img {
+    transform: none !important;
+}
+
 @media (max-width: 900px) {
     .mm-services {
         flex-wrap: wrap !important;
@@ -5159,14 +5125,20 @@ html.lenis {
 }
 
 @media (max-width: 375px) {
-    .hero__title,
-    .page-header__title {
-        font-size: 1.75rem;
+    .hero__title {
+        font-size: 1.85rem;
     }
 
-    .hero__subtitle,
-    .page-header__subtitle {
+    .page-header__title {
+        font-size: 1.6rem;
+    }
+
+    .hero__subtitle {
         font-size: 0.95rem;
+    }
+
+    .page-header__subtitle {
+        font-size: 0.9rem;
     }
 
     .section__title {
@@ -5586,23 +5558,38 @@ html.lenis {
     color: var(--color-text-muted, #666);
 }
 
-/* ── Offices Map Card (Apple-style) ── */
+/* ── Offices Map Card (horizontal layout) ── */
 .contact-offices-map-card {
-    padding: 0 !important;
-    overflow: hidden;
+    padding: 24px !important;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0 24px;
+    margin-top: 32px;
 }
 
 .contact-offices-map-card .contact-section-label {
-    padding: 24px 24px 0;
+    grid-column: 1 / -1;
+    padding: 0 0 16px;
 }
 
 .offices-map-wrapper {
     position: relative;
-    height: 220px;
-    margin: 16px 16px 0;
+    min-height: 100%;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: inset 0 0 0 1px var(--color-border, rgba(0,0,0,0.08));
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 768px) {
+    .contact-offices-map-card {
+        grid-template-columns: 1fr;
+        gap: 16px 0;
+    }
+    .offices-map-wrapper {
+        min-height: 250px;
+    }
 }
 
 .offices-map {
@@ -5641,10 +5628,26 @@ html.lenis {
 .offices-card-list {
     display: flex;
     flex-direction: column;
-    padding: 8px;
-    gap: 2px;
-    max-height: 380px;
-    overflow-y: auto;
+    padding: 0;
+    gap: 12px;
+}
+
+/* Country Group */
+.office-country-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.office-country-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted, #999);
+    padding: 0 14px 4px;
+    border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.06));
+    margin-bottom: 2px;
 }
 
 .offices-card-list::-webkit-scrollbar {
@@ -5663,19 +5666,17 @@ html.lenis {
 /* Individual Office Card */
 .office-card {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
                 box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .office-card:hover {
     background: var(--color-accent-glow, rgba(0,170,231,0.06));
-    transform: translateX(2px);
 }
 
 .office-card:focus-visible {
@@ -5690,16 +5691,17 @@ html.lenis {
 }
 
 .office-card-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     background: var(--color-accent-glow, rgba(0,170,231,0.1));
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-accent, #00AAE7);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
+    margin-top: 2px;
     transition: background 0.25s, transform 0.25s, color 0.25s;
 }
 
@@ -5738,10 +5740,6 @@ html.lenis {
     color: var(--color-text-muted, #5f6368);
     line-height: 1.4;
     margin-top: 3px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .office-card-arrow {
@@ -6214,9 +6212,6 @@ html.lenis {
         min-height: auto;
     }
 
-    .page-header__title {
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
-    }
 }
 
 /* --- Small Phones (480px) --- */
