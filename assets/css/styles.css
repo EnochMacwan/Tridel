@@ -395,6 +395,48 @@ h6 {
     padding-left: 24px;
 }
 
+/* --- Hero Scroll Indicator --- */
+.hero__scroll-indicator {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+    animation: scrollFadeInOut 3s ease-in-out infinite;
+}
+
+.hero__scroll-mouse {
+    width: 24px;
+    height: 38px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    position: relative;
+}
+
+.hero__scroll-wheel {
+    width: 4px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 2px;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scrollWheel 2s ease-in-out infinite;
+}
+
+@keyframes scrollWheel {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+}
+
+@keyframes scrollFadeInOut {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
 /* ---------------------------------- */
 /* 5. Ghost & Electric Buttons        */
 /* ---------------------------------- */
@@ -3926,8 +3968,8 @@ body {
         height: 100dvh;
         background: rgba(5, 5, 5, 0.95);
         backdrop-filter: blur(30px);
-        z-index: 9990; /* Below bottom bar z-index of 9999 */
-        padding: 80px 20px 100px 20px;
+        z-index: 9990;
+        padding: 80px 20px 40px 20px;
         transform: translateY(100%);
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
         opacity: 0;
@@ -3941,12 +3983,32 @@ body {
         visibility: visible;
     }
 
+    /* Raise header above HUD menu so hamburger button stays clickable */
+    body.nav-open .header {
+        z-index: 10000;
+    }
+
     .header__actions .button--primary {
         display: none; /* Hide 'Enquire Now' button on mobile header */
     }
 
     .header__menu-toggle {
-        display: none !important; /* Hide old toggle button */
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        min-width: 44px;
+        min-height: 44px;
+        cursor: pointer;
+        position: fixed;
+        top: 10px;
+        right: 16px;
+        z-index: 10001;
+        pointer-events: auto;
+        padding: 0;
     }
 
     .header {
@@ -3954,6 +4016,7 @@ body {
         backdrop-filter: none !important;
         border-bottom: none !important;
         pointer-events: none; /* Let clicks pass through empty areas */
+        padding: 10px 0;
     }
 
     .header__container {
@@ -3961,65 +4024,20 @@ body {
         justify-content: space-between;
     }
 
-    /* --- Bottom Glass Navigation --- */
-    .bottom-glass-nav {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 95%;
-        max-width: 400px;
-        height: 70px;
-        background: rgba(10, 10, 10, 0.65); /* Dark Glass */
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 35px; /* Pill shape */
-        z-index: 9999;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        padding: 0 10px;
-    }
-
-    .bottom-nav-item {
-        display: flex;
-        flex-direction: column;
+    .theme-toggle-btn {
+        font-size: 1.4rem;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex !important;
         align-items: center;
         justify-content: center;
-        color: rgba(255, 255, 255, 0.6);
-        text-decoration: none;
-        font-size: 0.75rem;
-        gap: 4px;
-        padding: 8px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .bottom-nav-item i {
-        font-size: 1.2rem;
-        margin-bottom: 2px;
-    }
-
-    .bottom-nav-item.active,
-    .bottom-nav-item:hover {
         color: white;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        margin-right: 4px;
     }
 
-    .bottom-nav-item.active::after {
-        content: '';
-        position: absolute;
-        bottom: 5px;
-        width: 4px;
-        height: 4px;
-        background: var(--color-accent, #00d2ff);
-        border-radius: 50%;
-        box-shadow: 0 0 8px var(--color-accent, #00d2ff);
+    /* --- Bottom Glass Navigation (replaced by hamburger) --- */
+    .bottom-glass-nav {
+        display: none !important;
     }
 
     /* Menu Trigger Special Styling */
@@ -4048,128 +4066,15 @@ body {
         list-style: none;
     }
 
-    /* --- Mobile Accordion & Horizontal Scroll Logic --- */
-
-    /* Reset Mega Menu for Mobile HUD flow */
-    .mobile-hud-menu .mega-menu {
-        position: static;
-        width: 100%;
-        max-width: none;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        box-shadow: none;
-        background: transparent !important;
-        border: none;
-        padding: 0;
-        margin-top: 10px;
-        display: none; /* Hidden by default (Accordion) */
-        overflow: visible; /* Allow children to scroll */
-    }
-
-    /* Show when Parent LI is open (JS toggles .mobile-menu-open on LI) */
+    /* --- No mega-menus on mobile — direct nav links only --- */
+    .mobile-hud-menu .mega-menu,
     .header__nav-list li.mobile-menu-open .mega-menu {
-        display: block;
-        animation: fadeIn 0.3s ease;
+        display: none !important;
     }
 
-    /* Turn Grid into Horizontal Snap Scroll */
-    .mobile-hud-menu .mm-glass-grid {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        scroll-snap-type: x mandatory;
-        gap: 16px;
-        padding: 4px 4px 20px 4px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Firefox */
-    }
-
-    .mobile-hud-menu .mm-glass-grid::-webkit-scrollbar {
-        display: none; /* Chrome/Safari */
-    }
-
-    /* Style Columns as HUD Cards */
-    .mobile-hud-menu .glass-col {
-        flex: 0 0 85%; /* Card width */
-        min-width: 85%;
-        scroll-snap-align: center;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 20px;
-        position: relative;
-        margin-bottom: 0; /* Override default */
-    }
-
-    /* HUD Tech Markers for glass-col */
-    .mobile-hud-menu .glass-col::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        height: 20px;
-        border-top: 2px solid rgba(0, 210, 255, 0.5);
-        border-left: 2px solid rgba(0, 210, 255, 0.5);
-        border-top-left-radius: 16px;
-    }
-
-    .mobile-hud-menu .glass-col::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 20px;
-        height: 20px;
-        border-bottom: 2px solid rgba(0, 210, 255, 0.5);
-        border-right: 2px solid rgba(0, 210, 255, 0.5);
-        border-bottom-right-radius: 16px;
-    }
-
-    /* Inner Content Styling */
-    .mobile-hud-menu .glass-col h4 {
-        font-size: 1.2rem;
-        color: var(--color-accent);
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .mobile-hud-menu .glass-link {
-        display: block;
-        padding: 12px 10px;
-        margin-bottom: 4px;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 8px;
-        border: 1px solid transparent;
-        color: rgba(255, 255, 255, 0.9) !important; /* Force white text */
-        font-size: 1rem;
-        transition: all 0.2s ease;
-    }
-
-    .mobile-hud-menu .glass-link:active {
-        background: rgba(0, 210, 255, 0.1);
-        border-color: rgba(0, 210, 255, 0.3);
-    }
-
-    /* Ensure Spotlight is visible and styled as a large card at the end */
-    .mobile-hud-menu .glass-spotlight {
-        display: block !important;
-        margin-top: 10px;
-        background: radial-gradient(circle at top right, rgba(0, 210, 255, 0.2), transparent);
-        border: 1px solid rgba(0, 210, 255, 0.3);
-        border-radius: 12px;
-        padding: 16px;
-    }
-
-    .mobile-hud-menu .glass-spotlight img {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-bottom: 10px;
+    /* Hide chevron arrows since mega-menus are disabled on mobile */
+    .mobile-hud-menu .header__nav-link .nav-icon-small {
+        display: none;
     }
 
     /* Nav Links in HUD (Top Level) */
@@ -5058,11 +4963,11 @@ html.lenis {
 /* ============================================ */
 @media (max-width: 1024px) {
     body {
-        padding-bottom: 100px;
+        padding-bottom: 0;
     }
 
     #back-to-top {
-        bottom: 110px;
+        bottom: 24px;
     }
 }
 
@@ -5259,15 +5164,6 @@ html.lenis {
 
     .section__title {
         font-size: 1.5rem;
-    }
-
-    .bottom-glass-nav {
-        width: 98%;
-        gap: 2px;
-    }
-
-    .bottom-nav-item span {
-        font-size: 0.6rem;
     }
 
     .button--primary,
@@ -5833,7 +5729,20 @@ html.lenis {
 /* --- Tablet (768px) --- */
 @media (max-width: 768px) {
     .hero {
-        min-height: 70vh;
+        min-height: 55vh;
+    }
+
+    .hero__content {
+        padding-top: 40px;
+    }
+
+    .hero__title {
+        margin-bottom: 20px;
+    }
+
+    .hero__subtitle {
+        margin-bottom: 24px;
+        padding-left: 16px;
     }
 
     .footer__container {
@@ -5879,7 +5788,11 @@ html.lenis {
 /* --- Small Phones (480px) --- */
 @media (max-width: 480px) {
     .hero {
-        min-height: 60vh;
+        min-height: 45vh;
+    }
+
+    .hero__content {
+        padding-top: 30px;
     }
 
     .hero__title {
@@ -5906,19 +5819,24 @@ html.lenis {
         width: 100%;
         justify-content: center;
     }
+
+    .header__logo img {
+        height: 44px;
+    }
+
+    .hero__scroll-indicator {
+        bottom: 16px;
+    }
+
+    .hero__scroll-mouse {
+        width: 20px;
+        height: 32px;
+    }
 }
 
-/* --- Extra Small (320px) --- */
+/* --- Extra Small (375px) --- */
 @media (max-width: 375px) {
-    .bottom-glass-nav {
-        padding: 6px 8px;
-    }
-
-    .bottom-nav-item {
-        padding: 6px 4px;
-    }
-
-    .bottom-nav-item i {
-        font-size: 1.1rem;
+    .hero {
+        min-height: 40vh;
     }
 }
