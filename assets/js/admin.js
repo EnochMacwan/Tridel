@@ -21,6 +21,12 @@
     try { if (typeof NEWS_DATA !== 'undefined') window.NEWS_DATA = NEWS_DATA; } catch(e){}
     try { if (typeof CONTACT_DATA !== 'undefined') window.CONTACT_DATA = CONTACT_DATA; } catch(e){}
     try { if (typeof SETTINGS_DATA !== 'undefined') window.SETTINGS_DATA = SETTINGS_DATA; } catch(e){}
+    try { if (typeof ABOUT_DATA !== 'undefined') window.ABOUT_DATA = ABOUT_DATA; } catch(e){}
+    try { if (typeof CONTACT_INFO_CARDS !== 'undefined') window.CONTACT_INFO_CARDS = CONTACT_INFO_CARDS; } catch(e){}
+    try { if (typeof CONTACT_FAQ_DATA !== 'undefined') window.CONTACT_FAQ_DATA = CONTACT_FAQ_DATA; } catch(e){}
+    try { if (typeof NAV_LINKS !== 'undefined') window.NAV_LINKS = NAV_LINKS; } catch(e){}
+    try { if (typeof FOOTER_DATA !== 'undefined') window.FOOTER_DATA = FOOTER_DATA; } catch(e){}
+    try { if (typeof PAGE_META !== 'undefined') window.PAGE_META = PAGE_META; } catch(e){}
 
     // Legacy camelCase aliases
     try { if (typeof servicesData !== 'undefined' && !window.SERVICES_DATA) window.SERVICES_DATA = servicesData; } catch(e){}
@@ -111,7 +117,10 @@ var GITHUB_DATA_FILES = {
     'testimonials': 'assets/js/testimonials-data.js',
     'settings': 'assets/js/contact-data.js',
     'form_settings': 'assets/js/settings-data.js',
-    'index_content': 'assets/js/index-page-data.js'
+    'index_content': 'assets/js/index-page-data.js',
+    'about_content': 'assets/js/about-page-data.js',
+    'contact_content': 'assets/js/contact-page-data.js',
+    'layout': 'assets/js/layout-data.js'
 };
 
 var GITHUB_VAR_NAMES = {
@@ -125,7 +134,10 @@ var GITHUB_VAR_NAMES = {
     'testimonials': 'TESTIMONIALS_DATA',
     'settings': 'CONTACT_DATA',
     'form_settings': 'SETTINGS_DATA',
-    'index_content': 'INDEX_HERO'
+    'index_content': 'INDEX_HERO',
+    'about_content': 'ABOUT_DATA',
+    'contact_content': 'CONTACT_INFO_CARDS',
+    'layout': 'NAV_LINKS'
 };
 
 async function loadDataFromGitHub() {
@@ -184,18 +196,26 @@ async function loadDataFromGitHub() {
         }
     }
 
-    // Special: load index page content (multi-var file)
-    try {
-        var indexPath = GITHUB_DATA_FILES['index_content'];
-        var indexRes = await fetch(
-            'https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + indexPath
-        );
-        if (indexRes.ok) {
-            var indexContent = await indexRes.text();
-            parseIndexPageContent(indexContent);
+    // Special: load multi-var files
+    var multiVarFiles = [
+        { key: 'index_content', parser: parseIndexPageContent },
+        { key: 'about_content', parser: parseAboutPageContent },
+        { key: 'contact_content', parser: parseContactPageContent },
+        { key: 'layout', parser: parseLayoutData }
+    ];
+    for (var mvi = 0; mvi < multiVarFiles.length; mvi++) {
+        try {
+            var mvPath = GITHUB_DATA_FILES[multiVarFiles[mvi].key];
+            var mvRes = await fetch(
+                'https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + mvPath
+            );
+            if (mvRes.ok) {
+                var mvContent = await mvRes.text();
+                multiVarFiles[mvi].parser(mvContent);
+            }
+        } catch (e) {
+            console.log('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
         }
-    } catch (e) {
-        console.log('Could not load index_content from GitHub:', e.message);
     }
 
     renderDashboard();
@@ -257,9 +277,17 @@ async function saveToGitHub(type, data) {
     // Generate file content
     var fileContent = '';
 
-    // Special: index_content has multiple var declarations
+    // Special: multi-var files need custom serialization
     if (type === 'index_content') {
         fileContent = serializeIndexPageData();
+    } else if (type === 'about_content') {
+        fileContent = serializeAboutPageData();
+    } else if (type === 'contact_content') {
+        fileContent = serializeContactPageData();
+    } else if (type === 'layout') {
+        fileContent = serializeLayoutData();
+    } else if (type === 'visibility') {
+        fileContent = 'const SETTINGS_DATA = ' + JSON.stringify(data, null, 2) + ';';
     } else {
         fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
     }
@@ -570,6 +598,10 @@ function renderAllSections() {
     renderHomeCards();
     renderLinkedIn();
     loadPageContentToForm();
+    loadAboutContentToForm();
+    loadContactContentToForm();
+    loadNavigationToForm();
+    loadVisibilityEditor();
 }
 
 // ==========================================
@@ -1675,7 +1707,7 @@ async function publishAllChanges() {
             var type = types[i];
             var data;
 
-            // Special payload for index_content (multi-var file)
+            // Special payloads for multi-var files
             if (type === 'index_content') {
                 data = {
                     INDEX_HERO: window.INDEX_HERO || {},
@@ -1684,6 +1716,21 @@ async function publishAllChanges() {
                     INDEX_CASE_STUDY: window.INDEX_CASE_STUDY || {},
                     INDEX_CTA: window.INDEX_CTA || {}
                 };
+            } else if (type === 'about_content') {
+                data = window.ABOUT_DATA || {};
+            } else if (type === 'contact_content') {
+                data = {
+                    CONTACT_INFO_CARDS: window.CONTACT_INFO_CARDS || [],
+                    CONTACT_FAQ_DATA: window.CONTACT_FAQ_DATA || []
+                };
+            } else if (type === 'layout') {
+                data = {
+                    NAV_LINKS: window.NAV_LINKS || [],
+                    FOOTER_DATA: window.FOOTER_DATA || {},
+                    PAGE_META: window.PAGE_META || {}
+                };
+            } else if (type === 'visibility') {
+                data = window.SETTINGS_DATA || {};
             } else {
                 data = getDataArray(type);
             }
@@ -2476,7 +2523,521 @@ function serializeIndexPageData() {
 }
 
 // ==========================================
-// 26. INITIALIZATION
+// 26. PAGE CONTENT TAB SWITCHING
+// ==========================================
+
+var currentContentTab = 'home';
+
+function switchContentTab(tab) {
+    currentContentTab = tab;
+    var tabs = ['home', 'about', 'contact'];
+    tabs.forEach(function (t) {
+        var el = document.getElementById('content-tab-' + t);
+        if (el) el.style.display = t === tab ? '' : 'none';
+    });
+    document.querySelectorAll('.content-tab').forEach(function (btn) {
+        var isActive = btn.getAttribute('data-tab') === tab;
+        btn.className = 'btn ' + (isActive ? 'btn-primary' : 'btn-secondary') + ' content-tab';
+    });
+}
+
+// ==========================================
+// 27. ABOUT PAGE CONTENT MANAGEMENT
+// ==========================================
+
+function loadAboutContentToForm() {
+    var data = window.ABOUT_DATA || {};
+    var header = data.pageHeader || {};
+    var wwa = data.whoWeAre || {};
+    var el;
+    el = document.getElementById('about-header-title'); if (el) el.value = header.title || '';
+    el = document.getElementById('about-header-subtitle'); if (el) el.value = header.subtitle || '';
+    el = document.getElementById('about-wwa-title'); if (el) el.value = wwa.title || '';
+    el = document.getElementById('about-wwa-text'); if (el) el.value = wwa.text || '';
+    el = document.getElementById('about-wwa-image'); if (el) el.value = wwa.image || '';
+    el = document.getElementById('about-wwa-image-alt'); if (el) el.value = wwa.imageAlt || '';
+}
+
+function saveAboutContent() {
+    if (!window.ABOUT_DATA) window.ABOUT_DATA = {};
+    if (!window.ABOUT_DATA.pageHeader) window.ABOUT_DATA.pageHeader = {};
+    if (!window.ABOUT_DATA.whoWeAre) window.ABOUT_DATA.whoWeAre = {};
+    window.ABOUT_DATA.pageHeader.title = (document.getElementById('about-header-title') || {}).value || '';
+    window.ABOUT_DATA.pageHeader.subtitle = (document.getElementById('about-header-subtitle') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.title = (document.getElementById('about-wwa-title') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.text = (document.getElementById('about-wwa-text') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.image = (document.getElementById('about-wwa-image') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.imageAlt = (document.getElementById('about-wwa-image-alt') || {}).value || '';
+    markAsPending('about_content');
+}
+
+function parseAboutPageContent(content) {
+    var match = content.match(/var\s+ABOUT_DATA\s*=\s*(\{[\s\S]*\});?\s*$/m);
+    if (match) {
+        try {
+            var raw = match[1].replace(/;+$/, '').replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            window.ABOUT_DATA = JSON.parse(raw);
+        } catch (e) { console.warn('Could not parse ABOUT_DATA:', e.message); }
+    }
+}
+
+function serializeAboutPageData() {
+    var lines = [];
+    lines.push('/**');
+    lines.push(' * About Page Data');
+    lines.push(' * Content for the Who We Are section');
+    lines.push(' */');
+    lines.push('var ABOUT_DATA = ' + JSON.stringify(window.ABOUT_DATA || {}, null, 2) + ';');
+    lines.push('');
+    return lines.join('\n');
+}
+
+// ==========================================
+// 28. CONTACT PAGE CONTENT MANAGEMENT
+// ==========================================
+
+function loadContactContentToForm() {
+    renderContactInfoCards();
+    renderContactFaqRows();
+}
+
+function renderContactInfoCards() {
+    var container = document.getElementById('contact-info-cards-list');
+    if (!container) return;
+    var cards = window.CONTACT_INFO_CARDS || [];
+    var html = '';
+    cards.forEach(function (card, i) {
+        html += '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">' +
+            '<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">' +
+                '<div style="flex:1"><label style="font-size:12px;">Icon (FA class)</label><input type="text" class="form-control" id="ci-icon-' + i + '" value="' + escapeHTML(card.icon || '') + '"></div>' +
+                '<div style="flex:2"><label style="font-size:12px;">Title</label><input type="text" class="form-control" id="ci-title-' + i + '" value="' + escapeHTML(card.title || '') + '"></div>' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="removeContactInfoCard(' + i + ')" style="margin-top:18px;"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+            '<div><label style="font-size:12px;">Detail (HTML allowed)</label><textarea class="form-control" id="ci-detail-' + i + '" rows="2">' + escapeHTML(card.detail || '') + '</textarea></div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addContactInfoCard() {
+    if (!window.CONTACT_INFO_CARDS) window.CONTACT_INFO_CARDS = [];
+    window.CONTACT_INFO_CARDS.push({ icon: 'fa-info-circle', title: 'New Card', detail: '' });
+    renderContactInfoCards();
+}
+
+function removeContactInfoCard(index) {
+    if (!confirm('Remove this info card?')) return;
+    window.CONTACT_INFO_CARDS.splice(index, 1);
+    renderContactInfoCards();
+}
+
+function renderContactFaqRows() {
+    var container = document.getElementById('contact-faq-list');
+    if (!container) return;
+    var faqs = window.CONTACT_FAQ_DATA || [];
+    var html = '';
+    faqs.forEach(function (faq, i) {
+        html += '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">' +
+            '<div style="display:flex;gap:10px;align-items:start;">' +
+                '<div style="flex:1">' +
+                    '<label style="font-size:12px;">Question</label><input type="text" class="form-control" id="faq-q-' + i + '" value="' + escapeHTML(faq.question || '') + '">' +
+                    '<label style="font-size:12px;margin-top:8px;">Answer</label><textarea class="form-control" id="faq-a-' + i + '" rows="3">' + escapeHTML(faq.answer || '') + '</textarea>' +
+                '</div>' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="removeContactFaq(' + i + ')" style="margin-top:18px;"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addContactFaq() {
+    if (!window.CONTACT_FAQ_DATA) window.CONTACT_FAQ_DATA = [];
+    window.CONTACT_FAQ_DATA.push({ question: '', answer: '' });
+    renderContactFaqRows();
+}
+
+function removeContactFaq(index) {
+    if (!confirm('Remove this FAQ?')) return;
+    window.CONTACT_FAQ_DATA.splice(index, 1);
+    renderContactFaqRows();
+}
+
+function saveContactContent() {
+    // Read info cards from form
+    var cards = window.CONTACT_INFO_CARDS || [];
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].icon = (document.getElementById('ci-icon-' + i) || {}).value || '';
+        cards[i].title = (document.getElementById('ci-title-' + i) || {}).value || '';
+        cards[i].detail = (document.getElementById('ci-detail-' + i) || {}).value || '';
+    }
+    window.CONTACT_INFO_CARDS = cards;
+    // Read FAQ from form
+    var faqs = window.CONTACT_FAQ_DATA || [];
+    for (var j = 0; j < faqs.length; j++) {
+        faqs[j].question = (document.getElementById('faq-q-' + j) || {}).value || '';
+        faqs[j].answer = (document.getElementById('faq-a-' + j) || {}).value || '';
+    }
+    window.CONTACT_FAQ_DATA = faqs;
+    markAsPending('contact_content');
+}
+
+function parseContactPageContent(content) {
+    // Parse CONTACT_INFO_CARDS
+    var match1 = content.match(/var\s+CONTACT_INFO_CARDS\s*=\s*(\[[\s\S]*?\]);/);
+    if (match1) {
+        try {
+            var raw1 = match1[1].replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw1 = raw1.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            window.CONTACT_INFO_CARDS = JSON.parse(raw1);
+        } catch (e) { console.warn('Could not parse CONTACT_INFO_CARDS:', e.message); }
+    }
+    // Parse CONTACT_FAQ_DATA
+    var match2 = content.match(/var\s+CONTACT_FAQ_DATA\s*=\s*(\[[\s\S]*?\]);/);
+    if (match2) {
+        try {
+            var raw2 = match2[1].replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw2 = raw2.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            window.CONTACT_FAQ_DATA = JSON.parse(raw2);
+        } catch (e) { console.warn('Could not parse CONTACT_FAQ_DATA:', e.message); }
+    }
+}
+
+function serializeContactPageData() {
+    var lines = [];
+    lines.push('/**');
+    lines.push(' * Contact Page Data');
+    lines.push(' * Contact info cards and FAQ data');
+    lines.push(' */');
+    lines.push('var CONTACT_INFO_CARDS = ' + JSON.stringify(window.CONTACT_INFO_CARDS || [], null, 2) + ';');
+    lines.push('');
+    lines.push('var CONTACT_FAQ_DATA = ' + JSON.stringify(window.CONTACT_FAQ_DATA || [], null, 2) + ';');
+    lines.push('');
+    return lines.join('\n');
+}
+
+// ==========================================
+// 29. SAVE PAGE CONTENT (CONSOLIDATED)
+// ==========================================
+
+// Override savePageContent to handle tabs
+var _originalSavePageContent = typeof savePageContent === 'function' ? savePageContent : null;
+
+// We need to redefine savePageContent to handle all tabs
+// The original saves home tab data, we wrap it
+function savePageContentAll() {
+    if (currentContentTab === 'about') {
+        saveAboutContent();
+        showToast('About page content saved!', 'success');
+    } else if (currentContentTab === 'contact') {
+        saveContactContent();
+        showToast('Contact page content saved!', 'success');
+    } else {
+        // Home tab - call original logic
+        if (_originalSavePageContent) _originalSavePageContent();
+    }
+}
+
+// ==========================================
+// 30. NAVIGATION & FOOTER MANAGEMENT
+// ==========================================
+
+function loadNavigationToForm() {
+    renderNavLinksEditor();
+    renderFooterEditor();
+    renderPageSeoEditor();
+}
+
+function renderNavLinksEditor() {
+    var container = document.getElementById('nav-links-list');
+    if (!container) return;
+    var links = window.NAV_LINKS || [];
+    var html = '';
+    links.forEach(function (link, i) {
+        html += '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">' +
+            '<div style="display:flex;gap:10px;align-items:center;">' +
+                '<div style="flex:2"><label style="font-size:12px;">Label</label><input type="text" class="form-control" id="nav-label-' + i + '" value="' + escapeHTML(link.label || '') + '"></div>' +
+                '<div style="flex:2"><label style="font-size:12px;">Href</label><input type="text" class="form-control" id="nav-href-' + i + '" value="' + escapeHTML(link.href || '') + '"></div>' +
+                '<div style="flex:1"><label style="font-size:12px;">Icon</label><input type="text" class="form-control" id="nav-icon-' + i + '" value="' + escapeHTML(link.icon || '') + '"></div>' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="removeNavLinkItem(' + i + ')" style="margin-top:18px;"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addNavLink() {
+    if (!window.NAV_LINKS) window.NAV_LINKS = [];
+    window.NAV_LINKS.push({ label: 'New Link', href: '#/', icon: 'fa-link', key: '/' });
+    renderNavLinksEditor();
+}
+
+function removeNavLinkItem(index) {
+    if (!confirm('Remove this nav link?')) return;
+    window.NAV_LINKS.splice(index, 1);
+    renderNavLinksEditor();
+}
+
+function renderFooterEditor() {
+    var data = window.FOOTER_DATA || {};
+    var el;
+    el = document.getElementById('footer-tagline'); if (el) el.value = data.tagline || '';
+    el = document.getElementById('footer-linkedin'); if (el) el.value = data.linkedIn || '';
+    el = document.getElementById('footer-copyright'); if (el) el.value = data.copyright || '';
+
+    // Quick links
+    var qlContainer = document.getElementById('footer-quick-links-list');
+    if (qlContainer) {
+        var qlHtml = '';
+        (data.quickLinks || []).forEach(function (link, i) {
+            qlHtml += '<div style="display:flex;gap:10px;margin-bottom:8px;align-items:center;">' +
+                '<input type="text" class="form-control" id="fql-label-' + i + '" value="' + escapeHTML(link.label || '') + '" placeholder="Label">' +
+                '<input type="text" class="form-control" id="fql-href-' + i + '" value="' + escapeHTML(link.href || '') + '" placeholder="Href">' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="removeFooterLink(\'quick\',' + i + ')"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+        });
+        qlContainer.innerHTML = qlHtml;
+    }
+
+    // Company links
+    var clContainer = document.getElementById('footer-company-links-list');
+    if (clContainer) {
+        var clHtml = '';
+        (data.companyLinks || []).forEach(function (link, i) {
+            clHtml += '<div style="display:flex;gap:10px;margin-bottom:8px;align-items:center;">' +
+                '<input type="text" class="form-control" id="fcl-label-' + i + '" value="' + escapeHTML(link.label || '') + '" placeholder="Label">' +
+                '<input type="text" class="form-control" id="fcl-href-' + i + '" value="' + escapeHTML(link.href || '') + '" placeholder="Href">' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="removeFooterLink(\'company\',' + i + ')"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+        });
+        clContainer.innerHTML = clHtml;
+    }
+}
+
+function addFooterLink(group) {
+    if (!window.FOOTER_DATA) window.FOOTER_DATA = {};
+    var key = group === 'quick' ? 'quickLinks' : 'companyLinks';
+    if (!window.FOOTER_DATA[key]) window.FOOTER_DATA[key] = [];
+    window.FOOTER_DATA[key].push({ label: 'New Link', href: '#/' });
+    renderFooterEditor();
+}
+
+function removeFooterLink(group, index) {
+    var key = group === 'quick' ? 'quickLinks' : 'companyLinks';
+    if (window.FOOTER_DATA && window.FOOTER_DATA[key]) {
+        window.FOOTER_DATA[key].splice(index, 1);
+        renderFooterEditor();
+    }
+}
+
+function renderPageSeoEditor() {
+    var container = document.getElementById('page-seo-list');
+    if (!container) return;
+    var meta = window.PAGE_META || {};
+    var html = '';
+    Object.keys(meta).forEach(function (route) {
+        var entry = meta[route];
+        var safeRoute = escapeHTML(route);
+        var inputId = route.replace(/[^a-zA-Z0-9]/g, '_');
+        html += '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">' +
+            '<h4 style="margin:0 0 10px;font-size:14px;color:var(--accent);"><i class="fas fa-route"></i> ' + safeRoute + '</h4>' +
+            '<div class="form-group"><label style="font-size:12px;">Title</label><input type="text" class="form-control" id="seo-title-' + inputId + '" value="' + escapeHTML(entry.title || '') + '"></div>' +
+            '<div class="form-group"><label style="font-size:12px;">Description</label><textarea class="form-control" id="seo-desc-' + inputId + '" rows="2">' + escapeHTML(entry.description || '') + '</textarea></div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function saveNavigation() {
+    // Save nav links from form
+    var links = window.NAV_LINKS || [];
+    for (var i = 0; i < links.length; i++) {
+        links[i].label = (document.getElementById('nav-label-' + i) || {}).value || '';
+        links[i].href = (document.getElementById('nav-href-' + i) || {}).value || '';
+        links[i].icon = (document.getElementById('nav-icon-' + i) || {}).value || '';
+        links[i].key = links[i].href.replace('#', '');
+    }
+    window.NAV_LINKS = links;
+
+    // Save footer data
+    if (!window.FOOTER_DATA) window.FOOTER_DATA = {};
+    window.FOOTER_DATA.tagline = (document.getElementById('footer-tagline') || {}).value || '';
+    window.FOOTER_DATA.linkedIn = (document.getElementById('footer-linkedin') || {}).value || '';
+    window.FOOTER_DATA.copyright = (document.getElementById('footer-copyright') || {}).value || '';
+
+    // Save quick links
+    var ql = window.FOOTER_DATA.quickLinks || [];
+    for (var qi = 0; qi < ql.length; qi++) {
+        ql[qi].label = (document.getElementById('fql-label-' + qi) || {}).value || '';
+        ql[qi].href = (document.getElementById('fql-href-' + qi) || {}).value || '';
+    }
+    window.FOOTER_DATA.quickLinks = ql;
+
+    // Save company links
+    var cl = window.FOOTER_DATA.companyLinks || [];
+    for (var ci = 0; ci < cl.length; ci++) {
+        cl[ci].label = (document.getElementById('fcl-label-' + ci) || {}).value || '';
+        cl[ci].href = (document.getElementById('fcl-href-' + ci) || {}).value || '';
+    }
+    window.FOOTER_DATA.companyLinks = cl;
+
+    // Save page SEO
+    var meta = window.PAGE_META || {};
+    Object.keys(meta).forEach(function (route) {
+        var inputId = route.replace(/[^a-zA-Z0-9]/g, '_');
+        meta[route].title = (document.getElementById('seo-title-' + inputId) || {}).value || '';
+        meta[route].description = (document.getElementById('seo-desc-' + inputId) || {}).value || '';
+    });
+    window.PAGE_META = meta;
+
+    markAsPending('layout');
+    showToast('Navigation & footer saved!', 'success');
+}
+
+function parseLayoutData(content) {
+    // Parse NAV_LINKS
+    var match1 = content.match(/var\s+NAV_LINKS\s*=\s*(\[[\s\S]*?\]);/);
+    if (match1) {
+        try {
+            var raw1 = match1[1].replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw1 = raw1.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            // Handle true/false not quoted
+            window.NAV_LINKS = JSON.parse(raw1);
+        } catch (e) { console.warn('Could not parse NAV_LINKS:', e.message); }
+    }
+    // Parse FOOTER_DATA
+    var match2 = content.match(/var\s+FOOTER_DATA\s*=\s*(\{[\s\S]*?\});/);
+    if (match2) {
+        try {
+            var raw2 = match2[1].replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw2 = raw2.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+            // Handle unicode escape
+            raw2 = raw2.replace(/\\u([0-9a-fA-F]{4})/g, function (m, p) { return String.fromCharCode(parseInt(p, 16)); });
+            window.FOOTER_DATA = JSON.parse(raw2);
+        } catch (e) { console.warn('Could not parse FOOTER_DATA:', e.message); }
+    }
+    // Parse PAGE_META
+    var match3 = content.match(/var\s+PAGE_META\s*=\s*(\{[\s\S]*\});?\s*$/m);
+    if (match3) {
+        try {
+            var raw3 = match3[1].replace(/;+$/, '').replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            raw3 = raw3.replace(/([{,]\s*)(?!")([\/\w-]+)\s*:/g, function (m, pre, key) {
+                return pre + '"' + key + '":';
+            });
+            // Handle escaped quotes within strings
+            raw3 = raw3.replace(/\\'/g, "'");
+            window.PAGE_META = JSON.parse(raw3);
+        } catch (e) { console.warn('Could not parse PAGE_META:', e.message); }
+    }
+}
+
+function serializeLayoutData() {
+    var lines = [];
+    lines.push('/**');
+    lines.push(' * Layout Data \u2014 Navigation links, footer data, and page metadata');
+    lines.push(' */');
+    lines.push('var NAV_LINKS = ' + JSON.stringify(window.NAV_LINKS || [], null, 2) + ';');
+    lines.push('');
+    lines.push('var FOOTER_DATA = ' + JSON.stringify(window.FOOTER_DATA || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var PAGE_META = ' + JSON.stringify(window.PAGE_META || {}, null, 2) + ';');
+    lines.push('');
+    return lines.join('\n');
+}
+
+// ==========================================
+// 31. SECTION VISIBILITY MANAGEMENT
+// ==========================================
+
+var VISIBILITY_MAP = {
+    home: {
+        label: 'Home', icon: 'fa-home',
+        sections: { hero: 'Hero Banner', stats: 'Statistics', whatWeDo: 'What We Do', caseStudy: 'Case Study', cta: 'Call to Action' }
+    },
+    about: {
+        label: 'About', icon: 'fa-building',
+        sections: { pageHeader: 'Page Header', whoWeAre: 'Who We Are' }
+    },
+    products: {
+        label: 'Products', icon: 'fa-cube',
+        sections: { hero: 'Hero Section', grid: 'Product Grid' }
+    },
+    services: {
+        label: 'Services', icon: 'fa-layer-group',
+        sections: { hero: 'Hero Section', grid: 'Service Grid' }
+    },
+    successStories: {
+        label: 'Success Stories', icon: 'fa-trophy',
+        sections: { hero: 'Hero Section', grid: 'Stories Grid' }
+    },
+    contact: {
+        label: 'Contact', icon: 'fa-envelope',
+        sections: { infoCards: 'Info Cards', faq: 'FAQ Section', form: 'Contact Form', map: 'Map' }
+    },
+    careers: {
+        label: 'Careers', icon: 'fa-briefcase',
+        sections: { hero: 'Hero Section', listings: 'Job Listings' }
+    }
+};
+
+function getVisibilityData() {
+    if (!window.SETTINGS_DATA) window.SETTINGS_DATA = {};
+    if (!window.SETTINGS_DATA.sectionVisibility) {
+        window.SETTINGS_DATA.sectionVisibility = {};
+        for (var page in VISIBILITY_MAP) {
+            window.SETTINGS_DATA.sectionVisibility[page] = {};
+            for (var sec in VISIBILITY_MAP[page].sections) {
+                window.SETTINGS_DATA.sectionVisibility[page][sec] = true;
+            }
+        }
+    }
+    return window.SETTINGS_DATA.sectionVisibility;
+}
+
+function loadVisibilityEditor() {
+    var container = document.getElementById('visibility-editor');
+    if (!container) return;
+    var vis = getVisibilityData();
+    var html = '';
+    for (var pageKey in VISIBILITY_MAP) {
+        var pageCfg = VISIBILITY_MAP[pageKey];
+        var pageVis = vis[pageKey] || {};
+        html += '<div class="item-card" style="max-width:800px;margin:0 auto 20px;">' +
+            '<h3 style="margin-bottom:15px;border-bottom:1px solid var(--border);padding-bottom:10px;">' +
+                '<i class="fas ' + pageCfg.icon + '"></i> ' + escapeHTML(pageCfg.label) +
+            '</h3>';
+        for (var secKey in pageCfg.sections) {
+            var checked = pageVis[secKey] !== false ? 'checked' : '';
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">' +
+                '<span>' + escapeHTML(pageCfg.sections[secKey]) + '</span>' +
+                '<label style="position:relative;display:inline-block;width:50px;height:26px;">' +
+                    '<input type="checkbox" ' + checked + ' onchange="toggleSectionVisibility(\'' + pageKey + '\',\'' + secKey + '\',this.checked)" style="opacity:0;width:0;height:0;">' +
+                    '<span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:' + (checked ? 'var(--accent)' : '#ccc') + ';border-radius:26px;transition:.3s;">' +
+                        '<span style="position:absolute;content:\'\';height:20px;width:20px;left:' + (checked ? '26px' : '3px') + ';bottom:3px;background:white;border-radius:50%;transition:.3s;display:block;"></span>' +
+                    '</span>' +
+                '</label>' +
+            '</div>';
+        }
+        html += '</div>';
+    }
+    container.innerHTML = html;
+}
+
+function toggleSectionVisibility(page, section, checked) {
+    var vis = getVisibilityData();
+    if (!vis[page]) vis[page] = {};
+    vis[page][section] = checked;
+    // Re-render to update toggle visual
+    loadVisibilityEditor();
+}
+
+function saveVisibility() {
+    markAsPending('form_settings');
+    showToast('Visibility settings saved!', 'success');
+}
+
+// ==========================================
+// 32. INITIALIZATION
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async function () {
