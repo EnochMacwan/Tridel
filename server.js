@@ -240,7 +240,8 @@ const DATA_FILES = {
     testimonials: 'assets/js/testimonials-data.js',
     locations: 'assets/js/locations-data.js',
     contact: 'assets/js/contact-data.js',
-    settings: 'assets/js/settings-data.js'
+    settings: 'assets/js/settings-data.js',
+    index_content: 'assets/js/index-page-data.js'
 };
 
 const VAR_NAMES = {
@@ -254,7 +255,8 @@ const VAR_NAMES = {
     testimonials: 'TESTIMONIALS_DATA',
     locations: 'LOCATIONS_DATA',
     contact: 'CONTACT_DATA',
-    settings: 'SETTINGS_DATA'
+    settings: 'SETTINGS_DATA',
+    index_content: 'INDEX_HERO'
 };
 
 // ============================================
@@ -304,7 +306,29 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
 
     try {
         const data = sanitizeObject(rawData);
-        const content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+        let content;
+        if (type === 'index_content') {
+            // Special: multi-var file with INDEX_HERO, INDEX_STATS, etc.
+            const lines = [
+                '/**',
+                ' * Index / Home Page Data',
+                ' * Content data for the home page hero, stats, value props, case study, and CTA',
+                ' */',
+            ];
+            lines.push(`var INDEX_HERO = ${JSON.stringify(data.INDEX_HERO || {}, null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_STATS = ${JSON.stringify(data.INDEX_STATS || [], null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_WHAT_WE_DO = ${JSON.stringify(data.INDEX_WHAT_WE_DO || {}, null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_CASE_STUDY = ${JSON.stringify(data.INDEX_CASE_STUDY || {}, null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_CTA = ${JSON.stringify(data.INDEX_CTA || {}, null, 2)};`);
+            lines.push('');
+            content = lines.join('\n');
+        } else {
+            content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+        }
         fs.writeFileSync(filePath, content, 'utf8');
         const count = Array.isArray(data) ? data.length : 1;
         console.log(`Saved ${type} (${count} items)`);

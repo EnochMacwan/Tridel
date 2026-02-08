@@ -91,6 +91,7 @@
                 <li><a href="#" data-section="locations"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
                 <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
                 <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
+                <li><a href="#content" data-section="content"><i class="fas fa-file-alt"></i> Page Content</a></li>
                 <li><a href="#health" data-section="health"><i class="fas fa-heartbeat"></i> System Health</a></li>
                 <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Global Settings</a></li>
             </ul>
@@ -276,6 +277,129 @@
                 <div class="items-grid" id="linkedin-grid"></div>
             </section>
 
+            <!-- Page Content -->
+            <section id="content" class="content-section">
+                <div class="section-header">
+                    <h2>Page Content</h2>
+                    <button type="button" class="btn btn-primary" onclick="savePageContent()">
+                        <i class="fas fa-save"></i> Save Content
+                    </button>
+                </div>
+
+                <!-- Home Page Hero -->
+                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <i class="fas fa-home"></i> Home Page Hero
+                    </h3>
+                    <div class="form-group">
+                        <label>Hero Title</label>
+                        <input type="text" class="form-control" id="content-hero-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Hero Subtitle</label>
+                        <textarea class="form-control" id="content-hero-subtitle" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Home Stats -->
+                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <i class="fas fa-chart-bar"></i> Stats Bar
+                    </h3>
+                    <div id="content-stats-list"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addStatRow()" style="margin-top:10px;">
+                        <i class="fas fa-plus"></i> Add Stat
+                    </button>
+                </div>
+
+                <!-- What We Do -->
+                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <i class="fas fa-tasks"></i> What We Do Section
+                    </h3>
+                    <div class="form-group">
+                        <label>Section Title</label>
+                        <input type="text" class="form-control" id="content-wwd-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Section Subtitle</label>
+                        <input type="text" class="form-control" id="content-wwd-subtitle">
+                    </div>
+                    <div id="content-wwd-cards"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addWwdCard()" style="margin-top:10px;">
+                        <i class="fas fa-plus"></i> Add Card
+                    </button>
+                </div>
+
+                <!-- Case Study -->
+                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <i class="fas fa-project-diagram"></i> Featured Case Study
+                    </h3>
+                    <div class="form-group">
+                        <label>Label</label>
+                        <input type="text" class="form-control" id="content-cs-label">
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" class="form-control" id="content-cs-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" id="content-cs-desc" rows="3"></textarea>
+                    </div>
+                    <div class="form-group" style="display:flex; gap:15px;">
+                        <div style="flex:1">
+                            <label>Image Path</label>
+                            <input type="text" class="form-control" id="content-cs-image">
+                        </div>
+                        <div style="flex:1">
+                            <label>Link Text</label>
+                            <input type="text" class="form-control" id="content-cs-link-text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Link Href</label>
+                        <input type="text" class="form-control" id="content-cs-link-href">
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
+                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <i class="fas fa-bullhorn"></i> Call to Action
+                    </h3>
+                    <div class="form-group">
+                        <label>CTA Title</label>
+                        <input type="text" class="form-control" id="content-cta-title">
+                    </div>
+                    <div class="form-group">
+                        <label>CTA Description</label>
+                        <textarea class="form-control" id="content-cta-desc" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" style="display:flex; gap:15px;">
+                        <div style="flex:1">
+                            <label>Primary Button Text</label>
+                            <input type="text" class="form-control" id="content-cta-primary-text">
+                        </div>
+                        <div style="flex:1">
+                            <label>Primary Button Link</label>
+                            <input type="text" class="form-control" id="content-cta-primary-href">
+                        </div>
+                    </div>
+                    <div class="form-group" style="display:flex; gap:15px;">
+                        <div style="flex:1">
+                            <label>Secondary Button Text</label>
+                            <input type="text" class="form-control" id="content-cta-secondary-text">
+                        </div>
+                        <div style="flex:1">
+                            <label>Secondary Button Link</label>
+                            <input type="text" class="form-control" id="content-cta-secondary-href">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- System Health -->
             <section id="health" class="content-section">
                 <div class="section-header">
@@ -441,6 +565,7 @@
     <script src="assets/js/success-stories-data.js"></script>
     <script src="assets/js/settings-data.js"></script>
     <script src="assets/js/home-data.js"></script>
+    <script src="assets/js/index-page-data.js"></script>
 
     <!-- Admin Logic -->
     <script src="assets/js/admin.js"></script>
