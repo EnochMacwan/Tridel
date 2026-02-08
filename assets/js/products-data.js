@@ -430,7 +430,7 @@ const PRODUCTS_DATA = [
     "features": [
       "<strong>Project Management:</strong> Streamlined workflow management for complex hydrographic projects.",
       "<strong>Data Utilization:</strong> Optimizes the use of survey data for reporting and analysis.",
-      "<strong>Web-Based:</strong> Accessible via web browser for remote project tracking."
+      "<strong>Web-Based:</strong> Accessible via web browser for remote project tracking|"
     ],
     "isNested": false,
     "parent": ""
