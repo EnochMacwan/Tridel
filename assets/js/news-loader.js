@@ -1,6 +1,30 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('news-feed-container');
+/**
+ * News Feed Loader
+ * Dynamically generates the LinkedIn news feed cards.
+ *
+ * Exports:
+ *   window.renderNewsFeed(container)
+ */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+// Format ISO date to friendly string (e.g. "May 15, 2025")
+function _newsFormatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr; // Return as-is if not parseable
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+        return dateStr;
+    }
+}
+
+/**
+ * Renders the News Feed
+ * Exported as window.renderNewsFeed for SPA router usage.
+ */
+window.renderNewsFeed = function(container) {
+    if (!container) container = document.getElementById('news-feed-container');
     // Support all variable names, prioritize NEWS_DATA
     const data = typeof NEWS_DATA !== 'undefined' ? NEWS_DATA
                : typeof LINKEDIN_POSTS !== 'undefined' ? LINKEDIN_POSTS
@@ -9,21 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!container || !data || !data.length) {
         if (container) {
-            container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">No news updates available.</p>';
+            container.innerHTML = '<p class="empty-state">No news updates available.</p>';
         }
         return;
-    }
-
-    // Format ISO date to friendly string (e.g. "May 15, 2025")
-    function formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr; // Return as-is if not parseable
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        } catch (e) {
-            return dateStr;
-        }
     }
 
     // Clear loading placeholder
@@ -36,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : item;
 
         const linkedInUrl = post.url || `https://www.linkedin.com/feed/update/${post.urn}`;
-        const friendlyDate = formatDate(post.date);
+        const friendlyDate = _newsFormatDate(post.date);
 
         const card = document.createElement('div');
         card.className = 'news-card';
@@ -79,4 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.appendChild(card);
     });
+};
+
+// --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('news-feed-container');
+    if (container) {
+        window.renderNewsFeed(container);
+    }
 });

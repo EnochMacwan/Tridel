@@ -3,7 +3,12 @@
  * Dynamically generates:
  * 1. Mega Menu Content for Services (on all pages)
  * 2. Service Grid Content (on services.html)
+ *
+ * Exports:
+ *   window.renderServicesMegaMenu(container)
+ *   window.renderServicesGrid(container)
  */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 /**
  * Helper: Get Icon Class for Category
@@ -13,18 +18,57 @@ function getIconForCategory(category) {
         'Environmental Monitoring': 'fas fa-satellite-dish',
         'Environmental Surveying': 'fas fa-map-marked-alt'
     };
-    return `<i class="${icons[category] || 'fas fa-cube'}"></i>`; 
+    return `<i class="${icons[category] || 'fas fa-cube'}"></i>`;
 }
 
+function attachServicesHoverEffects(container) {
+    const glassLinks = container.querySelectorAll('.glass-link');
+    const spotlight = container.querySelector('.glass-spotlight');
+    if (!spotlight) return;
+
+    const imgEl = spotlight.querySelector('img');
+    const titleEl = spotlight.querySelector('h3');
+    const descEl = spotlight.querySelector('p');
+    const btnEl = spotlight.querySelector('.spotlight-btn');
+
+    let updateTimeout;
+
+    glassLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            const title = link.dataset.title;
+            const desc = link.dataset.desc;
+            const img = link.dataset.img;
+            const href = link.getAttribute('href');
+
+            // 1. Fade out content slightly
+            spotlight.style.opacity = '0.9';
+            if (imgEl) imgEl.style.transform = 'scale(0.98)';
+
+            // 2. Change content after short delay
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                if (imgEl && img) imgEl.src = img;
+                if (titleEl && title) titleEl.textContent = title;
+                if (descEl && desc) descEl.textContent = desc;
+                if (btnEl) btnEl.href = href;
+
+                // 3. Fade in and pop
+                spotlight.style.opacity = '1';
+                if (imgEl) imgEl.style.transform = 'scale(1)';
+            }, 100);
+        });
+    });
+}
 
 /**
  * Renders the Mega Menu Columns for Services
+ * Exported as window.renderServicesMegaMenu for SPA router usage.
  */
-function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
+window.renderServicesMegaMenu = function(containerElement) {
     // Support both variable names
     const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
     if (!data) {
-        if (containerElement) containerElement.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        if (containerElement) containerElement.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
 
@@ -32,12 +76,12 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
     // 2. If not found, fallback to the main .mm-services container class
     // 3. If neither found, log error and exit
     let container = containerElement || document.getElementById('services-dynamic-content');
-    
+
     if (!container) {
         // Fallback: Find any .mm-services container
         container = document.querySelector('.mm-services');
     }
-    
+
     // Safety check: if nothing found, error
     if (!container) {
         console.error("Services Loader: No services mega menu container found!");
@@ -93,71 +137,39 @@ function renderServicesMegaMenu(containerElement) { // Renamed to avoid conflict
 
     // Attach Hover Effects
     attachServicesHoverEffects(container);
-}
 
-function attachServicesHoverEffects(container) {
-    const glassLinks = container.querySelectorAll('.glass-link');
-    const spotlight = container.querySelector('.glass-spotlight');
-    if (!spotlight) return;
-
-    const imgEl = spotlight.querySelector('img');
-    const titleEl = spotlight.querySelector('h3');
-    const descEl = spotlight.querySelector('p');
-    const btnEl = spotlight.querySelector('.spotlight-btn');
-
-    let updateTimeout;
-
-    glassLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-            const title = link.dataset.title;
-            const desc = link.dataset.desc;
-            const img = link.dataset.img;
-            const href = link.getAttribute('href');
-
-            // 1. Fade out content slightly
-            spotlight.style.opacity = '0.9';
-            if (imgEl) imgEl.style.transform = 'scale(0.98)';
-
-            // 2. Change content after short delay
-            clearTimeout(updateTimeout);
-            updateTimeout = setTimeout(() => {
-                if (imgEl && img) imgEl.src = img;
-                if (titleEl && title) titleEl.textContent = title;
-                if (descEl && desc) descEl.textContent = desc;
-                if (btnEl) btnEl.href = href;
-
-                // 3. Fade in and pop
-                spotlight.style.opacity = '1';
-                if (imgEl) imgEl.style.transform = 'scale(1)';
-            }, 100);
-        });
-    });
-}
+    // Initialize glass card hover effects
+    if (typeof window.initGlassCards === 'function') {
+        window.initGlassCards();
+    }
+};
 
 /**
  * Renders the Services Page Grid
+ * Exported as window.renderServicesGrid for SPA router usage.
  */
-function renderServicesPage(container) {
+window.renderServicesGrid = function(container) {
+    if (!container) container = document.getElementById('dynamic-services-container');
     // Support both variable names
     const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
     if (!data) {
-        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
 
     container.innerHTML = '';
 
     const sections = [
-        { 
-            title: 'Environmental Monitoring', 
+        {
+            title: 'Environmental Monitoring',
             subtitle: 'Advanced data collection and analysis for marine and coastal environments.',
             category: 'Environmental Monitoring',
             bgClass: 'section--light-bg'
         },
-        { 
-            title: 'Environmental Surveying', 
+        {
+            title: 'Environmental Surveying',
             subtitle: 'Comprehensive hydrographic and geophysical survey services.',
-            category: 'Environmental Surveying', 
+            category: 'Environmental Surveying',
             bgClass: 'section' // White bg
         }
     ];
@@ -168,7 +180,7 @@ function renderServicesPage(container) {
 
         // Get all items for this category, excluding nested items
         const items = data.filter(s => s.category === section.category && !s.isNested);
-        
+
         // Separate: main services first, then grouped by subcategory
         const mainItems = items.filter(s => !s.subcategory);
         const subcategories = [...new Set(items.filter(s => s.subcategory).map(s => s.subcategory))];
@@ -205,7 +217,7 @@ function renderServicesPage(container) {
         // Render subcategories with their services
         subcategories.forEach(subcat => {
             const subItems = items.filter(s => s.subcategory === subcat);
-            
+
             sectionContent += `
                 <div class="product-category">
                     <h3 class="product-category__title">
@@ -242,19 +254,19 @@ function renderServicesPage(container) {
         sectionEl.innerHTML = sectionContent;
         container.appendChild(sectionEl);
     });
-}
+};
 
-// --- Initialization Logic (Appended) ---
+// --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Mega Menu (Home Page)
     const mmContainer = document.getElementById('services-dynamic-content');
     if (mmContainer) {
-        renderServicesMegaMenu(mmContainer);
+        window.renderServicesMegaMenu(mmContainer);
     }
 
     // 2. Initialize Services Page Grid
     const pageContainer = document.getElementById('dynamic-services-container');
     if (pageContainer) {
-        renderServicesPage(pageContainer);
+        window.renderServicesGrid(pageContainer);
     }
 });

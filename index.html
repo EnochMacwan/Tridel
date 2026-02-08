@@ -29,645 +29,105 @@
       }
     }
   </script>
+
+  <!-- Styles -->
   <link href="assets/css/styles.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script defer src="assets/js/script.js">
-  </script>
-  <script defer src="assets/js/bg-animation-future.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Outfit:wght@400;500;700;800&amp;display=swap"
     rel="stylesheet">
-  <style>
-    .map-canvas {
-      height: 460px;
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-    }
 
-    .location-info.is-active {
-      outline: 2px solid #1e90ff;
-      border-radius: 8px;
-    }
-  </style>
-<script defer src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-    <script defer src="assets/js/smooth-scroll.js"></script>
+  <!-- Theme flash prevention (runs immediately on parse) -->
+  <script src="assets/js/theme-toggle.js"></script>
 </head>
 
-
-<body class="page-home">
-    <noscript>
-        <div class="noscript-message">
-            <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to continue.</p>
-        </div>
-    </noscript>
-  <!-- Global Animated Background -->
-  <div class="hero__bg">
-    <canvas id="hero-canvas" width="1920" height="1080"></canvas>
-  </div>
-
- <header class="header">
-<div class="container header__container">
-    <a class="header__logo" href="index.html">
-        <img alt="Tridel Logo" src="assets/images/logo/tridel.png">
-    </a>
-    <nav aria-label="Main Navigation" class="header__nav" id="main-nav">
-        <ul class="header__nav-list">
-            <li>
-                <a class="header__nav-link" href="index.html">
-                    Home
-                </a>
-            </li>
-            <li>
-                <a class="header__nav-link" href="about.html">
-                    About Us
-                </a>
-            </li>
-            <li>
-                <a class="header__nav-link" href="products.html">
-                    Products <i class="fas fa-chevron-down nav-icon-small"></i>
-                </a>
-                <!-- Mega Menu (Concept 3: Glass Prism) -->
-                <div class="mega-menu glass-mode">
-                    <div class="mm-glass-grid mm-products">
-                        <div style="grid-column: 1/-1; text-align: center; color: white;">Loading Products...</div>
-                        <!-- Content loaded dynamically by assets/js/products-loader.js -->
-                    </div>
-                </div>
-            </li>
-            <li>
-                <a class="header__nav-link" href="services.html">
-                    Services <i class="fas fa-chevron-down nav-icon-small"></i>
-                </a>
-                <div class="mega-menu glass-mode">
-                    <!-- Standardized Dynamic Container -->
-                    <div class="mm-glass-grid mm-services" id="services-dynamic-content">
-                         <div style="grid-column: 1/-1; text-align: center; color: white;">Loading Services...</div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <a class="header__nav-link" href="success-stories.html">
-                    Success Stories
-                </a>
-            </li>
-            <li>
-                <a class="header__nav-link" href="careers.html">
-                    Careers
-                </a>
-            </li>
-            <li>
-                <a class="header__nav-link" href="contact.html">
-                    Contact
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <div class="header__actions">
-        <button type="button" id="theme-toggle" class="button button--icon theme-toggle-btn"
-            aria-label="Toggle Dark Mode">
-            <i class="fas fa-moon"></i>
-        </button>
-        <a class="button button--primary" href="contact.html">
-            Enquire Now
-        </a>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <noscript>
+    <div class="noscript-message">
+      <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to
+        continue.</p>
     </div>
+  </noscript>
 
-    <!-- Bottom Glass Navigation (Mobile Only) -->
-    <nav class="bottom-glass-nav" aria-label="Mobile Navigation">
-        <a href="index.html" class="bottom-nav-item active">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="products.html" class="bottom-nav-item">
-            <i class="fas fa-cube"></i>
-            <span>Products</span>
-        </a>
-        <a href="services.html" class="bottom-nav-item">
-            <i class="fas fa-layer-group"></i>
-            <span>Services</span>
-        </a>
-        <a href="success-stories.html" class="bottom-nav-item">
-            <i class="fas fa-trophy"></i>
-            <span>Stories</span>
-        </a>
-        <a href="careers.html" class="bottom-nav-item">
-            <i class="fas fa-briefcase"></i>
-            <span>Careers</span>
-        </a>
-        <a href="contact.html" class="bottom-nav-item">
-            <i class="fas fa-envelope"></i>
-            <span>Contact</span>
-        </a>
-    </nav>
-</div>
-<script defer src="assets/js/utils.js"></script>
-<script defer src="assets/js/products-data.js"></script>
-<script defer src="assets/js/products-loader.js"></script>
-<script defer src="assets/js/services-data.js"></script>
-<script defer src="assets/js/services-loader.js"></script>
-</header>
-<main id="main-content">
-    <section class="hero">
-      <div class="hero__overlay"></div>
-      <div class="container hero__content">
-        <h1 class="hero__title">
-          Pioneering the Future of Maritime Intelligence
-        </h1>
-        <p class="hero__subtitle">
-          We deliver integrated hardware, software, and services for the comprehensive maritime domain.
-        </p>
-      </div>
-    </section>
-    <section class="section" id="highlights">
-      <div class="container--wide">
-        <div class="section__header">
-          <h2 class="section__title">
-            Highlights
-          </h2>
-        </div>
-        <div id="home-cards-container" class="highlights-grid highlights-grid--4-items">
-          <!-- Dynamic Content Loaded Here -->
-        </div>
-      </div>
-    </section>
-    <section class="section section--light-bg">
-      <div class="container--wide">
-        <div class="news-feed">
-          <h2 class="section__title">
-            Latest News
-          </h2>
-          <div id="news-feed-container">
-            <!-- News Cards will be loaded dynamically from assets/js/news-data.js -->
-            <div class="news-loading-placeholder" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-muted);">
-                <i class="fas fa-spinner fa-spin"></i> Loading latest updates...
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <div id="header-root"></div>
+  <main id="main-content"></main>
+  <div id="footer-root"></div>
 
-    <section class="section section--light-bg">
-      <div class="container--wide">
-        <div class="section__header">
-          <h2 class="section__title">
-            Global Client Stories
-          </h2>
-          <p class="section__subtitle">
-            Exploring our impact across the world.
-          </p>
-        </div>
-        <div class="testimonials">
-          <div id="map-container-section">
-            <div id="map-hero-canvas"></div>
-            <div id="map-sidebar">
-              <!-- Header moved outside -->
+  <!-- ========================================
+       SCRIPTS (order matters)
+       ======================================== -->
 
-              <div id="map-testimonial-content" class="map-testimonial-display active">
-                <img id="t-logo" src="assets/images/logo/tridel.png" alt="Logo" class="map-card-logo" onerror="this.onerror=null; this.src='assets/images/logo/tridel.png';">
-                <p id="t-quote" class="map-card-quote"></p>
-                <div id="t-author" class="map-card-author"></div>
-                <div id="t-role" class="map-card-role"></div>
-              </div>
+  <!-- 1. Core Utilities -->
+  <script src="assets/js/utils.js"></script>
 
-              <div class="map-controls">
-                <button type="button" class="map-nav-btn" id="map-prev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
-                <button type="button" class="map-nav-btn" id="map-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-              </div>
+  <!-- 2. Data Files (global arrays/objects, no DOM dependency) -->
+  <script src="assets/js/products-data.js"></script>
+  <script src="assets/js/services-data.js"></script>
+  <script src="assets/js/home-data.js"></script>
+  <script src="assets/js/news-data.js"></script>
+  <script src="assets/js/clients-data.js"></script>
+  <script src="assets/js/success-stories-data.js"></script>
+  <script src="assets/js/team-data.js"></script>
+  <script src="assets/js/testimonials-data.js"></script>
+  <script src="assets/js/contact-data.js"></script>
+  <script src="assets/js/locations-data.js"></script>
+  <script src="assets/js/settings-data.js"></script>
 
-              <div class="map-progress-bar">
-                <div id="progress" class="map-progress-fill"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="section" id="clients">
-      <div class="container">
-        <div class="section__header">
-          <h2 class="section__title">
-            Our Clients &amp; Partners
-          </h2>
-        </div>
-      </div>
-      <div class="client-logos">
-        <div class="client-logo-track">
-           <!-- Dynamically loaded by assets/js/clients-loader.js -->
-        </div>
-      </div>
-    </section>
-    
-    <!-- Dynamic Scripts -->
-    <script defer src="assets/js/clients-data.js"></script>
-    <script defer src="assets/js/clients-loader.js"></script>
-    <section class="section section--light-bg" id="map-section">
-      <div class="container">
-        <div class="section__header">
-          <h2 class="section__title">
-            Our Global Presence
-          </h2>
-        </div>
-        <div class="map-layout">
-          <div class="map-canvas" id="map">
-          </div>
-          <div class="contact-details">
-            <div class="section__header" style="text-align: left;">
-              <h2 class="section__title">
-                Our Offices
-              </h2>
-            </div>
-            <div id="location-details-uae" class="contact-location-group">
-              <h4>
-                UAE
-              </h4>
-              <p>
-                Tridel Technologies FZCO, QD01, DAFZA Industrial Park, Qusais, Dubai, UAE
-              </p>
-            </div>
+  <!-- 3. Page-specific Data Files -->
+  <script src="assets/js/index-page-data.js"></script>
+  <script src="assets/js/about-page-data.js"></script>
+  <script src="assets/js/contact-page-data.js"></script>
+  <script src="assets/js/layout-data.js"></script>
 
-            <h4 class="contact-location-label">
-              India
-            </h4>
+  <!-- 4. Loaders (callable functions, depend on data files) -->
+  <script src="assets/js/products-loader.js"></script>
+  <script src="assets/js/services-loader.js"></script>
+  <script src="assets/js/home-loader.js"></script>
+  <script src="assets/js/news-loader.js"></script>
+  <script src="assets/js/clients-loader.js"></script>
+  <script src="assets/js/success-stories-loader.js"></script>
+  <script src="assets/js/team-loader.js"></script>
+  <script src="assets/js/product-detail-loader.js"></script>
+  <script src="assets/js/service-detail-loader.js"></script>
+  <script src="assets/js/testimonial-map-loader.js"></script>
 
-            <!-- Chennai -->
-            <div id="location-details-india" class="contact-location-group" style="margin-bottom: 16px;">
-              <p style="margin-bottom: 8px;"><strong>Registered Office (Chennai)</strong></p>
-              <p class="contact-location-address">
-                Tridel Technologies Pvt Ltd<br>
-                No 10/1, 2nd Street, Thirumurugan Nagar,<br>
-                Arcot Road, Porur, Chennai, TN 600116
-              </p>
-            </div>
+  <!-- 5. SPA Components & Layout -->
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/layout.js"></script>
 
-            <!-- Vadodara Factory & Office Combined Click Target -->
-            <div id="location-details-india-vadodara" class="contact-location-group">
-              <p style="margin-bottom: 8px;"><strong>Factory Address (Vadodara)</strong></p>
-              <p class="contact-location-address" style="margin-bottom: 16px;">
-                Tridel Technologies Pvt Ltd<br>
-                Block No. 680 / Plot No. 2, Shah Industrial Estate-2,<br>
-                Lamdapura Road, Manjusar, Savli,<br>
-                Vadodara, Gujarat – 390025
-              </p>
+  <!-- 6. Behavior (callable functions) -->
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/bg-animation.js"></script>
+  <script src="assets/js/bg-animation-future.js"></script>
 
-              <p style="margin-bottom: 8px;"><strong>Office Address (Vadodara)</strong></p>
-              <p class="contact-location-address">
-                Tridel Technologies Pvt Ltd<br>
-                76, Swaminarayan Nagar, Nizampura,<br>
-                Vadodara, Gujarat – 390002
-              </p>
-            </div>
+  <!-- 7. Router (defines registerRoute, navigate, initRouter) -->
+  <script src="assets/js/router.js"></script>
 
-            <div id="location-details-australia" class="contact-location-group">
-              <h4 style="margin-top: 24px;">
-                Australia
-              </h4>
-              <p class="contact-location-address">
-                Tridel Technologies Pty Ltd<br>
-                Eden Hills, Adelaide, SA
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-  <footer class="footer">
-    <div class="container footer__container">
-      <div class="footer__brand">
-        <a class="footer__logo" href="index.html">
-          <img alt="Tridel Logo" src="assets/images/logo/tridel1.png" class="footer-logo-style">
-        </a>
-        <p class="footer__tagline">
-          Connecting Environmental Science, Engineering, and Technology
-        </p>
-      </div>
-      <div class="footer__links">
-        <div class="footer__links-col">
-          <h3 class="footer__heading">
-            Quick Links
-          </h3>
-          <ul>
-            <li>
-              <a class="footer__link" href="about.html">
-                About Us
-              </a>
-            </li>
-            <li>
-              <a class="footer__link" href="products.html">
-                Products
-              </a>
-            </li>
-            <li>
-              <a class="footer__link" href="services.html">
-                Services
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer__links-col">
-          <h3 class="footer__heading">
-            Company
-          </h3>
-          <ul>
-            <li>
-              <a class="footer__link" href="success-stories.html">
-                Success Stories
-              </a>
-            </li>
-            <li>
-              <a class="footer__link" href="careers.html">
-                Careers
-              </a>
-            </li>
-            <li>
-              <a class="footer__link" href="contact.html">
-                Contact
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer__social">
-        <h3 class="footer__heading">
-          Connect
-        </h3>
-        <a aria-label="LinkedIn" class="footer__social-link"
-          href="https://www.linkedin.com/company/tridel-technologies-company/">
-          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
-            </path>
-            <rect height="12" width="4" x="2" y="9">
-            </rect>
-            <circle cx="4" cy="4" r="2">
-            </circle>
-          </svg>
-        </a>
-        
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <p>
-          © 2026 Tridel Technologies. All Rights Reserved.
-        </p>
-        <a href="admin.html" style="color: #888; font-size: 12px; text-decoration: none;">
-          <i class="fas fa-cog"></i> Admin
-        </a>
-      </div>
-    </div>
-  </footer>
-  <script src="assets/js/theme-toggle.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 8. Page Renderers (call registerRoute to register their routes) -->
+  <script src="assets/js/pages/home.js"></script>
+  <script src="assets/js/pages/about.js"></script>
+  <script src="assets/js/pages/products.js"></script>
+  <script src="assets/js/pages/product-detail.js"></script>
+  <script src="assets/js/pages/services.js"></script>
+  <script src="assets/js/pages/service-detail.js"></script>
+  <script src="assets/js/pages/success-stories.js"></script>
+  <script src="assets/js/pages/contact.js"></script>
+  <script src="assets/js/pages/careers.js"></script>
+
+  <!-- 9. Smooth Scroll (Lenis) -->
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+  <script src="assets/js/smooth-scroll.js"></script>
+
+  <!-- 10. Boot -->
   <script>
-    // Map Testimonial Logic
-    document.addEventListener('DOMContentLoaded', function () {
-      const mapEl = document.getElementById('map-hero-canvas');
-      if (!mapEl) return;
-
-      // Enable Zoom Control (+/- buttons)
-      const map = L.map('map-hero-canvas', { zoomControl: true }).setView([25.0, 55.0], 3);
-
-      // Move zoom control to bottom right to avoid blocking pins
-      map.zoomControl.setPosition('bottomright');
-
-      // Map Layers
-      const lightTiles = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-      const darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-      let tileLayer = L.tileLayer(lightTiles, {
-        attribution: '&copy;OpenStreetMap, &copy;CartoDB'
-      }).addTo(map);
-
-      let geoJsonLayer = null;
-
-      // Function to update map style based on theme
-      function updateMapTheme(theme) {
-        const isDark = theme === 'dark';
-        const newUrl = isDark ? darkTiles : lightTiles;
-        tileLayer.setUrl(newUrl);
-
-        const container = document.getElementById('map-container-section');
-        if (container) {
-          container.style.background = isDark ? '#001220' : '#f8f9fa';
-          container.style.color = isDark ? 'white' : '#333';
-        }
-
-        if (geoJsonLayer) {
-          geoJsonLayer.setStyle({
-            color: isDark ? '#4a4a4a' : '#cbd5e0', // Subtle light grey for dark mode, subtle dark grey for light mode
-            weight: 1.5,
-            opacity: 0.8
-          });
-        }
-      }
-
-      // Initial Theme Check
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-      updateMapTheme(currentTheme);
-
-      // Listen for Theme Changes
-      window.addEventListener('themeChanged', (e) => {
-        updateMapTheme(e.detail.theme);
-      });
-
-      // Overlay Official India Boundary (Survey of India Compliant)
-      fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')
-        .then(response => response.json())
-        .then(data => {
-          geoJsonLayer = L.geoJSON(data, {
-            style: {
-              color: "#cbd5e0",    // Initial default (light mode compliant)
-              weight: 1.5,         // Thinner, "normal" lines
-              opacity: 0.8,
-              fillOpacity: 0
-            }
-          }).addTo(map);
-
-          // Apply correct style immediately after loading based on current theme
-          const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
-          updateMapTheme(activeTheme);
-        })
-        .catch(err => console.log('Error loading India GeoJSON:', err));
-
-      // Testimonials loaded from assets/js/testimonials-data.js
-      const testimonials = typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA : [];
-      testimonials.sort((a, b) => a.lng - b.lng);
-
-      const iconNormal = L.divIcon({
-        className: 'custom-pin',
-        html: `<div style="
-                  width: 24px;
-                  height: 24px;
-                  background: #00AAE7;
-                  border-radius: 50% 50% 50% 0;
-                  transform: rotate(-45deg);
-                  border: 2px solid white;
-                  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                  display: flex; align-items: center; justify-content: center;
-                  margin-top: -34px; margin-left: -12px;">
-                  <div style="width: 8px; height: 8px; background: white; border-radius: 50%; transform: rotate(45deg);"></div>
-              </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
-
-      const iconActive = L.divIcon({
-        className: 'custom-pin-active',
-        html: `<div style="
-                  width: 36px;
-                  height: 36px;
-                  background: white;
-                  border-radius: 50% 50% 50% 0;
-                  transform: rotate(-45deg);
-                  border: 4px solid #00AAE7;
-                  box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
-                  display: flex; align-items: center; justify-content: center;
-                  margin-top: -48px; margin-left: -18px; z-index: 1000;">
-                  <div style="width: 12px; height: 12px; background: #00AAE7; border-radius: 50%; transform: rotate(45deg);"></div>
-              </div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
-      });
-
-      let markers = [];
-      testimonials.forEach((t, index) => {
-        const marker = L.marker([t.lat, t.lng], { icon: iconNormal }).addTo(map);
-        marker.index = index;
-        marker.on('mouseover', () => {
-          if (!isManualInteraction) { isPaused = true; showTestimonial(index); }
-        });
-        marker.on('mouseout', () => {
-          if (!isManualInteraction) { isPaused = false; }
-        });
-        marker.on('click', () => {
-          isManualInteraction = true; // Stop auto-play permanently on click
-          showTestimonial(index);
-          currentIndex = index;
-          stopTimer();
-        });
-        markers.push(marker);
-      });
-
-      let currentIndex = 0;
-      let isPaused = false;
-      let isManualInteraction = false;
-      let timer;
-      const duration = 5000; // 5 Seconds
-
-      function showTestimonial(index) {
-        const t = testimonials[index];
-        const content = document.getElementById('map-testimonial-content');
-
-        // Force reflow for animation
-        content.classList.remove('active');
-        void content.offsetWidth;
-
-        document.getElementById('t-logo').src = 'assets/images/testimonials/' + t.logo;
-        document.getElementById('t-quote').textContent = t.quote;
-        document.getElementById('t-author').textContent = t.author;
-        document.getElementById('t-role').textContent = t.role + ', ' + t.location;
-        content.classList.add('active');
-
-        markers.forEach((m, i) => {
-          if (i === index) { m.setIcon(iconActive); m.setZIndexOffset(1000); }
-          else { m.setIcon(iconNormal); m.setZIndexOffset(0); }
-        });
-
-        map.flyTo([t.lat, t.lng], 4, { animate: true, duration: 2 });
-      }
-
-      function nextSlide() {
-        if (isPaused || isManualInteraction) return;
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        showTestimonial(currentIndex);
-        resetProgress();
-      }
-
-      function resetTimer() {
-        stopTimer();
-        timer = setInterval(nextSlide, duration);
-        resetProgress();
-      }
-
-      function stopTimer() {
-        clearInterval(timer);
-        document.getElementById('progress').style.width = '0%';
-      }
-
-      function resetProgress() {
-        const bar = document.getElementById('progress');
-        bar.style.transition = 'none';
-        bar.style.width = '0%';
-        setTimeout(() => {
-          if (!isPaused && !isManualInteraction) {
-            bar.style.transition = 'width ' + duration + 'ms linear';
-            bar.style.width = '100%';
-          }
-        }, 50);
-      }
-
-      // Navigation Buttons
-      document.getElementById('map-prev').addEventListener('click', () => {
-        isManualInteraction = true;
-        stopTimer();
-        currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
-        showTestimonial(currentIndex);
-      });
-
-      document.getElementById('map-next').addEventListener('click', () => {
-        isManualInteraction = true;
-        stopTimer();
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        showTestimonial(currentIndex);
-      });
-
-      document.getElementById('map-sidebar').addEventListener('mouseenter', () => isPaused = true);
-      document.getElementById('map-sidebar').addEventListener('mouseleave', () => {
-        // Only resume if map is zoomed out and no manual interaction occurred
-        if (map.getZoom() <= 4 && !isManualInteraction) {
-          isPaused = false;
-          resetTimer(); // Resume timer
-        }
-      });
-
-      // Pause on Zoom
-      map.on('zoom', () => {
-        if (map.getZoom() > 4) {
-          isPaused = true;
-          stopTimer();
-        } else {
-          // Only resume if not hovering and no manual interaction
-          if (!document.querySelector('#map-sidebar:hover') && !isManualInteraction) {
-            isPaused = false;
-            resetTimer();
-          }
-        }
-      });
-
-      // Pause on Drag
-      map.on('dragstart', () => {
-        isManualInteraction = true;
-        stopTimer();
-      });
-
-      showTestimonial(0);
-      resetTimer();
-    });
+    (function () {
+      window.initLayout();
+      window.initRouter();
+    })();
   </script>
-
-<script defer src="assets/js/products-loader.js"></script>
-<script defer src="assets/js/services-data.js"></script>
-<script defer src="assets/js/services-loader.js"></script>
-<script defer src="assets/js/news-data.js"></script>
-    <script defer src="assets/js/news-loader.js"></script>
-    <script defer src="assets/js/home-data.js"></script>
-    <script defer src="assets/js/home-loader.js"></script>
-    <script defer src="assets/js/testimonials-data.js"></script>
 </body>
 
 </html>

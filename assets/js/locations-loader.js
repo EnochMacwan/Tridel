@@ -2,6 +2,7 @@
  * locations-loader.js
  * Loads locations from LOCATIONS_DATA and renders them into the Global Presence section.
  */
+var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 document.addEventListener('DOMContentLoaded', function() {
     renderGlobalPresence();
@@ -15,7 +16,7 @@ function renderGlobalPresence() {
     const container = document.querySelector('.contact-details');
 
     if (!locations || locations.length === 0) {
-        if (container) container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Content is currently unavailable. Please try again later.</p>';
+        if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
     if (!container) return; // Exit if container not found
