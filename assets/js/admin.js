@@ -46,6 +46,7 @@ function getDataArray(type) {
         case 'testimonials': data = window.TESTIMONIALS_DATA; break;
         case 'locations': data = window.LOCATIONS_DATA; break;
         case 'settings': return [window.CONTACT_DATA || {}];
+        case 'index_content': return [window.INDEX_HERO || {}];
         default: return [];
     }
     return Array.isArray(data) ? data : [];
@@ -109,7 +110,8 @@ var GITHUB_DATA_FILES = {
     'team': 'assets/js/team-data.js',
     'testimonials': 'assets/js/testimonials-data.js',
     'settings': 'assets/js/contact-data.js',
-    'form_settings': 'assets/js/settings-data.js'
+    'form_settings': 'assets/js/settings-data.js',
+    'index_content': 'assets/js/index-page-data.js'
 };
 
 var GITHUB_VAR_NAMES = {
@@ -122,7 +124,8 @@ var GITHUB_VAR_NAMES = {
     'team': 'TEAM_DATA',
     'testimonials': 'TESTIMONIALS_DATA',
     'settings': 'CONTACT_DATA',
-    'form_settings': 'SETTINGS_DATA'
+    'form_settings': 'SETTINGS_DATA',
+    'index_content': 'INDEX_HERO'
 };
 
 async function loadDataFromGitHub() {
@@ -181,9 +184,63 @@ async function loadDataFromGitHub() {
         }
     }
 
+    // Special: load index page content (multi-var file)
+    try {
+        var indexPath = GITHUB_DATA_FILES['index_content'];
+        var indexRes = await fetch(
+            'https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + indexPath
+        );
+        if (indexRes.ok) {
+            var indexContent = await indexRes.text();
+            parseIndexPageContent(indexContent);
+        }
+    } catch (e) {
+        console.log('Could not load index_content from GitHub:', e.message);
+    }
+
     renderDashboard();
     renderAllSections();
     showToast('Data loaded from GitHub!', 'success');
+}
+
+function parseIndexPageContent(content) {
+    // Parse multiple var declarations from index-page-data.js
+    var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA'];
+    varNames.forEach(function (varName) {
+        var regex = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*(?:var\\s|$)', 'g');
+        var match = regex.exec(content);
+        if (!match) {
+            // Try without the trailing var lookahead (for last declaration)
+            var regex2 = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*$', 'm');
+            match = regex2.exec(content);
+        }
+        if (match) {
+            try {
+                var raw = match[1].trim();
+                // Remove trailing semicolons
+                raw = raw.replace(/;+$/, '');
+                raw = raw.replace(/\/\/.*$/gm, '');
+                raw = raw.replace(/\/\*[\s\S]*?\*\//g, '');
+                raw = raw.replace(/,\s*([\]}])/g, '$1');
+                raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
+                // Escape control characters
+                var out = '', inStr = false;
+                for (var ci = 0; ci < raw.length; ci++) {
+                    var ch = raw[ci];
+                    if (ch === '"' && (ci === 0 || raw[ci - 1] !== '\\')) { inStr = !inStr; out += ch; }
+                    else if (inStr && ch === '\n') out += '\\n';
+                    else if (inStr && ch === '\r') out += '\\r';
+                    else if (inStr && ch === '\t') out += '\\t';
+                    else if (inStr && ch.charCodeAt(0) < 0x20) out += '';
+                    else out += ch;
+                }
+                var parsed = JSON.parse(out);
+                window[varName] = parsed;
+            } catch (e) {
+                console.warn('Could not parse ' + varName + ':', e.message);
+            }
+        }
+    });
 }
 
 async function saveToGitHub(type, data) {
@@ -198,7 +255,14 @@ async function saveToGitHub(type, data) {
     if (!filePath || !varName) return;
 
     // Generate file content
-    var fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
+    var fileContent = '';
+
+    // Special: index_content has multiple var declarations
+    if (type === 'index_content') {
+        fileContent = serializeIndexPageData();
+    } else {
+        fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
+    }
 
     // For products, also include the featuredProduct for the Spotlight card
     if (type === 'products') {
@@ -505,6 +569,7 @@ function renderAllSections() {
     renderLocations();
     renderHomeCards();
     renderLinkedIn();
+    loadPageContentToForm();
 }
 
 // ==========================================
@@ -1608,7 +1673,20 @@ async function publishAllChanges() {
 
         for (var i = 0; i < types.length; i++) {
             var type = types[i];
-            var data = getDataArray(type);
+            var data;
+
+            // Special payload for index_content (multi-var file)
+            if (type === 'index_content') {
+                data = {
+                    INDEX_HERO: window.INDEX_HERO || {},
+                    INDEX_STATS: window.INDEX_STATS || [],
+                    INDEX_WHAT_WE_DO: window.INDEX_WHAT_WE_DO || {},
+                    INDEX_CASE_STUDY: window.INDEX_CASE_STUDY || {},
+                    INDEX_CTA: window.INDEX_CTA || {}
+                };
+            } else {
+                data = getDataArray(type);
+            }
 
             if (isLocal && authToken) {
                 try {
@@ -2165,7 +2243,240 @@ function initGalleryDragDrop() {
 }
 
 // ==========================================
-// 25. INITIALIZATION
+// 25. PAGE CONTENT MANAGEMENT
+// ==========================================
+
+function loadPageContentToForm() {
+    // Hero
+    var hero = window.INDEX_HERO || {};
+    var heroTitle = document.getElementById('content-hero-title');
+    var heroSubtitle = document.getElementById('content-hero-subtitle');
+    if (heroTitle) heroTitle.value = hero.title || '';
+    if (heroSubtitle) heroSubtitle.value = hero.subtitle || '';
+
+    // Stats
+    renderStatsRows();
+
+    // What We Do
+    var wwd = window.INDEX_WHAT_WE_DO || {};
+    var wwdTitle = document.getElementById('content-wwd-title');
+    var wwdSubtitle = document.getElementById('content-wwd-subtitle');
+    if (wwdTitle) wwdTitle.value = wwd.title || '';
+    if (wwdSubtitle) wwdSubtitle.value = wwd.subtitle || '';
+    renderWwdCards();
+
+    // Case Study
+    var cs = window.INDEX_CASE_STUDY || {};
+    var csLabel = document.getElementById('content-cs-label');
+    var csTitle = document.getElementById('content-cs-title');
+    var csDesc = document.getElementById('content-cs-desc');
+    var csImage = document.getElementById('content-cs-image');
+    var csLinkText = document.getElementById('content-cs-link-text');
+    var csLinkHref = document.getElementById('content-cs-link-href');
+    if (csLabel) csLabel.value = cs.label || '';
+    if (csTitle) csTitle.value = cs.title || '';
+    if (csDesc) csDesc.value = cs.desc || '';
+    if (csImage) csImage.value = cs.image || '';
+    if (csLinkText) csLinkText.value = cs.linkText || '';
+    if (csLinkHref) csLinkHref.value = cs.linkHref || '';
+
+    // CTA
+    var cta = window.INDEX_CTA || {};
+    var ctaTitle = document.getElementById('content-cta-title');
+    var ctaDesc = document.getElementById('content-cta-desc');
+    var ctaPrimaryText = document.getElementById('content-cta-primary-text');
+    var ctaPrimaryHref = document.getElementById('content-cta-primary-href');
+    var ctaSecondaryText = document.getElementById('content-cta-secondary-text');
+    var ctaSecondaryHref = document.getElementById('content-cta-secondary-href');
+    if (ctaTitle) ctaTitle.value = cta.title || '';
+    if (ctaDesc) ctaDesc.value = cta.desc || '';
+    if (ctaPrimaryText) ctaPrimaryText.value = (cta.primaryBtn && cta.primaryBtn.text) || '';
+    if (ctaPrimaryHref) ctaPrimaryHref.value = (cta.primaryBtn && cta.primaryBtn.href) || '';
+    if (ctaSecondaryText) ctaSecondaryText.value = (cta.secondaryBtn && cta.secondaryBtn.text) || '';
+    if (ctaSecondaryHref) ctaSecondaryHref.value = (cta.secondaryBtn && cta.secondaryBtn.href) || '';
+}
+
+function renderStatsRows() {
+    var container = document.getElementById('content-stats-list');
+    if (!container) return;
+    var stats = window.INDEX_STATS || [];
+    var html = '';
+    stats.forEach(function (s, i) {
+        html +=
+            '<div class="form-group" style="display:flex; gap:10px; align-items:flex-end;" data-stat-row="' + i + '">' +
+                '<div style="flex:1">' +
+                    '<label>Value</label>' +
+                    '<input type="number" class="form-control stat-target" value="' + (s.target || 0) + '">' +
+                '</div>' +
+                '<div style="width:80px;">' +
+                    '<label>Suffix</label>' +
+                    '<input type="text" class="form-control stat-suffix" value="' + escapeHTML(s.suffix || '') + '">' +
+                '</div>' +
+                '<div style="flex:1">' +
+                    '<label>Label</label>' +
+                    '<input type="text" class="form-control stat-label" value="' + escapeHTML(s.label || '') + '">' +
+                '</div>' +
+                '<button type="button" class="btn btn-danger btn-icon" onclick="removeStatRow(' + i + ')" title="Remove">' +
+                    '<i class="fas fa-trash"></i>' +
+                '</button>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addStatRow() {
+    var stats = window.INDEX_STATS || [];
+    stats.push({ target: 0, suffix: '', label: 'New Stat' });
+    window.INDEX_STATS = stats;
+    renderStatsRows();
+}
+
+function removeStatRow(index) {
+    var stats = window.INDEX_STATS || [];
+    stats.splice(index, 1);
+    window.INDEX_STATS = stats;
+    renderStatsRows();
+}
+
+function renderWwdCards() {
+    var container = document.getElementById('content-wwd-cards');
+    if (!container) return;
+    var wwd = window.INDEX_WHAT_WE_DO || {};
+    var cards = wwd.cards || [];
+    var html = '';
+    cards.forEach(function (card, i) {
+        html +=
+            '<div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:12px;" data-wwd-card="' + i + '">' +
+                '<div class="form-group" style="display:flex; gap:10px; align-items:flex-end;">' +
+                    '<div style="width:140px;">' +
+                        '<label>Icon (FA class)</label>' +
+                        '<input type="text" class="form-control wwd-icon" value="' + escapeHTML(card.icon || '') + '" placeholder="fa-microchip">' +
+                    '</div>' +
+                    '<div style="flex:1">' +
+                        '<label>Title</label>' +
+                        '<input type="text" class="form-control wwd-title" value="' + escapeHTML(card.title || '') + '">' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-danger btn-icon" onclick="removeWwdCard(' + i + ')" title="Remove">' +
+                        '<i class="fas fa-trash"></i>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="form-group" style="margin-bottom:0;">' +
+                    '<label>Description</label>' +
+                    '<textarea class="form-control wwd-desc" rows="2">' + escapeHTML(card.desc || '') + '</textarea>' +
+                '</div>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addWwdCard() {
+    var wwd = window.INDEX_WHAT_WE_DO || { title: '', subtitle: '', cards: [] };
+    wwd.cards = wwd.cards || [];
+    wwd.cards.push({ icon: 'fa-star', title: 'New Card', desc: '' });
+    window.INDEX_WHAT_WE_DO = wwd;
+    renderWwdCards();
+}
+
+function removeWwdCard(index) {
+    var wwd = window.INDEX_WHAT_WE_DO || {};
+    if (wwd.cards) {
+        wwd.cards.splice(index, 1);
+        window.INDEX_WHAT_WE_DO = wwd;
+        renderWwdCards();
+    }
+}
+
+function savePageContent() {
+    // Hero
+    window.INDEX_HERO = {
+        title: (document.getElementById('content-hero-title').value || '').trim(),
+        subtitle: (document.getElementById('content-hero-subtitle').value || '').trim()
+    };
+
+    // Stats — read from dynamic rows
+    var statsContainer = document.getElementById('content-stats-list');
+    var statRows = statsContainer ? statsContainer.querySelectorAll('[data-stat-row]') : [];
+    var newStats = [];
+    statRows.forEach(function (row) {
+        var target = parseInt(row.querySelector('.stat-target').value) || 0;
+        var suffix = row.querySelector('.stat-suffix').value || '';
+        var label = (row.querySelector('.stat-label').value || '').trim();
+        if (label) {
+            newStats.push({ target: target, suffix: suffix, label: label });
+        }
+    });
+    window.INDEX_STATS = newStats;
+
+    // What We Do
+    var wwdCards = [];
+    var wwdContainer = document.getElementById('content-wwd-cards');
+    if (wwdContainer) {
+        var cardEls = wwdContainer.querySelectorAll('[data-wwd-card]');
+        cardEls.forEach(function (el) {
+            var icon = (el.querySelector('.wwd-icon').value || '').trim();
+            var title = (el.querySelector('.wwd-title').value || '').trim();
+            var desc = (el.querySelector('.wwd-desc').value || '').trim();
+            if (title) {
+                wwdCards.push({ icon: icon, title: title, desc: desc });
+            }
+        });
+    }
+    window.INDEX_WHAT_WE_DO = {
+        title: (document.getElementById('content-wwd-title').value || '').trim(),
+        subtitle: (document.getElementById('content-wwd-subtitle').value || '').trim(),
+        cards: wwdCards
+    };
+
+    // Case Study
+    window.INDEX_CASE_STUDY = {
+        label: (document.getElementById('content-cs-label').value || '').trim(),
+        title: (document.getElementById('content-cs-title').value || '').trim(),
+        desc: (document.getElementById('content-cs-desc').value || '').trim(),
+        image: (document.getElementById('content-cs-image').value || '').trim(),
+        imageAlt: (document.getElementById('content-cs-title').value || '').trim(),
+        linkText: (document.getElementById('content-cs-link-text').value || '').trim(),
+        linkHref: (document.getElementById('content-cs-link-href').value || '').trim()
+    };
+
+    // CTA
+    window.INDEX_CTA = {
+        title: (document.getElementById('content-cta-title').value || '').trim(),
+        desc: (document.getElementById('content-cta-desc').value || '').trim(),
+        primaryBtn: {
+            text: (document.getElementById('content-cta-primary-text').value || '').trim(),
+            href: (document.getElementById('content-cta-primary-href').value || '').trim(),
+            icon: 'fa-arrow-right'
+        },
+        secondaryBtn: {
+            text: (document.getElementById('content-cta-secondary-text').value || '').trim(),
+            href: (document.getElementById('content-cta-secondary-href').value || '').trim()
+        }
+    };
+
+    markAsPending('index_content');
+}
+
+function serializeIndexPageData() {
+    var lines = [];
+    lines.push('/**');
+    lines.push(' * Index / Home Page Data');
+    lines.push(' * Content data for the home page hero, stats, value props, case study, and CTA');
+    lines.push(' */');
+    lines.push('var INDEX_HERO = ' + JSON.stringify(window.INDEX_HERO || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_STATS = ' + JSON.stringify(window.INDEX_STATS || [], null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_WHAT_WE_DO = ' + JSON.stringify(window.INDEX_WHAT_WE_DO || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_CASE_STUDY = ' + JSON.stringify(window.INDEX_CASE_STUDY || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_CTA = ' + JSON.stringify(window.INDEX_CTA || {}, null, 2) + ';');
+    lines.push('');
+    return lines.join('\n');
+}
+
+// ==========================================
+// 26. INITIALIZATION
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async function () {
