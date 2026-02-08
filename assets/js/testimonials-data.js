@@ -3,7 +3,7 @@ const TESTIMONIALS_DATA = [
     "lat": 19.076,
     "lng": 72.8777,
     "name": "Shankar Surveys",
-    "location": "Navi Mumbai, India",
+    "location": "Navi Mumbai, India.",
     "logo": "assets/images/testimonials/shankar-surveys.png",
     "quote": "The assistance provided by the team helped us initiate the field programs at Adani Vizhinjam Port with a complete success. We value the support and look forward to our cooperation with Tridel.",
     "author": "Sreenivasan Shankar",
