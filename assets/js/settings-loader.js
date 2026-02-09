@@ -12,7 +12,8 @@
  */
 function isSectionVisible(page, section) {
     try {
-        var vis = window.SETTINGS_DATA && window.SETTINGS_DATA.sectionVisibility;
+        var sd = (typeof SETTINGS_DATA !== 'undefined') ? SETTINGS_DATA : null;
+        var vis = sd && sd.sectionVisibility;
         if (!vis || !vis[page]) return true;
         return vis[page][section] !== false;
     } catch (e) { return true; }
