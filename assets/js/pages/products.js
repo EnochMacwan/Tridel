@@ -11,6 +11,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('products', 'hero'))
     html += window.renderPageHeader({
       title: 'Our Products',
       subtitle: 'Comprehensive Survey & Monitoring Solutions, Software, and Integrated Systems.',
@@ -21,6 +22,7 @@
     });
 
     // Dynamic product grid container
+    if (isSectionVisible('products', 'grid'))
     html +=
       '<div id="dynamic-products-container">' +
         '<div style="text-align: center; padding: 50px;">' +

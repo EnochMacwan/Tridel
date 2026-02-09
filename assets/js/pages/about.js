@@ -21,6 +21,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('about', 'pageHeader'))
     html += window.renderPageHeader({
       title: header.title || 'Pioneering the Future of Maritime Intelligence',
       subtitle: header.subtitle || 'We are a team of engineers, scientists, and hydrographers dedicated to solving complex challenges in the marine environment.',
@@ -31,6 +32,7 @@
     });
 
     // Who We Are section
+    if (isSectionVisible('about', 'whoWeAre'))
     html +=
       '<section class="section" id="who-we-are">' +
         '<div class="container">' +

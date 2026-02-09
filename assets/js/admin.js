@@ -287,7 +287,7 @@ async function saveToGitHub(type, data) {
         fileContent = serializeContactPageData();
     } else if (type === 'layout') {
         fileContent = serializeLayoutData();
-    } else if (type === 'visibility') {
+    } else if (type === 'visibility' || type === 'form_settings') {
         fileContent = 'const SETTINGS_DATA = ' + JSON.stringify(data, null, 2) + ';';
     } else {
         fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
@@ -313,7 +313,7 @@ async function saveToGitHub(type, data) {
             title: "Comprehensive Solutions",
             description: "End-to-end expertise from feasibility to real-time monitoring.",
             link: "#/services",
-            buttonText: "View All Services",
+            buttonText: "Learn More",
             image: "assets/images/services/port-monitoring.png"
         };
         fileContent += '\n\n// Featured Service for Spotlight Card in Mega Menu\nconst featuredService = ' + JSON.stringify(featuredServiceData, null, 2) + ';';
@@ -1731,7 +1731,7 @@ async function publishAllChanges() {
                     FOOTER_DATA: window.FOOTER_DATA || {},
                     PAGE_META: window.PAGE_META || {}
                 };
-            } else if (type === 'visibility') {
+            } else if (type === 'visibility' || type === 'form_settings') {
                 data = window.SETTINGS_DATA || {};
             } else {
                 data = getDataArray(type);

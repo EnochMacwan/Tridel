@@ -83,6 +83,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('contact', 'hero'))
     html += window.renderPageHeader({
       title: hero.title || 'Contact Us',
       subtitle: hero.subtitle || "We're here to help. Reach out to us with any questions or enquiries about our solutions.",
@@ -93,10 +94,16 @@
     });
 
     // ── Form + Sidebar Section ──
+    var showForm = isSectionVisible('contact', 'form');
+    var showInfoCards = isSectionVisible('contact', 'infoCards');
+    var showMap = isSectionVisible('contact', 'map');
+
+    if (showForm || showInfoCards || showMap) {
     html += '<section class="section reveal"><div class="container">';
     html += '<div class="contact-form-layout">';
 
     // ── LEFT: Form Card ──
+    if (showForm)
     html +=
       '<div class="contact-form-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
@@ -148,6 +155,7 @@
       '</div>';
 
     // ── RIGHT: Sidebar ──
+    if (showInfoCards) {
     html += '<div class="contact-sidebar">';
 
     // Response guarantee
@@ -195,17 +203,20 @@
       '</div>';
 
     html += '</div>'; // end sidebar
+    } // end showInfoCards
+
     html += '</div>'; // end contact-form-layout
 
     // Offices map card — full-width below the form layout
-    if (offices.locations.length) {
+    if (offices.locations.length && showMap) {
       html += buildOfficesMapCard(offices.label, offices.locations);
     }
 
     html += '</div></section>'; // end section
+    } // end if (showForm || showInfoCards || showMap)
 
     // ── FAQ Section ──
-    if (faqData.length) {
+    if (faqData.length && isSectionVisible('contact', 'faq')) {
       html +=
         '<section class="section section--light-bg reveal">' +
           '<div class="container">' +
