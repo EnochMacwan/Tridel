@@ -2,6 +2,22 @@
  * Settings Loader
  * Applies global configuration from SETTINGS_DATA to the frontend.
  */
+
+/**
+ * Check if a section is visible on a given page.
+ * Usage: if (isSectionVisible('home', 'hero')) { ... }
+ * Returns true by default (sections visible unless explicitly hidden).
+ * This function lives here (not in settings-data.js) because the admin panel
+ * overwrites settings-data.js on publish — this file is safe from that.
+ */
+function isSectionVisible(page, section) {
+    try {
+        var vis = window.SETTINGS_DATA && window.SETTINGS_DATA.sectionVisibility;
+        if (!vis || !vis[page]) return true;
+        return vis[page][section] !== false;
+    } catch (e) { return true; }
+}
+
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 document.addEventListener('DOMContentLoaded', () => {
