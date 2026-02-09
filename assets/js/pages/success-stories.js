@@ -11,6 +11,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('successStories', 'hero'))
     html += window.renderPageHeader({
       title: 'Success Stories',
       subtitle: 'Explore our portfolio of successful projects, showcasing our expertise in environmental monitoring, hydrographic surveying, and custom solution development.',
@@ -21,6 +22,7 @@
     });
 
     // Dynamic success stories container
+    if (isSectionVisible('successStories', 'grid'))
     html +=
       '<div id="dynamic-success-stories">' +
         '<div style="text-align: center; padding: 100px; color: var(--color-text-muted);">' +

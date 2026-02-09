@@ -11,6 +11,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('services', 'hero'))
     html += window.renderPageHeader({
       title: 'Our Services',
       subtitle: 'Providing end-to-end solutions across the entire project lifecycle, from initial studies to data management and custom engineering.',
@@ -21,6 +22,7 @@
     });
 
     // Dynamic service grid container
+    if (isSectionVisible('services', 'grid'))
     html +=
       '<div id="dynamic-services-container">' +
         '<div style="text-align: center; padding: 50px;">' +

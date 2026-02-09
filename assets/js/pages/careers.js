@@ -11,6 +11,7 @@
     var html = '';
 
     // Page header with breadcrumb
+    if (isSectionVisible('careers', 'hero'))
     html += window.renderPageHeader({
       title: 'Join Our Team',
       subtitle: 'We are always looking for passionate, talented individuals to help us innovate in the maritime technology sector. See a future with us? Get in touch.',
@@ -21,6 +22,7 @@
     });
 
     // EOI Form section
+    if (isSectionVisible('careers', 'listings'))
     html +=
       '<section class="section" id="eoi-form">' +
         '<div class="container form-container">' +

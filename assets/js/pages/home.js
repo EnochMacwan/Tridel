@@ -135,6 +135,7 @@
     var html = '';
 
     // Hero
+    if (isSectionVisible('home', 'hero')) {
     html +=
       '<section class="hero">' +
         '<div class="hero__bg">' +
@@ -149,9 +150,10 @@
           '<div class="hero__scroll-mouse"><div class="hero__scroll-wheel"></div></div>' +
         '</div>' +
       '</section>';
+    }
 
     // Stats Bar
-    if (stats.length) {
+    if (stats.length && isSectionVisible('home', 'stats')) {
       html +=
         '<section class="stats-bar reveal">' +
           '<div class="container">' +
@@ -161,7 +163,7 @@
     }
 
     // What We Do
-    if (whatWeDo) {
+    if (whatWeDo && isSectionVisible('home', 'whatWeDo')) {
       html += buildWhatWeDoHtml(whatWeDo);
     }
 
@@ -206,12 +208,12 @@
       '</section>';
 
     // Case Study
-    if (caseStudy) {
+    if (caseStudy && isSectionVisible('home', 'caseStudy')) {
       html += buildCaseStudyHtml(caseStudy);
     }
 
     // CTA
-    if (cta) {
+    if (cta && isSectionVisible('home', 'cta')) {
       html += buildCtaHtml(cta);
     }
 
