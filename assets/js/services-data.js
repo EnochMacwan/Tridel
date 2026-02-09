@@ -227,6 +227,6 @@ const featuredService = {
   "title": "Comprehensive Solutions",
   "description": "End-to-end expertise from feasibility to real-time monitoring.",
   "link": "#/services",
-  "buttonText": "View All Services",
+  "buttonText": "Learn More",
   "image": "assets/images/services/port-monitoring.png"
 };
