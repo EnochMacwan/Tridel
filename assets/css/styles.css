@@ -2143,11 +2143,13 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 .gallery-main {
     position: relative;
     width: 100%;
+    aspect-ratio: 4 / 3;
     border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: zoom-in;
     border: 1px solid #e2e8f0;
     transition: box-shadow 0.3s ease;
+    background: var(--color-surface-pure, #f8f9fa);
 }
 
 .gallery-main:hover {
@@ -2156,9 +2158,10 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .gallery-main img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
     display: block;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
 .enlarge-hint {
@@ -2826,25 +2829,22 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 /* Image Side (Right) */
 .detail-layout__image {
     position: relative;
-    height: 100%;
-    min-height: 360px;
     clip-path: none;
     margin-left: 0;
     padding: 20px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     background: #f8fafc;
 }
 
 /* Make image fill container */
-.detail-layout__image img,
-.detail-layout__image .product-gallery,
+.detail-layout__image .product-gallery {
+    width: 100%;
+}
+
 .detail-layout__image .gallery-main {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 0;
     border-radius: 12px;
 }
 
@@ -2860,7 +2860,6 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
         order: -1;
         clip-path: none;
         margin-left: 0;
-        min-height: 240px;
         padding: 16px;
     }
 
@@ -4139,10 +4138,8 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .glass-spotlight img {
     width: 100%;
-    height: auto;
-    max-height: 200px;
+    height: 100%;
     object-fit: contain;
-    margin-bottom: 16px;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
     transition: transform 0.3s ease;
 }
@@ -4163,11 +4160,23 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     font-weight: 700;
 }
 
+.spotlight-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .spotlight-desc {
-    font-size: 1rem;
+    font-size: 0.85rem;
     color: var(--color-text-muted);
     margin-bottom: 16px;
-    line-height: 1.5;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: calc(0.85rem * 1.45 * 5);
 }
 
 .spotlight-btn {
@@ -4242,12 +4251,20 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 }
 
 /* --- Spotlight Redesign (Step 1522) --- */
-.glass-spotlight img {
-    /* Re-adding base image style for spotlight */
+.spotlight-image {
     width: 100%;
-    height: auto;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
     border-radius: 8px;
     margin-bottom: 15px;
+    background: var(--color-surface-pure, #f8f9fa);
+}
+
+.glass-spotlight img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
     transition: transform 0.3s ease;
 }
 

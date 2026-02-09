@@ -118,7 +118,10 @@ window.renderProductDetail = function(container, productId) {
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
+// Skip if SPA router is active (hash-based routing handles rendering)
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.initRouter === 'function') return;
+
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('id');
     const container = document.getElementById('product-detail-container');

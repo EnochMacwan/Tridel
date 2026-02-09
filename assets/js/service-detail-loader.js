@@ -105,7 +105,10 @@ window.renderServiceDetail = function(container, serviceId) {
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
+// Skip if SPA router is active (hash-based routing handles rendering)
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.initRouter === 'function') return;
+
     const params = new URLSearchParams(window.location.search);
     const serviceId = params.get('id');
     const container = document.getElementById('service-detail-container');

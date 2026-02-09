@@ -403,17 +403,13 @@
         map.invalidateSize();
       }, 250);
 
-      // Store cleanup references
+      // Store cleanup reference
       _contactMapInstance = map;
-      _contactMapInstance._themeHandler = onThemeChange;
     });
   }
 
   function cleanupOfficesMap() {
     if (_contactMapInstance) {
-      if (_contactMapInstance._themeHandler) {
-        window.removeEventListener('themeChanged', _contactMapInstance._themeHandler);
-      }
       _contactMapInstance.remove();
       _contactMapInstance = null;
     }
