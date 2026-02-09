@@ -1,17 +1,39 @@
 const SETTINGS_DATA = {
-    contactEmail: "geminibaba1@gmail.com",
-    careersEmail: "geminibaba1@gmail.com"
+  "contactEmail": "geminibaba1@gmail.com",
+  "careersEmail": "geminibaba1@gmail.com",
+  "sectionVisibility": {
+    "home": {
+      "hero": true,
+      "stats": true,
+      "whatWeDo": false,
+      "caseStudy": true,
+      "cta": true
+    },
+    "about": {
+      "pageHeader": true,
+      "whoWeAre": true
+    },
+    "products": {
+      "hero": true,
+      "grid": true
+    },
+    "services": {
+      "hero": true,
+      "grid": true
+    },
+    "successStories": {
+      "hero": true,
+      "grid": true
+    },
+    "contact": {
+      "infoCards": true,
+      "faq": true,
+      "form": true,
+      "map": true
+    },
+    "careers": {
+      "hero": true,
+      "listings": true
+    }
+  }
 };
-
-/**
- * Check if a section is visible on a given page.
- * Usage: if (isSectionVisible('home', 'hero')) { ... }
- * Returns true by default (sections visible unless explicitly hidden).
- */
-function isSectionVisible(page, section) {
-    try {
-        var vis = window.SETTINGS_DATA && window.SETTINGS_DATA.sectionVisibility;
-        if (!vis || !vis[page]) return true;
-        return vis[page][section] !== false;
-    } catch (e) { return true; }
-}
