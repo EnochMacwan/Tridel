@@ -14,7 +14,7 @@ var INDEX_STATS = [
     "label": "Products"
   },
   {
-    "target": 15,
+    "target": 10,
     "suffix": "+",
     "label": "Services"
   },
