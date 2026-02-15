@@ -24,6 +24,45 @@ function getIconForProductCategory(category) {
     return `<i class="${icons[category.toLowerCase()] || 'fas fa-cube'}"></i>`;
 }
 
+function attachProductsHoverEffects(container) {
+    const glassLinks = container.querySelectorAll('.glass-link');
+    const spotlight = container.querySelector('.glass-spotlight');
+    if (!spotlight) return;
+
+    const imgEl = spotlight.querySelector('img');
+    const titleEl = spotlight.querySelector('h3');
+    const descEl = spotlight.querySelector('p');
+    const btnEl = spotlight.querySelector('.spotlight-btn');
+
+    let updateTimeout;
+
+    glassLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            const title = link.dataset.title;
+            const desc = link.dataset.desc;
+            const img = link.dataset.img;
+            const href = link.getAttribute('href');
+
+            // 1. Fade out content slightly
+            spotlight.style.opacity = '0.9';
+            if (imgEl) imgEl.style.transform = 'scale(0.98)';
+
+            // 2. Change content after short delay
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                if (imgEl && img) imgEl.src = img;
+                if (titleEl && title) titleEl.textContent = title;
+                if (descEl && desc) descEl.textContent = desc;
+                if (btnEl) btnEl.href = href;
+
+                // 3. Fade in and pop
+                spotlight.style.opacity = '1';
+                if (imgEl) imgEl.style.transform = 'scale(1)';
+            }, 100);
+        });
+    });
+}
+
 /**
  * Renders the Mega Menu Columns
  * Exported as window.renderProductsMegaMenu for SPA router usage.
@@ -95,6 +134,9 @@ window.renderProductsMegaMenu = function(container) {
         `;
         container.appendChild(spotlight);
     }
+
+    // Attach Hover Effects
+    attachProductsHoverEffects(container);
 
     // Initialize glass card hover effects
     if (typeof window.initGlassCards === 'function') {
