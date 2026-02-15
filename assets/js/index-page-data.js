@@ -46,7 +46,7 @@ var INDEX_WHAT_WE_DO = {
     },
     {
       "icon": "fa-water",
-      "title": "Survey Services",
+      "title": "Surveying Services",
       "desc": "Hydrographic, geophysical, and environmental surveys with full project lifecycle management."
     },
     {
