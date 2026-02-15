@@ -74,10 +74,36 @@ function renderGlobalPresence() {
     
     container.innerHTML = headerHTML + listHTML;
     
-    // Initialize Map Markers if Leaflet is available
-    if (typeof L !== 'undefined' && document.getElementById('map')) {
-        initMap(locations);
+    container.innerHTML = headerHTML + listHTML;
+    
+    // Initialize Map Markers if Leaflet is available or can be loaded
+    if (document.getElementById('map')) {
+        ensureLeaflet(function() {
+            initMap(locations);
+        });
     }
+}
+
+function ensureLeaflet(cb) {
+    if (typeof L !== 'undefined') return cb();
+
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet"]')) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+        link.crossOrigin = '';
+        document.head.appendChild(link);
+    }
+
+    // Load Leaflet JS
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+    script.crossOrigin = '';
+    script.onload = cb;
+    document.head.appendChild(script);
 }
 
 let map;
