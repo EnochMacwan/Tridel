@@ -478,8 +478,25 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     margin: 0 auto;
 }
 
+.container--wide {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 .section {
     padding: var(--space-section) 0;
+}
+
+#news-feed-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    max-width: 1600px !important;
+    width: 95% !important;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .section__title {
@@ -897,6 +914,11 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 [data-theme="dark"] .news-card:hover {
     box-shadow: var(--shadow-elevated);
+}
+
+/* Ensure full width in flex container */
+.news-card {
+    /* width: 100% !important;  <-- Removed for Grid Layout */
 }
 
 /* --- Card Header (LinkedIn-style author bar) --- */
@@ -6204,4 +6226,100 @@ html.lenis {
     .hero {
         min-height: 40vh;
     }
+}
+/* ---------------------------------- */
+/* 9. Detailed LinkedIn Card Styling  */
+/* ---------------------------------- */
+
+.hashtag {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.hashtag:hover {
+    text-decoration: underline;
+}
+
+/* Stats Bar (Likes/Comments) */
+.news-card__stats {
+    padding: 8px 20px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.stats-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stats-icon-stack {
+    display: flex;
+    align-items: center;
+}
+
+.stats-icon-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    margin-right: -6px;
+    font-size: 8px;
+    color: white;
+}
+
+[data-theme="dark"] .stats-icon-circle {
+    border-color: #222; /* Dark border for overlap in dark mode */
+}
+
+.bg-like { background: #378fe9; }
+.bg-heart { background: #e34e44; }
+.bg-idea { background: #f5bb0c; }
+
+/* Action Bar (Like, Comment, Share buttons) */
+.news-card__actions {
+    padding: 4px 12px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--color-border);
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    padding: 10px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, color 0.2s;
+    flex: 1;
+    justify-content: center;
+    text-decoration: none; /* For link actions */
+}
+
+.action-btn:hover {
+    background: rgba(0,0,0,0.05);
+    color: var(--color-text-main);
+}
+
+[data-theme="dark"] .action-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.action-btn i {
+    font-size: 1.1rem;
 }

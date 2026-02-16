@@ -19,6 +19,22 @@ function _newsFormatDate(dateStr) {
     }
 }
 
+// Helper: Process hashtags in text
+function _processHashtags(text) {
+    if (!text) return '';
+    // Replace #word with span
+    return text.replace(/#(\w+)/g, '<a href="#" class="hashtag" onclick="event.preventDefault()">#$1</a>');
+}
+
+// Helper: Generate deterministic random stats based on index/text length
+function _getRandomStats(seed) {
+    const base = seed % 50; 
+    const likes = 40 + base * 3;
+    const comments = Math.floor(base / 2);
+    const reposts = Math.floor(base / 5);
+    return { likes, comments, reposts };
+}
+
 /**
  * Renders the News Feed
  * Exported as window.renderNewsFeed for SPA router usage.
@@ -40,53 +56,40 @@ window.renderNewsFeed = function(container) {
 
     // Clear loading placeholder
     container.innerHTML = '';
+    // Remove feed-layout class if present
+    container.classList.remove('feed-layout');
 
-    data.forEach((item) => {
+    data.forEach((item, index) => {
         // Backward compatibility: if item is a string (old URN-only format), wrap it
         const post = typeof item === 'string'
             ? { urn: item, text: 'Tridel Technologies Update', date: '', image: '', url: '' }
             : item;
 
-        const linkedInUrl = post.url || `https://www.linkedin.com/feed/update/${post.urn}`;
-        const friendlyDate = _newsFormatDate(post.date);
+        // Use new embedUrl if available, otherwise construct one (less reliable for activity URNs)
+        const embedSrc = post.embedUrl || `https://www.linkedin.com/embed/feed/update/${post.urn}`;
 
         const card = document.createElement('div');
-        card.className = 'news-card';
-
-        // Build image section (only if image URL provided)
-        let imageHTML = '';
-        if (post.image) {
-            imageHTML = `<div class="news-card__image">
-                <img src="${post.image}" alt="Post image" loading="lazy">
-            </div>`;
-        }
-
-        // Text (truncated to ~180 chars for card display)
-        const displayText = post.text
-            ? (post.text.length > 180 ? post.text.substring(0, 177) + '...' : post.text)
-            : 'Tridel Technologies Update';
+        // Add 'news-card' class for grid sizing, and 'news-card--iframe' for specific overrides
+        card.className = 'news-card news-card--iframe';
+        
+        // Remove padding if needed via inline style or CSS class, and ensure transparent background
+        // LinkedIn iframes have their own styling/border/shadow
+        card.style.padding = '0';
+        card.style.background = 'transparent';
+        card.style.boxShadow = 'none';
+        card.style.border = 'none';
 
         card.innerHTML = `
-            <div class="news-card__header">
-                <div class="news-card__avatar">
-                    <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                </div>
-                <div class="news-card__meta">
-                    <span class="news-card__author">Tridel Technologies</span>
-                    ${friendlyDate ? `<span class="news-card__date">${friendlyDate}</span>` : ''}
-                </div>
-            </div>
-            <div class="news-card__body">
-                <p class="news-card__text">${displayText}</p>
-            </div>
-            ${imageHTML}
-            <div class="news-card__footer">
-                <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" class="news-card__button">
-                    <svg class="news-card__li-icon" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                    View on LinkedIn
-                    <svg class="news-card__ext-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                </a>
-            </div>
+            <iframe 
+                src="${embedSrc}" 
+                height="500" 
+                width="100%" 
+                frameborder="0" 
+                allowfullscreen="" 
+                title="LinkedIn Update"
+                loading="lazy"
+                style="border-radius: 8px; border: 1px solid #e0e0e0;"
+            ></iframe>
         `;
 
         container.appendChild(card);
