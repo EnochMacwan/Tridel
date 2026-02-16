@@ -7,7 +7,7 @@ const HOME_CARDS_DATA = [
     "image": "assets/images/products/catamaran-vessel/catamaran-new.jpg"
   },
   {
-    "title": "Survey & Monitoring Softwares",
+    "title": "Survey & Monitoring Software",
     "excerpt": "Our real-time, instrument-independent TEMS data platform for integrated environmental monitoring.",
     "link": "#/products",
     "linkText": "Explore Softwares",
