@@ -1,10 +1,10 @@
 const NEWS_DATA = [
   {
-    "urn": "urn:li:ugcPost:7414735364030164992",
+    "urn": "urn:li:ugcPost:7424105142175645696",
     "text": "Tridel Technologies shares the latest updates on our innovative maritime solutions and environmental monitoring capabilities.",
     "date": "2025-05-15",
     "image": "",
-    "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7414735364030164992"
+    "url": <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7424105142175645696" height="1467" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
   },
   {
     "urn": "urn:li:ugcPost:7414202914933518336",
