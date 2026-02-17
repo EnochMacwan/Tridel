@@ -13,7 +13,7 @@ const NEWS_DATA = [
     "date": "2025-05-14",
     "image": "assets/images/services/areal-mapping.png",
     "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7414202914933518336",
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7414202914933518336"
+    "embedUrl": "https://www.linkedin.com/posts/vinayak-pradeepkumar-b65013168_trideltechnologies-oceandata-marineinnovation-ugcPost-7359201892737990657-Ps7P?utm_source=share&utm_medium=member_desktop&rcm=ACoAADt0AakB5koWibSCBrwmjHy_QZXVaG-QqmA"
   },
   {
     "urn": "urn:li:share:7407035127169433600",
@@ -29,6 +29,6 @@ const NEWS_DATA = [
     "date": "2025-04-28",
     "image": "assets/images/services/geodatabase-illustration.png",
     "url": "https://www.linkedin.com/feed/update/urn:li:activity:7404381845112741888",
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7404381845112741888"
+    "embedUrl": "https://www.linkedin.com/posts/bala-krishnan-580a9270_we-tridel-technologies-are-glad-to-cooperate-ugcPost-7300333720861872128-b7k3?utm_source=share&utm_medium=member_desktop&rcm=ACoAADt0AakB5koWibSCBrwmjHy_QZXVaG-QqmA"
   }
 ];
