@@ -13,7 +13,7 @@ const NEWS_DATA = [
     "date": "2025-05-14",
     "image": "assets/images/services/areal-mapping.png",
     "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7414202914933518336",
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7424105142175645696"
+    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7414202914933518336"
   },
   {
     "urn": "urn:li:share:7407035127169433600",
@@ -21,7 +21,7 @@ const NEWS_DATA = [
     "date": "2025-05-01",
     "image": "assets/images/services/port-monitoring.png",
     "url": "https://www.linkedin.com/feed/update/urn:li:share:7407035127169433600",
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7424105142175645696"
+    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7407035127169433600"
   },
   {
     "urn": "urn:li:activity:7404381845112741888",
@@ -29,6 +29,6 @@ const NEWS_DATA = [
     "date": "2025-04-28",
     "image": "assets/images/services/geodatabase-illustration.png",
     "url": "https://www.linkedin.com/feed/update/urn:li:activity:7404381845112741888",
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7424105142175645696"
+    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7404381845112741888"
   }
 ];
