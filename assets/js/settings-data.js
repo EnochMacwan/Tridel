@@ -8,7 +8,7 @@ const SETTINGS_DATA = {
       "whatWeDo": true,
       "whyChoose": true,
       "caseStudy": false,
-      "cta": true
+      "cta": false
     },
     "about": {
       "pageHeader": true,
