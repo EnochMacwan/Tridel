@@ -128,6 +128,7 @@ app.use((req, res, next) => {
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    // CSP: Add domains to frame-src as needed when embedding new iframe sources
     res.setHeader(
         'Content-Security-Policy',
         "default-src 'self'; " +
@@ -135,6 +136,7 @@ app.use((req, res, next) => {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com; " +
+        "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com; " +
         "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com"
     );
     next();

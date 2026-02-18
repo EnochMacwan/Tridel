@@ -104,7 +104,7 @@ function updateThemeIcon(theme) {
 
 var gitHubConfig = {};
 try {
-    gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+    gitHubConfig = JSON.parse(sessionStorage.getItem('tridel_github_config') || '{}');
 } catch (e) {
     gitHubConfig = {};
 }
@@ -116,6 +116,7 @@ var GITHUB_DATA_FILES = {
     'stories': 'assets/js/success-stories-data.js',
     'home': 'assets/js/home-data.js',
     'news': 'assets/js/news-data.js',
+    'linkedin': 'assets/js/news-data.js',
     'team': 'assets/js/team-data.js',
     'testimonials': 'assets/js/testimonials-data.js',
     'settings': 'assets/js/contact-data.js',
@@ -133,6 +134,7 @@ var GITHUB_VAR_NAMES = {
     'stories': 'SUCCESS_STORIES_DATA',
     'home': 'HOME_CARDS_DATA',
     'news': 'NEWS_DATA',
+    'linkedin': 'NEWS_DATA',
     'team': 'TEAM_DATA',
     'testimonials': 'TESTIMONIALS_DATA',
     'settings': 'CONTACT_DATA',
@@ -151,7 +153,7 @@ async function loadDataFromGitHub() {
 
     showToast('Loading data from GitHub...', 'success');
 
-    var types = ['products', 'services', 'clients', 'stories', 'home', 'team', 'testimonials', 'settings'];
+    var types = ['products', 'services', 'clients', 'stories', 'home', 'news', 'team', 'testimonials', 'locations', 'settings'];
 
     for (var i = 0; i < types.length; i++) {
         var type = types[i];
@@ -395,7 +397,7 @@ function saveGitHubConfig() {
     }
 
     gitHubConfig = { owner: owner, repo: repo, branch: branch, token: token };
-    localStorage.setItem('tridel_github_config', JSON.stringify(gitHubConfig));
+    sessionStorage.setItem('tridel_github_config', JSON.stringify(gitHubConfig));
 
     closeGitHubConfig();
     showToast('Settings saved. Reloading...', 'success');
@@ -965,30 +967,40 @@ function renderHomeCards() {
 function renderLinkedIn() {
     var data = getDataArray('linkedin');
     var grid = document.getElementById('linkedin-grid');
-    if (grid) {
-        grid.innerHTML = data.map(function (post, i) {
-            var item = typeof post === 'string'
-                ? { urn: post, text: '', date: '', image: '', url: '' }
-                : post;
-            var displayText = item.text
-                ? (item.text.length > 80 ? escapeHTML(item.text.substring(0, 77)) + '...' : escapeHTML(item.text))
-                : '<em style="opacity:0.5;">(No text)</em>';
-            return '<div class="item-card">' +
-                '<div class="item-card-header"><div>' +
-                '<h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ' + (i + 1) + '</h3>' +
-                (item.date ? '<small style="color:var(--text-muted);">' + escapeHTML(item.date) + '</small>' : '') +
-                '</div></div>' +
-                '<p style="margin-bottom:6px;">' + displayText + '</p>' +
-                '<p class="text-xs font-mono break-all" style="opacity:0.5;">' + escapeHTML(item.urn || '') + '</p>' +
-                (item.image ? '<img src="' + escapeHTML(item.image) + '" style="max-width:100%;max-height:80px;border-radius:4px;margin-top:8px;" alt="Post image">' : '') +
-                '<div class="item-card-actions">' +
-                '<button type="button" class="btn btn-secondary btn-icon" onclick="editItem(\'linkedin\', ' + i + ')">' +
-                '<i class="fas fa-edit"></i> Edit</button>' +
-                '<button type="button" class="btn btn-danger btn-icon" onclick="deleteItem(\'linkedin\', ' + i + ')">' +
-                '<i class="fas fa-trash"></i></button>' +
-                '</div></div>';
-        }).join('');
+    if (!grid) return;
+
+    if (data.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No LinkedIn posts added yet. Click "Add Post" to embed a LinkedIn post.</div>';
+        return;
     }
+
+    grid.innerHTML = '<div class="items-grid">' + data.map(function (post, i) {
+        var embedUrl = post.embedUrl || '';
+        var displayUrl = embedUrl.length > 70
+            ? escapeHTML(embedUrl.substring(0, 67)) + '...'
+            : escapeHTML(embedUrl);
+
+        // Extract URN identifier from embed URL for display
+        var urnMatch = embedUrl.match(/urn:li:\w+:\d+/);
+        var urnLabel = urnMatch ? urnMatch[0] : 'Unknown';
+
+        return '<div class="item-card">' +
+            '<div class="item-card-header"><div>' +
+            '<h3><i class="fab fa-linkedin" style="color: #0077b5; margin-right: 8px;"></i> Post ' + (i + 1) + '</h3>' +
+            '<span class="category">' + escapeHTML(urnLabel) + '</span>' +
+            '</div></div>' +
+            '<div style="margin:10px 0; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px; overflow:hidden;">' +
+            '<iframe src="' + escapeHTML(embedUrl) + '" height="300" width="100%" frameborder="0" ' +
+            'style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>' +
+            '</div>' +
+            '<p class="text-xs font-mono break-all" style="opacity:0.5; word-break:break-all;">' + displayUrl + '</p>' +
+            '<div class="item-card-actions">' +
+            '<button type="button" class="btn btn-secondary btn-icon" onclick="editItem(\'linkedin\', ' + i + ')">' +
+            '<i class="fas fa-edit"></i> Edit</button>' +
+            '<button type="button" class="btn btn-danger btn-icon" onclick="deleteItem(\'linkedin\', ' + i + ')">' +
+            '<i class="fas fa-trash"></i></button>' +
+            '</div></div>';
+    }).join('') + '</div>';
 }
 
 function renderTeam() {
@@ -1341,28 +1353,27 @@ function getFormHTML(type, data) {
                 getSingleImageFieldHTML('Card Image <span style="color:red">*</span>', 'field-image', data.image);
 
         case 'linkedin':
-            var liData = typeof data === 'string' ? { urn: data } : (data || {});
+            var liData = data || {};
             return '<div class="form-group">' +
-                '<label>LinkedIn Post URN <span style="color:red">*</span></label>' +
-                '<input type="text" class="form-control" id="field-urn" value="' + (liData.urn || '') + '" placeholder="urn:li:ugcPost:1234567890">' +
+                '<label>LinkedIn Embed URL <span style="color:red">*</span></label>' +
+                '<input type="text" class="form-control" id="field-embedUrl" value="' + escapeHTML(liData.embedUrl || '') + '" ' +
+                'placeholder="https://www.linkedin.com/embed/feed/update/urn:li:share:1234567890" ' +
+                'oninput="previewLinkedInEmbed(this.value)">' +
                 '<small style="color: var(--text-muted); display: block; margin-top: 8px;">' +
-                '<i class="fas fa-info-circle"></i> You can find the URN in the LinkedIn post URL or embed code.</small>' +
+                '<i class="fas fa-info-circle"></i> <strong>How to get the Embed URL:</strong><br>' +
+                '1. Go to the LinkedIn post<br>' +
+                '2. Click the <strong>···</strong> menu → <strong>Embed this post</strong><br>' +
+                '3. Copy the URL from the <code>src="..."</code> attribute in the embed code<br>' +
+                'Format: <code>https://www.linkedin.com/embed/feed/update/urn:li:share:XXXXXXXXX</code>' +
+                '</small>' +
                 '</div>' +
                 '<div class="form-group">' +
-                '<label>Post Text <span style="color:red">*</span></label>' +
-                '<textarea class="form-control" id="field-text" rows="3" placeholder="Summary of the LinkedIn post...">' + (liData.text || '') + '</textarea>' +
+                '<label>Preview</label>' +
+                '<div id="linkedin-embed-preview" style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px; min-height:100px; display:flex; align-items:center; justify-content:center;">' +
+                (liData.embedUrl
+                    ? '<iframe src="' + escapeHTML(liData.embedUrl) + '" height="400" width="100%" frameborder="0" style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>'
+                    : '<span style="color:var(--text-muted);"><i class="fab fa-linkedin" style="font-size:2rem; opacity:0.3; margin-right:10px;"></i> Enter an embed URL above to preview</span>') +
                 '</div>' +
-                '<div class="form-group">' +
-                '<label>Date</label>' +
-                '<input type="text" class="form-control" id="field-date" value="' + (liData.date || '') + '" placeholder="e.g. 2025-05-15 or 2 days ago">' +
-                '</div>' +
-                '<div class="form-group">' +
-                '<label>Image URL</label>' +
-                '<input type="text" class="form-control" id="field-image-url" value="' + (liData.image || '') + '" placeholder="https://example.com/image.jpg">' +
-                '</div>' +
-                '<div class="form-group">' +
-                '<label>LinkedIn URL</label>' +
-                '<input type="text" class="form-control" id="field-url" value="' + (liData.url || '') + '" placeholder="Auto-generated from URN if left empty">' +
                 '</div>';
 
         case 'team':
@@ -1409,6 +1420,22 @@ function getFormHTML(type, data) {
 // ==========================================
 // 15. FORM HELPERS
 // ==========================================
+
+// Live preview helper for LinkedIn embed URL input
+function previewLinkedInEmbed(url) {
+    var container = document.getElementById('linkedin-embed-preview');
+    if (!container) return;
+
+    url = (url || '').trim();
+    if (url && url.includes('linkedin.com/embed/')) {
+        container.innerHTML = '<iframe src="' + escapeHTML(url) + '" height="400" width="100%" frameborder="0" ' +
+            'style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>';
+    } else if (url) {
+        container.innerHTML = '<span style="color:var(--text-muted);"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i> URL should contain "linkedin.com/embed/"</span>';
+    } else {
+        container.innerHTML = '<span style="color:var(--text-muted);"><i class="fab fa-linkedin" style="font-size:2rem; opacity:0.3; margin-right:10px;"></i> Enter an embed URL above to preview</span>';
+    }
+}
 
 function addFeature() {
     var container = document.getElementById('features-container');
@@ -1491,27 +1518,19 @@ function saveItem() {
             return;
         }
     } else {
-        var urnVal = document.getElementById('field-urn').value.trim();
-        var textVal = document.getElementById('field-text').value.trim();
-        if (!urnVal) { showToast('Validation Error: LinkedIn URN is required', 'error'); return; }
-        if (!textVal) { showToast('Validation Error: Post text is required', 'error'); return; }
+        var embedUrlVal = document.getElementById('field-embedUrl').value.trim();
+        if (!embedUrlVal) { showToast('Validation Error: LinkedIn Embed URL is required', 'error'); return; }
+        if (!embedUrlVal.includes('linkedin.com/embed/')) {
+            showToast('Warning: URL should be a LinkedIn embed URL (linkedin.com/embed/...)', 'info');
+        }
     }
 
     var arr = getDataArray(currentEditType);
 
     // LinkedIn
     if (currentEditType === 'linkedin') {
-        var urn = document.getElementById('field-urn').value.trim();
-        var text = document.getElementById('field-text').value.trim();
-        var date = document.getElementById('field-date').value.trim();
-        var image = document.getElementById('field-image-url').value.trim();
-        var url = document.getElementById('field-url').value.trim();
-
-        if (!url && urn) {
-            url = 'https://www.linkedin.com/feed/update/' + urn;
-        }
-
-        var postObj = { urn: urn, text: text, date: date, image: image, url: url };
+        var embedUrl = document.getElementById('field-embedUrl').value.trim();
+        var postObj = { embedUrl: embedUrl };
 
         if (currentEditIndex !== null) {
             arr[currentEditIndex] = postObj;
@@ -1740,9 +1759,12 @@ async function publishAllChanges() {
                 data = getDataArray(type);
             }
 
+            // Map admin 'linkedin' type to server 'news' type
+            var serverType = (type === 'linkedin') ? 'news' : type;
+
             if (isLocal && authToken) {
                 try {
-                    var res = await fetch('/api/data/' + type, {
+                    var res = await fetch('/api/data/' + serverType, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-Auth-Token': authToken },
                         body: JSON.stringify(data)
@@ -1800,7 +1822,7 @@ async function reloadSectionData(type) {
         }
 
         if (content) {
-            var match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+            var match = content.match(/(?:const|var|let)\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
             if (match) {
                 window[varName] = JSON.parse(match[1]);
                 if (type === 'products') renderProducts();
