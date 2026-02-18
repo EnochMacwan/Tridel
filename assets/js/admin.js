@@ -28,6 +28,8 @@
     try { if (typeof NAV_LINKS !== 'undefined') window.NAV_LINKS = NAV_LINKS; } catch(e){}
     try { if (typeof FOOTER_DATA !== 'undefined') window.FOOTER_DATA = FOOTER_DATA; } catch(e){}
     try { if (typeof PAGE_META !== 'undefined') window.PAGE_META = PAGE_META; } catch(e){}
+    try { if (typeof INDEX_WHY_CHOOSE !== 'undefined') window.INDEX_WHY_CHOOSE = INDEX_WHY_CHOOSE; } catch(e){}
+    try { if (typeof INDEX_SECTION_ORDER !== 'undefined') window.INDEX_SECTION_ORDER = INDEX_SECTION_ORDER; } catch(e){}
 
     // Legacy camelCase aliases
     try { if (typeof servicesData !== 'undefined' && !window.SERVICES_DATA) window.SERVICES_DATA = servicesData; } catch(e){}
@@ -226,7 +228,7 @@ async function loadDataFromGitHub() {
 
 function parseIndexPageContent(content) {
     // Parse multiple var declarations from index-page-data.js
-    var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA'];
+    var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA', 'INDEX_WHY_CHOOSE', 'INDEX_SECTION_ORDER'];
     varNames.forEach(function (varName) {
         var regex = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*(?:var\\s|$)', 'g');
         var match = regex.exec(content);
@@ -1569,7 +1571,26 @@ function saveItem() {
             }
         }
 
-        // Nesting
+        // Clients logo
+        if (currentEditType === 'clients' && data.gallery && data.gallery.length > 0) {
+            data.logo = data.gallery[0];
+            delete data.gallery;
+            delete data.image;
+        }
+
+        // Stories/Home cleanup
+        if ((currentEditType === 'stories' || currentEditType === 'home') && data.gallery) {
+            delete data.gallery;
+        }
+
+        // Push or merge data BEFORE nesting so dataObj reference is correct
+        if (currentEditIndex !== null) {
+            Object.assign(arr[currentEditIndex], data);
+        } else {
+            arr.push(data);
+        }
+
+        // Nesting (must come after push so new items exist in arr)
         var parentField = document.getElementById('field-parent');
         if (parentField && (currentEditType === 'products' || currentEditType === 'services')) {
             var parentId = parentField.value;
@@ -1606,24 +1627,6 @@ function saveItem() {
             } else {
                 dataObj.isNested = false;
             }
-        }
-
-        // Clients logo
-        if (currentEditType === 'clients' && data.gallery && data.gallery.length > 0) {
-            data.logo = data.gallery[0];
-            delete data.gallery;
-            delete data.image;
-        }
-
-        // Stories/Home cleanup
-        if ((currentEditType === 'stories' || currentEditType === 'home') && data.gallery) {
-            delete data.gallery;
-        }
-
-        if (currentEditIndex !== null) {
-            Object.assign(arr[currentEditIndex], data);
-        } else {
-            arr.push(data);
         }
     }
 
@@ -2096,8 +2099,9 @@ function showToast(message, type) {
     var container = document.getElementById('toast-container');
     var toast = document.createElement('div');
     toast.className = 'toast ' + type;
+    var safeMessage = escapeHTML(message);
     toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + '"></i>' +
-        '<span>' + message + '</span>';
+        '<span>' + safeMessage + '</span>';
     container.appendChild(toast);
     setTimeout(function () { toast.remove(); }, 3000);
 }
@@ -2314,6 +2318,14 @@ function loadPageContentToForm() {
     if (wwdSubtitle) wwdSubtitle.value = wwd.subtitle || '';
     renderWwdCards();
 
+    // Why Choose
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    var wcTitle = document.getElementById('content-wc-title');
+    var wcSubtitle = document.getElementById('content-wc-subtitle');
+    if (wcTitle) wcTitle.value = wc.title || '';
+    if (wcSubtitle) wcSubtitle.value = wc.subtitle || '';
+    renderWhyChooseReasons();
+
     // Case Study
     var cs = window.INDEX_CASE_STUDY || {};
     var csLabel = document.getElementById('content-cs-label');
@@ -2343,6 +2355,64 @@ function loadPageContentToForm() {
     if (ctaPrimaryHref) ctaPrimaryHref.value = (cta.primaryBtn && cta.primaryBtn.href) || '';
     if (ctaSecondaryText) ctaSecondaryText.value = (cta.secondaryBtn && cta.secondaryBtn.text) || '';
     if (ctaSecondaryHref) ctaSecondaryHref.value = (cta.secondaryBtn && cta.secondaryBtn.href) || '';
+
+    // Section Order
+    renderSectionOrderList();
+}
+
+// --- Section Order Drag-and-Drop ---
+var SECTION_LABEL_MAP = {
+    hero: { label: 'Hero Banner', icon: 'fa-image' },
+    stats: { label: 'Stats Bar', icon: 'fa-chart-bar' },
+    whatWeDo: { label: 'What We Do', icon: 'fa-tasks' },
+    whyChoose: { label: 'Why Choose Us', icon: 'fa-star' },
+    highlights: { label: 'Highlights', icon: 'fa-fire' },
+    news: { label: 'Latest News', icon: 'fa-newspaper' },
+    clients: { label: 'Clients & Partners', icon: 'fa-building' },
+    caseStudy: { label: 'Case Study', icon: 'fa-briefcase' },
+    cta: { label: 'Call to Action', icon: 'fa-bullhorn' },
+    testimonialMap: { label: 'Testimonial Map', icon: 'fa-globe' }
+};
+
+function renderSectionOrderList() {
+    var container = document.getElementById('section-order-list');
+    if (!container) return;
+
+    var defaultOrder = ['hero', 'stats', 'whatWeDo', 'whyChoose', 'highlights', 'news', 'clients', 'caseStudy', 'cta', 'testimonialMap'];
+    var order = (window.INDEX_SECTION_ORDER && window.INDEX_SECTION_ORDER.length)
+        ? window.INDEX_SECTION_ORDER
+        : defaultOrder;
+
+    var html = '';
+    order.forEach(function (key, idx) {
+        var info = SECTION_LABEL_MAP[key] || { label: key, icon: 'fa-puzzle-piece' };
+        html +=
+            '<div class="section-order-item" data-section-key="' + key + '">' +
+                '<span class="grip"><i class="fas fa-grip-vertical"></i></span>' +
+                '<span class="section-order-icon"><i class="fas ' + info.icon + '"></i></span>' +
+                '<span class="section-order-label">' + info.label + '</span>' +
+                '<span class="section-order-num">#' + (idx + 1) + '</span>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+
+    // Initialize SortableJS
+    if (typeof Sortable !== 'undefined') {
+        Sortable.create(container, {
+            animation: 200,
+            handle: '.grip',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function () {
+                // Update position numbers
+                var items = container.querySelectorAll('.section-order-item');
+                items.forEach(function (item, i) {
+                    var num = item.querySelector('.section-order-num');
+                    if (num) num.textContent = '#' + (i + 1);
+                });
+            }
+        });
+    }
 }
 
 function renderStatsRows() {
@@ -2435,6 +2505,54 @@ function removeWwdCard(index) {
     }
 }
 
+function renderWhyChooseReasons() {
+    var container = document.getElementById('content-wc-reasons');
+    if (!container) return;
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    var reasons = wc.reasons || [];
+    var html = '';
+    reasons.forEach(function (r, i) {
+        html +=
+            '<div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:12px;" data-wc-reason="' + i + '">' +
+                '<div class="form-group" style="display:flex; gap:10px; align-items:flex-end;">' +
+                    '<div style="width:140px;">' +
+                        '<label>Icon (FA class)</label>' +
+                        '<input type="text" class="form-control wc-icon" value="' + escapeHTML(r.icon || '') + '" placeholder="fa-handshake">' +
+                    '</div>' +
+                    '<div style="flex:1">' +
+                        '<label>Title</label>' +
+                        '<input type="text" class="form-control wc-title" value="' + escapeHTML(r.title || '') + '">' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-danger btn-icon" onclick="removeWhyChooseReason(' + i + ')" title="Remove">' +
+                        '<i class="fas fa-trash"></i>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="form-group" style="margin-bottom:0;">' +
+                    '<label>Description</label>' +
+                    '<textarea class="form-control wc-desc" rows="2">' + escapeHTML(r.desc || '') + '</textarea>' +
+                '</div>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addWhyChooseReason() {
+    var wc = window.INDEX_WHY_CHOOSE || { title: '', subtitle: '', reasons: [] };
+    wc.reasons = wc.reasons || [];
+    wc.reasons.push({ icon: 'fa-star', title: 'New Reason', desc: '' });
+    window.INDEX_WHY_CHOOSE = wc;
+    renderWhyChooseReasons();
+}
+
+function removeWhyChooseReason(index) {
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    if (wc.reasons) {
+        wc.reasons.splice(index, 1);
+        window.INDEX_WHY_CHOOSE = wc;
+        renderWhyChooseReasons();
+    }
+}
+
 function savePageContent() {
     // Hero
     window.INDEX_HERO = {
@@ -2502,6 +2620,39 @@ function savePageContent() {
         }
     };
 
+    // Why Choose
+    var wcReasons = [];
+    var wcContainer = document.getElementById('content-wc-reasons');
+    if (wcContainer) {
+        var reasonEls = wcContainer.querySelectorAll('[data-wc-reason]');
+        reasonEls.forEach(function (el) {
+            var icon = (el.querySelector('.wc-icon').value || '').trim();
+            var title = (el.querySelector('.wc-title').value || '').trim();
+            var desc = (el.querySelector('.wc-desc').value || '').trim();
+            if (title) {
+                wcReasons.push({ icon: icon, title: title, desc: desc });
+            }
+        });
+    }
+    window.INDEX_WHY_CHOOSE = {
+        title: (document.getElementById('content-wc-title').value || '').trim(),
+        subtitle: (document.getElementById('content-wc-subtitle').value || '').trim(),
+        reasons: wcReasons
+    };
+
+    // Section Order
+    var orderList = document.getElementById('section-order-list');
+    if (orderList) {
+        var items = orderList.querySelectorAll('.section-order-item');
+        var newOrder = [];
+        items.forEach(function (item) {
+            newOrder.push(item.getAttribute('data-section-key'));
+        });
+        if (newOrder.length) {
+            window.INDEX_SECTION_ORDER = newOrder;
+        }
+    }
+
     markAsPending('index_content');
 }
 
@@ -2520,6 +2671,10 @@ function serializeIndexPageData() {
     lines.push('var INDEX_CASE_STUDY = ' + JSON.stringify(window.INDEX_CASE_STUDY || {}, null, 2) + ';');
     lines.push('');
     lines.push('var INDEX_CTA = ' + JSON.stringify(window.INDEX_CTA || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_WHY_CHOOSE = ' + JSON.stringify(window.INDEX_WHY_CHOOSE || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_SECTION_ORDER = ' + JSON.stringify(window.INDEX_SECTION_ORDER || [], null, 2) + ';');
     lines.push('');
     return lines.join('\n');
 }
@@ -3082,7 +3237,7 @@ function serializeLayoutData() {
 var VISIBILITY_MAP = {
     home: {
         label: 'Home', icon: 'fa-home',
-        sections: { hero: 'Hero Banner', stats: 'Statistics', whatWeDo: 'What We Do', caseStudy: 'Case Study', cta: 'Call to Action' }
+        sections: { hero: 'Hero Banner', stats: 'Statistics', whatWeDo: 'What We Do', whyChoose: 'Why Choose Us', caseStudy: 'Case Study', cta: 'Call to Action' }
     },
     about: {
         label: 'About', icon: 'fa-building',
@@ -3102,7 +3257,7 @@ var VISIBILITY_MAP = {
     },
     contact: {
         label: 'Contact', icon: 'fa-envelope',
-        sections: { infoCards: 'Info Cards', faq: 'FAQ Section', form: 'Contact Form', map: 'Map' }
+        sections: { hero: 'Page Header', infoCards: 'Info Cards', faq: 'FAQ Section', form: 'Contact Form', map: 'Map' }
     },
     careers: {
         label: 'Careers', icon: 'fa-briefcase',

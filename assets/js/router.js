@@ -127,6 +127,11 @@
       setTimeout(function () { window.initScrollReveal(); }, 50);
     }
 
+    // Apply form email settings (contact/careers) to dynamically rendered forms
+    if (typeof window.applyFormSettings === 'function') {
+      setTimeout(function () { window.applyFormSettings(); }, 100);
+    }
+
     // Init bg animation if hero-canvas exists
     setTimeout(function () {
       var canvas = document.getElementById('hero-canvas');

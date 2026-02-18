@@ -20,35 +20,26 @@ function isSectionVisible(page, section) {
     } catch (e) { return true; }
 }
 
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+/**
+ * Apply form email settings to any formsubmit.co forms currently in the DOM.
+ * Called after SPA route renders, since forms are created dynamically.
+ */
+window.applyFormSettings = function () {
+    if (typeof SETTINGS_DATA === 'undefined') return;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if settings exist
-    if (typeof SETTINGS_DATA === 'undefined') {
-        console.warn('SETTINGS_DATA not found. Using default form actions.');
-        return;
-    }
+    var config = SETTINGS_DATA;
+    var formSubmitBase = 'https://formsubmit.co/';
+    var hash = window.location.hash || '';
 
-    const config = SETTINGS_DATA;
-    const formSubmitBase = "https://formsubmit.co/";
+    var forms = document.querySelectorAll('form[action*="formsubmit.co"]');
+    forms.forEach(function (form) {
+        var isContact = hash.includes('/contact') || document.querySelector('.page-contact');
+        var isCareers = hash.includes('/careers') || document.querySelector('.page-careers');
 
-    // 1. Configure Contact Form
-    const contactForm = document.querySelector('form[action*="formsubmit.co"]');
-
-    const isContactPage = window.location.pathname.includes('contact.html') || window.location.hash.includes('/contact') || document.querySelector('.page-contact');
-    const isCareersPage = window.location.pathname.includes('careers.html') || window.location.hash.includes('/careers') || document.querySelector('.page-careers');
-
-    if (isContactPage && contactForm) {
-        if (config.contactEmail) {
-            contactForm.action = formSubmitBase + config.contactEmail;
+        if (isContact && config.contactEmail) {
+            form.action = formSubmitBase + config.contactEmail;
+        } else if (isCareers && config.careersEmail) {
+            form.action = formSubmitBase + config.careersEmail;
         }
-    }
-
-    // 2. Configure Careers Form
-    if (isCareersPage) {
-        const careersForm = document.querySelector('form[action*="formsubmit.co"]');
-        if (careersForm && config.careersEmail) {
-            careersForm.action = formSubmitBase + config.careersEmail;
-        }
-    }
-});
+    });
+};

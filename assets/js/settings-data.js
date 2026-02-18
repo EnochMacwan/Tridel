@@ -6,6 +6,7 @@ const SETTINGS_DATA = {
       "hero": true,
       "stats": true,
       "whatWeDo": true,
+      "whyChoose": true,
       "caseStudy": false,
       "cta": true
     },
@@ -26,6 +27,7 @@ const SETTINGS_DATA = {
       "grid": true
     },
     "contact": {
+      "hero": true,
       "infoCards": true,
       "faq": true,
       "form": true,
