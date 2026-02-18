@@ -74,8 +74,6 @@ function renderGlobalPresence() {
     
     container.innerHTML = headerHTML + listHTML;
     
-    container.innerHTML = headerHTML + listHTML;
-    
     // Initialize Map Markers if Leaflet is available or can be loaded
     if (document.getElementById('map')) {
         ensureLeaflet(function() {
@@ -108,11 +106,17 @@ function ensureLeaflet(cb) {
 
 let map;
 let markers = [];
+let _locThemeHandler = null;
 
 function initMap(locations) {
     if (map) {
         // Clear existing if re-initializing (though usually runs once)
         map.remove();
+    }
+    // Remove previous theme listener to prevent accumulation
+    if (_locThemeHandler) {
+        window.removeEventListener('themeChanged', _locThemeHandler);
+        _locThemeHandler = null;
     }
     
     // Default center (India/UAE region)
@@ -129,10 +133,11 @@ function initMap(locations) {
         maxZoom: 19
     }).addTo(map);
     
-    // Listen for theme changes to update tiles
-    window.addEventListener('themeChanged', (e) => {
+    // Listen for theme changes to update tiles (stored for cleanup)
+    _locThemeHandler = (e) => {
         tileLayer.setUrl(e.detail.theme === 'dark' ? darkTiles : lightTiles);
-    });
+    };
+    window.addEventListener('themeChanged', _locThemeHandler);
 
     // Custom Icons
     const iconNormal = L.divIcon({

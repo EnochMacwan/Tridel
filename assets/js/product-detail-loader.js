@@ -41,7 +41,7 @@ window.renderProductDetail = function(container, productId) {
         featuresHtml = `
             <h3>Key Features</h3>
             <ul class="detail-layout__list">
-                ${product.features.map(f => `<li>${f}</li>`).join('')}
+                ${product.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
             </ul>
         `;
     }

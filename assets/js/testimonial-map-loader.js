@@ -16,10 +16,12 @@
 // Internal state for cleanup
 var _mapTimer = null;
 var _mapInstance = null;
+var _tmThemeHandler = null;
 
 window.cleanupTestimonialMap = function() {
   if (_mapTimer) { clearInterval(_mapTimer); _mapTimer = null; }
   if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
+  if (_tmThemeHandler) { window.removeEventListener('themeChanged', _tmThemeHandler); _tmThemeHandler = null; }
 };
 
 window.renderTestimonialMap = function(container) {
@@ -107,7 +109,8 @@ window.renderTestimonialMap = function(container) {
     }
 
     updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
-    window.addEventListener('themeChanged', function (e) { updateMapTheme(e.detail.theme); });
+    _tmThemeHandler = function (e) { updateMapTheme(e.detail.theme); };
+    window.addEventListener('themeChanged', _tmThemeHandler);
 
     // India GeoJSON overlay (Survey of India compliance)
     fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')

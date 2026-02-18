@@ -230,11 +230,11 @@ window.renderServicesGrid = function(container) {
                 sectionContent += `
                     <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
                         <div class="product-card-visual">
-                            <img loading="lazy" alt="${item.name}" class="product-item__image product-image-style" src="${item.image}">
+                            <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image product-image-style" src="${item.image}">
                         </div>
                         <div class="product-content-outside">
-                            <h4>${item.name}</h4>
-                            <p class="product-item__excerpt">${item.description}</p>
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p class="product-item__excerpt">${escapeHtml(item.description)}</p>
                             <span class="button button--secondary">View Details</span>
                         </div>
                     </a>

@@ -88,8 +88,12 @@
     }
 
     // Cancel any running bg animations
-    if (typeof window.cleanupAnimation === 'function') {
-      window.cleanupAnimation();
+    if (typeof window.cleanupBgAnimation === 'function') {
+      window.cleanupBgAnimation();
+    }
+    // Cancel any running testimonial map timers/instances
+    if (typeof window.cleanupTestimonialMap === 'function') {
+      window.cleanupTestimonialMap();
     }
 
     // Update page meta
