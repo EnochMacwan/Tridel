@@ -83,7 +83,7 @@ var FOOTER_DATA = {
       "href": "#/contact"
     }
   ],
-  "linkedIn": "https://www.linkedin.com/company/tridel-technologies/",
+  "linkedIn": "https://www.linkedin.com/company/tridel-technologies-company/",
   "copyright": "© 2026 Tridel Technologies. All Rights Reserved."
 };
 

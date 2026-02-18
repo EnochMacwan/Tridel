@@ -219,13 +219,42 @@
       },
       news: function () {
         return (
-          '<section class="section section--light-bg reveal">' +
+          '<section class="section linkedin-section reveal">' +
             '<div class="container--wide">' +
-              '<div class="news-feed">' +
-                '<h2 class="section__title">Latest News</h2>' +
-                '<div id="news-feed-container">' +
-                  '<div class="news-loading-placeholder" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-muted);">' +
-                    '<i class="fas fa-spinner fa-spin"></i> Loading latest updates...' +
+              '<div class="linkedin-feed">' +
+                '<div class="section__header">' +
+                  '<div class="linkedin-section__badge">' +
+                    '<i class="fab fa-linkedin"></i>' +
+                  '</div>' +
+                  '<h2 class="section__title">Latest from LinkedIn</h2>' +
+                  '<p class="section__subtitle">Stay connected with our latest updates, insights, and milestone announcements.</p>' +
+                '</div>' +
+                '<div id="news-feed-container" class="linkedin-feed__grid">' +
+                  '<div class="linkedin-feed__loading">' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
                   '</div>' +
                 '</div>' +
               '</div>' +
