@@ -197,7 +197,7 @@ async function loadDataFromGitHub() {
                 }
             }
         } catch (e) {
-            console.log('Could not load ' + type + ' from GitHub:', e.message);
+            console.warn('Could not load ' + type + ' from GitHub:', e.message);
         }
     }
 
@@ -219,7 +219,7 @@ async function loadDataFromGitHub() {
                 multiVarFiles[mvi].parser(mvContent);
             }
         } catch (e) {
-            console.log('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
+            console.warn('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
         }
     }
 
@@ -344,7 +344,7 @@ async function saveToGitHub(type, data) {
             var fileData = await getRes.json();
             sha = fileData.sha;
         }
-    } catch (e) { console.log('File not found, creating new...'); }
+    } catch (e) { /* File doesn't exist yet, will create new */ }
 
     // 2. Update file
     var body = {
@@ -782,8 +782,8 @@ function renderWithNesting(type, data, gridId) {
 
 function renderItemCard(type, item, index, isChild) {
     isChild = isChild || false;
-    var title = escapeHTML(item.title || item.name);
-    var category = escapeHTML(item.category || (type === 'products' ? 'Uncategorized' : 'Service'));
+    var title = escapeHTML(item.title || item.name || 'Untitled');
+    var category = escapeHTML(item.category || (type === 'products' ? 'Uncategorized' : 'Item'));
 
     if (type === 'home' && !item.title) {
         title = escapeHTML(item.tag || 'Untitled Card');
@@ -1797,7 +1797,6 @@ async function publishAllChanges() {
         showToast('Successfully saved ' + successCount + ' update(s) to ' + mode + '!', 'success');
     } catch (error) {
         showToast('Error saving: ' + error.message, 'error');
-        console.error(error);
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;

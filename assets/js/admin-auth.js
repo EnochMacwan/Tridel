@@ -81,7 +81,7 @@ const AdminAuth = {
                 return true;
             }
         } catch (e) {
-            console.error("Auth Error:", e);
+            // Auth error handled silently — returning false below
         }
         return false;
     },

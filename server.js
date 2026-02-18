@@ -387,7 +387,7 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
         res.json({ success: true, message: `${type} saved successfully`, count });
     } catch (err) {
         console.error(`Error saving ${type}:`, err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Failed to save data. Check server logs for details.' });
     }
 });
 
@@ -453,6 +453,8 @@ app.post('/api/save-all', requireAuth, (req, res) => {
                         lines.push(`var INDEX_CTA = ${JSON.stringify(data.INDEX_CTA || {}, null, 2)};`);
                         lines.push('');
                         lines.push(`var INDEX_WHY_CHOOSE = ${JSON.stringify(data.INDEX_WHY_CHOOSE || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_SECTION_ORDER = ${JSON.stringify(data.INDEX_SECTION_ORDER || [], null, 2)};`);
                         content = lines.join('\n');
                     } else if (type === 'about_content') {
                         content = `/**\n * About Page Data\n */\nvar ABOUT_DATA = ${JSON.stringify(data, null, 2)};\n`;
