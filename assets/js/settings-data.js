@@ -5,7 +5,7 @@ const SETTINGS_DATA = {
     "home": {
       "hero": true,
       "stats": true,
-      "whatWeDo": false,
+      "whatWeDo": true,
       "caseStudy": false,
       "cta": false
     },
