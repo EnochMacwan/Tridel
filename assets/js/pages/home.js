@@ -182,7 +182,7 @@
     // Latest News
     html +=
       '<section class="section section--light-bg reveal">' +
-        '<div class="container--wide">' +
+        '<div class="container--wide" style="max-width: 1800px; width: 95%; !important">' +
           '<div class="news-feed">' +
             '<h2 class="section__title">Latest News</h2>' +
             '<div id="news-feed-container">' +

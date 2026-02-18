@@ -135,7 +135,8 @@ app.use((req, res, next) => {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com; " +
-        "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com"
+        "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com; " +
+        "frame-src 'self' https://www.linkedin.com;"
     );
     next();
 });

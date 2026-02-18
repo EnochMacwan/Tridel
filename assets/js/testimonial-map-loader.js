@@ -111,10 +111,18 @@ window.renderTestimonialMap = function(container) {
 
     // India GeoJSON overlay (Survey of India compliance)
     fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')
-      .then(function (r) { return r.json(); })
+      .then(function (r) { 
+        if (!r.ok) throw new Error('Network response was not ok');
+        return r.json(); 
+      })
       .then(function (data) {
-        geoJsonLayer = L.geoJSON(data, { style: { color: '#cbd5e0', weight: 1.5, opacity: 0.8, fillOpacity: 0 } }).addTo(map);
-        updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
+        try {
+            if (!data || !data.type) throw new Error('Invalid GeoJSON data');
+            geoJsonLayer = L.geoJSON(data, { style: { color: '#cbd5e0', weight: 1.5, opacity: 0.8, fillOpacity: 0 } }).addTo(map);
+            updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
+        } catch (e) {
+            console.warn('Failed to render India GeoJSON overlay:', e);
+        }
       })
       .catch(function (err) { console.log('Error loading India GeoJSON:', err); });
 
