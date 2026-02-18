@@ -4,11 +4,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Patch querySelector to handle SPA route hashes (e.g. #/contact)
         // Lenis internally calls querySelector(hash) on hashchange,
-        // which throws on SPA-style selectors like '#/contact'
+        // which throws a SyntaxError on SPA-style selectors like '#/contact'
         const _origQS = document.querySelector.bind(document);
         document.querySelector = function(selector) {
             try { return _origQS(selector); }
-            catch(e) { return null; }
+            catch(e) {
+                // Only suppress SyntaxError from SPA-style hash selectors
+                if (e instanceof SyntaxError && typeof selector === 'string' && selector.includes('/')) {
+                    return null;
+                }
+                throw e; // Re-throw all other errors to avoid masking real bugs
+            }
         };
 
         const lenis = new Lenis({
@@ -41,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
 
-        console.log("Tridel Smooth Scroll Active");
+    } else {
+        // Lenis not loaded — Smooth scroll unavailable
     }
 });

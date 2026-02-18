@@ -16,6 +16,7 @@
 
   // ── Map state for cleanup ──
   var _contactMapInstance = null;
+  var _mapResizeTimeout = null;
 
   function buildSectorOptions(options) {
     var html = '<option value="">Select an option...</option>';
@@ -53,7 +54,7 @@
 
         html +=
           '<div class="office-card" data-location-id="' + esc(loc.id) + '" ' +
-               'data-lat="' + loc.lat + '" data-lng="' + loc.lng + '" tabindex="0" role="button">' +
+               'data-lat="' + parseFloat(loc.lat) + '" data-lng="' + parseFloat(loc.lng) + '" tabindex="0" role="button">' +
             '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
             '<div class="office-card-body">' +
               '<div class="office-card-name">' + esc(loc.name) + '</div>' +
@@ -108,7 +109,7 @@
       '<div class="contact-form-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
         '<h2 class="contact-form-title">Project Enquiry</h2>' +
-        '<form id="contact-form" class="contact-form" action="https://formsubmit.co/geminibaba1@gmail.com" method="POST">' +
+        '<form id="contact-form" class="contact-form" action="' + esc(enquiry.formAction || '#') + '" method="POST">' +
           '<input type="hidden" name="_subject" value="New Contact Enquiry - Tridel Website">' +
           '<input type="hidden" name="_captcha" value="false">' +
           '<input type="hidden" name="_template" value="table">' +
@@ -197,7 +198,7 @@
           '<div class="contact-info-icon"><i class="fab fa-linkedin"></i></div>' +
           '<div>' +
             '<h4>LinkedIn</h4>' +
-            '<span class="contact-link-item">' + esc(enquiry.linkedin || '') + '</span>' +
+            '<a href="' + esc(enquiry.linkedin || '#') + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(enquiry.linkedin || 'Follow us on LinkedIn') + '</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -271,14 +272,14 @@
         link.rel = 'stylesheet';
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
         link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = '';
+        link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
       }
 
       var script = document.createElement('script');
       script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
       script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = '';
+      script.crossOrigin = 'anonymous';
       script.onload = cb;
       document.head.appendChild(script);
     }
@@ -385,10 +386,11 @@
           markers[id].setIcon(pinActive);
           markers[id].setZIndexOffset(1000);
           var ll = markers[id].getLatLng();
-          map.flyTo(ll, 8, { animate: true, duration: 1.2 });
+          map.flyTo(ll, 8, { animate: true, duration: 1200 });
         }
 
-        var newCard = document.querySelector('.office-card[data-location-id="' + id + '"]');
+        var escapedId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(id) : id.replace(/(["\\])/g, '\\$1');
+        var newCard = document.querySelector('.office-card[data-location-id="' + escapedId + '"]');
         if (newCard) {
           newCard.classList.add('active');
           newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -410,7 +412,7 @@
       });
 
       // Fix tile rendering for initially hidden containers
-      setTimeout(function () {
+      _mapResizeTimeout = setTimeout(function () {
         map.invalidateSize();
       }, 250);
 
@@ -420,6 +422,10 @@
   }
 
   function cleanupOfficesMap() {
+    if (_mapResizeTimeout) {
+      clearTimeout(_mapResizeTimeout);
+      _mapResizeTimeout = null;
+    }
     if (_contactMapInstance) {
       _contactMapInstance.remove();
       _contactMapInstance = null;
@@ -456,14 +462,14 @@
   }
 
   function validateField(input) {
-    var value = input.value.trim();
+    var value = (input.value || '').trim();
     var isValid = true;
 
     if (input.hasAttribute('required') && !value) {
       isValid = false;
     }
     if (input.type === 'email' && value) {
-      isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      isValid = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
     }
 
     if (isValid) {

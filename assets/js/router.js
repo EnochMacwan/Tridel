@@ -88,8 +88,12 @@
     }
 
     // Cancel any running bg animations
-    if (typeof window.cleanupAnimation === 'function') {
-      window.cleanupAnimation();
+    if (typeof window.cleanupBgAnimation === 'function') {
+      window.cleanupBgAnimation();
+    }
+    // Cancel any running testimonial map timers/instances
+    if (typeof window.cleanupTestimonialMap === 'function') {
+      window.cleanupTestimonialMap();
     }
 
     // Update page meta
@@ -125,6 +129,11 @@
     // Re-init scroll reveal for new content
     if (typeof window.initScrollReveal === 'function') {
       setTimeout(function () { window.initScrollReveal(); }, 50);
+    }
+
+    // Apply form email settings (contact/careers) to dynamically rendered forms
+    if (typeof window.applyFormSettings === 'function') {
+      setTimeout(function () { window.applyFormSettings(); }, 100);
     }
 
     // Init bg animation if hero-canvas exists

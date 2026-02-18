@@ -16,16 +16,23 @@
 // Internal state for cleanup
 var _mapTimer = null;
 var _mapInstance = null;
+var _tmThemeHandler = null;
+var _mapDestroyed = false;
+var _progressTimeout = null;
 
 window.cleanupTestimonialMap = function() {
+  _mapDestroyed = true;
+  if (_progressTimeout) { clearTimeout(_progressTimeout); _progressTimeout = null; }
   if (_mapTimer) { clearInterval(_mapTimer); _mapTimer = null; }
-  if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
+  if (_mapInstance) { try { _mapInstance.remove(); } catch(e) { /* already removed */ } _mapInstance = null; }
+  if (_tmThemeHandler) { window.removeEventListener('themeChanged', _tmThemeHandler); _tmThemeHandler = null; }
 };
 
 window.renderTestimonialMap = function(container) {
   if (!container) container = document.getElementById('testimonial-map-root');
   if (!container) return;
   window.cleanupTestimonialMap();
+  _mapDestroyed = false;
 
   // --- Build DOM ---
   container.innerHTML = '';
@@ -107,16 +114,23 @@ window.renderTestimonialMap = function(container) {
     }
 
     updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
-    window.addEventListener('themeChanged', function (e) { updateMapTheme(e.detail.theme); });
+    _tmThemeHandler = function (e) { updateMapTheme(e.detail.theme); };
+    window.addEventListener('themeChanged', _tmThemeHandler);
 
     // India GeoJSON overlay (Survey of India compliance)
     fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')
       .then(function (r) { return r.json(); })
       .then(function (data) {
+        // Guard: map may have been destroyed if user navigated away
+        if (_mapDestroyed || !_mapInstance) return;
+        try {
+          var containerEl = map.getContainer();
+          if (!containerEl || !containerEl.parentNode) return;
+        } catch(e) { return; }
         geoJsonLayer = L.geoJSON(data, { style: { color: '#cbd5e0', weight: 1.5, opacity: 0.8, fillOpacity: 0 } }).addTo(map);
         updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
       })
-      .catch(function (err) { console.log('Error loading India GeoJSON:', err); });
+      .catch(function (err) { console.warn('India GeoJSON load skipped:', err.message || err); });
 
     // Testimonials
     var testimonials = typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA : [];
@@ -174,9 +188,14 @@ window.renderTestimonialMap = function(container) {
     function stopTimer() { clearInterval(timer); _mapTimer = null; var prog = document.getElementById('progress'); if (prog) prog.style.width = '0%'; }
     function resetProgress() {
       var bar = document.getElementById('progress');
+      if (!bar) return;
       bar.style.transition = 'none'; bar.style.width = '0%';
-      setTimeout(function () {
-        if (!isPaused && !isManualInteraction) { bar.style.transition = 'width ' + duration + 'ms linear'; bar.style.width = '100%'; }
+      if (_progressTimeout) { clearTimeout(_progressTimeout); }
+      _progressTimeout = setTimeout(function () {
+        if (_mapDestroyed) return;
+        var b = document.getElementById('progress');
+        if (b && !isPaused && !isManualInteraction) { b.style.transition = 'width ' + duration + 'ms linear'; b.style.width = '100%'; }
+        _progressTimeout = null;
       }, 50);
     }
 

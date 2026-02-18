@@ -52,6 +52,30 @@
     );
   }
 
+  function buildWhyChooseHtml(data) {
+    var reasons = '';
+    (data.reasons || []).forEach(function (r, i) {
+      reasons +=
+        '<div class="why-choose-card reveal" style="animation-delay:' + (i * 0.1) + 's">' +
+          '<div class="why-choose-card__number">' + String(i + 1).padStart(2, '0') + '</div>' +
+          '<div class="why-choose-card__icon"><i class="fas ' + esc(r.icon) + '"></i></div>' +
+          '<h3 class="why-choose-card__title">' + esc(r.title) + '</h3>' +
+          '<p class="why-choose-card__desc">' + esc(r.desc) + '</p>' +
+        '</div>';
+    });
+    return (
+      '<section class="section why-choose-section reveal">' +
+        '<div class="container">' +
+          '<div class="section__header">' +
+            '<h2 class="section__title">' + esc(data.title) + '</h2>' +
+            '<p class="section__subtitle">' + esc(data.subtitle) + '</p>' +
+          '</div>' +
+          '<div class="why-choose-grid">' + reasons + '</div>' +
+        '</div>' +
+      '</section>'
+    );
+  }
+
   function buildCaseStudyHtml(cs) {
     return (
       '<section class="section reveal">' +
@@ -132,93 +156,152 @@
     var caseStudy = (typeof INDEX_CASE_STUDY !== 'undefined') ? INDEX_CASE_STUDY : null;
     var cta = (typeof INDEX_CTA !== 'undefined') ? INDEX_CTA : null;
 
+    var whyChoose = (typeof INDEX_WHY_CHOOSE !== 'undefined') ? INDEX_WHY_CHOOSE : null;
+
     var html = '';
 
-    // Hero
-    if (isSectionVisible('home', 'hero')) {
-    html +=
-      '<section class="hero">' +
-        '<div class="hero__bg">' +
-          '<canvas id="hero-canvas" width="1920" height="1080"></canvas>' +
-        '</div>' +
-        '<div class="hero__overlay"></div>' +
-        '<div class="container hero__content">' +
-          '<h1 class="hero__title">' + esc(hero.title) + '</h1>' +
-          '<p class="hero__subtitle">' + esc(hero.subtitle) + '</p>' +
-        '</div>' +
-        '<div class="hero__scroll-indicator" aria-hidden="true">' +
-          '<div class="hero__scroll-mouse"><div class="hero__scroll-wheel"></div></div>' +
-        '</div>' +
-      '</section>';
-    }
+    // Default section order
+    var defaultOrder = ['hero', 'stats', 'whatWeDo', 'whyChoose', 'highlights', 'news', 'clients', 'caseStudy', 'cta', 'testimonialMap'];
+    var sectionOrder = (typeof INDEX_SECTION_ORDER !== 'undefined' && Array.isArray(INDEX_SECTION_ORDER) && INDEX_SECTION_ORDER.length)
+      ? INDEX_SECTION_ORDER
+      : defaultOrder;
 
-    // Stats Bar
-    if (stats.length && isSectionVisible('home', 'stats')) {
-      html +=
-        '<section class="stats-bar reveal">' +
-          '<div class="container">' +
-            '<div class="stats-grid">' + buildStatsHtml(stats) + '</div>' +
-          '</div>' +
-        '</section>';
-    }
-
-    // What We Do
-    if (whatWeDo && isSectionVisible('home', 'whatWeDo')) {
-      html += buildWhatWeDoHtml(whatWeDo);
-    }
-
-    // Highlights
-    html +=
-      '<section class="section reveal" id="highlights">' +
-        '<div class="container--wide">' +
-          '<div class="section__header">' +
-            '<h2 class="section__title">Highlights</h2>' +
-          '</div>' +
-          '<div id="home-cards-container" class="highlights-grid highlights-grid--4-items">' +
-          '</div>' +
-        '</div>' +
-      '</section>';
-
-    // Latest News
-    html +=
-      '<section class="section section--light-bg reveal">' +
-        '<div class="container--wide">' +
-          '<div class="news-feed">' +
-            '<h2 class="section__title">Latest News</h2>' +
-            '<div id="news-feed-container">' +
-              '<div class="news-loading-placeholder" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-muted);">' +
-                '<i class="fas fa-spinner fa-spin"></i> Loading latest updates...' +
+    // Section builder map — each returns HTML string or ''
+    var sectionBuilders = {
+      hero: function () {
+        if (!isSectionVisible('home', 'hero')) return '';
+        return (
+          '<section class="hero">' +
+            '<div class="hero__bg">' +
+              '<canvas id="hero-canvas" width="1920" height="1080"></canvas>' +
+            '</div>' +
+            '<div class="hero__overlay"></div>' +
+            '<div class="container hero__content">' +
+              '<h1 class="hero__title">' + esc(hero.title) + '</h1>' +
+              '<p class="hero__subtitle">' + esc(hero.subtitle) + '</p>' +
+            '</div>' +
+            '<div class="hero__scroll-indicator" aria-hidden="true">' +
+              '<div class="hero__scroll-mouse"><div class="hero__scroll-wheel"></div></div>' +
+            '</div>' +
+          '</section>'
+        );
+      },
+      stats: function () {
+        if (!stats.length || !isSectionVisible('home', 'stats')) return '';
+        return (
+          '<section class="stats-bar reveal">' +
+            '<div class="container">' +
+              '<div class="stats-grid">' + buildStatsHtml(stats) + '</div>' +
+            '</div>' +
+          '</section>'
+        );
+      },
+      whatWeDo: function () {
+        if (!whatWeDo || !isSectionVisible('home', 'whatWeDo')) return '';
+        return buildWhatWeDoHtml(whatWeDo);
+      },
+      whyChoose: function () {
+        if (!whyChoose || !whyChoose.reasons || !whyChoose.reasons.length || !isSectionVisible('home', 'whyChoose')) return '';
+        return buildWhyChooseHtml(whyChoose);
+      },
+      highlights: function () {
+        return (
+          '<section class="section reveal" id="highlights">' +
+            '<div class="container--wide">' +
+              '<div class="section__header">' +
+                '<h2 class="section__title">Highlights</h2>' +
+              '</div>' +
+              '<div id="home-cards-container" class="highlights-grid highlights-grid--4-items">' +
               '</div>' +
             '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>';
+          '</section>'
+        );
+      },
+      news: function () {
+        return (
+          '<section class="section linkedin-section reveal">' +
+            '<div class="container--wide">' +
+              '<div class="linkedin-feed">' +
+                '<div class="section__header">' +
+                  '<div class="linkedin-section__badge">' +
+                    '<i class="fab fa-linkedin"></i>' +
+                  '</div>' +
+                  '<h2 class="section__title">Latest from LinkedIn</h2>' +
+                  '<p class="section__subtitle">Stay connected with our latest updates, insights, and milestone announcements.</p>' +
+                '</div>' +
+                '<div id="news-feed-container" class="linkedin-feed__grid">' +
+                  '<div class="linkedin-feed__loading">' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="linkedin-embed-card">' +
+                      '<div class="linkedin-embed-card__shimmer">' +
+                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
+                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
+                      '</div>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</section>'
+        );
+      },
+      clients: function () {
+        return (
+          '<section class="section reveal" id="clients">' +
+            '<div class="container">' +
+              '<div class="section__header">' +
+                '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
+              '</div>' +
+            '</div>' +
+            '<div class="client-logos">' +
+              '<div class="client-logo-track"></div>' +
+            '</div>' +
+          '</section>'
+        );
+      },
+      caseStudy: function () {
+        if (!caseStudy || !isSectionVisible('home', 'caseStudy')) return '';
+        return buildCaseStudyHtml(caseStudy);
+      },
+      cta: function () {
+        if (!cta || !isSectionVisible('home', 'cta')) return '';
+        return buildCtaHtml(cta);
+      },
+      testimonialMap: function () {
+        return '<div id="testimonial-map-root"></div>';
+      }
+    };
 
-    // Clients
-    html +=
-      '<section class="section reveal" id="clients">' +
-        '<div class="container">' +
-          '<div class="section__header">' +
-            '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
-          '</div>' +
-        '</div>' +
-        '<div class="client-logos">' +
-          '<div class="client-logo-track"></div>' +
-        '</div>' +
-      '</section>';
+    // Render sections in configured order
+    sectionOrder.forEach(function (key) {
+      var builder = sectionBuilders[key];
+      if (builder) html += builder();
+    });
 
-    // Case Study
-    if (caseStudy && isSectionVisible('home', 'caseStudy')) {
-      html += buildCaseStudyHtml(caseStudy);
-    }
-
-    // CTA
-    if (cta && isSectionVisible('home', 'cta')) {
-      html += buildCtaHtml(cta);
-    }
-
-    // Testimonial Map (Global Client Stories)
-    html += '<div id="testimonial-map-root"></div>';
+    // Append any sections not in the order array (safety net)
+    defaultOrder.forEach(function (key) {
+      if (sectionOrder.indexOf(key) === -1) {
+        var builder = sectionBuilders[key];
+        if (builder) html += builder();
+      }
+    });
 
     mainEl.innerHTML = html;
 

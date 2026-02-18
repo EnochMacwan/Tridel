@@ -5,7 +5,8 @@ const SETTINGS_DATA = {
     "home": {
       "hero": true,
       "stats": true,
-      "whatWeDo": false,
+      "whatWeDo": true,
+      "whyChoose": true,
       "caseStudy": false,
       "cta": false
     },
@@ -26,6 +27,7 @@ const SETTINGS_DATA = {
       "grid": true
     },
     "contact": {
+      "hero": true,
       "infoCards": true,
       "faq": true,
       "form": true,

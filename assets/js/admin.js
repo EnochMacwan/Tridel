@@ -28,6 +28,8 @@
     try { if (typeof NAV_LINKS !== 'undefined') window.NAV_LINKS = NAV_LINKS; } catch(e){}
     try { if (typeof FOOTER_DATA !== 'undefined') window.FOOTER_DATA = FOOTER_DATA; } catch(e){}
     try { if (typeof PAGE_META !== 'undefined') window.PAGE_META = PAGE_META; } catch(e){}
+    try { if (typeof INDEX_WHY_CHOOSE !== 'undefined') window.INDEX_WHY_CHOOSE = INDEX_WHY_CHOOSE; } catch(e){}
+    try { if (typeof INDEX_SECTION_ORDER !== 'undefined') window.INDEX_SECTION_ORDER = INDEX_SECTION_ORDER; } catch(e){}
 
     // Legacy camelCase aliases
     try { if (typeof servicesData !== 'undefined' && !window.SERVICES_DATA) window.SERVICES_DATA = servicesData; } catch(e){}
@@ -102,7 +104,7 @@ function updateThemeIcon(theme) {
 
 var gitHubConfig = {};
 try {
-    gitHubConfig = JSON.parse(localStorage.getItem('tridel_github_config') || '{}');
+    gitHubConfig = JSON.parse(sessionStorage.getItem('tridel_github_config') || '{}');
 } catch (e) {
     gitHubConfig = {};
 }
@@ -114,6 +116,7 @@ var GITHUB_DATA_FILES = {
     'stories': 'assets/js/success-stories-data.js',
     'home': 'assets/js/home-data.js',
     'news': 'assets/js/news-data.js',
+    'linkedin': 'assets/js/news-data.js',
     'team': 'assets/js/team-data.js',
     'testimonials': 'assets/js/testimonials-data.js',
     'settings': 'assets/js/contact-data.js',
@@ -131,6 +134,7 @@ var GITHUB_VAR_NAMES = {
     'stories': 'SUCCESS_STORIES_DATA',
     'home': 'HOME_CARDS_DATA',
     'news': 'NEWS_DATA',
+    'linkedin': 'NEWS_DATA',
     'team': 'TEAM_DATA',
     'testimonials': 'TESTIMONIALS_DATA',
     'settings': 'CONTACT_DATA',
@@ -149,7 +153,7 @@ async function loadDataFromGitHub() {
 
     showToast('Loading data from GitHub...', 'success');
 
-    var types = ['products', 'services', 'clients', 'stories', 'home', 'team', 'testimonials', 'settings'];
+    var types = ['products', 'services', 'clients', 'stories', 'home', 'news', 'team', 'testimonials', 'locations', 'settings'];
 
     for (var i = 0; i < types.length; i++) {
         var type = types[i];
@@ -193,7 +197,7 @@ async function loadDataFromGitHub() {
                 }
             }
         } catch (e) {
-            console.log('Could not load ' + type + ' from GitHub:', e.message);
+            console.warn('Could not load ' + type + ' from GitHub:', e.message);
         }
     }
 
@@ -215,7 +219,7 @@ async function loadDataFromGitHub() {
                 multiVarFiles[mvi].parser(mvContent);
             }
         } catch (e) {
-            console.log('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
+            console.warn('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
         }
     }
 
@@ -226,7 +230,7 @@ async function loadDataFromGitHub() {
 
 function parseIndexPageContent(content) {
     // Parse multiple var declarations from index-page-data.js
-    var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA'];
+    var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA', 'INDEX_WHY_CHOOSE', 'INDEX_SECTION_ORDER'];
     varNames.forEach(function (varName) {
         var regex = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*(?:var\\s|$)', 'g');
         var match = regex.exec(content);
@@ -324,25 +328,32 @@ async function saveToGitHub(type, data) {
         fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
     }
 
-    // 1. Get current SHA
+    // 1. Get current SHA (with timeout)
     var apiUrl = 'https://api.github.com/repos/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/contents/' + filePath;
 
     var sha = null;
     try {
+        var getController = new AbortController();
+        var getTimeout = setTimeout(function() { getController.abort(); }, 30000);
         var getRes = await fetch(apiUrl, {
             headers: {
                 'Authorization': 'token ' + gitHubConfig.token,
                 'Accept': 'application/vnd.github.v3+json'
-            }
+            },
+            signal: getController.signal
         });
+        clearTimeout(getTimeout);
 
         if (getRes.ok) {
             var fileData = await getRes.json();
             sha = fileData.sha;
         }
-    } catch (e) { console.log('File not found, creating new...'); }
+    } catch (e) {
+        if (e.name === 'AbortError') throw new Error('GitHub API request timed out (30s). Check your connection.');
+        /* File doesn't exist yet, will create new */
+    }
 
-    // 2. Update file
+    // 2. Update file (with timeout)
     var body = {
         message: 'Update ' + type + ' via Admin Panel',
         content: btoa(unescape(encodeURIComponent(fileContent))),
@@ -350,14 +361,18 @@ async function saveToGitHub(type, data) {
     };
     if (sha) body.sha = sha;
 
+    var putController = new AbortController();
+    var putTimeout = setTimeout(function() { putController.abort(); }, 30000);
     var putRes = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
             'Authorization': 'token ' + gitHubConfig.token,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: putController.signal
     });
+    clearTimeout(putTimeout);
 
     if (!putRes.ok) {
         var err = await putRes.json();
@@ -393,7 +408,7 @@ function saveGitHubConfig() {
     }
 
     gitHubConfig = { owner: owner, repo: repo, branch: branch, token: token };
-    localStorage.setItem('tridel_github_config', JSON.stringify(gitHubConfig));
+    sessionStorage.setItem('tridel_github_config', JSON.stringify(gitHubConfig));
 
     closeGitHubConfig();
     showToast('Settings saved. Reloading...', 'success');
@@ -778,8 +793,8 @@ function renderWithNesting(type, data, gridId) {
 
 function renderItemCard(type, item, index, isChild) {
     isChild = isChild || false;
-    var title = escapeHTML(item.title || item.name);
-    var category = escapeHTML(item.category || (type === 'products' ? 'Uncategorized' : 'Service'));
+    var title = escapeHTML(item.title || item.name || 'Untitled');
+    var category = escapeHTML(item.category || (type === 'products' ? 'Uncategorized' : 'Item'));
 
     if (type === 'home' && !item.title) {
         title = escapeHTML(item.tag || 'Untitled Card');
@@ -820,7 +835,7 @@ function renderItemCard(type, item, index, isChild) {
 
     var imageHtml = imageUrl ?
         '<div class="card-preview-image">' +
-        '<img src="' + imageUrl + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img src="' + escapeHTML(imageUrl) + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         '</div>' : '';
 
     return '<div class="item-card ' + (isChild ? 'nested-card' : '') + '">' +
@@ -829,10 +844,10 @@ function renderItemCard(type, item, index, isChild) {
         '<div class="item-header-content">' +
         (!isChild ? '<input type="checkbox" class="checkbox-sm" ' +
             (isSelected ? 'checked' : '') +
-            ' onchange="toggleSelection(\'' + type + '\', ' + index + ', this.checked)">' : '') +
+            ' onchange="toggleSelection(\'' + escapeHTML(type) + '\', ' + index + ', this.checked)">' : '') +
         (!isChild ? '<i class="fas fa-grip-vertical drag-handle drag-handle-icon"></i>' : '') +
         '<div>' +
-        '<h3>' + title + ' ' + badge + '</h3>' +
+        '<h3>' + escapeHTML(title) + ' ' + badge + '</h3>' +
         '<span class="category">' + category + '</span>' +
         '</div>' +
         '</div>' +
@@ -963,117 +978,96 @@ function renderHomeCards() {
 function renderLinkedIn() {
     var data = getDataArray('linkedin');
     var grid = document.getElementById('linkedin-grid');
-    if (grid) {
-        grid.innerHTML = data.map(function (post, i) {
-            var item = typeof post === 'string'
-                ? { urn: post, text: '', date: '', image: '', url: '' }
-                : post;
-            var displayText = item.text
-                ? (item.text.length > 80 ? escapeHTML(item.text.substring(0, 77)) + '...' : escapeHTML(item.text))
-                : '<em style="opacity:0.5;">(No text)</em>';
-            return '<div class="item-card">' +
-                '<div class="item-card-header"><div>' +
-                '<h3><i class="fab fa-linkedin" style="color: #0077b5;"></i> Post ' + (i + 1) + '</h3>' +
-                (item.date ? '<small style="color:var(--text-muted);">' + escapeHTML(item.date) + '</small>' : '') +
-                '</div></div>' +
-                '<p style="margin-bottom:6px;">' + displayText + '</p>' +
-                '<p class="text-xs font-mono break-all" style="opacity:0.5;">' + escapeHTML(item.urn || '') + '</p>' +
-                (item.image ? '<img src="' + escapeHTML(item.image) + '" style="max-width:100%;max-height:80px;border-radius:4px;margin-top:8px;" alt="Post image">' : '') +
-                '<div class="item-card-actions">' +
-                '<button type="button" class="btn btn-secondary btn-icon" onclick="editItem(\'linkedin\', ' + i + ')">' +
-                '<i class="fas fa-edit"></i> Edit</button>' +
-                '<button type="button" class="btn btn-danger btn-icon" onclick="deleteItem(\'linkedin\', ' + i + ')">' +
-                '<i class="fas fa-trash"></i></button>' +
-                '</div></div>';
-        }).join('');
+    if (!grid) return;
+
+    if (data.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No LinkedIn posts added yet. Click "Add Post" to embed a LinkedIn post.</div>';
+        return;
+    }
+
+    grid.innerHTML = '<div class="items-grid">' + data.map(function (post, i) {
+        var embedUrl = post.embedUrl || '';
+        var displayUrl = embedUrl.length > 70
+            ? escapeHTML(embedUrl.substring(0, 67)) + '...'
+            : escapeHTML(embedUrl);
+
+        // Extract URN identifier from embed URL for display
+        var urnMatch = embedUrl.match(/urn:li:\w+:\d+/);
+        var urnLabel = urnMatch ? urnMatch[0] : 'Unknown';
+
+        return '<div class="item-card">' +
+            '<div class="item-card-header"><div>' +
+            '<h3><i class="fab fa-linkedin" style="color: #0077b5; margin-right: 8px;"></i> Post ' + (i + 1) + '</h3>' +
+            '<span class="category">' + escapeHTML(urnLabel) + '</span>' +
+            '</div></div>' +
+            '<div style="margin:10px 0; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px; overflow:hidden;">' +
+            '<iframe src="' + escapeHTML(embedUrl) + '" height="300" width="100%" frameborder="0" ' +
+            'style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>' +
+            '</div>' +
+            '<p class="text-xs font-mono break-all" style="opacity:0.5; word-break:break-all;">' + displayUrl + '</p>' +
+            '<div class="item-card-actions">' +
+            '<button type="button" class="btn btn-secondary btn-icon" onclick="editItem(\'linkedin\', ' + i + ')">' +
+            '<i class="fas fa-edit"></i> Edit</button>' +
+            '<button type="button" class="btn btn-danger btn-icon" onclick="deleteItem(\'linkedin\', ' + i + ')">' +
+            '<i class="fas fa-trash"></i></button>' +
+            '</div></div>';
+    }).join('') + '</div>';
+}
+
+function renderDataGrid(type, dataVarName, gridId) {
+    var grid = document.getElementById(gridId);
+    if (!grid) return;
+
+    var data = window[dataVarName];
+    if (typeof data === 'undefined') {
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + dataVarName + ' is not defined.</div>';
+        return;
+    }
+
+    if (!Array.isArray(data)) {
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + dataVarName + ' is not an array.</div>';
+        return;
+    }
+
+    if (data.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No items found.</div>';
+        return;
+    }
+
+    try {
+        grid.innerHTML = '<div class="items-grid">' +
+            data.map(function (item, i) { return renderItemCard(type, item, i); }).join('') +
+            '</div>';
+
+        if (typeof Sortable !== 'undefined') {
+            var container = grid.querySelector('.items-grid');
+            if (container) {
+                new Sortable(container, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    onEnd: function (evt) {
+                        var oldIndex = evt.oldIndex;
+                        var newIndex = evt.newIndex;
+                        if (oldIndex !== newIndex) {
+                            var item = data.splice(oldIndex, 1)[0];
+                            data.splice(newIndex, 0, item);
+                            markAsPending(type);
+                        }
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error rendering grid: ' + escapeHTML(e.message) + '</div>';
     }
 }
 
 function renderTeam() {
-    var grid = document.getElementById('team-grid');
-
-    if (typeof TEAM_DATA === 'undefined') {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TEAM_DATA is not defined.</div>';
-        return;
-    }
-
-    if (!Array.isArray(TEAM_DATA)) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TEAM_DATA is not an array.</div>';
-        return;
-    }
-
-    if (TEAM_DATA.length === 0) {
-        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No team members found.</div>';
-        return;
-    }
-
-    try {
-        grid.innerHTML = '<div class="items-grid">' +
-            TEAM_DATA.map(function (member, i) { return renderItemCard('team', member, i); }).join('') +
-            '</div>';
-
-        if (typeof Sortable !== 'undefined') {
-            var container = grid.querySelector('.items-grid');
-            if (container) {
-                new Sortable(container, {
-                    animation: 150,
-                    handle: '.drag-handle',
-                    onEnd: function (evt) {
-                        var oldIndex = evt.oldIndex;
-                        var newIndex = evt.newIndex;
-                        if (oldIndex !== newIndex) {
-                            var item = TEAM_DATA.splice(oldIndex, 1)[0];
-                            TEAM_DATA.splice(newIndex, 0, item);
-                            markAsPending('team');
-                        }
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error rendering cards: ' + escapeHTML(e.message) + '</div>';
-    }
+    renderDataGrid('team', 'TEAM_DATA', 'team-grid');
 }
 
 function renderTestimonials() {
-    var grid = document.getElementById('testimonials-grid');
-
-    if (typeof TESTIMONIALS_DATA === 'undefined') {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TESTIMONIALS_DATA is not defined.</div>';
-        return;
-    }
-
-    if (TESTIMONIALS_DATA.length === 0) {
-        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No testimonials found.</div>';
-        return;
-    }
-
-    try {
-        grid.innerHTML = '<div class="items-grid">' +
-            TESTIMONIALS_DATA.map(function (item, i) { return renderItemCard('testimonials', item, i); }).join('') +
-            '</div>';
-
-        if (typeof Sortable !== 'undefined') {
-            var container = grid.querySelector('.items-grid');
-            if (container) {
-                new Sortable(container, {
-                    animation: 150,
-                    handle: '.drag-handle',
-                    onEnd: function (evt) {
-                        var oldIndex = evt.oldIndex;
-                        var newIndex = evt.newIndex;
-                        if (oldIndex !== newIndex) {
-                            var item = TESTIMONIALS_DATA.splice(oldIndex, 1)[0];
-                            TESTIMONIALS_DATA.splice(newIndex, 0, item);
-                            markAsPending('testimonials');
-                        }
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + escapeHTML(e.message) + '</div>';
-    }
+    renderDataGrid('testimonials', 'TESTIMONIALS_DATA', 'testimonials-grid');
 }
 
 // ==========================================
@@ -1115,10 +1109,10 @@ function getSingleImageFieldHTML(label, fieldId, value) {
         '<label>' + label + '</label>' +
         '<div class="single-image-upload" id="container-' + fieldId + '">' +
         '<div class="image-preview-container" id="preview-' + fieldId + '">' +
-        (value ? '<img src="' + value + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>') +
+        (value ? '<img src="' + escapeHTML(value) + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>') +
         '</div>' +
         '<div class="upload-controls">' +
-        '<input type="text" class="form-control" id="' + fieldId + '" value="' + (value || '') + '" placeholder="Path or upload image...">' +
+        '<input type="text" class="form-control" id="' + fieldId + '" value="' + escapeHTML(value || '') + '" placeholder="Path or upload image...">' +
         '<button type="button" class="btn btn-secondary" onclick="document.getElementById(\'upload-' + fieldId + '\').click()">' +
         '<i class="fas fa-upload"></i> Upload</button>' +
         '<input type="file" id="upload-' + fieldId + '" accept="image/*" style="display:none" onchange="handleFileUpload(this, \'' + fieldId + '\', false)">' +
@@ -1128,7 +1122,7 @@ function getSingleImageFieldHTML(label, fieldId, value) {
 function renderSingleImagePreview(fieldId, value) {
     var container = document.getElementById('preview-' + fieldId);
     if (container) {
-        container.innerHTML = value ? '<img src="' + value + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>';
+        container.innerHTML = value ? '<img src="' + escapeHTML(value) + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>';
     }
 }
 
@@ -1140,7 +1134,7 @@ function getGalleryHTML(images) {
         '<div class="gallery-thumbnails" id="gallery-thumbs">' +
         (gallery.length > 0 ? gallery.map(function (img, i) {
             return '<div class="gallery-thumb" draggable="true" data-index="' + i + '">' +
-                '<img src="' + img + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+                '<img src="' + escapeHTML(img) + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
                 '<button type="button" class="thumb-delete" onclick="removeGalleryImage(' + i + ')"><i class="fas fa-times"></i></button>' +
                 '<span class="thumb-order">' + (i + 1) + '</span></div>';
         }).join('') : '<div class="gallery-empty">No images added yet</div>') +
@@ -1149,7 +1143,7 @@ function getGalleryHTML(images) {
         '<div class="gallery-add-btn" onclick="document.getElementById(\'gallery-upload-input\').click()"><i class="fas fa-upload"></i> Upload</div>' +
         '<input type="file" id="gallery-upload-input" accept="image/*" multiple style="display:none" onchange="handleFileUpload(this, \'field-gallery\', true)">' +
         '</div>' +
-        '<input type="hidden" id="field-gallery" value=\'' + JSON.stringify(gallery) + '\'>' +
+        '<input type="hidden" id="field-gallery" value="' + escapeHTML(JSON.stringify(gallery)) + '">' + +
         '</div>';
 }
 
@@ -1172,8 +1166,8 @@ function getParentOptions(type, currentId) {
         if (item.isNested) return;
 
         var selected = item.id === currentParentId ? 'selected' : '';
-        var name = item.name || item.title || 'Untitled';
-        options += '<option value="' + item.id + '" ' + selected + '>' + name + '</option>';
+        var name = escapeHTML(item.name || item.title || 'Untitled');
+        options += '<option value="' + escapeHTML(item.id) + '" ' + selected + '>' + name + '</option>';
     });
     return options;
 }
@@ -1339,28 +1333,27 @@ function getFormHTML(type, data) {
                 getSingleImageFieldHTML('Card Image <span style="color:red">*</span>', 'field-image', data.image);
 
         case 'linkedin':
-            var liData = typeof data === 'string' ? { urn: data } : (data || {});
+            var liData = data || {};
             return '<div class="form-group">' +
-                '<label>LinkedIn Post URN <span style="color:red">*</span></label>' +
-                '<input type="text" class="form-control" id="field-urn" value="' + (liData.urn || '') + '" placeholder="urn:li:ugcPost:1234567890">' +
+                '<label>LinkedIn Embed URL <span style="color:red">*</span></label>' +
+                '<input type="text" class="form-control" id="field-embedUrl" value="' + escapeHTML(liData.embedUrl || '') + '" ' +
+                'placeholder="https://www.linkedin.com/embed/feed/update/urn:li:share:1234567890" ' +
+                'oninput="previewLinkedInEmbed(this.value)">' +
                 '<small style="color: var(--text-muted); display: block; margin-top: 8px;">' +
-                '<i class="fas fa-info-circle"></i> You can find the URN in the LinkedIn post URL or embed code.</small>' +
+                '<i class="fas fa-info-circle"></i> <strong>How to get the Embed URL:</strong><br>' +
+                '1. Go to the LinkedIn post<br>' +
+                '2. Click the <strong>···</strong> menu → <strong>Embed this post</strong><br>' +
+                '3. Copy the URL from the <code>src="..."</code> attribute in the embed code<br>' +
+                'Format: <code>https://www.linkedin.com/embed/feed/update/urn:li:share:XXXXXXXXX</code>' +
+                '</small>' +
                 '</div>' +
                 '<div class="form-group">' +
-                '<label>Post Text <span style="color:red">*</span></label>' +
-                '<textarea class="form-control" id="field-text" rows="3" placeholder="Summary of the LinkedIn post...">' + (liData.text || '') + '</textarea>' +
+                '<label>Preview</label>' +
+                '<div id="linkedin-embed-preview" style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px; min-height:100px; display:flex; align-items:center; justify-content:center;">' +
+                (liData.embedUrl
+                    ? '<iframe src="' + escapeHTML(liData.embedUrl) + '" height="400" width="100%" frameborder="0" style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>'
+                    : '<span style="color:var(--text-muted);"><i class="fab fa-linkedin" style="font-size:2rem; opacity:0.3; margin-right:10px;"></i> Enter an embed URL above to preview</span>') +
                 '</div>' +
-                '<div class="form-group">' +
-                '<label>Date</label>' +
-                '<input type="text" class="form-control" id="field-date" value="' + (liData.date || '') + '" placeholder="e.g. 2025-05-15 or 2 days ago">' +
-                '</div>' +
-                '<div class="form-group">' +
-                '<label>Image URL</label>' +
-                '<input type="text" class="form-control" id="field-image-url" value="' + (liData.image || '') + '" placeholder="https://example.com/image.jpg">' +
-                '</div>' +
-                '<div class="form-group">' +
-                '<label>LinkedIn URL</label>' +
-                '<input type="text" class="form-control" id="field-url" value="' + (liData.url || '') + '" placeholder="Auto-generated from URN if left empty">' +
                 '</div>';
 
         case 'team':
@@ -1407,6 +1400,22 @@ function getFormHTML(type, data) {
 // ==========================================
 // 15. FORM HELPERS
 // ==========================================
+
+// Live preview helper for LinkedIn embed URL input
+function previewLinkedInEmbed(url) {
+    var container = document.getElementById('linkedin-embed-preview');
+    if (!container) return;
+
+    url = (url || '').trim();
+    if (url && url.includes('linkedin.com/embed/')) {
+        container.innerHTML = '<iframe src="' + escapeHTML(url) + '" height="400" width="100%" frameborder="0" ' +
+            'style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>';
+    } else if (url) {
+        container.innerHTML = '<span style="color:var(--text-muted);"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i> URL should contain "linkedin.com/embed/"</span>';
+    } else {
+        container.innerHTML = '<span style="color:var(--text-muted);"><i class="fab fa-linkedin" style="font-size:2rem; opacity:0.3; margin-right:10px;"></i> Enter an embed URL above to preview</span>';
+    }
+}
 
 function addFeature() {
     var container = document.getElementById('features-container');
@@ -1489,27 +1498,19 @@ function saveItem() {
             return;
         }
     } else {
-        var urnVal = document.getElementById('field-urn').value.trim();
-        var textVal = document.getElementById('field-text').value.trim();
-        if (!urnVal) { showToast('Validation Error: LinkedIn URN is required', 'error'); return; }
-        if (!textVal) { showToast('Validation Error: Post text is required', 'error'); return; }
+        var embedUrlVal = document.getElementById('field-embedUrl').value.trim();
+        if (!embedUrlVal) { showToast('Validation Error: LinkedIn Embed URL is required', 'error'); return; }
+        if (!embedUrlVal.includes('linkedin.com/embed/')) {
+            showToast('Warning: URL should be a LinkedIn embed URL (linkedin.com/embed/...)', 'info');
+        }
     }
 
     var arr = getDataArray(currentEditType);
 
     // LinkedIn
     if (currentEditType === 'linkedin') {
-        var urn = document.getElementById('field-urn').value.trim();
-        var text = document.getElementById('field-text').value.trim();
-        var date = document.getElementById('field-date').value.trim();
-        var image = document.getElementById('field-image-url').value.trim();
-        var url = document.getElementById('field-url').value.trim();
-
-        if (!url && urn) {
-            url = 'https://www.linkedin.com/feed/update/' + urn;
-        }
-
-        var postObj = { urn: urn, text: text, date: date, image: image, url: url };
+        var embedUrl = document.getElementById('field-embedUrl').value.trim();
+        var postObj = { embedUrl: embedUrl };
 
         if (currentEditIndex !== null) {
             arr[currentEditIndex] = postObj;
@@ -1569,7 +1570,26 @@ function saveItem() {
             }
         }
 
-        // Nesting
+        // Clients logo
+        if (currentEditType === 'clients' && data.gallery && data.gallery.length > 0) {
+            data.logo = data.gallery[0];
+            delete data.gallery;
+            delete data.image;
+        }
+
+        // Stories/Home cleanup
+        if ((currentEditType === 'stories' || currentEditType === 'home') && data.gallery) {
+            delete data.gallery;
+        }
+
+        // Push or merge data BEFORE nesting so dataObj reference is correct
+        if (currentEditIndex !== null) {
+            Object.assign(arr[currentEditIndex], data);
+        } else {
+            arr.push(data);
+        }
+
+        // Nesting (must come after push so new items exist in arr)
         var parentField = document.getElementById('field-parent');
         if (parentField && (currentEditType === 'products' || currentEditType === 'services')) {
             var parentId = parentField.value;
@@ -1606,24 +1626,6 @@ function saveItem() {
             } else {
                 dataObj.isNested = false;
             }
-        }
-
-        // Clients logo
-        if (currentEditType === 'clients' && data.gallery && data.gallery.length > 0) {
-            data.logo = data.gallery[0];
-            delete data.gallery;
-            delete data.image;
-        }
-
-        // Stories/Home cleanup
-        if ((currentEditType === 'stories' || currentEditType === 'home') && data.gallery) {
-            delete data.gallery;
-        }
-
-        if (currentEditIndex !== null) {
-            Object.assign(arr[currentEditIndex], data);
-        } else {
-            arr.push(data);
         }
     }
 
@@ -1737,9 +1739,12 @@ async function publishAllChanges() {
                 data = getDataArray(type);
             }
 
+            // Map admin 'linkedin' type to server 'news' type
+            var serverType = (type === 'linkedin') ? 'news' : type;
+
             if (isLocal && authToken) {
                 try {
-                    var res = await fetch('/api/data/' + type, {
+                    var res = await fetch('/api/data/' + serverType, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-Auth-Token': authToken },
                         body: JSON.stringify(data)
@@ -1772,7 +1777,6 @@ async function publishAllChanges() {
         showToast('Successfully saved ' + successCount + ' update(s) to ' + mode + '!', 'success');
     } catch (error) {
         showToast('Error saving: ' + error.message, 'error');
-        console.error(error);
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -1797,7 +1801,7 @@ async function reloadSectionData(type) {
         }
 
         if (content) {
-            var match = content.match(/const\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
+            var match = content.match(/(?:const|var|let)\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
             if (match) {
                 window[varName] = JSON.parse(match[1]);
                 if (type === 'products') renderProducts();
@@ -1887,7 +1891,7 @@ function showPreview() {
 
     var previewHTML = '<div class="preview-card">' +
         '<div class="preview-image">' +
-        '<img src="' + mainImage + '" alt="' + name + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img src="' + escapeHTML(mainImage) + '" alt="' + escapeHTML(name) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         (gallery.length > 1 ? '<span class="preview-gallery-count"><i class="fas fa-images"></i> ' + gallery.length + ' images</span>' : '') +
         '</div>' +
         '<div class="preview-content">' +
@@ -2096,8 +2100,9 @@ function showToast(message, type) {
     var container = document.getElementById('toast-container');
     var toast = document.createElement('div');
     toast.className = 'toast ' + type;
+    var safeMessage = escapeHTML(message);
     toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + '"></i>' +
-        '<span>' + message + '</span>';
+        '<span>' + safeMessage + '</span>';
     container.appendChild(toast);
     setTimeout(function () { toast.remove(); }, 3000);
 }
@@ -2232,7 +2237,7 @@ function renderGalleryThumbs(images) {
     } else {
         container.innerHTML = images.map(function (img, i) {
             return '<div class="gallery-thumb" draggable="true" data-index="' + i + '">' +
-                '<img src="' + img + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+                '<img src="' + escapeHTML(img) + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
                 '<button type="button" class="thumb-delete" onclick="removeGalleryImage(' + i + ')"><i class="fas fa-times"></i></button>' +
                 '<span class="thumb-order">' + (i + 1) + '</span></div>';
         }).join('');
@@ -2314,6 +2319,14 @@ function loadPageContentToForm() {
     if (wwdSubtitle) wwdSubtitle.value = wwd.subtitle || '';
     renderWwdCards();
 
+    // Why Choose
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    var wcTitle = document.getElementById('content-wc-title');
+    var wcSubtitle = document.getElementById('content-wc-subtitle');
+    if (wcTitle) wcTitle.value = wc.title || '';
+    if (wcSubtitle) wcSubtitle.value = wc.subtitle || '';
+    renderWhyChooseReasons();
+
     // Case Study
     var cs = window.INDEX_CASE_STUDY || {};
     var csLabel = document.getElementById('content-cs-label');
@@ -2343,6 +2356,64 @@ function loadPageContentToForm() {
     if (ctaPrimaryHref) ctaPrimaryHref.value = (cta.primaryBtn && cta.primaryBtn.href) || '';
     if (ctaSecondaryText) ctaSecondaryText.value = (cta.secondaryBtn && cta.secondaryBtn.text) || '';
     if (ctaSecondaryHref) ctaSecondaryHref.value = (cta.secondaryBtn && cta.secondaryBtn.href) || '';
+
+    // Section Order
+    renderSectionOrderList();
+}
+
+// --- Section Order Drag-and-Drop ---
+var SECTION_LABEL_MAP = {
+    hero: { label: 'Hero Banner', icon: 'fa-image' },
+    stats: { label: 'Stats Bar', icon: 'fa-chart-bar' },
+    whatWeDo: { label: 'What We Do', icon: 'fa-tasks' },
+    whyChoose: { label: 'Why Choose Us', icon: 'fa-star' },
+    highlights: { label: 'Highlights', icon: 'fa-fire' },
+    news: { label: 'Latest News', icon: 'fa-newspaper' },
+    clients: { label: 'Clients & Partners', icon: 'fa-building' },
+    caseStudy: { label: 'Case Study', icon: 'fa-briefcase' },
+    cta: { label: 'Call to Action', icon: 'fa-bullhorn' },
+    testimonialMap: { label: 'Testimonial Map', icon: 'fa-globe' }
+};
+
+function renderSectionOrderList() {
+    var container = document.getElementById('section-order-list');
+    if (!container) return;
+
+    var defaultOrder = ['hero', 'stats', 'whatWeDo', 'whyChoose', 'highlights', 'news', 'clients', 'caseStudy', 'cta', 'testimonialMap'];
+    var order = (window.INDEX_SECTION_ORDER && window.INDEX_SECTION_ORDER.length)
+        ? window.INDEX_SECTION_ORDER
+        : defaultOrder;
+
+    var html = '';
+    order.forEach(function (key, idx) {
+        var info = SECTION_LABEL_MAP[key] || { label: key, icon: 'fa-puzzle-piece' };
+        html +=
+            '<div class="section-order-item" data-section-key="' + key + '">' +
+                '<span class="grip"><i class="fas fa-grip-vertical"></i></span>' +
+                '<span class="section-order-icon"><i class="fas ' + info.icon + '"></i></span>' +
+                '<span class="section-order-label">' + info.label + '</span>' +
+                '<span class="section-order-num">#' + (idx + 1) + '</span>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+
+    // Initialize SortableJS
+    if (typeof Sortable !== 'undefined') {
+        Sortable.create(container, {
+            animation: 200,
+            handle: '.grip',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function () {
+                // Update position numbers
+                var items = container.querySelectorAll('.section-order-item');
+                items.forEach(function (item, i) {
+                    var num = item.querySelector('.section-order-num');
+                    if (num) num.textContent = '#' + (i + 1);
+                });
+            }
+        });
+    }
 }
 
 function renderStatsRows() {
@@ -2435,6 +2506,54 @@ function removeWwdCard(index) {
     }
 }
 
+function renderWhyChooseReasons() {
+    var container = document.getElementById('content-wc-reasons');
+    if (!container) return;
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    var reasons = wc.reasons || [];
+    var html = '';
+    reasons.forEach(function (r, i) {
+        html +=
+            '<div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:12px;" data-wc-reason="' + i + '">' +
+                '<div class="form-group" style="display:flex; gap:10px; align-items:flex-end;">' +
+                    '<div style="width:140px;">' +
+                        '<label>Icon (FA class)</label>' +
+                        '<input type="text" class="form-control wc-icon" value="' + escapeHTML(r.icon || '') + '" placeholder="fa-handshake">' +
+                    '</div>' +
+                    '<div style="flex:1">' +
+                        '<label>Title</label>' +
+                        '<input type="text" class="form-control wc-title" value="' + escapeHTML(r.title || '') + '">' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-danger btn-icon" onclick="removeWhyChooseReason(' + i + ')" title="Remove">' +
+                        '<i class="fas fa-trash"></i>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="form-group" style="margin-bottom:0;">' +
+                    '<label>Description</label>' +
+                    '<textarea class="form-control wc-desc" rows="2">' + escapeHTML(r.desc || '') + '</textarea>' +
+                '</div>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function addWhyChooseReason() {
+    var wc = window.INDEX_WHY_CHOOSE || { title: '', subtitle: '', reasons: [] };
+    wc.reasons = wc.reasons || [];
+    wc.reasons.push({ icon: 'fa-star', title: 'New Reason', desc: '' });
+    window.INDEX_WHY_CHOOSE = wc;
+    renderWhyChooseReasons();
+}
+
+function removeWhyChooseReason(index) {
+    var wc = window.INDEX_WHY_CHOOSE || {};
+    if (wc.reasons) {
+        wc.reasons.splice(index, 1);
+        window.INDEX_WHY_CHOOSE = wc;
+        renderWhyChooseReasons();
+    }
+}
+
 function savePageContent() {
     // Hero
     window.INDEX_HERO = {
@@ -2502,6 +2621,39 @@ function savePageContent() {
         }
     };
 
+    // Why Choose
+    var wcReasons = [];
+    var wcContainer = document.getElementById('content-wc-reasons');
+    if (wcContainer) {
+        var reasonEls = wcContainer.querySelectorAll('[data-wc-reason]');
+        reasonEls.forEach(function (el) {
+            var icon = (el.querySelector('.wc-icon').value || '').trim();
+            var title = (el.querySelector('.wc-title').value || '').trim();
+            var desc = (el.querySelector('.wc-desc').value || '').trim();
+            if (title) {
+                wcReasons.push({ icon: icon, title: title, desc: desc });
+            }
+        });
+    }
+    window.INDEX_WHY_CHOOSE = {
+        title: (document.getElementById('content-wc-title').value || '').trim(),
+        subtitle: (document.getElementById('content-wc-subtitle').value || '').trim(),
+        reasons: wcReasons
+    };
+
+    // Section Order
+    var orderList = document.getElementById('section-order-list');
+    if (orderList) {
+        var items = orderList.querySelectorAll('.section-order-item');
+        var newOrder = [];
+        items.forEach(function (item) {
+            newOrder.push(item.getAttribute('data-section-key'));
+        });
+        if (newOrder.length) {
+            window.INDEX_SECTION_ORDER = newOrder;
+        }
+    }
+
     markAsPending('index_content');
 }
 
@@ -2520,6 +2672,10 @@ function serializeIndexPageData() {
     lines.push('var INDEX_CASE_STUDY = ' + JSON.stringify(window.INDEX_CASE_STUDY || {}, null, 2) + ';');
     lines.push('');
     lines.push('var INDEX_CTA = ' + JSON.stringify(window.INDEX_CTA || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_WHY_CHOOSE = ' + JSON.stringify(window.INDEX_WHY_CHOOSE || {}, null, 2) + ';');
+    lines.push('');
+    lines.push('var INDEX_SECTION_ORDER = ' + JSON.stringify(window.INDEX_SECTION_ORDER || [], null, 2) + ';');
     lines.push('');
     return lines.join('\n');
 }
@@ -3082,7 +3238,7 @@ function serializeLayoutData() {
 var VISIBILITY_MAP = {
     home: {
         label: 'Home', icon: 'fa-home',
-        sections: { hero: 'Hero Banner', stats: 'Statistics', whatWeDo: 'What We Do', caseStudy: 'Case Study', cta: 'Call to Action' }
+        sections: { hero: 'Hero Banner', stats: 'Statistics', whatWeDo: 'What We Do', whyChoose: 'Why Choose Us', caseStudy: 'Case Study', cta: 'Call to Action' }
     },
     about: {
         label: 'About', icon: 'fa-building',
@@ -3102,7 +3258,7 @@ var VISIBILITY_MAP = {
     },
     contact: {
         label: 'Contact', icon: 'fa-envelope',
-        sections: { infoCards: 'Info Cards', faq: 'FAQ Section', form: 'Contact Form', map: 'Map' }
+        sections: { hero: 'Page Header', infoCards: 'Info Cards', faq: 'FAQ Section', form: 'Contact Form', map: 'Map' }
     },
     careers: {
         label: 'Careers', icon: 'fa-briefcase',

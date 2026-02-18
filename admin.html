@@ -1,567 +1,1387 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Tridel Admin Panel</title>
-    <link rel="icon" type="image/png" href="assets/images/logo/tridel.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="icon" type="image/png" href="assets/images/logo/tridel.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/admin.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="assets/js/admin-auth.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Bulk Action Bar -->
     <div id="bulk-action-bar" class="bulk-action-bar">
-        <span id="bulk-count" class="bulk-count">0 Selected</span>
-        <button type="button" class="btn btn-danger" onclick="executeBulkDelete()">
-            <i class="fas fa-trash"></i> Delete Selected
-        </button>
+      <span id="bulk-count" class="bulk-count">0 Selected</span>
+      <button
+        type="button"
+        class="btn btn-danger"
+        onclick="executeBulkDelete()"
+      >
+        <i class="fas fa-trash"></i> Delete Selected
+      </button>
     </div>
 
     <!-- Login Overlay -->
-    <div id="login-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:10000; justify-content:center; align-items:center;">
-        <div style="background:var(--bg-card); border-radius:16px; padding:40px; max-width:400px; width:90%; border:1px solid var(--border);">
-            <div style="text-align:center; margin-bottom:24px;">
-                <img src="assets/images/logo/tridel.png" alt="Tridel" style="width:60px; margin-bottom:12px;">
-                <h2 style="color:var(--text); font-size:1.4rem;">Admin Login</h2>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Enter your password to continue</p>
-            </div>
-            <div id="login-error" style="display:none; background:var(--danger); color:white; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:0.85rem;">
-                Invalid password. Please try again.
-            </div>
-            <input type="password" id="login-password" placeholder="Password"
-                style="width:100%; padding:12px 16px; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:1rem; margin-bottom:16px; outline:none;"
-                onkeydown="if(event.key==='Enter') doLogin()">
-            <button onclick="doLogin()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">
-                Login
-            </button>
+    <div
+      id="login-overlay"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: var(--bg-card);
+          border-radius: 16px;
+          padding: 40px;
+          max-width: 400px;
+          width: 90%;
+          border: 1px solid var(--border);
+        "
+      >
+        <div style="text-align: center; margin-bottom: 24px">
+          <img
+            src="assets/images/logo/tridel.png"
+            alt="Tridel"
+            style="width: 60px; margin-bottom: 12px"
+          />
+          <h2 style="color: var(--text); font-size: 1.4rem">Admin Login</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem">
+            Enter your password to continue
+          </p>
         </div>
+        <div
+          id="login-error"
+          style="
+            display: none;
+            background: var(--danger);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+          "
+        >
+          Invalid password. Please try again.
+        </div>
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Password"
+          style="
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            outline: none;
+          "
+          onkeydown="if (event.key === 'Enter') doLogin();"
+        />
+        <button
+          onclick="doLogin()"
+          style="
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+          "
+        >
+          Login
+        </button>
+      </div>
     </div>
 
     <noscript>
-        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f0f0f; color:white; display:flex; justify-content:center; align-items:center; z-index:10000; text-align:center;">
-            <div>
-                <h1>JavaScript Required</h1>
-                <p>This Admin Panel requires JavaScript to function securely.</p>
-            </div>
+      <div
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #0f0f0f;
+          color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10000;
+          text-align: center;
+        "
+      >
+        <div>
+          <h1>JavaScript Required</h1>
+          <p>This Admin Panel requires JavaScript to function securely.</p>
         </div>
+      </div>
     </noscript>
 
     <header class="admin-header">
-        <h1><i class="fas fa-rocket"></i> Tridel Admin</h1>
-        <div class="header-actions">
-            <button type="button" class="btn btn-secondary btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                <i class="fas fa-moon" id="theme-icon"></i>
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="openGitHubConfig()" id="github-config-btn">
-                <i class="fab fa-github"></i> GitHub Settings
-            </button>
-            <button type="button" class="btn btn-primary" onclick="loadDataFromGitHub()" id="load-data-btn">
-                <i class="fas fa-sync"></i> Load Data
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="publishAllChanges()" id="publish-btn" title="No pending changes" style="opacity: 0.7;">
-                <i class="fas fa-cloud-upload-alt"></i> Publish All <span id="pending-count" class="pending-badge" style="display: none;"></span>
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="exportAllData()">
-                <i class="fas fa-download"></i> Export
-            </button>
-            <button type="button" class="btn btn-danger" onclick="doLogout()" id="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            <a href="index.html" class="btn btn-primary">
-                <i class="fas fa-external-link-alt"></i> View Site
-            </a>
-        </div>
+      <h1><i class="fas fa-rocket"></i> Tridel Admin</h1>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn btn-secondary btn-icon"
+          onclick="toggleTheme()"
+          title="Toggle Dark/Light Mode"
+        >
+          <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="openGitHubConfig()"
+          id="github-config-btn"
+        >
+          <i class="fab fa-github"></i> GitHub Settings
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="loadDataFromGitHub()"
+          id="load-data-btn"
+        >
+          <i class="fas fa-sync"></i> Load Data
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="publishAllChanges()"
+          id="publish-btn"
+          title="No pending changes"
+          style="opacity: 0.7"
+        >
+          <i class="fas fa-cloud-upload-alt"></i> Publish All
+          <span
+            id="pending-count"
+            class="pending-badge"
+            style="display: none"
+          ></span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="exportAllData()"
+        >
+          <i class="fas fa-download"></i> Export
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="doLogout()"
+          id="logout-btn"
+        >
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+        <a href="index.html" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> View Site
+        </a>
+      </div>
     </header>
 
     <div class="admin-container">
-        <nav class="sidebar">
-            <ul class="sidebar-nav">
-                <li><a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
-                <li><a href="#products" data-section="products"><i class="fas fa-cube"></i> Products</a></li>
-                <li><a href="#services" data-section="services"><i class="fas fa-layer-group"></i> Services</a></li>
-                <li><a href="#clients" data-section="clients"><i class="fas fa-building"></i> Clients</a></li>
-                <li><a href="#team" data-section="team"><i class="fas fa-users"></i> Team</a></li>
-                <li><a href="#stories" data-section="stories"><i class="fas fa-trophy"></i> Success Stories</a></li>
-                <li><a href="#testimonials" data-section="testimonials"><i class="fas fa-comment-alt"></i> Testimonials</a></li>
-                <li><a href="#" data-section="locations"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
-                <li><a href="#home" data-section="home"><i class="fas fa-home"></i> Home Cards</a></li>
-                <li><a href="#linkedin" data-section="linkedin"><i class="fab fa-linkedin"></i> LinkedIn News</a></li>
-                <li><a href="#content" data-section="content"><i class="fas fa-file-alt"></i> Page Content</a></li>
-                <li><a href="#navigation" data-section="navigation"><i class="fas fa-bars"></i> Navigation</a></li>
-                <li><a href="#visibility" data-section="visibility"><i class="fas fa-eye"></i> Visibility</a></li>
-                <li><a href="#health" data-section="health"><i class="fas fa-heartbeat"></i> System Health</a></li>
-                <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Global Settings</a></li>
-            </ul>
-        </nav>
+      <nav class="sidebar">
+        <ul class="sidebar-nav">
+          <li>
+            <a href="#dashboard" class="active" data-section="dashboard"
+              ><i class="fas fa-chart-pie"></i> Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="#products" data-section="products"
+              ><i class="fas fa-cube"></i> Products</a
+            >
+          </li>
+          <li>
+            <a href="#services" data-section="services"
+              ><i class="fas fa-layer-group"></i> Services</a
+            >
+          </li>
+          <li>
+            <a href="#clients" data-section="clients"
+              ><i class="fas fa-building"></i> Clients</a
+            >
+          </li>
+          <li>
+            <a href="#team" data-section="team"
+              ><i class="fas fa-users"></i> Team</a
+            >
+          </li>
+          <li>
+            <a href="#stories" data-section="stories"
+              ><i class="fas fa-trophy"></i> Success Stories</a
+            >
+          </li>
+          <li>
+            <a href="#testimonials" data-section="testimonials"
+              ><i class="fas fa-comment-alt"></i> Testimonials</a
+            >
+          </li>
+          <li>
+            <a href="#" data-section="locations"
+              ><i class="fas fa-map-marker-alt"></i> Locations</a
+            >
+          </li>
+          <li>
+            <a href="#home" data-section="home"
+              ><i class="fas fa-home"></i> Home Cards</a
+            >
+          </li>
+          <li>
+            <a href="#linkedin" data-section="linkedin"
+              ><i class="fab fa-linkedin"></i> LinkedIn News</a
+            >
+          </li>
+          <li>
+            <a href="#content" data-section="content"
+              ><i class="fas fa-file-alt"></i> Page Content</a
+            >
+          </li>
+          <li>
+            <a href="#navigation" data-section="navigation"
+              ><i class="fas fa-bars"></i> Navigation</a
+            >
+          </li>
+          <li>
+            <a href="#visibility" data-section="visibility"
+              ><i class="fas fa-eye"></i> Visibility</a
+            >
+          </li>
+          <li>
+            <a href="#health" data-section="health"
+              ><i class="fas fa-heartbeat"></i> System Health</a
+            >
+          </li>
+          <li>
+            <a href="#settings" data-section="settings"
+              ><i class="fas fa-cog"></i> Global Settings</a
+            >
+          </li>
+        </ul>
+      </nav>
 
-        <main class="main-content">
-            <!-- Dashboard -->
-            <section id="dashboard" class="content-section active">
-                <div class="section-header">
-                    <h2>Dashboard</h2>
-                </div>
-                <div class="stats-grid" id="stats-grid"></div>
-                <div class="section-header">
-                    <h2>Quick Actions</h2>
-                </div>
-                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="showSection('products'); openAddModal('products')">
-                        <i class="fas fa-plus"></i> Add Product
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('services'); openAddModal('services')">
-                        <i class="fas fa-plus"></i> Add Service
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('clients'); openAddModal('clients')">
-                        <i class="fas fa-plus"></i> Add Client
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('stories'); openAddModal('stories')">
-                        <i class="fas fa-plus"></i> Add Story
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('team'); openAddModal('team')">
-                        <i class="fas fa-plus"></i> Add Team Member
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('testimonials'); openAddModal('testimonials')">
-                        <i class="fas fa-plus"></i> Add Testimonial
-                    </button>
-                    <button class="btn btn-primary" onclick="showSection('locations'); openAddModal('locations')">
-                        <i class="fas fa-plus"></i> Add Location
-                    </button>
-                </div>
-            </section>
+      <main class="main-content">
+        <!-- Dashboard -->
+        <section id="dashboard" class="content-section active">
+          <div class="section-header">
+            <h2>Dashboard</h2>
+          </div>
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="section-header">
+            <h2>Quick Actions</h2>
+          </div>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap">
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('products');
+                openAddModal('products');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Product
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('services');
+                openAddModal('services');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Service
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('clients');
+                openAddModal('clients');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Client
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('stories');
+                openAddModal('stories');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Story
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('team');
+                openAddModal('team');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Team Member
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('testimonials');
+                openAddModal('testimonials');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Testimonial
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="
+                showSection('locations');
+                openAddModal('locations');
+              "
+            >
+              <i class="fas fa-plus"></i> Add Location
+            </button>
+          </div>
+        </section>
 
-            <!-- Products -->
-            <section id="products" class="content-section">
-                <div class="section-header">
-                    <h2>Products</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('products')" id="undo-btn-products" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('products')">
-                            <i class="fas fa-plus"></i> Add Product
-                        </button>
-                    </div>
-                </div>
-                <div id="products-grid"></div>
-            </section>
+        <!-- Products -->
+        <section id="products" class="content-section">
+          <div class="section-header">
+            <h2>Products</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('products')"
+                id="undo-btn-products"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('products')"
+              >
+                <i class="fas fa-plus"></i> Add Product
+              </button>
+            </div>
+          </div>
+          <div id="products-grid"></div>
+        </section>
 
-            <!-- Services -->
-            <section id="services" class="content-section">
-                <div class="section-header">
-                    <h2>Services</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('services')" id="undo-btn-services" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('services')">
-                            <i class="fas fa-plus"></i> Add Service
-                        </button>
-                    </div>
-                </div>
-                <div id="services-grid"></div>
-            </section>
+        <!-- Services -->
+        <section id="services" class="content-section">
+          <div class="section-header">
+            <h2>Services</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('services')"
+                id="undo-btn-services"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('services')"
+              >
+                <i class="fas fa-plus"></i> Add Service
+              </button>
+            </div>
+          </div>
+          <div id="services-grid"></div>
+        </section>
 
-            <!-- Clients -->
-            <section id="clients" class="content-section">
-                <div class="section-header">
-                    <h2>Clients</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('clients')" id="undo-btn-clients" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('clients')">
-                            <i class="fas fa-plus"></i> Add Client
-                        </button>
-                    </div>
-                </div>
-                <div class="items-grid" id="clients-grid"></div>
-            </section>
+        <!-- Clients -->
+        <section id="clients" class="content-section">
+          <div class="section-header">
+            <h2>Clients</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('clients')"
+                id="undo-btn-clients"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('clients')"
+              >
+                <i class="fas fa-plus"></i> Add Client
+              </button>
+            </div>
+          </div>
+          <div class="items-grid" id="clients-grid"></div>
+        </section>
 
-            <!-- Team -->
-            <section id="team" class="content-section">
-                <div class="section-header">
-                    <h2>Team Members</h2>
-                    <div class="header-actions">
-                        <button type="button" class="btn btn-secondary" onclick="loadDataFromGitHub('team')">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('team')">
-                            <i class="fas fa-plus"></i> Add Member
-                        </button>
-                    </div>
-                </div>
-                <div id="team-grid"></div>
-            </section>
+        <!-- Team -->
+        <section id="team" class="content-section">
+          <div class="section-header">
+            <h2>Team Members</h2>
+            <div class="header-actions">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('team')"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('team')"
+              >
+                <i class="fas fa-plus"></i> Add Member
+              </button>
+            </div>
+          </div>
+          <div id="team-grid"></div>
+        </section>
 
-            <!-- Testimonials -->
-            <section id="testimonials" class="content-section">
-                <div class="section-header">
-                    <h2>Testimonials &amp; Map Pins</h2>
-                    <div class="header-actions">
-                        <button type="button" class="btn btn-secondary" onclick="loadDataFromGitHub('testimonials')">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('testimonials')">
-                            <i class="fas fa-plus"></i> Add Testimonial
-                        </button>
-                    </div>
-                </div>
-                <div id="testimonials-grid"></div>
-            </section>
+        <!-- Testimonials -->
+        <section id="testimonials" class="content-section">
+          <div class="section-header">
+            <h2>Testimonials &amp; Map Pins</h2>
+            <div class="header-actions">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('testimonials')"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('testimonials')"
+              >
+                <i class="fas fa-plus"></i> Add Testimonial
+              </button>
+            </div>
+          </div>
+          <div id="testimonials-grid"></div>
+        </section>
 
-            <!-- Stories -->
-            <section id="stories" class="content-section">
-                <div class="section-header">
-                    <h2>Success Stories</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('stories')" id="undo-btn-stories" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('stories')">
-                            <i class="fas fa-plus"></i> Add Story
-                        </button>
-                    </div>
-                </div>
-                <div class="items-grid" id="stories-grid"></div>
-            </section>
+        <!-- Stories -->
+        <section id="stories" class="content-section">
+          <div class="section-header">
+            <h2>Success Stories</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('stories')"
+                id="undo-btn-stories"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('stories')"
+              >
+                <i class="fas fa-plus"></i> Add Story
+              </button>
+            </div>
+          </div>
+          <div class="items-grid" id="stories-grid"></div>
+        </section>
 
-            <!-- Locations -->
-            <section id="locations" class="content-section">
-                <div class="section-header">
-                    <h2>Global Locations</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('locations')" id="undo-btn-locations" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('locations')">
-                            <i class="fas fa-plus"></i> Add Location
-                        </button>
-                    </div>
-                </div>
-                <div class="items-grid" id="locations-grid"></div>
-            </section>
+        <!-- Locations -->
+        <section id="locations" class="content-section">
+          <div class="section-header">
+            <h2>Global Locations</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('locations')"
+                id="undo-btn-locations"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('locations')"
+              >
+                <i class="fas fa-plus"></i> Add Location
+              </button>
+            </div>
+          </div>
+          <div class="items-grid" id="locations-grid"></div>
+        </section>
 
-            <!-- Home Cards -->
-            <section id="home" class="content-section">
-                <div class="section-header">
-                    <h2>Home Page Cards</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('home')" id="undo-btn-home" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('home')">
-                            <i class="fas fa-plus"></i> Add Card
-                        </button>
-                    </div>
-                </div>
-                <div class="items-grid" id="home-grid"></div>
-            </section>
+        <!-- Home Cards -->
+        <section id="home" class="content-section">
+          <div class="section-header">
+            <h2>Home Page Cards</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('home')"
+                id="undo-btn-home"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('home')"
+              >
+                <i class="fas fa-plus"></i> Add Card
+              </button>
+            </div>
+          </div>
+          <div class="items-grid" id="home-grid"></div>
+        </section>
 
-            <!-- LinkedIn News -->
-            <section id="linkedin" class="content-section">
-                <div class="section-header">
-                    <h2>LinkedIn News Feed</h2>
-                    <div>
-                        <button type="button" class="btn btn-secondary" onclick="undoChanges('linkedin')" id="undo-btn-linkedin" style="display:none; margin-right: 8px;">
-                            <i class="fas fa-undo"></i> Undo Changes
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="openAddModal('linkedin')">
-                            <i class="fas fa-plus"></i> Add Post
-                        </button>
-                    </div>
-                </div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Manage LinkedIn posts that appear in your website's news feed.</p>
-                <div class="items-grid" id="linkedin-grid"></div>
-            </section>
+        <!-- LinkedIn News -->
+        <section id="linkedin" class="content-section">
+          <div class="section-header">
+            <h2>LinkedIn News Feed</h2>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="undoChanges('linkedin')"
+                id="undo-btn-linkedin"
+                style="display: none; margin-right: 8px"
+              >
+                <i class="fas fa-undo"></i> Undo Changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openAddModal('linkedin')"
+              >
+                <i class="fas fa-plus"></i> Add Post
+              </button>
+            </div>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 20px">
+            Manage LinkedIn posts that appear in your website's news feed.
+          </p>
+          <div class="items-grid" id="linkedin-grid"></div>
+        </section>
 
-            <!-- Page Content -->
-            <section id="content" class="content-section">
-                <div class="section-header">
-                    <h2>Page Content</h2>
-                    <button type="button" class="btn btn-primary" onclick="savePageContentAll()">
-                        <i class="fas fa-save"></i> Save Content
-                    </button>
-                </div>
+        <!-- Page Content -->
+        <section id="content" class="content-section">
+          <div class="section-header">
+            <h2>Page Content</h2>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="savePageContentAll()"
+            >
+              <i class="fas fa-save"></i> Save Content
+            </button>
+          </div>
 
-                <!-- Tab Bar -->
-                <div style="display:flex;gap:8px;margin-bottom:20px;">
-                    <button type="button" class="btn btn-primary content-tab" data-tab="home" onclick="switchContentTab('home')"><i class="fas fa-home"></i> Home</button>
-                    <button type="button" class="btn btn-secondary content-tab" data-tab="about" onclick="switchContentTab('about')"><i class="fas fa-building"></i> About</button>
-                    <button type="button" class="btn btn-secondary content-tab" data-tab="contact" onclick="switchContentTab('contact')"><i class="fas fa-envelope"></i> Contact</button>
-                </div>
+          <!-- Tab Bar -->
+          <div style="display: flex; gap: 8px; margin-bottom: 20px">
+            <button
+              type="button"
+              class="btn btn-primary content-tab"
+              data-tab="home"
+              onclick="switchContentTab('home')"
+            >
+              <i class="fas fa-home"></i> Home
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary content-tab"
+              data-tab="about"
+              onclick="switchContentTab('about')"
+            >
+              <i class="fas fa-building"></i> About
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary content-tab"
+              data-tab="contact"
+              onclick="switchContentTab('contact')"
+            >
+              <i class="fas fa-envelope"></i> Contact
+            </button>
+          </div>
 
-                <!-- HOME TAB -->
-                <div id="content-tab-home">
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-home"></i> Home Page Hero
-                        </h3>
-                        <div class="form-group">
-                            <label>Hero Title</label>
-                            <input type="text" class="form-control" id="content-hero-title">
-                        </div>
-                        <div class="form-group">
-                            <label>Hero Subtitle</label>
-                            <textarea class="form-control" id="content-hero-subtitle" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-chart-bar"></i> Stats Bar
-                        </h3>
-                        <div id="content-stats-list"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addStatRow()" style="margin-top:10px;">
-                            <i class="fas fa-plus"></i> Add Stat
-                        </button>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-tasks"></i> What We Do Section
-                        </h3>
-                        <div class="form-group">
-                            <label>Section Title</label>
-                            <input type="text" class="form-control" id="content-wwd-title">
-                        </div>
-                        <div class="form-group">
-                            <label>Section Subtitle</label>
-                            <input type="text" class="form-control" id="content-wwd-subtitle">
-                        </div>
-                        <div id="content-wwd-cards"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addWwdCard()" style="margin-top:10px;">
-                            <i class="fas fa-plus"></i> Add Card
-                        </button>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-project-diagram"></i> Featured Case Study
-                        </h3>
-                        <div class="form-group"><label>Label</label><input type="text" class="form-control" id="content-cs-label"></div>
-                        <div class="form-group"><label>Title</label><input type="text" class="form-control" id="content-cs-title"></div>
-                        <div class="form-group"><label>Description</label><textarea class="form-control" id="content-cs-desc" rows="3"></textarea></div>
-                        <div class="form-group" style="display:flex; gap:15px;">
-                            <div style="flex:1"><label>Image Path</label><input type="text" class="form-control" id="content-cs-image"></div>
-                            <div style="flex:1"><label>Link Text</label><input type="text" class="form-control" id="content-cs-link-text"></div>
-                        </div>
-                        <div class="form-group"><label>Link Href</label><input type="text" class="form-control" id="content-cs-link-href"></div>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-bullhorn"></i> Call to Action
-                        </h3>
-                        <div class="form-group"><label>CTA Title</label><input type="text" class="form-control" id="content-cta-title"></div>
-                        <div class="form-group"><label>CTA Description</label><textarea class="form-control" id="content-cta-desc" rows="2"></textarea></div>
-                        <div class="form-group" style="display:flex; gap:15px;">
-                            <div style="flex:1"><label>Primary Button Text</label><input type="text" class="form-control" id="content-cta-primary-text"></div>
-                            <div style="flex:1"><label>Primary Button Link</label><input type="text" class="form-control" id="content-cta-primary-href"></div>
-                        </div>
-                        <div class="form-group" style="display:flex; gap:15px;">
-                            <div style="flex:1"><label>Secondary Button Text</label><input type="text" class="form-control" id="content-cta-secondary-text"></div>
-                            <div style="flex:1"><label>Secondary Button Link</label><input type="text" class="form-control" id="content-cta-secondary-href"></div>
-                        </div>
-                    </div>
+          <!-- HOME TAB -->
+          <div id="content-tab-home">
+            <div class="item-card" style="max-width: 800px; margin: 0 auto 20px">
+              <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <i class="fas fa-sort"></i> Section Order
+                <span style="font-size:12px; font-weight:400; color:var(--text-muted); margin-left:8px;">Drag to reorder sections on the live page</span>
+              </h3>
+              <div id="section-order-list" class="section-order-list"></div>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-home"></i> Home Page Hero
+              </h3>
+              <div class="form-group">
+                <label>Hero Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="content-hero-title"
+                />
+              </div>
+              <div class="form-group">
+                <label>Hero Subtitle</label>
+                <textarea
+                  class="form-control"
+                  id="content-hero-subtitle"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-chart-bar"></i> Stats Bar
+              </h3>
+              <div id="content-stats-list"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addStatRow()"
+                style="margin-top: 10px"
+              >
+                <i class="fas fa-plus"></i> Add Stat
+              </button>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-tasks"></i> What We Do Section
+              </h3>
+              <div class="form-group">
+                <label>Section Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="content-wwd-title"
+                />
+              </div>
+              <div class="form-group">
+                <label>Section Subtitle</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="content-wwd-subtitle"
+                />
+              </div>
+              <div id="content-wwd-cards"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addWwdCard()"
+                style="margin-top: 10px"
+              >
+                <i class="fas fa-plus"></i> Add Card
+              </button>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-star"></i> Why Choose Us
+              </h3>
+              <div class="form-group">
+                <label>Section Title</label>
+                <input type="text" class="form-control" id="content-wc-title" />
+              </div>
+              <div class="form-group">
+                <label>Section Subtitle</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="content-wc-subtitle"
+                />
+              </div>
+              <div id="content-wc-reasons"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addWhyChooseReason()"
+                style="margin-top: 10px"
+              >
+                <i class="fas fa-plus"></i> Add Reason
+              </button>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-project-diagram"></i> Featured Case Study
+              </h3>
+              <div class="form-group">
+                <label>Label</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="content-cs-label"
+                />
+              </div>
+              <div class="form-group">
+                <label>Title</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="content-cs-title"
+                />
+              </div>
+              <div class="form-group">
+                <label>Description</label
+                ><textarea
+                  class="form-control"
+                  id="content-cs-desc"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="form-group" style="display: flex; gap: 15px">
+                <div style="flex: 1">
+                  <label>Image Path</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cs-image"
+                  />
                 </div>
+                <div style="flex: 1">
+                  <label>Link Text</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cs-link-text"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Link Href</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="content-cs-link-href"
+                />
+              </div>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-bullhorn"></i> Call to Action
+              </h3>
+              <div class="form-group">
+                <label>CTA Title</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="content-cta-title"
+                />
+              </div>
+              <div class="form-group">
+                <label>CTA Description</label
+                ><textarea
+                  class="form-control"
+                  id="content-cta-desc"
+                  rows="2"
+                ></textarea>
+              </div>
+              <div class="form-group" style="display: flex; gap: 15px">
+                <div style="flex: 1">
+                  <label>Primary Button Text</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cta-primary-text"
+                  />
+                </div>
+                <div style="flex: 1">
+                  <label>Primary Button Link</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cta-primary-href"
+                  />
+                </div>
+              </div>
+              <div class="form-group" style="display: flex; gap: 15px">
+                <div style="flex: 1">
+                  <label>Secondary Button Text</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cta-secondary-text"
+                  />
+                </div>
+                <div style="flex: 1">
+                  <label>Secondary Button Link</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="content-cta-secondary-href"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- ABOUT TAB -->
-                <div id="content-tab-about" style="display:none">
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-heading"></i> About Page Header
-                        </h3>
-                        <div class="form-group"><label>Page Title</label><input type="text" class="form-control" id="about-header-title"></div>
-                        <div class="form-group"><label>Page Subtitle</label><textarea class="form-control" id="about-header-subtitle" rows="2"></textarea></div>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-info-circle"></i> Who We Are
-                        </h3>
-                        <div class="form-group"><label>Section Title</label><input type="text" class="form-control" id="about-wwa-title"></div>
-                        <div class="form-group"><label>Description</label><textarea class="form-control" id="about-wwa-text" rows="6"></textarea></div>
-                        <div class="form-group" style="display:flex; gap:15px;">
-                            <div style="flex:1"><label>Image Path</label><input type="text" class="form-control" id="about-wwa-image"></div>
-                            <div style="flex:1"><label>Image Alt Text</label><input type="text" class="form-control" id="about-wwa-image-alt"></div>
-                        </div>
-                    </div>
+          <!-- ABOUT TAB -->
+          <div id="content-tab-about" style="display: none">
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-heading"></i> About Page Header
+              </h3>
+              <div class="form-group">
+                <label>Page Title</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="about-header-title"
+                />
+              </div>
+              <div class="form-group">
+                <label>Page Subtitle</label
+                ><textarea
+                  class="form-control"
+                  id="about-header-subtitle"
+                  rows="2"
+                ></textarea>
+              </div>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-info-circle"></i> Who We Are
+              </h3>
+              <div class="form-group">
+                <label>Section Title</label
+                ><input type="text" class="form-control" id="about-wwa-title" />
+              </div>
+              <div class="form-group">
+                <label>Description</label
+                ><textarea
+                  class="form-control"
+                  id="about-wwa-text"
+                  rows="6"
+                ></textarea>
+              </div>
+              <div class="form-group" style="display: flex; gap: 15px">
+                <div style="flex: 1">
+                  <label>Image Path</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="about-wwa-image"
+                  />
                 </div>
+                <div style="flex: 1">
+                  <label>Image Alt Text</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="about-wwa-image-alt"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- CONTACT TAB -->
-                <div id="content-tab-contact" style="display:none">
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-address-card"></i> Contact Info Cards
-                        </h3>
-                        <div id="contact-info-cards-list"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addContactInfoCard()" style="margin-top:10px;">
-                            <i class="fas fa-plus"></i> Add Info Card
-                        </button>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-question-circle"></i> FAQ
-                        </h3>
-                        <div id="contact-faq-list"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addContactFaq()" style="margin-top:10px;">
-                            <i class="fas fa-plus"></i> Add FAQ
-                        </button>
-                    </div>
-                    <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                        <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <i class="fas fa-cog"></i> Page Settings
-                        </h3>
-                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Auto-generated from page configuration. Changes here update the contact page automatically.</p>
-                        <div id="contact-config-editor"></div>
-                    </div>
-                </div>
-            </section>
+          <!-- CONTACT TAB -->
+          <div id="content-tab-contact" style="display: none">
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-address-card"></i> Contact Info Cards
+              </h3>
+              <div id="contact-info-cards-list"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addContactInfoCard()"
+                style="margin-top: 10px"
+              >
+                <i class="fas fa-plus"></i> Add Info Card
+              </button>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-question-circle"></i> FAQ
+              </h3>
+              <div id="contact-faq-list"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addContactFaq()"
+                style="margin-top: 10px"
+              >
+                <i class="fas fa-plus"></i> Add FAQ
+              </button>
+            </div>
+            <div
+              class="item-card"
+              style="max-width: 800px; margin: 0 auto 20px"
+            >
+              <h3
+                style="
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-cog"></i> Page Settings
+              </h3>
+              <p
+                style="
+                  font-size: 13px;
+                  color: var(--text-secondary);
+                  margin-bottom: 16px;
+                "
+              >
+                Auto-generated from page configuration. Changes here update the
+                contact page automatically.
+              </p>
+              <div id="contact-config-editor"></div>
+            </div>
+          </div>
+        </section>
 
-            <!-- Navigation & Footer -->
-            <section id="navigation" class="content-section">
-                <div class="section-header">
-                    <h2>Navigation & Footer</h2>
-                    <button type="button" class="btn btn-primary" onclick="saveNavigation()">
-                        <i class="fas fa-save"></i> Save Navigation
-                    </button>
-                </div>
-                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-link"></i> Navigation Links
-                    </h3>
-                    <div id="nav-links-list"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addNavLink()" style="margin-top:10px;">
-                        <i class="fas fa-plus"></i> Add Nav Link
-                    </button>
-                </div>
-                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-columns"></i> Footer
-                    </h3>
-                    <div class="form-group"><label>Tagline</label><input type="text" class="form-control" id="footer-tagline"></div>
-                    <div class="form-group"><label>LinkedIn URL</label><input type="text" class="form-control" id="footer-linkedin"></div>
-                    <div class="form-group"><label>Copyright Text</label><input type="text" class="form-control" id="footer-copyright"></div>
-                    <h4 style="margin:20px 0 10px;font-size:14px;color:var(--text-muted);">Quick Links</h4>
-                    <div id="footer-quick-links-list"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addFooterLink('quick')" style="margin-top:10px;margin-bottom:20px;">
-                        <i class="fas fa-plus"></i> Add Quick Link
-                    </button>
-                    <h4 style="margin:20px 0 10px;font-size:14px;color:var(--text-muted);">Company Links</h4>
-                    <div id="footer-company-links-list"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addFooterLink('company')" style="margin-top:10px;">
-                        <i class="fas fa-plus"></i> Add Company Link
-                    </button>
-                </div>
-                <div class="item-card" style="max-width: 800px; margin: 0 auto 20px;">
-                    <h3 style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <i class="fas fa-search"></i> Page SEO
-                    </h3>
-                    <div id="page-seo-list"></div>
-                </div>
-            </section>
+        <!-- Navigation & Footer -->
+        <section id="navigation" class="content-section">
+          <div class="section-header">
+            <h2>Navigation & Footer</h2>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="saveNavigation()"
+            >
+              <i class="fas fa-save"></i> Save Navigation
+            </button>
+          </div>
+          <div class="item-card" style="max-width: 800px; margin: 0 auto 20px">
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+              "
+            >
+              <i class="fas fa-link"></i> Navigation Links
+            </h3>
+            <div id="nav-links-list"></div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="addNavLink()"
+              style="margin-top: 10px"
+            >
+              <i class="fas fa-plus"></i> Add Nav Link
+            </button>
+          </div>
+          <div class="item-card" style="max-width: 800px; margin: 0 auto 20px">
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+              "
+            >
+              <i class="fas fa-columns"></i> Footer
+            </h3>
+            <div class="form-group">
+              <label>Tagline</label
+              ><input type="text" class="form-control" id="footer-tagline" />
+            </div>
+            <div class="form-group">
+              <label>LinkedIn URL</label
+              ><input type="text" class="form-control" id="footer-linkedin" />
+            </div>
+            <div class="form-group">
+              <label>Copyright Text</label
+              ><input type="text" class="form-control" id="footer-copyright" />
+            </div>
+            <h4
+              style="
+                margin: 20px 0 10px;
+                font-size: 14px;
+                color: var(--text-muted);
+              "
+            >
+              Quick Links
+            </h4>
+            <div id="footer-quick-links-list"></div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="addFooterLink('quick')"
+              style="margin-top: 10px; margin-bottom: 20px"
+            >
+              <i class="fas fa-plus"></i> Add Quick Link
+            </button>
+            <h4
+              style="
+                margin: 20px 0 10px;
+                font-size: 14px;
+                color: var(--text-muted);
+              "
+            >
+              Company Links
+            </h4>
+            <div id="footer-company-links-list"></div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="addFooterLink('company')"
+              style="margin-top: 10px"
+            >
+              <i class="fas fa-plus"></i> Add Company Link
+            </button>
+          </div>
+          <div class="item-card" style="max-width: 800px; margin: 0 auto 20px">
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+              "
+            >
+              <i class="fas fa-search"></i> Page SEO
+            </h3>
+            <div id="page-seo-list"></div>
+          </div>
+        </section>
 
-            <!-- Section Visibility -->
-            <section id="visibility" class="content-section">
-                <div class="section-header">
-                    <h2>Section Visibility</h2>
-                    <button type="button" class="btn btn-primary" onclick="saveVisibility()">
-                        <i class="fas fa-save"></i> Save Visibility
-                    </button>
-                </div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Toggle page sections on or off without deleting content.</p>
-                <div id="visibility-editor"></div>
-            </section>
+        <!-- Section Visibility -->
+        <section id="visibility" class="content-section">
+          <div class="section-header">
+            <h2>Section Visibility</h2>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="saveVisibility()"
+            >
+              <i class="fas fa-save"></i> Save Visibility
+            </button>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 20px">
+            Toggle page sections on or off without deleting content.
+          </p>
+          <div id="visibility-editor"></div>
+        </section>
 
-            <!-- System Health -->
-            <section id="health" class="content-section">
-                <div class="section-header">
-                    <h2>System Health & Broken Links</h2>
-                    <button type="button" class="btn btn-primary" id="run-scan-btn" onclick="runHealthScan()">
-                        <i class="fas fa-search"></i> Run Scan
-                    </button>
-                </div>
-                <div id="health-results" style="margin-top: 20px;">
-                    <div class="toast info" style="position:static; transform:none; max-width:100%; text-align:center;">
-                        Click "Run Scan" to check for broken links and data issues.
-                    </div>
-                </div>
-            </section>
+        <!-- System Health -->
+        <section id="health" class="content-section">
+          <div class="section-header">
+            <h2>System Health & Broken Links</h2>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="run-scan-btn"
+              onclick="runHealthScan()"
+            >
+              <i class="fas fa-search"></i> Run Scan
+            </button>
+          </div>
+          <div id="health-results" style="margin-top: 20px">
+            <div
+              class="toast info"
+              style="
+                position: static;
+                transform: none;
+                max-width: 100%;
+                text-align: center;
+              "
+            >
+              Click "Run Scan" to check for broken links and data issues.
+            </div>
+          </div>
+        </section>
 
-            <!-- Global Settings -->
-            <section id="settings" class="content-section">
-                <div class="section-header">
-                    <h2>Global Business Settings</h2>
-                    <button type="button" class="btn btn-primary" onclick="saveGlobalSettings()">
-                        <i class="fas fa-save"></i> Save Settings
-                    </button>
-                </div>
+        <!-- Global Settings -->
+        <section id="settings" class="content-section">
+          <div class="section-header">
+            <h2>Global Business Settings</h2>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="saveGlobalSettings()"
+            >
+              <i class="fas fa-save"></i> Save Settings
+            </button>
+          </div>
 
-                <div class="item-card" style="max-width: 800px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Form Destinations</h3>
-                    <div class="form-group">
-                        <label>General Enquiries Email (Contact Form)</label>
-                        <input type="text" class="form-control" id="form-contact-email" placeholder="geminibaba1@gmail.com">
-                        <small class="text-muted-sm"><i class="fas fa-info-circle"></i> Destination for contact form.</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Careers Email (Job Application Form)</label>
-                        <input type="text" class="form-control" id="form-careers-email" placeholder="geminibaba1@gmail.com">
-                        <small class="text-muted-sm"><i class="fas fa-info-circle"></i> Destination for careers form.</small>
-                    </div>
+          <div class="item-card" style="max-width: 800px; margin: 0 auto">
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+              "
+            >
+              Form Destinations
+            </h3>
+            <div class="form-group">
+              <label>General Enquiries Email (Contact Form)</label>
+              <input
+                type="text"
+                class="form-control"
+                id="form-contact-email"
+                placeholder="geminibaba1@gmail.com"
+              />
+              <small class="text-muted-sm"
+                ><i class="fas fa-info-circle"></i> Destination for contact
+                form.</small
+              >
+            </div>
+            <div class="form-group">
+              <label>Careers Email (Job Application Form)</label>
+              <input
+                type="text"
+                class="form-control"
+                id="form-careers-email"
+                placeholder="geminibaba1@gmail.com"
+              />
+              <small class="text-muted-sm"
+                ><i class="fas fa-info-circle"></i> Destination for careers
+                form.</small
+              >
+            </div>
 
-                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px;">Contact Information</h3>
-                    <div class="form-group">
-                        <label>Company Address</label>
-                        <textarea class="form-control" id="setting-address" placeholder="Full address..."></textarea>
-                    </div>
-                    <div class="form-group" style="display:flex; gap:15px;">
-                        <div style="flex:1">
-                            <label>Phone Number</label>
-                            <input type="text" class="form-control" id="setting-phone" placeholder="+91 ...">
-                        </div>
-                        <div style="flex:1">
-                            <label>Email Address</label>
-                            <input type="text" class="form-control" id="setting-email" placeholder="info@tridel...or sales@tridel...">
-                        </div>
-                    </div>
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+                margin-top: 30px;
+              "
+            >
+              Contact Information
+            </h3>
+            <div class="form-group">
+              <label>Company Address</label>
+              <textarea
+                class="form-control"
+                id="setting-address"
+                placeholder="Full address..."
+              ></textarea>
+            </div>
+            <div class="form-group" style="display: flex; gap: 15px">
+              <div style="flex: 1">
+                <label>Phone Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="setting-phone"
+                  placeholder="+91 ..."
+                />
+              </div>
+              <div style="flex: 1">
+                <label>Email Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="setting-email"
+                  placeholder="info@tridel...or sales@tridel..."
+                />
+              </div>
+            </div>
 
-                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px;">Social Media Links</h3>
-                    <div class="form-group">
-                        <label><i class="fab fa-linkedin" style="color:#0077b5;"></i> LinkedIn URL</label>
-                        <input type="text" class="form-control" id="setting-linkedin" placeholder="https://linkedin.com/company/...">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube URL</label>
-                        <input type="text" class="form-control" id="setting-youtube" placeholder="https://youtube.com/...">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fab fa-instagram" style="color:#e4405f;"></i> Instagram URL</label>
-                        <input type="text" class="form-control" id="setting-instagram" placeholder="https://instagram.com/...">
-                    </div>
-                </div>
-            </section>
-        </main>
+            <h3
+              style="
+                margin-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 10px;
+                margin-top: 30px;
+              "
+            >
+              Social Media Links
+            </h3>
+            <div class="form-group">
+              <label
+                ><i class="fab fa-linkedin" style="color: #0077b5"></i> LinkedIn
+                URL</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="setting-linkedin"
+                placeholder="https://linkedin.com/company/..."
+              />
+            </div>
+            <div class="form-group">
+              <label
+                ><i class="fab fa-youtube" style="color: #ff0000"></i> YouTube
+                URL</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="setting-youtube"
+                placeholder="https://youtube.com/..."
+              />
+            </div>
+            <div class="form-group">
+              <label
+                ><i class="fab fa-instagram" style="color: #e4405f"></i>
+                Instagram URL</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="setting-instagram"
+                placeholder="https://instagram.com/..."
+              />
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
 
     <!-- Edit Modal -->
     <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-title">Add Item</h3>
-                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="modal-body"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="showPreview()" id="preview-btn">
-                    <i class="fas fa-eye"></i> Preview
-                </button>
-                <button type="button" class="btn btn-success" onclick="saveItem()">
-                    <i class="fas fa-save"></i> Save
-                </button>
-            </div>
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Add Item</h3>
+          <button type="button" class="modal-close" onclick="closeModal()">
+            &times;
+          </button>
         </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="showPreview()"
+            id="preview-btn"
+          >
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <button type="button" class="btn btn-success" onclick="saveItem()">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Toast Container -->
@@ -569,61 +1389,119 @@
 
     <!-- Preview Modal -->
     <div class="modal-overlay" id="preview-overlay">
-        <div class="modal" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3><i class="fas fa-eye"></i> Preview</h3>
-                <button type="button" class="modal-close" onclick="closePreview()">&times;</button>
-            </div>
-            <div class="modal-body" id="preview-body" style="padding: 0;"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closePreview()">Close Preview</button>
-            </div>
+      <div class="modal" style="max-width: 600px">
+        <div class="modal-header">
+          <h3><i class="fas fa-eye"></i> Preview</h3>
+          <button type="button" class="modal-close" onclick="closePreview()">
+            &times;
+          </button>
         </div>
+        <div class="modal-body" id="preview-body" style="padding: 0"></div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closePreview()"
+          >
+            Close Preview
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- GitHub Config Modal -->
     <div class="modal-overlay" id="github-config-overlay">
-        <div class="modal" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3><i class="fab fa-github"></i> GitHub Configuration</h3>
-                <button type="button" class="modal-close" onclick="closeGitHubConfig()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    Configure GitHub API to save changes directly to your repository.
-                </p>
-                <div class="form-group">
-                    <label>GitHub Username/Owner</label>
-                    <input type="text" class="form-control" id="github-owner" placeholder="e.g. EnochMacwan" value="EnochMacwan">
-                </div>
-                <div class="form-group">
-                    <label>Repository Name</label>
-                    <input type="text" class="form-control" id="github-repo" placeholder="e.g. Tridel" value="Tridel">
-                </div>
-                <div class="form-group">
-                    <label>Branch</label>
-                    <input type="text" class="form-control" id="github-branch" placeholder="e.g. main" value="main">
-                </div>
-                <div class="form-group">
-                    <label>Personal Access Token</label>
-                    <input type="password" class="form-control" id="github-token" placeholder="ghp_xxxx or github_pat_xxxx">
-                    <small style="color: var(--text-muted); display: block; margin-top: 8px;">
-                        <i class="fas fa-info-circle"></i> Get token at:
-                        <a href="https://github.com/settings/tokens" target="_blank" style="color: var(--accent);">github.com/settings/tokens</a>
-                    </small>
-                </div>
-                <div id="github-status" style="margin-top: 16px;"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeGitHubConfig()">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="testGitHubConnection()">
-                    <i class="fas fa-plug"></i> Test Connection
-                </button>
-                <button type="button" class="btn btn-success" onclick="saveGitHubConfig()">
-                    <i class="fas fa-save"></i> Save
-                </button>
-            </div>
+      <div class="modal" style="max-width: 500px">
+        <div class="modal-header">
+          <h3><i class="fab fa-github"></i> GitHub Configuration</h3>
+          <button
+            type="button"
+            class="modal-close"
+            onclick="closeGitHubConfig()"
+          >
+            &times;
+          </button>
         </div>
+        <div class="modal-body">
+          <p style="color: var(--text-muted); margin-bottom: 20px">
+            Configure GitHub API to save changes directly to your repository.
+          </p>
+          <div class="form-group">
+            <label>GitHub Username/Owner</label>
+            <input
+              type="text"
+              class="form-control"
+              id="github-owner"
+              placeholder="e.g. EnochMacwan"
+              value="EnochMacwan"
+            />
+          </div>
+          <div class="form-group">
+            <label>Repository Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="github-repo"
+              placeholder="e.g. Tridel"
+              value="Tridel"
+            />
+          </div>
+          <div class="form-group">
+            <label>Branch</label>
+            <input
+              type="text"
+              class="form-control"
+              id="github-branch"
+              placeholder="e.g. main"
+              value="main"
+            />
+          </div>
+          <div class="form-group">
+            <label>Personal Access Token</label>
+            <input
+              type="password"
+              class="form-control"
+              id="github-token"
+              placeholder="ghp_xxxx or github_pat_xxxx"
+            />
+            <small
+              style="color: var(--text-muted); display: block; margin-top: 8px"
+            >
+              <i class="fas fa-info-circle"></i> Get token at:
+              <a
+                href="https://github.com/settings/tokens"
+                target="_blank"
+                style="color: var(--accent)"
+                >github.com/settings/tokens</a
+              >
+            </small>
+          </div>
+          <div id="github-status" style="margin-top: 16px"></div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeGitHubConfig()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="testGitHubConnection()"
+          >
+            <i class="fas fa-plug"></i> Test Connection
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="saveGitHubConfig()"
+          >
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Data Files -->
@@ -645,5 +1523,5 @@
 
     <!-- Admin Logic -->
     <script src="assets/js/admin.js"></script>
-</body>
+  </body>
 </html>

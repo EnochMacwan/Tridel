@@ -15,11 +15,10 @@ window.renderSuccessStories = function(container) {
     if (!container) container = document.getElementById('dynamic-success-stories');
     // Support both variable names
     const data = typeof SUCCESS_STORIES_DATA !== 'undefined' ? SUCCESS_STORIES_DATA : (typeof successStoriesData !== 'undefined' ? successStoriesData : null);
-    if (!data) {
+    if (!data || !container) {
         if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
-    if (!container) return;
 
     container.innerHTML = '';
 
@@ -48,7 +47,7 @@ window.renderSuccessStories = function(container) {
                 <div class="grid-card-wrapper">
                     <div class="grid-card-visual">
                         <img loading="lazy" alt="${escapeHtml(story.title)}" class="story-card__image"
-                            src="${story.image}">
+                            src="${escapeHtml(story.image || 'assets/images/logo/tridel.png')}">
                     </div>
                     <div class="grid-content-outside">
                         <h3 class="story-card__title">

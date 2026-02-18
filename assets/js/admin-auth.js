@@ -5,8 +5,9 @@
  */
 
 const AdminAuth = {
-    // SHA-256 Hash of 'tridel2026'
-    HASH: 'd4de1e781e29cf9ea1e9fbe380017478bfb37554d53a9094a836e22e2b605c7c',
+    // Fallback hash for offline/GitHub Pages mode only (server-side auth is preferred)
+    // SHA-256 Hash of 'tridel2026' — used ONLY when server is unreachable
+    FALLBACK_HASH: 'd4de1e781e29cf9ea1e9fbe380017478bfb37554d53a9094a836e22e2b605c7c',
     SESSION_KEY: 'tridel_secure_session_v1',
 
     init() {
@@ -25,25 +26,54 @@ const AdminAuth = {
     },
 
     async sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return hashHex;
+        // crypto.subtle requires a secure context (HTTPS or localhost)
+        if (window.crypto && window.crypto.subtle) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        // Reject non-secure contexts instead of using a weak fallback
+        throw new Error('Secure context required. Admin login requires HTTPS — deploy over HTTPS for proper security.');
     },
 
     async login(password) {
         try {
+            // Strategy 1: Try server-side auth first (preferred — uses env var password)
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.token) {
+                        sessionStorage.setItem('adminToken', data.token);
+                    }
+                    sessionStorage.setItem(this.SESSION_KEY, 'auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+                    this.removeModal();
+                    this.showContent();
+                    return true;
+                }
+                if (res.status === 401 || res.status === 429) {
+                    return false; // Server says wrong password or rate limited
+                }
+            } catch (networkErr) {
+                // Server not available — fall through to client-side fallback
+                console.warn('Server unreachable, falling back to client-side auth.');
+            }
+
+            // Strategy 2: Client-side fallback (for GitHub Pages / offline mode)
             const hash = await this.sha256(password);
-            if (hash === this.HASH) {
-                // Store a "token" (timestamp) instead of just true
+            if (hash === this.FALLBACK_HASH) {
                 sessionStorage.setItem(this.SESSION_KEY, 'auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
                 this.removeModal();
                 this.showContent();
                 return true;
             }
         } catch (e) {
-            console.error("Auth Error:", e);
+            // Auth error handled silently — returning false below
         }
         return false;
     },

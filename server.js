@@ -103,6 +103,23 @@ function sanitizeObject(obj) {
     return cleaned;
 }
 
+// Check nesting depth to prevent DoS via deeply nested payloads
+function checkDepth(obj, maxDepth, currentDepth) {
+    currentDepth = currentDepth || 0;
+    if (currentDepth > maxDepth) return false;
+    if (obj === null || typeof obj !== 'object') return true;
+    if (Array.isArray(obj)) {
+        for (var i = 0; i < obj.length; i++) {
+            if (!checkDepth(obj[i], maxDepth, currentDepth + 1)) return false;
+        }
+    } else {
+        for (const key of Object.keys(obj)) {
+            if (!checkDepth(obj[key], maxDepth, currentDepth + 1)) return false;
+        }
+    }
+    return true;
+}
+
 // Generate session token
 function generateToken() {
     return crypto.randomBytes(32).toString('hex');
@@ -128,6 +145,9 @@ app.use((req, res, next) => {
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    // HSTS: enforce HTTPS for 1 year (only effective when served over HTTPS)
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    // CSP: Add domains to frame-src as needed when embedding new iframe sources
     res.setHeader(
         'Content-Security-Policy',
         "default-src 'self'; " +
@@ -135,6 +155,7 @@ app.use((req, res, next) => {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " +
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com; " +
+        "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com; " +
         "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com"
     );
     next();
@@ -167,7 +188,7 @@ app.use(cors({
     }
 }));
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '2mb' }));
 app.use(express.static('.'));  // Serve static files from current directory
 
 // ============================================
@@ -280,8 +301,8 @@ app.get('/api/data/:type', requireAuth, (req, res) => {
 
     try {
         const content = fs.readFileSync(filePath, 'utf8');
-        // Extract JSON from JS const declaration (arrays or objects)
-        const match = content.match(/const\s+\w+\s*=\s*([\[{][\s\S]*[\]}]);?/);
+        // Extract JSON from JS const/var declaration (arrays or objects)
+        const match = content.match(/(?:const|var|let)\s+\w+\s*=\s*([\[{][\s\S]*[\]}]);?/);
         if (match) {
             const data = JSON.parse(match[1]);
             res.json(data);
@@ -310,6 +331,16 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
         return res.status(400).json({ error: 'Invalid data format: expected an array or object' });
     }
 
+    // Depth check: prevent deeply nested payloads from causing stack overflow
+    if (!checkDepth(rawData, 10)) {
+        return res.status(400).json({ error: 'Payload too deeply nested (max 10 levels)' });
+    }
+
+    // Array length check: prevent excessively large payloads
+    if (Array.isArray(rawData) && rawData.length > 500) {
+        return res.status(400).json({ error: 'Too many items (max 500)' });
+    }
+
     try {
         const data = sanitizeObject(rawData);
         let content;
@@ -330,6 +361,10 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
             lines.push(`var INDEX_CASE_STUDY = ${JSON.stringify(data.INDEX_CASE_STUDY || {}, null, 2)};`);
             lines.push('');
             lines.push(`var INDEX_CTA = ${JSON.stringify(data.INDEX_CTA || {}, null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_WHY_CHOOSE = ${JSON.stringify(data.INDEX_WHY_CHOOSE || {}, null, 2)};`);
+            lines.push('');
+            lines.push(`var INDEX_SECTION_ORDER = ${JSON.stringify(data.INDEX_SECTION_ORDER || [], null, 2)};`);
             lines.push('');
             content = lines.join('\n');
         } else if (type === 'about_content') {
@@ -381,7 +416,7 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
         res.json({ success: true, message: `${type} saved successfully`, count });
     } catch (err) {
         console.error(`Error saving ${type}:`, err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Failed to save data. Check server logs for details.' });
     }
 });
 
@@ -392,7 +427,7 @@ app.get('/api/all-data', requireAuth, (req, res) => {
     for (const [type, filePath] of Object.entries(DATA_FILES)) {
         try {
             const content = fs.readFileSync(filePath, 'utf8');
-            const match = content.match(/const\s+\w+\s*=\s*([\[{][\s\S]*[\]}]);?/);
+            const match = content.match(/(?:const|var|let)\s+\w+\s*=\s*([\[{][\s\S]*[\]}]);?/);
             allData[type] = match ? JSON.parse(match[1]) : [];
         } catch (err) {
             allData[type] = [];
@@ -413,6 +448,9 @@ app.post('/api/save-all', requireAuth, (req, res) => {
         }
     }
 
+    // Multi-var file types that need special serialization
+    const MULTI_VAR_TYPES = new Set(['index_content', 'about_content', 'contact_content', 'layout']);
+
     for (const [type, rawData] of Object.entries(req.body)) {
         const filePath = DATA_FILES[type];
         const varName = VAR_NAMES[type];
@@ -426,7 +464,50 @@ app.post('/api/save-all', requireAuth, (req, res) => {
 
             try {
                 const data = sanitizeObject(rawData);
-                const content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+                let content;
+
+                if (MULTI_VAR_TYPES.has(type)) {
+                    // Delegate to the same logic as POST /api/data/:type
+                    // Re-use the individual save endpoint's serialization
+                    if (type === 'index_content') {
+                        const lines = ['/**', ' * Index / Home Page Data', ' */'];
+                        lines.push(`var INDEX_HERO = ${JSON.stringify(data.INDEX_HERO || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_STATS = ${JSON.stringify(data.INDEX_STATS || [], null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_WHAT_WE_DO = ${JSON.stringify(data.INDEX_WHAT_WE_DO || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_CASE_STUDY = ${JSON.stringify(data.INDEX_CASE_STUDY || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_CTA = ${JSON.stringify(data.INDEX_CTA || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_WHY_CHOOSE = ${JSON.stringify(data.INDEX_WHY_CHOOSE || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var INDEX_SECTION_ORDER = ${JSON.stringify(data.INDEX_SECTION_ORDER || [], null, 2)};`);
+                        content = lines.join('\n');
+                    } else if (type === 'about_content') {
+                        content = `/**\n * About Page Data\n */\nvar ABOUT_DATA = ${JSON.stringify(data, null, 2)};\n`;
+                    } else if (type === 'contact_content') {
+                        const lines = ['/**', ' * Contact Page Data', ' */'];
+                        lines.push(`var CONTACT_INFO_CARDS = ${JSON.stringify(data.CONTACT_INFO_CARDS || [], null, 2)};`);
+                        lines.push('');
+                        lines.push(`var CONTACT_FAQ_DATA = ${JSON.stringify(data.CONTACT_FAQ_DATA || [], null, 2)};`);
+                        lines.push('');
+                        lines.push(`var CONTACT_PAGE_CONFIG = ${JSON.stringify(data.CONTACT_PAGE_CONFIG || {}, null, 2)};`);
+                        content = lines.join('\n');
+                    } else if (type === 'layout') {
+                        const lines = ['/**', ' * Layout Data', ' */'];
+                        lines.push(`var NAV_LINKS = ${JSON.stringify(data.NAV_LINKS || [], null, 2)};`);
+                        lines.push('');
+                        lines.push(`var FOOTER_DATA = ${JSON.stringify(data.FOOTER_DATA || {}, null, 2)};`);
+                        lines.push('');
+                        lines.push(`var PAGE_META = ${JSON.stringify(data.PAGE_META || {}, null, 2)};`);
+                        content = lines.join('\n');
+                    }
+                } else {
+                    content = `const ${varName} = ${JSON.stringify(data, null, 2)};`;
+                }
+
                 fs.writeFileSync(filePath, content, 'utf8');
                 const count = Array.isArray(data) ? data.length : 1;
                 results[type] = { success: true, count };
