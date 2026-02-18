@@ -386,7 +386,7 @@
           markers[id].setIcon(pinActive);
           markers[id].setZIndexOffset(1000);
           var ll = markers[id].getLatLng();
-          map.flyTo(ll, 8, { animate: true, duration: 1.2 });
+          map.flyTo(ll, 8, { animate: true, duration: 1200 });
         }
 
         var escapedId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(id) : id.replace(/(["\\])/g, '\\$1');
@@ -462,14 +462,14 @@
   }
 
   function validateField(input) {
-    var value = input.value.trim();
+    var value = (input.value || '').trim();
     var isValid = true;
 
     if (input.hasAttribute('required') && !value) {
       isValid = false;
     }
     if (input.type === 'email' && value) {
-      isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      isValid = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
     }
 
     if (isValid) {

@@ -844,10 +844,10 @@ function renderItemCard(type, item, index, isChild) {
         '<div class="item-header-content">' +
         (!isChild ? '<input type="checkbox" class="checkbox-sm" ' +
             (isSelected ? 'checked' : '') +
-            ' onchange="toggleSelection(\'' + type + '\', ' + index + ', this.checked)">' : '') +
+            ' onchange="toggleSelection(\'' + escapeHTML(type) + '\', ' + index + ', this.checked)">' : '') +
         (!isChild ? '<i class="fas fa-grip-vertical drag-handle drag-handle-icon"></i>' : '') +
         '<div>' +
-        '<h3>' + title + ' ' + badge + '</h3>' +
+        '<h3>' + escapeHTML(title) + ' ' + badge + '</h3>' +
         '<span class="category">' + category + '</span>' +
         '</div>' +
         '</div>' +
@@ -1014,28 +1014,29 @@ function renderLinkedIn() {
     }).join('') + '</div>';
 }
 
-function renderTeam() {
-    var grid = document.getElementById('team-grid');
+function renderDataGrid(type, dataVarName, gridId) {
+    var grid = document.getElementById(gridId);
     if (!grid) return;
 
-    if (typeof TEAM_DATA === 'undefined') {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TEAM_DATA is not defined.</div>';
+    var data = window[dataVarName];
+    if (typeof data === 'undefined') {
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + dataVarName + ' is not defined.</div>';
         return;
     }
 
-    if (!Array.isArray(TEAM_DATA)) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TEAM_DATA is not an array.</div>';
+    if (!Array.isArray(data)) {
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + dataVarName + ' is not an array.</div>';
         return;
     }
 
-    if (TEAM_DATA.length === 0) {
-        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No team members found.</div>';
+    if (data.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No items found.</div>';
         return;
     }
 
     try {
         grid.innerHTML = '<div class="items-grid">' +
-            TEAM_DATA.map(function (member, i) { return renderItemCard('team', member, i); }).join('') +
+            data.map(function (item, i) { return renderItemCard(type, item, i); }).join('') +
             '</div>';
 
         if (typeof Sortable !== 'undefined') {
@@ -1048,59 +1049,25 @@ function renderTeam() {
                         var oldIndex = evt.oldIndex;
                         var newIndex = evt.newIndex;
                         if (oldIndex !== newIndex) {
-                            var item = TEAM_DATA.splice(oldIndex, 1)[0];
-                            TEAM_DATA.splice(newIndex, 0, item);
-                            markAsPending('team');
+                            var item = data.splice(oldIndex, 1)[0];
+                            data.splice(newIndex, 0, item);
+                            markAsPending(type);
                         }
                     }
                 });
             }
         }
     } catch (e) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error rendering cards: ' + escapeHTML(e.message) + '</div>';
+        grid.innerHTML = '<div style="color:red; padding:20px;">Error rendering grid: ' + escapeHTML(e.message) + '</div>';
     }
 }
 
+function renderTeam() {
+    renderDataGrid('team', 'TEAM_DATA', 'team-grid');
+}
+
 function renderTestimonials() {
-    var grid = document.getElementById('testimonials-grid');
-    if (!grid) return;
-
-    if (typeof TESTIMONIALS_DATA === 'undefined') {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: TESTIMONIALS_DATA is not defined.</div>';
-        return;
-    }
-
-    if (TESTIMONIALS_DATA.length === 0) {
-        grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">No testimonials found.</div>';
-        return;
-    }
-
-    try {
-        grid.innerHTML = '<div class="items-grid">' +
-            TESTIMONIALS_DATA.map(function (item, i) { return renderItemCard('testimonials', item, i); }).join('') +
-            '</div>';
-
-        if (typeof Sortable !== 'undefined') {
-            var container = grid.querySelector('.items-grid');
-            if (container) {
-                new Sortable(container, {
-                    animation: 150,
-                    handle: '.drag-handle',
-                    onEnd: function (evt) {
-                        var oldIndex = evt.oldIndex;
-                        var newIndex = evt.newIndex;
-                        if (oldIndex !== newIndex) {
-                            var item = TESTIMONIALS_DATA.splice(oldIndex, 1)[0];
-                            TESTIMONIALS_DATA.splice(newIndex, 0, item);
-                            markAsPending('testimonials');
-                        }
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        grid.innerHTML = '<div style="color:red; padding:20px;">Error: ' + escapeHTML(e.message) + '</div>';
-    }
+    renderDataGrid('testimonials', 'TESTIMONIALS_DATA', 'testimonials-grid');
 }
 
 // ==========================================
