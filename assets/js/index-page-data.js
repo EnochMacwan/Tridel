@@ -80,3 +80,43 @@ var INDEX_CTA = {
     "href": "#/products"
   }
 };
+
+var INDEX_WHY_CHOOSE = {
+  "title": "Why Choose Tridel Technologies?",
+  "subtitle": "We don't just deliver solutions — we build lasting partnerships rooted in trust, innovation, and excellence.",
+  "reasons": [
+    {
+      "icon": "fa-handshake",
+      "title": "Client‑First Approach",
+      "desc": "We listen, adapt, and deliver solutions that align with your unique goals."
+    },
+    {
+      "icon": "fa-award",
+      "title": "Proven Expertise",
+      "desc": "Our team brings deep industry experience and technical mastery."
+    },
+    {
+      "icon": "fa-lightbulb",
+      "title": "Innovative Solutions",
+      "desc": "We leverage the latest technologies to drive transformation — not just maintain status quo."
+    },
+    {
+      "icon": "fa-gem",
+      "title": "Commitment to Quality",
+      "desc": "From concept to delivery, excellence is our standard."
+    }
+  ]
+};
+
+var INDEX_SECTION_ORDER = [
+  "hero",
+  "stats",
+  "highlights",
+  "whatWeDo",
+  "whyChoose",
+  "news",
+  "clients",
+  "caseStudy",
+  "cta",
+  "testimonialMap"
+];
