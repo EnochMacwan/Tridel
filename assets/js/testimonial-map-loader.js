@@ -17,10 +17,12 @@
 var _mapTimer = null;
 var _mapInstance = null;
 var _tmThemeHandler = null;
+var _mapDestroyed = false;
 
 window.cleanupTestimonialMap = function() {
+  _mapDestroyed = true;
   if (_mapTimer) { clearInterval(_mapTimer); _mapTimer = null; }
-  if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
+  if (_mapInstance) { try { _mapInstance.remove(); } catch(e) { /* already removed */ } _mapInstance = null; }
   if (_tmThemeHandler) { window.removeEventListener('themeChanged', _tmThemeHandler); _tmThemeHandler = null; }
 };
 
@@ -28,6 +30,7 @@ window.renderTestimonialMap = function(container) {
   if (!container) container = document.getElementById('testimonial-map-root');
   if (!container) return;
   window.cleanupTestimonialMap();
+  _mapDestroyed = false;
 
   // --- Build DOM ---
   container.innerHTML = '';
@@ -116,10 +119,16 @@ window.renderTestimonialMap = function(container) {
     fetch('https://raw.githubusercontent.com/datameet/maps/master/Country/india-composite.geojson')
       .then(function (r) { return r.json(); })
       .then(function (data) {
+        // Guard: map may have been destroyed if user navigated away
+        if (_mapDestroyed || !_mapInstance) return;
+        try {
+          var containerEl = map.getContainer();
+          if (!containerEl || !containerEl.parentNode) return;
+        } catch(e) { return; }
         geoJsonLayer = L.geoJSON(data, { style: { color: '#cbd5e0', weight: 1.5, opacity: 0.8, fillOpacity: 0 } }).addTo(map);
         updateMapTheme(document.documentElement.getAttribute('data-theme') || 'light');
       })
-      .catch(function (err) { console.log('Error loading India GeoJSON:', err); });
+      .catch(function (err) { console.warn('India GeoJSON load skipped:', err.message || err); });
 
     // Testimonials
     var testimonials = typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA : [];

@@ -25,7 +25,7 @@
     if (isSectionVisible('services', 'grid'))
     html +=
       '<div id="dynamic-services-container">' +
-        '<div style="text-align: center; padding: 50px;">' +
+        '<div class="loading-state">' +
           '<span role="status" aria-live="polite"><i class="fas fa-spinner fa-spin fa-2x"></i> Loading Services...</span>' +
         '</div>' +
       '</div>';

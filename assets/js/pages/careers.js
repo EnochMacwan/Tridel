@@ -22,7 +22,7 @@
     });
 
     // EOI Form section
-    if (isSectionVisible('careers', 'listings'))
+    if (isSectionVisible('careers', 'listings')) {
     html +=
       '<section class="section" id="eoi-form">' +
         '<div class="container form-container">' +
@@ -102,6 +102,7 @@
     });
 
     html += '</div></section>';
+    } // end isSectionVisible
 
     mainEl.innerHTML = html;
 

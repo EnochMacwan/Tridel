@@ -197,7 +197,7 @@
           '<div class="contact-info-icon"><i class="fab fa-linkedin"></i></div>' +
           '<div>' +
             '<h4>LinkedIn</h4>' +
-            '<span class="contact-link-item">' + esc(enquiry.linkedin || '') + '</span>' +
+            '<a href="' + esc(enquiry.linkedin || '#') + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(enquiry.linkedin || 'Follow us on LinkedIn') + '</a>' +
           '</div>' +
         '</div>' +
       '</div>';

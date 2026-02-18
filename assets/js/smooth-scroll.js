@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
 
-        console.log("Tridel Smooth Scroll Active");
+    } else {
+        // Lenis not loaded — Smooth scroll unavailable
     }
 });

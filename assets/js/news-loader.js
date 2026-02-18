@@ -52,6 +52,7 @@ window.renderNewsFeed = function (container) {
             'allowfullscreen ' +
             'title="LinkedIn Update" ' +
             'loading="lazy" ' +
+            'sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" ' +
             'class="linkedin-embed-card__iframe"' +
             '></iframe>';
 
