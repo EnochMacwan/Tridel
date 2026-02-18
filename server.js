@@ -103,6 +103,23 @@ function sanitizeObject(obj) {
     return cleaned;
 }
 
+// Check nesting depth to prevent DoS via deeply nested payloads
+function checkDepth(obj, maxDepth, currentDepth) {
+    currentDepth = currentDepth || 0;
+    if (currentDepth > maxDepth) return false;
+    if (obj === null || typeof obj !== 'object') return true;
+    if (Array.isArray(obj)) {
+        for (var i = 0; i < obj.length; i++) {
+            if (!checkDepth(obj[i], maxDepth, currentDepth + 1)) return false;
+        }
+    } else {
+        for (const key of Object.keys(obj)) {
+            if (!checkDepth(obj[key], maxDepth, currentDepth + 1)) return false;
+        }
+    }
+    return true;
+}
+
 // Generate session token
 function generateToken() {
     return crypto.randomBytes(32).toString('hex');
@@ -128,6 +145,8 @@ app.use((req, res, next) => {
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    // HSTS: enforce HTTPS for 1 year (only effective when served over HTTPS)
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     // CSP: Add domains to frame-src as needed when embedding new iframe sources
     res.setHeader(
         'Content-Security-Policy',
@@ -169,7 +188,7 @@ app.use(cors({
     }
 }));
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '2mb' }));
 app.use(express.static('.'));  // Serve static files from current directory
 
 // ============================================
@@ -310,6 +329,16 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
     const rawData = req.body;
     if (rawData === null || rawData === undefined || typeof rawData === 'string' || typeof rawData === 'number' || typeof rawData === 'boolean') {
         return res.status(400).json({ error: 'Invalid data format: expected an array or object' });
+    }
+
+    // Depth check: prevent deeply nested payloads from causing stack overflow
+    if (!checkDepth(rawData, 10)) {
+        return res.status(400).json({ error: 'Payload too deeply nested (max 10 levels)' });
+    }
+
+    // Array length check: prevent excessively large payloads
+    if (Array.isArray(rawData) && rawData.length > 500) {
+        return res.status(400).json({ error: 'Too many items (max 500)' });
     }
 
     try {

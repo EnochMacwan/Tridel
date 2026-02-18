@@ -33,16 +33,8 @@ const AdminAuth = {
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
-        // Fallback: basic hash for non-secure contexts (e.g. HTTP deployment)
-        // WARNING: This is NOT cryptographically secure — only a deterrent
-        console.warn('crypto.subtle unavailable (non-HTTPS context). Using fallback hash — deploy over HTTPS for proper security.');
-        let hash = 0;
-        for (let i = 0; i < message.length; i++) {
-            const char = message.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash |= 0; // Convert to 32bit integer
-        }
-        return 'fallback_' + Math.abs(hash).toString(16);
+        // Reject non-secure contexts instead of using a weak fallback
+        throw new Error('Secure context required. Admin login requires HTTPS — deploy over HTTPS for proper security.');
     },
 
     async login(password) {

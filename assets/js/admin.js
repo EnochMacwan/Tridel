@@ -328,25 +328,32 @@ async function saveToGitHub(type, data) {
         fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
     }
 
-    // 1. Get current SHA
+    // 1. Get current SHA (with timeout)
     var apiUrl = 'https://api.github.com/repos/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/contents/' + filePath;
 
     var sha = null;
     try {
+        var getController = new AbortController();
+        var getTimeout = setTimeout(function() { getController.abort(); }, 30000);
         var getRes = await fetch(apiUrl, {
             headers: {
                 'Authorization': 'token ' + gitHubConfig.token,
                 'Accept': 'application/vnd.github.v3+json'
-            }
+            },
+            signal: getController.signal
         });
+        clearTimeout(getTimeout);
 
         if (getRes.ok) {
             var fileData = await getRes.json();
             sha = fileData.sha;
         }
-    } catch (e) { /* File doesn't exist yet, will create new */ }
+    } catch (e) {
+        if (e.name === 'AbortError') throw new Error('GitHub API request timed out (30s). Check your connection.');
+        /* File doesn't exist yet, will create new */
+    }
 
-    // 2. Update file
+    // 2. Update file (with timeout)
     var body = {
         message: 'Update ' + type + ' via Admin Panel',
         content: btoa(unescape(encodeURIComponent(fileContent))),
@@ -354,14 +361,18 @@ async function saveToGitHub(type, data) {
     };
     if (sha) body.sha = sha;
 
+    var putController = new AbortController();
+    var putTimeout = setTimeout(function() { putController.abort(); }, 30000);
     var putRes = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
             'Authorization': 'token ' + gitHubConfig.token,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: putController.signal
     });
+    clearTimeout(putTimeout);
 
     if (!putRes.ok) {
         var err = await putRes.json();
@@ -1005,6 +1016,7 @@ function renderLinkedIn() {
 
 function renderTeam() {
     var grid = document.getElementById('team-grid');
+    if (!grid) return;
 
     if (typeof TEAM_DATA === 'undefined') {
         grid.innerHTML = '<div style="color:red; padding:20px;">Error: TEAM_DATA is not defined.</div>';
@@ -1051,6 +1063,7 @@ function renderTeam() {
 
 function renderTestimonials() {
     var grid = document.getElementById('testimonials-grid');
+    if (!grid) return;
 
     if (typeof TESTIMONIALS_DATA === 'undefined') {
         grid.innerHTML = '<div style="color:red; padding:20px;">Error: TESTIMONIALS_DATA is not defined.</div>';

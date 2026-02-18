@@ -18,9 +18,11 @@ var _mapTimer = null;
 var _mapInstance = null;
 var _tmThemeHandler = null;
 var _mapDestroyed = false;
+var _progressTimeout = null;
 
 window.cleanupTestimonialMap = function() {
   _mapDestroyed = true;
+  if (_progressTimeout) { clearTimeout(_progressTimeout); _progressTimeout = null; }
   if (_mapTimer) { clearInterval(_mapTimer); _mapTimer = null; }
   if (_mapInstance) { try { _mapInstance.remove(); } catch(e) { /* already removed */ } _mapInstance = null; }
   if (_tmThemeHandler) { window.removeEventListener('themeChanged', _tmThemeHandler); _tmThemeHandler = null; }
@@ -186,9 +188,14 @@ window.renderTestimonialMap = function(container) {
     function stopTimer() { clearInterval(timer); _mapTimer = null; var prog = document.getElementById('progress'); if (prog) prog.style.width = '0%'; }
     function resetProgress() {
       var bar = document.getElementById('progress');
+      if (!bar) return;
       bar.style.transition = 'none'; bar.style.width = '0%';
-      setTimeout(function () {
-        if (!isPaused && !isManualInteraction) { bar.style.transition = 'width ' + duration + 'ms linear'; bar.style.width = '100%'; }
+      if (_progressTimeout) { clearTimeout(_progressTimeout); }
+      _progressTimeout = setTimeout(function () {
+        if (_mapDestroyed) return;
+        var b = document.getElementById('progress');
+        if (b && !isPaused && !isManualInteraction) { b.style.transition = 'width ' + duration + 'ms linear'; b.style.width = '100%'; }
+        _progressTimeout = null;
       }, 50);
     }
 
