@@ -50,7 +50,7 @@ function renderGlobalPresence() {
              // UAE usually has a specific style in the original
              groupedLocations[country].forEach(loc => {
                  listHTML += `
-                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})" onkeydown="if(event.key==='Enter')focusMap(${loc.lat}, ${loc.lng})" tabindex="0" role="button">
+                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
                       <h4>${escapeHtml(loc.country)}</h4>
                       <p class="contact-location-address">${escapeHtml(loc.address)}</p>
                     </div>
@@ -62,7 +62,7 @@ function renderGlobalPresence() {
             
             groupedLocations[country].forEach(loc => {
                 listHTML += `
-                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${loc.lat}, ${loc.lng})" onkeydown="if(event.key==='Enter')focusMap(${loc.lat}, ${loc.lng})" tabindex="0" role="button">
+                    <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
                       ${loc.type !== 'Office' && loc.type !== 'Factory' ? '' : `<p><strong>${escapeHtml(loc.name)}</strong></p>`}
                       ${loc.type === 'Registered Office' ? `<p class="contact-location-label">${escapeHtml(loc.name)}</p>` : ''}
                       <p class="contact-location-address">${escapeHtml(loc.address)}</p>
@@ -91,7 +91,7 @@ function ensureLeaflet(cb) {
         link.rel = 'stylesheet';
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
         link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = '';
+        link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
     }
 
@@ -99,7 +99,7 @@ function ensureLeaflet(cb) {
     var script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-    script.crossOrigin = '';
+    script.crossOrigin = 'anonymous';
     script.onload = cb;
     document.head.appendChild(script);
 }
@@ -118,6 +118,7 @@ function initMap(locations) {
         window.removeEventListener('themeChanged', _locThemeHandler);
         _locThemeHandler = null;
     }
+    markers = []; // Reset markers array to prevent accumulation
     
     // Default center (India/UAE region)
     map = L.map('map').setView([20, 70], 3);

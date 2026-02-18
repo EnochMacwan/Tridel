@@ -25,11 +25,11 @@ window.renderHomeCards = function(container) {
     data.forEach(card => {
         const cardLink = document.createElement('a');
         cardLink.className = 'grid-card-wrapper';
-        cardLink.href = card.link || '#';
+        cardLink.href = esc(card.link || '#');
 
         cardLink.innerHTML = `
             <div class="grid-card-visual">
-              <img loading="lazy" alt="${escapeHtml(card.title)}" src="${card.image}">
+              <img loading="lazy" alt="${escapeHtml(card.title)}" src="${escapeHtml(card.image)}">
             </div>
             <div class="grid-content-outside">
               <h3 class="card__title">

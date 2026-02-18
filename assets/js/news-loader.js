@@ -5,6 +5,7 @@
  * Exports:
  *   window.renderNewsFeed(container)
  */
+var _newsEsc = typeof escapeHtml === 'function' ? escapeHtml : function(s) { return String(s).replace(/[&<>"']/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; }); };
 
 window.renderNewsFeed = function (container) {
     if (!container) container = document.getElementById('news-feed-container');
@@ -45,7 +46,7 @@ window.renderNewsFeed = function (container) {
         card.innerHTML =
             shimmer +
             '<iframe ' +
-            'src="' + embedSrc + '" ' +
+            'src="' + _newsEsc(embedSrc) + '" ' +
             'height="570" ' +
             'width="100%" ' +
             'frameborder="0" ' +
@@ -58,11 +59,13 @@ window.renderNewsFeed = function (container) {
 
         // When iframe loads, hide shimmer
         var iframe = card.querySelector('iframe');
-        iframe.addEventListener('load', function () {
-            var shimmerEl = card.querySelector('.linkedin-embed-card__shimmer');
-            if (shimmerEl) shimmerEl.style.display = 'none';
-            iframe.classList.add('linkedin-embed-card__iframe--loaded');
-        });
+        if (iframe) {
+            iframe.addEventListener('load', function () {
+                var shimmerEl = card.querySelector('.linkedin-embed-card__shimmer');
+                if (shimmerEl) shimmerEl.style.display = 'none';
+                iframe.classList.add('linkedin-embed-card__iframe--loaded');
+            });
+        }
 
         container.appendChild(card);
     });

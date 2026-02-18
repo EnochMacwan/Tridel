@@ -835,7 +835,7 @@ function renderItemCard(type, item, index, isChild) {
 
     var imageHtml = imageUrl ?
         '<div class="card-preview-image">' +
-        '<img src="' + imageUrl + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img src="' + escapeHTML(imageUrl) + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         '</div>' : '';
 
     return '<div class="item-card ' + (isChild ? 'nested-card' : '') + '">' +
@@ -1142,10 +1142,10 @@ function getSingleImageFieldHTML(label, fieldId, value) {
         '<label>' + label + '</label>' +
         '<div class="single-image-upload" id="container-' + fieldId + '">' +
         '<div class="image-preview-container" id="preview-' + fieldId + '">' +
-        (value ? '<img src="' + value + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>') +
+        (value ? '<img src="' + escapeHTML(value) + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>') +
         '</div>' +
         '<div class="upload-controls">' +
-        '<input type="text" class="form-control" id="' + fieldId + '" value="' + (value || '') + '" placeholder="Path or upload image...">' +
+        '<input type="text" class="form-control" id="' + fieldId + '" value="' + escapeHTML(value || '') + '" placeholder="Path or upload image...">' +
         '<button type="button" class="btn btn-secondary" onclick="document.getElementById(\'upload-' + fieldId + '\').click()">' +
         '<i class="fas fa-upload"></i> Upload</button>' +
         '<input type="file" id="upload-' + fieldId + '" accept="image/*" style="display:none" onchange="handleFileUpload(this, \'' + fieldId + '\', false)">' +
@@ -1155,7 +1155,7 @@ function getSingleImageFieldHTML(label, fieldId, value) {
 function renderSingleImagePreview(fieldId, value) {
     var container = document.getElementById('preview-' + fieldId);
     if (container) {
-        container.innerHTML = value ? '<img src="' + value + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>';
+        container.innerHTML = value ? '<img src="' + escapeHTML(value) + '" alt="Preview" onerror="this.src=\'assets/images/logo/tridel.png\'">' : '<div class="preview-placeholder">No image selected</div>';
     }
 }
 
@@ -1167,7 +1167,7 @@ function getGalleryHTML(images) {
         '<div class="gallery-thumbnails" id="gallery-thumbs">' +
         (gallery.length > 0 ? gallery.map(function (img, i) {
             return '<div class="gallery-thumb" draggable="true" data-index="' + i + '">' +
-                '<img src="' + img + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+                '<img src="' + escapeHTML(img) + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
                 '<button type="button" class="thumb-delete" onclick="removeGalleryImage(' + i + ')"><i class="fas fa-times"></i></button>' +
                 '<span class="thumb-order">' + (i + 1) + '</span></div>';
         }).join('') : '<div class="gallery-empty">No images added yet</div>') +
@@ -1176,7 +1176,7 @@ function getGalleryHTML(images) {
         '<div class="gallery-add-btn" onclick="document.getElementById(\'gallery-upload-input\').click()"><i class="fas fa-upload"></i> Upload</div>' +
         '<input type="file" id="gallery-upload-input" accept="image/*" multiple style="display:none" onchange="handleFileUpload(this, \'field-gallery\', true)">' +
         '</div>' +
-        '<input type="hidden" id="field-gallery" value=\'' + JSON.stringify(gallery) + '\'>' +
+        '<input type="hidden" id="field-gallery" value="' + escapeHTML(JSON.stringify(gallery)) + '">' + +
         '</div>';
 }
 
@@ -1199,8 +1199,8 @@ function getParentOptions(type, currentId) {
         if (item.isNested) return;
 
         var selected = item.id === currentParentId ? 'selected' : '';
-        var name = item.name || item.title || 'Untitled';
-        options += '<option value="' + item.id + '" ' + selected + '>' + name + '</option>';
+        var name = escapeHTML(item.name || item.title || 'Untitled');
+        options += '<option value="' + escapeHTML(item.id) + '" ' + selected + '>' + name + '</option>';
     });
     return options;
 }
@@ -1924,7 +1924,7 @@ function showPreview() {
 
     var previewHTML = '<div class="preview-card">' +
         '<div class="preview-image">' +
-        '<img src="' + mainImage + '" alt="' + name + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img src="' + escapeHTML(mainImage) + '" alt="' + escapeHTML(name) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         (gallery.length > 1 ? '<span class="preview-gallery-count"><i class="fas fa-images"></i> ' + gallery.length + ' images</span>' : '') +
         '</div>' +
         '<div class="preview-content">' +
@@ -2270,7 +2270,7 @@ function renderGalleryThumbs(images) {
     } else {
         container.innerHTML = images.map(function (img, i) {
             return '<div class="gallery-thumb" draggable="true" data-index="' + i + '">' +
-                '<img src="' + img + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+                '<img src="' + escapeHTML(img) + '" alt="Image ' + (i + 1) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
                 '<button type="button" class="thumb-delete" onclick="removeGalleryImage(' + i + ')"><i class="fas fa-times"></i></button>' +
                 '<span class="thumb-order">' + (i + 1) + '</span></div>';
         }).join('');

@@ -16,8 +16,7 @@ window.renderTeamGrid = function(container) {
     if (!container) return;
 
     if (typeof TEAM_DATA === 'undefined' || !Array.isArray(TEAM_DATA)) {
-        console.error('TEAM_DATA is not loaded or not an array.');
-        if (container) container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
+        container.innerHTML = '<p class="empty-state">Content is currently unavailable. Please try again later.</p>';
         return;
     }
 
@@ -27,7 +26,7 @@ window.renderTeamGrid = function(container) {
             <div class="grid-card-wrapper">
                 <div class="grid-card-visual">
                     <img loading="lazy" alt="${escapeHtml(member.name)}" class="team-member__photo-full"
-                        src="${member.image ? member.image : 'assets/images/logo/tridel.png'}"
+                        src="${escapeHtml(member.image ? member.image : 'assets/images/logo/tridel.png')}"
                         style="object-position: center;"
                         onerror="this.src='assets/images/logo/tridel.png'">
                 </div>
