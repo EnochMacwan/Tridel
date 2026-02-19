@@ -25,7 +25,7 @@ const TEAM_DATA = [
   },
   {
     "name": "Dr. John Luick",
-    "role": "Director-Australia",
+    "role": "Founder & Director-Australia",
     "image": "assets/images/team/john-luick.jpg",
     "bio": "With over four decades of industry & academic experience, John leads the Australia office operations, bringing deep expertise in oceanographic studies, marine modelling, and marine data quality assurance, control, and reporting."
   },
