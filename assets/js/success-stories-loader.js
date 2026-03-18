@@ -57,7 +57,7 @@ window.renderSuccessStories = function(container) {
         let html = `
             <div class="container">
                 <div class="section__header success-stories-category-header">
-                    <h2 class="product-category__title success-stories-category-title">${escapeHtml(categoryName)}</h2>
+                    <h2 class="section__title success-stories-category-title">${escapeHtml(categoryName)}</h2>
                     <p class="section__subtitle success-stories-category-subtitle">${escapeHtml(categoryMeta.subtitle)}</p>
                 </div>
                 <div class="product-list-grid">

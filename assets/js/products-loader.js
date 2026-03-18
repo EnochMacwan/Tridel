@@ -159,6 +159,16 @@ function scrollToProductSection(sectionId) {
     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
+function scheduleProductSectionScroll(sectionId) {
+    if (!sectionId) return;
+
+    [160, 420, 900].forEach(function (delay) {
+        window.setTimeout(function () {
+            scrollToProductSection(sectionId);
+        }, delay);
+    });
+}
+
 window.renderProductsGrid = function(container, targetSectionId) {
     if (!container) container = document.getElementById('dynamic-products-container');
     // Support both variable names
@@ -250,11 +260,7 @@ window.renderProductsGrid = function(container, targetSectionId) {
         container.appendChild(sectionEl);
     });
 
-    if (targetSectionId) {
-        window.requestAnimationFrame(function () {
-            scrollToProductSection(targetSectionId);
-        });
-    }
+    scheduleProductSectionScroll(targetSectionId);
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---
