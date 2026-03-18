@@ -2,6 +2,10 @@
 
 Official website for Tridel Technologies, featuring a dynamic content management system and modern responsive design.
 
+## Technical Documentation
+
+See [TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md) for the current stack, deployment model, admin authentication details, and server environment variable requirements.
+
 ## 🚀 Features
 
 - **Dynamic Content**: Manage Products, Services, Clients, Team, and more via JSON-based data files.
