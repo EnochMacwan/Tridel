@@ -31,6 +31,13 @@ if (process.env.TRIDEL_ADMIN_PASSWORD) {
     console.warn('WARNING: Using default admin password. Set TRIDEL_ADMIN_PASSWORD env var for production.');
 }
 
+const SERVER_GITHUB_CONFIG = {
+    owner: (process.env.TRIDEL_GITHUB_OWNER || '').trim(),
+    repo: (process.env.TRIDEL_GITHUB_REPO || '').trim(),
+    branch: (process.env.TRIDEL_GITHUB_BRANCH || 'main').trim() || 'main',
+    token: (process.env.TRIDEL_GITHUB_TOKEN || '').trim()
+};
+
 const sessions = new Map();  // In-memory session store
 
 // ============================================
@@ -125,6 +132,113 @@ function checkDepth(obj, maxDepth, currentDepth) {
 // Generate session token
 function generateToken() {
     return crypto.randomBytes(32).toString('hex');
+}
+
+function hasServerGitHubConfig() {
+    return !!(SERVER_GITHUB_CONFIG.owner && SERVER_GITHUB_CONFIG.repo && SERVER_GITHUB_CONFIG.token);
+}
+
+function getRequestGitHubConfig(req) {
+    if (hasServerGitHubConfig()) {
+        return { ...SERVER_GITHUB_CONFIG };
+    }
+
+    const body = req.body || {};
+    return {
+        owner: String(body.owner || '').trim(),
+        repo: String(body.repo || '').trim(),
+        branch: String(body.branch || 'main').trim() || 'main',
+        token: String(body.token || '').trim()
+    };
+}
+
+function isValidGitHubConfig(config) {
+    return !!(config && config.owner && config.repo && config.branch && config.token);
+}
+
+function encodeGitHubPath(filePath) {
+    return String(filePath || '')
+        .split('/')
+        .filter(Boolean)
+        .map(segment => encodeURIComponent(segment))
+        .join('/');
+}
+
+function getGitHubHeaders(token, accept) {
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28'
+    };
+
+    if (accept) {
+        headers.Accept = accept;
+    }
+
+    return headers;
+}
+
+async function readGitHubContent(config, filePath) {
+    const encodedPath = encodeGitHubPath(filePath);
+    const url = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${encodedPath}?ref=${encodeURIComponent(config.branch)}`;
+    const res = await fetch(url, {
+        headers: getGitHubHeaders(config.token, 'application/vnd.github+json')
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`GitHub read failed (${res.status}): ${errorText || res.statusText}`);
+    }
+
+    const payload = await res.json();
+    const rawContent = String(payload.content || '').replace(/\n/g, '');
+    return {
+        sha: payload.sha || null,
+        content: Buffer.from(rawContent, 'base64').toString('utf8')
+    };
+}
+
+async function writeGitHubContent(config, filePath, content, message) {
+    const encodedPath = encodeGitHubPath(filePath);
+    const url = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${encodedPath}`;
+    let sha = null;
+
+    const getRes = await fetch(`${url}?ref=${encodeURIComponent(config.branch)}`, {
+        headers: getGitHubHeaders(config.token, 'application/vnd.github+json')
+    });
+
+    if (getRes.ok) {
+        const existingFile = await getRes.json();
+        sha = existingFile.sha || null;
+    } else if (getRes.status !== 404) {
+        const errorText = await getRes.text();
+        throw new Error(`GitHub preflight failed (${getRes.status}): ${errorText || getRes.statusText}`);
+    }
+
+    const body = {
+        message,
+        content: Buffer.from(String(content || ''), 'utf8').toString('base64'),
+        branch: config.branch
+    };
+
+    if (sha) {
+        body.sha = sha;
+    }
+
+    const putRes = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            ...getGitHubHeaders(config.token, 'application/vnd.github+json'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!putRes.ok) {
+        const errorText = await putRes.text();
+        throw new Error(`GitHub write failed (${putRes.status}): ${errorText || putRes.statusText}`);
+    }
+
+    return putRes.json();
 }
 
 // Auth middleware - protects API routes
@@ -244,6 +358,103 @@ app.get('/api/check-auth', (req, res) => {
     } else {
         if (token) sessions.delete(token);
         res.json({ authenticated: false });
+    }
+});
+
+app.get('/api/github/config', requireAuth, (req, res) => {
+    res.json({
+        mode: hasServerGitHubConfig() ? 'server' : 'client',
+        owner: SERVER_GITHUB_CONFIG.owner,
+        repo: SERVER_GITHUB_CONFIG.repo,
+        branch: SERVER_GITHUB_CONFIG.branch,
+        hasToken: hasServerGitHubConfig()
+    });
+});
+
+app.post('/api/github/test', requireAuth, async (req, res) => {
+    const config = getRequestGitHubConfig(req);
+
+    if (!isValidGitHubConfig(config)) {
+        return res.status(400).json({ error: 'GitHub owner, repo, branch, and token are required' });
+    }
+
+    try {
+        const url = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}`;
+        const ghRes = await fetch(url, {
+            headers: getGitHubHeaders(config.token, 'application/vnd.github+json')
+        });
+
+        if (!ghRes.ok) {
+            const errorText = await ghRes.text();
+            return res.status(400).json({ error: errorText || ghRes.statusText });
+        }
+
+        res.json({
+            success: true,
+            mode: hasServerGitHubConfig() ? 'server' : 'client',
+            owner: config.owner,
+            repo: config.repo,
+            branch: config.branch
+        });
+    } catch (err) {
+        console.error('GitHub connection test failed:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/github/load', requireAuth, async (req, res) => {
+    const config = getRequestGitHubConfig(req);
+    const filePath = String((req.body || {}).path || '').trim();
+
+    if (!filePath) {
+        return res.status(400).json({ error: 'GitHub file path is required' });
+    }
+
+    if (!isValidGitHubConfig(config)) {
+        return res.status(400).json({ error: 'GitHub owner, repo, branch, and token are required' });
+    }
+
+    try {
+        const result = await readGitHubContent(config, filePath);
+        res.json({
+            success: true,
+            content: result.content,
+            sha: result.sha,
+            mode: hasServerGitHubConfig() ? 'server' : 'client'
+        });
+    } catch (err) {
+        console.error(`GitHub load failed for ${filePath}:`, err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/github/save', requireAuth, async (req, res) => {
+    const config = getRequestGitHubConfig(req);
+    const filePath = String((req.body || {}).path || '').trim();
+    const content = String((req.body || {}).content || '');
+    const message = String((req.body || {}).message || 'Update content via Admin Panel').trim();
+
+    if (!filePath) {
+        return res.status(400).json({ error: 'GitHub file path is required' });
+    }
+
+    if (!isValidGitHubConfig(config)) {
+        return res.status(400).json({ error: 'GitHub owner, repo, branch, and token are required' });
+    }
+
+    try {
+        await writeGitHubContent(config, filePath, content, message);
+        res.json({
+            success: true,
+            mode: hasServerGitHubConfig() ? 'server' : 'client',
+            owner: config.owner,
+            repo: config.repo,
+            branch: config.branch,
+            path: filePath
+        });
+    } catch (err) {
+        console.error(`GitHub save failed for ${filePath}:`, err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -555,6 +766,11 @@ app.listen(PORT, () => {
     console.log(`   Website:     http://localhost:${PORT}/index.html`);
     console.log('--------------------------------------------------------');
     console.log('   Password required to make changes');
+    if (hasServerGitHubConfig()) {
+        console.log(`   GitHub Sync:  ${SERVER_GITHUB_CONFIG.owner}/${SERVER_GITHUB_CONFIG.repo} (${SERVER_GITHUB_CONFIG.branch})`);
+    } else {
+        console.log('   GitHub Sync:  Browser token or env vars required');
+    }
     console.log('   Press Ctrl+C to stop the server');
     console.log('========================================================');
     console.log('');

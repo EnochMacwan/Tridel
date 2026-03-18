@@ -109,6 +109,9 @@ try {
     gitHubConfig = {};
 }
 
+var serverGitHubConfig = null;
+var serverGitHubProxyAvailable = false;
+
 var GITHUB_DATA_FILES = {
     'products': 'assets/js/products-data.js',
     'services': 'assets/js/services-data.js',
@@ -145,8 +148,150 @@ var GITHUB_VAR_NAMES = {
     'layout': 'NAV_LINKS'
 };
 
+function getAdminAuthHeaders() {
+    var token = sessionStorage.getItem('adminToken') || '';
+    return token ? { 'X-Auth-Token': token } : {};
+}
+
+async function loadServerGitHubConfig() {
+    try {
+        var res = await fetch('/api/github/config', {
+            headers: getAdminAuthHeaders()
+        });
+        if (!res.ok) return;
+        serverGitHubConfig = await res.json();
+        serverGitHubProxyAvailable = true;
+    } catch (e) {
+        serverGitHubConfig = null;
+        serverGitHubProxyAvailable = false;
+    }
+}
+
+function isServerGitHubManaged() {
+    return !!(serverGitHubProxyAvailable && serverGitHubConfig && serverGitHubConfig.mode === 'server' && serverGitHubConfig.hasToken);
+}
+
+function getEffectiveGitHubConfig() {
+    if (isServerGitHubManaged()) {
+        return {
+            owner: serverGitHubConfig.owner || '',
+            repo: serverGitHubConfig.repo || '',
+            branch: serverGitHubConfig.branch || 'main',
+            token: ''
+        };
+    }
+
+    return {
+        owner: gitHubConfig.owner || '',
+        repo: gitHubConfig.repo || '',
+        branch: gitHubConfig.branch || 'main',
+        token: gitHubConfig.token || ''
+    };
+}
+
+function getGitHubFormConfig() {
+    return {
+        owner: ((document.getElementById('github-owner') || {}).value || '').trim(),
+        repo: ((document.getElementById('github-repo') || {}).value || '').trim(),
+        branch: ((document.getElementById('github-branch') || {}).value || 'main').trim() || 'main',
+        token: ((document.getElementById('github-token') || {}).value || '').trim()
+    };
+}
+
+function hasConfiguredGitHub() {
+    var config = getEffectiveGitHubConfig();
+    return !!(config.owner && config.repo && (isServerGitHubManaged() || config.token));
+}
+
+function buildGitHubProxyPayload(baseConfig) {
+    var config = baseConfig || getEffectiveGitHubConfig();
+    var payload = {
+        owner: config.owner,
+        repo: config.repo,
+        branch: config.branch || 'main'
+    };
+
+    if (!isServerGitHubManaged()) {
+        payload.token = config.token || '';
+    }
+
+    return payload;
+}
+
+function updateGitHubConfigUI() {
+    var ownerInput = document.getElementById('github-owner');
+    var repoInput = document.getElementById('github-repo');
+    var branchInput = document.getElementById('github-branch');
+    var tokenInput = document.getElementById('github-token');
+    var statusEl = document.getElementById('github-status');
+    var saveBtn = document.getElementById('github-save-btn');
+
+    if (!ownerInput || !repoInput || !branchInput || !tokenInput) return;
+
+    var config = getEffectiveGitHubConfig();
+    var managed = isServerGitHubManaged();
+
+    ownerInput.value = config.owner || '';
+    repoInput.value = config.repo || '';
+    branchInput.value = config.branch || 'main';
+    tokenInput.value = managed ? '' : (config.token || '');
+
+    ownerInput.disabled = managed;
+    repoInput.disabled = managed;
+    branchInput.disabled = managed;
+    tokenInput.disabled = managed;
+
+    if (saveBtn) {
+        saveBtn.disabled = managed;
+        saveBtn.title = managed ? 'GitHub settings are managed by server environment variables.' : '';
+    }
+
+    if (statusEl) {
+        if (managed) {
+            statusEl.innerHTML = '<i class="fas fa-shield-alt"></i> Using server-managed GitHub credentials from environment variables.';
+            statusEl.style.color = 'var(--accent)';
+        } else {
+            statusEl.innerHTML = '';
+            statusEl.style.color = 'var(--text)';
+        }
+    }
+}
+
+async function fetchGitHubFileContent(filePath) {
+    if (serverGitHubProxyAvailable) {
+        var proxyRes = await fetch('/api/github/load', {
+            method: 'POST',
+            headers: Object.assign({
+                'Content-Type': 'application/json'
+            }, getAdminAuthHeaders()),
+            body: JSON.stringify(Object.assign(buildGitHubProxyPayload(), {
+                path: filePath
+            }))
+        });
+
+        if (!proxyRes.ok) {
+            var proxyErr = await proxyRes.json().catch(function () { return {}; });
+            throw new Error(proxyErr.error || proxyRes.statusText);
+        }
+
+        var proxyData = await proxyRes.json();
+        return proxyData.content || '';
+    }
+
+    var config = getEffectiveGitHubConfig();
+    var res = await fetch(
+        'https://raw.githubusercontent.com/' + config.owner + '/' + config.repo + '/' + config.branch + '/' + filePath
+    );
+
+    if (!res.ok) {
+        throw new Error(res.statusText || 'Failed to load GitHub content');
+    }
+
+    return res.text();
+}
+
 async function loadDataFromGitHub() {
-    if (!gitHubConfig.token) {
+    if (!hasConfiguredGitHub()) {
         showToast('GitHub not configured', 'error');
         return;
     }
@@ -161,39 +306,33 @@ async function loadDataFromGitHub() {
         var varName = GITHUB_VAR_NAMES[type];
 
         try {
-            var res = await fetch(
-                'https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + filePath
-            );
-
-            if (res.ok) {
-                var content = await res.text();
-                var match = content.match(/(?:const\s+\w+|window\.\w+)\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
-                if (match) {
-                    try {
-                        // Sanitize JS to valid JSON
-                        var raw = match[1];
-                        raw = raw.replace(/\/\/.*$/gm, '');           // strip single-line comments
-                        raw = raw.replace(/\/\*[\s\S]*?\*\//g, '');   // strip block comments
-                        raw = raw.replace(/,\s*([\]}])/g, '$1');      // strip trailing commas
-                        raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":'); // quote unquoted keys
-                        // Escape control characters inside JSON string values
-                        var out = '', inStr = false;
-                        for (var ci = 0; ci < raw.length; ci++) {
-                            var ch = raw[ci];
-                            if (ch === '"' && (ci === 0 || raw[ci - 1] !== '\\')) { inStr = !inStr; out += ch; }
-                            else if (inStr && ch === '\n') out += '\\n';
-                            else if (inStr && ch === '\r') out += '\\r';
-                            else if (inStr && ch === '\t') out += '\\t';
-                            else if (inStr && ch.charCodeAt(0) < 0x20) out += '';
-                            else out += ch;
-                        }
-                        raw = out;
-                        var data = JSON.parse(raw);
-                        window[varName] = data;
-                    } catch (parseErr) {
-                        // Non-JSON JS data from GitHub is expected; local data files are used instead
-                        console.warn('GitHub data for ' + type + ' not JSON-compatible, using local data');
+            var content = await fetchGitHubFileContent(filePath);
+            var match = content.match(/(?:const\s+\w+|window\.\w+)\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
+            if (match) {
+                try {
+                    // Sanitize JS to valid JSON
+                    var raw = match[1];
+                    raw = raw.replace(/\/\/.*$/gm, '');           // strip single-line comments
+                    raw = raw.replace(/\/\*[\s\S]*?\*\//g, '');   // strip block comments
+                    raw = raw.replace(/,\s*([\]}])/g, '$1');      // strip trailing commas
+                    raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":'); // quote unquoted keys
+                    // Escape control characters inside JSON string values
+                    var out = '', inStr = false;
+                    for (var ci = 0; ci < raw.length; ci++) {
+                        var ch = raw[ci];
+                        if (ch === '"' && (ci === 0 || raw[ci - 1] !== '\\')) { inStr = !inStr; out += ch; }
+                        else if (inStr && ch === '\n') out += '\\n';
+                        else if (inStr && ch === '\r') out += '\\r';
+                        else if (inStr && ch === '\t') out += '\\t';
+                        else if (inStr && ch.charCodeAt(0) < 0x20) out += '';
+                        else out += ch;
                     }
+                    raw = out;
+                    var data = JSON.parse(raw);
+                    window[varName] = data;
+                } catch (parseErr) {
+                    // Non-JSON JS data from GitHub is expected; local data files are used instead
+                    console.warn('GitHub data for ' + type + ' not JSON-compatible, using local data');
                 }
             }
         } catch (e) {
@@ -211,13 +350,8 @@ async function loadDataFromGitHub() {
     for (var mvi = 0; mvi < multiVarFiles.length; mvi++) {
         try {
             var mvPath = GITHUB_DATA_FILES[multiVarFiles[mvi].key];
-            var mvRes = await fetch(
-                'https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + mvPath
-            );
-            if (mvRes.ok) {
-                var mvContent = await mvRes.text();
-                multiVarFiles[mvi].parser(mvContent);
-            }
+            var mvContent = await fetchGitHubFileContent(mvPath);
+            multiVarFiles[mvi].parser(mvContent);
         } catch (e) {
             console.warn('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
         }
@@ -269,7 +403,7 @@ function parseIndexPageContent(content) {
 }
 
 async function saveToGitHub(type, data) {
-    if (!gitHubConfig.token) {
+    if (!hasConfiguredGitHub()) {
         showToast('GitHub not configured', 'error');
         return;
     }
@@ -328,8 +462,29 @@ async function saveToGitHub(type, data) {
         fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
     }
 
-    // 1. Get current SHA (with timeout)
-    var apiUrl = 'https://api.github.com/repos/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/contents/' + filePath;
+    if (serverGitHubProxyAvailable) {
+        var proxyRes = await fetch('/api/github/save', {
+            method: 'POST',
+            headers: Object.assign({
+                'Content-Type': 'application/json'
+            }, getAdminAuthHeaders()),
+            body: JSON.stringify(Object.assign(buildGitHubProxyPayload(), {
+                path: filePath,
+                content: fileContent,
+                message: 'Update ' + type + ' via Admin Panel'
+            }))
+        });
+
+        if (!proxyRes.ok) {
+            var proxyErr = await proxyRes.json().catch(function () { return {}; });
+            throw new Error(proxyErr.error || proxyRes.statusText);
+        }
+
+        return;
+    }
+
+    var effectiveConfig = getEffectiveGitHubConfig();
+    var apiUrl = 'https://api.github.com/repos/' + effectiveConfig.owner + '/' + effectiveConfig.repo + '/contents/' + filePath;
 
     var sha = null;
     try {
@@ -337,7 +492,7 @@ async function saveToGitHub(type, data) {
         var getTimeout = setTimeout(function() { getController.abort(); }, 30000);
         var getRes = await fetch(apiUrl, {
             headers: {
-                'Authorization': 'token ' + gitHubConfig.token,
+                'Authorization': 'token ' + effectiveConfig.token,
                 'Accept': 'application/vnd.github.v3+json'
             },
             signal: getController.signal
@@ -353,11 +508,10 @@ async function saveToGitHub(type, data) {
         /* File doesn't exist yet, will create new */
     }
 
-    // 2. Update file (with timeout)
     var body = {
         message: 'Update ' + type + ' via Admin Panel',
         content: btoa(unescape(encodeURIComponent(fileContent))),
-        branch: gitHubConfig.branch
+        branch: effectiveConfig.branch
     };
     if (sha) body.sha = sha;
 
@@ -366,7 +520,7 @@ async function saveToGitHub(type, data) {
     var putRes = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
-            'Authorization': 'token ' + gitHubConfig.token,
+            'Authorization': 'token ' + effectiveConfig.token,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
@@ -381,14 +535,7 @@ async function saveToGitHub(type, data) {
 }
 
 function openGitHubConfig() {
-    document.getElementById('github-owner').value = gitHubConfig.owner || '';
-    document.getElementById('github-repo').value = gitHubConfig.repo || '';
-    document.getElementById('github-branch').value = gitHubConfig.branch || 'main';
-    document.getElementById('github-token').value = gitHubConfig.token || '';
-
-    var statusEl = document.getElementById('github-status');
-    if (statusEl) statusEl.innerHTML = '';
-
+    updateGitHubConfigUI();
     document.getElementById('github-config-overlay').style.display = 'flex';
 }
 
@@ -397,6 +544,12 @@ function closeGitHubConfig() {
 }
 
 function saveGitHubConfig() {
+    if (isServerGitHubManaged()) {
+        showToast('GitHub is managed by server environment variables', 'info');
+        closeGitHubConfig();
+        return;
+    }
+
     var owner = document.getElementById('github-owner').value.trim();
     var repo = document.getElementById('github-repo').value.trim();
     var branch = document.getElementById('github-branch').value.trim();
@@ -416,17 +569,36 @@ function saveGitHubConfig() {
 }
 
 async function testGitHubConnection() {
-    var owner = document.getElementById('github-owner').value.trim();
-    var repo = document.getElementById('github-repo').value.trim();
-    var token = document.getElementById('github-token').value.trim();
+    var formConfig = getGitHubFormConfig();
     var statusEl = document.getElementById('github-status');
 
     statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
     statusEl.style.color = 'var(--text)';
 
     try {
-        var res = await fetch('https://api.github.com/repos/' + owner + '/' + repo, {
-            headers: { 'Authorization': 'token ' + token }
+        if (serverGitHubProxyAvailable) {
+            var proxyRes = await fetch('/api/github/test', {
+                method: 'POST',
+                headers: Object.assign({
+                    'Content-Type': 'application/json'
+                }, getAdminAuthHeaders()),
+                body: JSON.stringify(Object.assign(buildGitHubProxyPayload(formConfig), formConfig))
+            });
+
+            if (proxyRes.ok) {
+                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection Successful!';
+                statusEl.style.color = 'var(--success)';
+                return;
+            }
+
+            var proxyErr = await proxyRes.json().catch(function () { return {}; });
+            statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + escapeHTML(proxyErr.error || 'Connection Failed');
+            statusEl.style.color = 'var(--danger)';
+            return;
+        }
+
+        var res = await fetch('https://api.github.com/repos/' + formConfig.owner + '/' + formConfig.repo, {
+            headers: { 'Authorization': 'token ' + formConfig.token }
         });
 
         if (res.ok) {
@@ -515,7 +687,7 @@ function enableOfflineMode() {
     hideLogin();
     showToast('Running in Offline / GitHub Mode', 'info');
 
-    if (!gitHubConfig.token) {
+    if (!hasConfiguredGitHub()) {
         setTimeout(function () {
             if (confirm('GitHub is not configured. Do you want to configure it now?')) {
                 openGitHubConfig();
@@ -1725,7 +1897,7 @@ async function publishAllChanges() {
         var successCount = 0;
         var types = Array.from(pendingChanges);
 
-        var useGitHub = !!(gitHubConfig.token && gitHubConfig.owner && gitHubConfig.repo);
+        var useGitHub = hasConfiguredGitHub();
         var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
         for (var i = 0; i < types.length; i++) {
@@ -1814,9 +1986,8 @@ async function reloadSectionData(type) {
         var content = '';
         var t = Date.now();
 
-        if (gitHubConfig.token) {
-            var res = await fetch('https://raw.githubusercontent.com/' + gitHubConfig.owner + '/' + gitHubConfig.repo + '/' + gitHubConfig.branch + '/' + filePath + '?t=' + t);
-            if (res.ok) content = await res.text();
+        if (hasConfiguredGitHub()) {
+            content = await fetchGitHubFileContent(filePath);
         } else {
             var res2 = await fetch(filePath + '?t=' + t);
             if (res2.ok) content = await res2.text();
@@ -1861,7 +2032,7 @@ async function undoChanges(type) {
 // ==========================================
 
 async function saveToServer(type, data) {
-    if (gitHubConfig.token) {
+    if (hasConfiguredGitHub()) {
         await saveToGitHub(type, data);
         return;
     }
@@ -3350,6 +3521,7 @@ function saveVisibility() {
 
 document.addEventListener('DOMContentLoaded', async function () {
     await checkAuth();
+    await loadServerGitHubConfig();
     initNavigation();
 
     // Update theme icon now that DOM is ready
@@ -3357,7 +3529,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     updateThemeIcon(savedTheme);
 
     // Load data from GitHub if configured
-    if (gitHubConfig.token && gitHubConfig.owner && gitHubConfig.repo) {
+    if (hasConfiguredGitHub()) {
         await loadDataFromGitHub();
     }
 

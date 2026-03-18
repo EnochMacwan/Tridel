@@ -1422,7 +1422,7 @@
         </div>
         <div class="modal-body">
           <p style="color: var(--text-muted); margin-bottom: 20px">
-            Configure GitHub API to save changes directly to your repository.
+            Configure GitHub sync for saving changes directly to your repository. If the local server has GitHub environment variables set, this panel will use them automatically.
           </p>
           <div class="form-group">
             <label>GitHub Username/Owner</label>
@@ -1494,6 +1494,7 @@
           <button
             type="button"
             class="btn btn-success"
+            id="github-save-btn"
             onclick="saveGitHubConfig()"
           >
             <i class="fas fa-save"></i> Save
