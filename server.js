@@ -19,7 +19,11 @@ app.disable('x-powered-by');
 // SECURITY: Password Configuration
 // ============================================
 // In production, TRIDEL_ADMIN_PASSWORD env var is REQUIRED.
-// In development, a fallback is used with a warning.
+// In development, generate a high-entropy password if one is not provided.
+function generateDevelopmentAdminPassword() {
+    return crypto.randomBytes(18).toString('base64url');
+}
+
 let ADMIN_PASSWORD;
 if (process.env.TRIDEL_ADMIN_PASSWORD) {
     ADMIN_PASSWORD = process.env.TRIDEL_ADMIN_PASSWORD;
@@ -27,8 +31,10 @@ if (process.env.TRIDEL_ADMIN_PASSWORD) {
     console.error('FATAL: TRIDEL_ADMIN_PASSWORD environment variable is required in production.');
     process.exit(1);
 } else {
-    ADMIN_PASSWORD = 'tridel2026';
-    console.warn('WARNING: Using default admin password. Set TRIDEL_ADMIN_PASSWORD env var for production.');
+    ADMIN_PASSWORD = generateDevelopmentAdminPassword();
+    console.warn('WARNING: TRIDEL_ADMIN_PASSWORD is not set.');
+    console.warn(`Generated one-time development admin password for this server process: ${ADMIN_PASSWORD}`);
+    console.warn('Set TRIDEL_ADMIN_PASSWORD to use a stable admin secret.');
 }
 
 const SERVER_GITHUB_CONFIG = {
@@ -256,7 +262,6 @@ function requireAuth(req, res, next) {
 // SECURITY: Headers Middleware
 // ============================================
 app.use((req, res, next) => {
-    res.setHeader('Server', 'Tridel');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -311,6 +316,55 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '2mb' }));
+
+const BLOCKED_PUBLIC_FILES = new Set([
+    '/server.js',
+    '/package.json',
+    '/package-lock.json',
+    '/readme.md',
+    '/technical_documentation.md',
+    '/verify_news.txt',
+    '/.gitignore',
+    '/_headers',
+    '/_redirects',
+    '/crossdomain.xml',
+    '/sitemap.xml'
+]);
+
+const BLOCKED_PUBLIC_EXTENSIONS = new Set([
+    '.md',
+    '.txt',
+    '.json',
+    '.lock',
+    '.toml',
+    '.yaml',
+    '.yml'
+]);
+
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
+
+    const normalizedPath = (req.path || '').toLowerCase();
+    const ext = path.extname(normalizedPath);
+    const baseName = path.basename(normalizedPath);
+
+    if (normalizedPath.startsWith('/logs/')) {
+        return res.status(404).type('text/plain').send('Not found');
+    }
+
+    if (baseName.startsWith('.')) {
+        return res.status(404).type('text/plain').send('Not found');
+    }
+
+    if (BLOCKED_PUBLIC_FILES.has(normalizedPath) || BLOCKED_PUBLIC_EXTENSIONS.has(ext)) {
+        return res.status(404).type('text/plain').send('Not found');
+    }
+
+    next();
+});
+
 app.use(express.static('.'));  // Serve static files from current directory
 
 // ============================================

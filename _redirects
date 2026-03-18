@@ -1,2 +1,11 @@
+/.git*   /404.html   404
+/_headers   /404.html   404
+/_redirects   /404.html   404
+/crossdomain.xml   /404.html   404
+/sitemap.xml   /404.html   404
+/logs/*   /404.html   404
+/*.md   /404.html   404
+/*.txt   /404.html   404
+/*.json   /404.html   404
 /*.*   /404.html   404
 /*     /index.html 200

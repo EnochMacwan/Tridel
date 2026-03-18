@@ -1,16 +1,16 @@
 /**
  * Admin Authentication Script
- * Provides a simple client-side lock for the admin panel.
- * note: This is not server-side secure but prevents casual access.
+ * Keeps the admin UI locked until the Express auth API accepts a login.
  */
 
 document.documentElement.classList.add('admin-auth-pending');
 
 const AdminAuth = {
-    // Fallback hash for offline/GitHub Pages mode only (server-side auth is preferred)
-    // SHA-256 Hash of 'tridel2026' — used ONLY when server is unreachable
-    FALLBACK_HASH: 'd4de1e781e29cf9ea1e9fbe380017478bfb37554d53a9094a836e22e2b605c7c',
     SESSION_KEY: 'tridel_secure_session_v1',
+
+    createSessionMarker() {
+        return 'auth_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+    },
 
     setAuthState(state) {
         const root = document.documentElement;
@@ -19,7 +19,6 @@ const AdminAuth = {
     },
 
     init() {
-        // Simple session check
         const session = sessionStorage.getItem(this.SESSION_KEY);
         if (!session || !session.startsWith('auth_')) {
             this.renderLoginModal();
@@ -33,57 +32,43 @@ const AdminAuth = {
         return session && session.startsWith('auth_');
     },
 
-    async sha256(message) {
-        // crypto.subtle requires a secure context (HTTPS or localhost)
-        if (window.crypto && window.crypto.subtle) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-        // Reject non-secure contexts instead of using a weak fallback
-        throw new Error('Secure context required. Admin login requires HTTPS — deploy over HTTPS for proper security.');
-    },
-
     async login(password) {
         try {
-            // Strategy 1: Try server-side auth first (preferred — uses env var password)
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: password })
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.token) {
-                        sessionStorage.setItem('adminToken', data.token);
-                    }
-                    sessionStorage.setItem(this.SESSION_KEY, 'auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
-                    this.removeModal();
-                    this.showContent();
-                    return true;
-                }
-                if (res.status === 401 || res.status === 429) {
-                    return false; // Server says wrong password or rate limited
-                }
-            } catch (networkErr) {
-                // Server not available — fall through to client-side fallback
-                console.warn('Server unreachable, falling back to client-side auth.');
-            }
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            });
+            const data = await res.json().catch(() => ({}));
 
-            // Strategy 2: Client-side fallback (for GitHub Pages / offline mode)
-            const hash = await this.sha256(password);
-            if (hash === this.FALLBACK_HASH) {
-                sessionStorage.setItem(this.SESSION_KEY, 'auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+            if (res.ok) {
+                if (data.token) {
+                    sessionStorage.setItem('adminToken', data.token);
+                }
+                sessionStorage.setItem(this.SESSION_KEY, this.createSessionMarker());
                 this.removeModal();
                 this.showContent();
-                return true;
+                return { ok: true };
             }
+
+            if (res.status === 401 || res.status === 429) {
+                return {
+                    ok: false,
+                    message: data.error || 'Login failed.'
+                };
+            }
+
+            return {
+                ok: false,
+                message: 'Admin login is unavailable right now. Please try again later.'
+            };
         } catch (e) {
-            // Auth error handled silently — returning false below
+            console.warn('Admin login requires the Tridel server API.');
+            return {
+                ok: false,
+                message: 'Admin login requires the Tridel server. Start server.js and set TRIDEL_ADMIN_PASSWORD.'
+            };
         }
-        return false;
     },
 
     logout() {
@@ -98,10 +83,11 @@ const AdminAuth = {
             return;
         }
 
-        // Hide main content initially
         document.body.style.overflow = 'hidden';
         const mainContainer = document.querySelector('.admin-container');
-        if(mainContainer) mainContainer.style.filter = 'blur(10px)';
+        if (mainContainer) {
+            mainContainer.style.filter = 'blur(10px)';
+        }
 
         const modal = document.createElement('div');
         modal.className = 'auth-overlay';
@@ -109,8 +95,8 @@ const AdminAuth = {
             <div class="auth-card">
                 <img src="assets/images/logo/tridel.png" alt="Tridel Logo" class="auth-logo">
                 <h2 class="auth-title">Admin Access</h2>
-                <p class="auth-subtitle">Please enter your credentials to continue</p>
-                
+                <p class="auth-subtitle">Enter the server admin password to continue</p>
+
                 <form class="auth-form" onsubmit="AdminAuth.handleSubmit(event)">
                     <div class="auth-input-group">
                         <input type="password" id="admin-pass" class="auth-input" placeholder="Password" required autofocus>
@@ -119,7 +105,7 @@ const AdminAuth = {
                     <button type="submit" class="auth-btn">
                         <i class="fas fa-lock"></i> Login
                     </button>
-                    <div id="auth-error" class="auth-error">Invalid password</div>
+                    <div id="auth-error" class="auth-error">Login failed</div>
                 </form>
             </div>
         `;
@@ -131,30 +117,29 @@ const AdminAuth = {
         const input = document.getElementById('admin-pass');
         const error = document.getElementById('auth-error');
         const btn = e.target.querySelector('button');
-        
-        // Show loading state
+
         const originalBtnText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
         btn.disabled = true;
+        error.classList.remove('visible');
 
-        const success = await this.login(input.value);
-        
-        if (success) {
-            // Success handled in login()
-        } else {
-            btn.innerHTML = originalBtnText;
-            btn.disabled = false;
-            
-            error.classList.add('visible');
-            input.value = '';
-            input.focus();
-            
-            // Shake animation
-            const card = document.querySelector('.auth-card');
-            card.style.animation = 'none';
-            card.offsetHeight; /* trigger reflow */
-            card.style.animation = 'shake 0.4s ease';
+        const result = await this.login(input.value);
+
+        if (result.ok) {
+            return;
         }
+
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+        error.textContent = result.message || 'Login failed';
+        error.classList.add('visible');
+        input.value = '';
+        input.focus();
+
+        const card = document.querySelector('.auth-card');
+        card.style.animation = 'none';
+        card.offsetHeight;
+        card.style.animation = 'shake 0.4s ease';
     },
 
     removeModal() {
@@ -169,12 +154,11 @@ const AdminAuth = {
         this.setAuthState('admin-auth-ready');
         document.body.style.overflow = '';
         const mainContainer = document.querySelector('.admin-container');
-        if(mainContainer) {
+        if (mainContainer) {
             mainContainer.style.filter = 'none';
-            mainContainer.style.display = 'flex'; // Restore layout
+            mainContainer.style.display = 'flex';
         }
-        
-        // Add Logout Button to Header if not exists
+
         this.addLogoutButton();
     },
 
@@ -206,22 +190,16 @@ const AdminAuth = {
     }
 };
 
-// Auto-init
 document.addEventListener('DOMContentLoaded', () => {
-    // Add CSS first
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'assets/css/admin-auth.css';
     document.head.appendChild(link);
-    
-    // Init Auth
+
     AdminAuth.init();
-    
-    // Bind global logout for existing HTML button
     window.doLogout = () => AdminAuth.logout();
 });
 
-// Add shake animation style dynamically
 const style = document.createElement('style');
 style.innerHTML = `
     @keyframes shake {

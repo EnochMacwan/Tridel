@@ -4585,7 +4585,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #2 — prefers-reduced-motion        */
+/* Update #2 - prefers-reduced-motion */
 /* ============================================ */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -4626,7 +4626,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #3 — :focus-visible styles          */
+/* Update #3 - :focus-visible styles */
 /* ============================================ */
 .button--primary:focus-visible,
 .button--secondary:focus-visible,
@@ -4730,7 +4730,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #6 — Print styles                  */
+/* Update #6 - Print styles */
 /* ============================================ */
 @media print {
     .header,
@@ -4795,7 +4795,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #9 — Hover-only → add focus-within */
+/* Update #9 - Hover-only to focus-within */
 /* ============================================ */
 .header__nav-link:focus-within::after,
 .header__nav-link:focus-visible::after {
@@ -4827,7 +4827,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #10 — Contrast fixes               */
+/* Update #10 - Contrast adjustments */
 /* ============================================ */
 .header__nav-link {
     opacity: 1;
@@ -4844,7 +4844,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #11 — Touch target minimum 44x44   */
+/* Update #11 - Touch target minimum 44x44 */
 /* ============================================ */
 .slider-btn {
     min-width: 44px;
@@ -4867,7 +4867,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #12 — Z-index system               */
+/* Update #12 - Z-index system */
 /* ============================================ */
 :root {
     --z-back-to-top: 900;
@@ -4894,7 +4894,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #13 — Bottom nav content clearance  */
+/* Update #13 - Bottom nav content clearance */
 /* ============================================ */
 @media (max-width: 1024px) {
     body {
@@ -4907,7 +4907,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #17 — Dark mode hardcoded colors    */
+/* Update #17 - Dark mode hardcoded colors */
 /* ============================================ */
 [data-theme="dark"] .map-header-content h3 {
     color: #e8eaed;
@@ -4957,7 +4957,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #23 — Disabled button styles        */
+/* Update #23 - Disabled button styles */
 /* ============================================ */
 .button--primary:disabled,
 .button--primary[disabled] {
@@ -4984,7 +4984,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #24 — Active press state on buttons */
+/* Update #24 - Active press state on buttons */
 /* ============================================ */
 .button--primary:active {
     transform: translateY(0);
@@ -5007,7 +5007,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #27 — Text overflow handling        */
+/* Update #27 - Text overflow handling */
 /* ============================================ */
 .team-member__name,
 .footer__link,
@@ -5031,14 +5031,14 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #41 — Decorative quote opacity      */
+/* Update #41 - Decorative quote opacity */
 /* ============================================ */
 .map-card-quote::before {
     opacity: 0.5;
 }
 
 /* ============================================ */
-/* BUG FIX: #39 — CSS class for inline styles  */
+/* Update #39 - CSS class for inline styles */
 /* ============================================ */
 .product-grid-wrapper {
     text-decoration: none;
@@ -5046,7 +5046,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #20 — noscript fallback styling    */
+/* Update #20 - Noscript fallback styling */
 /* ============================================ */
 .noscript-message {
     text-align: center;
@@ -5067,7 +5067,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #33 — Footer logo uniform style    */
+/* Update #33 - Footer logo uniform style */
 /* ============================================ */
 .footer-logo-style {
     height: 32px;
@@ -5075,7 +5075,7 @@ html.lenis {
 }
 
 /* ============================================ */
-/* BUG FIX: #36 — Additional responsive breaks */
+/* Update #36 - Additional responsive breaks */
 /* ============================================ */
 @media (min-width: 1440px) {
     .container {

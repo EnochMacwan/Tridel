@@ -80,8 +80,6 @@ The project runs in one of two modes:
 - `_headers`: static-host response headers
 - `_redirects`: static-host SPA routing rules
 - `404.html`: static-host 404 page
-- `crossdomain.xml`: deny policy for legacy cross-domain policy requests
-- `sitemap.xml`: sitemap
 
 ## Local Development
 
@@ -180,7 +178,7 @@ Use this mode if only the public site is being hosted and no Express process wil
 
 - The public site will work without Node.
 - The admin page can still open, but server-backed authentication and server-managed GitHub secrets will not be available.
-- In static-only mode, the admin falls back to client-side login behavior and browser-based GitHub token entry.
+- In static-only mode, the public site can be hosted, but admin authentication is intentionally unavailable without the Express server.
 
 ## Required Passphrases and Environment Variables
 
@@ -191,6 +189,15 @@ Use this mode if only the public site is being hosted and no Express process wil
 - Purpose: Admin login password for the Express API.
 - Required for production Express deployment.
 - If missing in production, `server.js` exits.
+- If missing in local development, `server.js` creates a random temporary admin password and prints it in the terminal when the server starts.
+
+In simple words:
+
+- If you set `TRIDEL_ADMIN_PASSWORD`, that is the admin password.
+- If you do not set it on a local machine, the server makes a random password for you.
+- That random password works only for the current server run.
+- If you stop and restart the server, a new random password is created.
+- For staging or production, always set `TRIDEL_ADMIN_PASSWORD` yourself so the password stays stable.
 
 ### Optional but Recommended
 
@@ -219,13 +226,15 @@ Use this mode if only the public site is being hosted and no Express process wil
 
 ## Important Authentication Note
 
-There is a development/offline fallback password path in `assets/js/admin-auth.js`.
+The admin panel now uses the Express server to check the password.
 
-- Fallback password value: `tridel2026`
-- Purpose: GitHub Pages/offline fallback when the server is unavailable
-- Security implication: this fallback is not acceptable for production security
+In simple words:
 
-If the project will be deployed as a static admin without the Express server, the fallback hash in `assets/js/admin-auth.js` must be reviewed and rotated as part of the security process.
+- The admin page does not keep its own backup password in the browser anymore.
+- The server is the only place that decides whether the password is correct.
+- If the server is not running, admin login will not work.
+- Running the public site as static files is fine, but secure admin login still needs the Express server.
+- For any real deployment, set `TRIDEL_ADMIN_PASSWORD` on the server before starting the app.
 
 ## GitHub Token Requirements
 
@@ -259,8 +268,6 @@ Do not commit the token, store it in the repository, or send it in chat.
 - The Express server sets CSP, anti-clickjacking, `nosniff`, referrer policy, permissions policy, COOP, CORP, and HSTS headers.
 - The static hosting equivalents are defined in `_headers`.
 - `_redirects` prevents unknown file-extension paths from being rewritten into the SPA shell.
-- `crossdomain.xml` is intentionally present and explicitly denies legacy cross-domain policy access.
-- `sitemap.xml` is intentionally present.
 
 ## Operational Caveats
 
