@@ -7,6 +7,21 @@
  */
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+var SUCCESS_STORY_CATEGORY_META = {
+    'Environmental Monitoring': {
+        subtitle: 'Real-time air, odor, noise, and weather monitoring systems for compliance and operational visibility.'
+    },
+    'Environmental Surveying': {
+        subtitle: 'Comprehensive hydrographic and geophysical survey services.'
+    },
+    'Integrated Solutions': {
+        subtitle: 'Integrated platforms that combine sensors, analytics, reporting, and decision support into one workflow.'
+    },
+    'Offshore Infrastructure': {
+        subtitle: 'Marine and offshore systems designed for deployment support, long-term monitoring, and field operations.'
+    }
+};
+
 /**
  * Renders the Success Stories
  * Exported as window.renderSuccessStories for SPA router usage.
@@ -35,10 +50,16 @@ window.renderSuccessStories = function(container) {
     for (const [categoryName, stories] of Object.entries(categories)) {
         const section = document.createElement('section');
         section.className = 'section product-category';
+        const categoryMeta = SUCCESS_STORY_CATEGORY_META[categoryName] || {
+            subtitle: 'Selected projects showcasing Tridel expertise across marine, environmental, and engineering domains.'
+        };
 
         let html = `
             <div class="container">
-                <h2 class="product-category__title">${escapeHtml(categoryName)}</h2>
+                <div class="section__header success-stories-category-header">
+                    <h2 class="product-category__title success-stories-category-title">${escapeHtml(categoryName)}</h2>
+                    <p class="section__subtitle success-stories-category-subtitle">${escapeHtml(categoryMeta.subtitle)}</p>
+                </div>
                 <div class="product-list-grid">
         `;
 

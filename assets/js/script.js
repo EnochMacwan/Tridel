@@ -200,8 +200,28 @@ window.initScrollReveal = function () {
   btn.ariaLabel = 'Back to Top';
   btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>';
 
+  function getBaseOffset() {
+    return window.innerWidth <= 1024 ? 24 : 30;
+  }
+
+  // Lift the floating button above the footer's admin link when the footer is in view.
+  function updateBackToTopPosition() {
+    var baseOffset = getBaseOffset();
+    var footerBottom = document.querySelector('.footer__bottom');
+
+    if (!footerBottom) {
+      btn.style.bottom = baseOffset + 'px';
+      return;
+    }
+
+    var footerRect = footerBottom.getBoundingClientRect();
+    var overlap = Math.max(0, window.innerHeight - footerRect.top);
+    btn.style.bottom = (baseOffset + overlap) + 'px';
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(btn);
+    updateBackToTopPosition();
   });
 
   window.addEventListener('scroll', function () {
@@ -213,7 +233,14 @@ window.initScrollReveal = function () {
     if (indicator) {
       indicator.style.opacity = window.scrollY > 50 ? '0' : '';
     }
+
+    updateBackToTopPosition();
   }, { passive: true });
+
+  window.addEventListener('resize', updateBackToTopPosition);
+  window.addEventListener('hashchange', function () {
+    setTimeout(updateBackToTopPosition, 0);
+  });
 
   btn.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: 'smooth' });

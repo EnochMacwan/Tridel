@@ -13,6 +13,8 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 3000;
 
+app.disable('x-powered-by');
+
 // ============================================
 // SECURITY: Password Configuration
 // ============================================
@@ -140,23 +142,29 @@ function requireAuth(req, res, next) {
 // SECURITY: Headers Middleware
 // ============================================
 app.use((req, res, next) => {
+    res.setHeader('Server', 'Tridel');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
     // HSTS: enforce HTTPS for 1 year (only effective when served over HTTPS)
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    // CSP: Add domains to frame-src as needed when embedding new iframe sources
+    // CSP: Add domains to frame-src/img-src as needed when embedding new sources
     res.setHeader(
         'Content-Security-Policy',
         "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " +
-        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+        "base-uri 'self'; " +
+        "object-src 'none'; " +
+        "frame-ancestors 'none'; " +
+        "form-action 'self' https://formsubmit.co; " +
+        "script-src 'self' 'unsafe-inline'; " +
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
+        "font-src 'self' https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com; " +
         "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com; " +
-        "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com"
+        "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://*.basemaps.cartocdn.com"
     );
     next();
 });
@@ -525,8 +533,15 @@ app.post('/api/save-all', requireAuth, (req, res) => {
 // SPA FALLBACK: Serve index.html for all non-API routes
 // ============================================
 app.get('*', (req, res) => {
-    // Skip API routes and known static files
-    if (req.path.startsWith('/api/')) return;
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Not found' });
+    }
+
+    // Do not rewrite unknown file-like requests into the SPA shell.
+    if (path.extname(req.path)) {
+        return res.status(404).type('text/plain').send('Not found');
+    }
+
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 

@@ -1,8 +1,6 @@
 /* ---------------------------------- */
 /* 1. Design Tokens: Electric Geospatial */
 /* ---------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
 :root {
     /* Brand Core - Google Antigravity */
     --color-primary: #000000;
@@ -241,6 +239,13 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .header__logo img {
     height: 56px;
+}
+
+.header__logo.logo-link--current,
+.header__logo.logo-link--current img,
+.footer__logo.logo-link--current,
+.footer__logo.logo-link--current img {
+    cursor: default;
 }
 
 .viewer-header img {
@@ -545,7 +550,7 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 /* Feed Grid */
 .linkedin-feed__grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(16px, 2vw, 24px);
     margin-top: clamp(24px, 3vw, 40px);
 }
@@ -1062,6 +1067,12 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     /* Space between visual card and text */
     text-decoration: none;
     /* Ensure links don't underline everything */
+    min-width: 0;
+}
+
+.product-grid-wrapper {
+    display: grid;
+    grid-template-rows: auto 1fr;
 }
 
 /* The visual card (Photo Only) */
@@ -1150,7 +1161,7 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 /* The Text Content (Outside) */
 .product-content-outside {
     text-align: center;
-    padding: 0 8px;
+    padding: 8px 8px 0;
     background: transparent;
     border: none;
     box-shadow: none;
@@ -1158,6 +1169,9 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 14px;
 }
 
 /* ---------------------------------- */
@@ -1343,6 +1357,25 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     line-height: 1.5;
 }
 
+.product-content-outside h4,
+.product-content-outside .product-item__excerpt {
+    margin: 0;
+}
+
+.product-content-outside .product-item__excerpt {
+    flex: 1 1 auto;
+    min-height: calc(1.5em * 5);
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-content-outside .button--secondary {
+    margin-top: auto;
+}
+
 /* Legacy support/Override old product-item if needed */
 
 /* Inner pages: canvas contained within page-header */
@@ -1371,6 +1404,19 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     /* Responsive: never exceeds viewport on small phones */
     gap: clamp(20px, 4vw, 40px);
+    align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+    .product-list-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .product-list-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Product Item Card */
@@ -3571,7 +3617,8 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 
 .product-grid-wrapper {
-    display: block;
+    display: grid;
+    grid-template-rows: auto 1fr;
     text-decoration: none;
     color: inherit;
     transition: transform 0.3s ease;
@@ -3583,10 +3630,54 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 /* Success Stories Specific Spacing Override */
 .page-success-stories .product-category.section {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: clamp(28px, 4vw, 48px);
+    padding-bottom: clamp(20px, 3vw, 36px);
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.page-success-stories .success-stories-category-header {
+    max-width: 980px;
+    margin: 0 auto clamp(32px, 5vw, 56px);
+    padding: clamp(12px, 2vw, 20px) 0 0;
+}
+
+.page-success-stories .success-stories-category-title {
+    display: block;
+    border: none;
+    padding: 0;
+    margin: 0 0 var(--space-md);
+    color: var(--color-text-main);
+    font-size: clamp(2.6rem, 6vw, 4.9rem);
+    font-weight: 800;
+    line-height: 1.03;
+    letter-spacing: -0.05em;
+    text-align: center;
+}
+
+.page-success-stories .success-stories-category-subtitle {
+    max-width: 36ch;
+    margin: 0 auto;
+    font-size: clamp(1.05rem, 1.9vw, 1.55rem);
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .page-success-stories .success-stories-category-header {
+        margin-bottom: 32px;
+    }
+
+    .page-success-stories .success-stories-category-title {
+        font-size: clamp(2rem, 10vw, 3.1rem);
+        letter-spacing: -0.04em;
+    }
+
+    .page-success-stories .success-stories-category-subtitle {
+        font-size: 1rem;
+        max-width: 32ch;
+    }
 }
 
 /* ---------------------------------- */
@@ -4452,11 +4543,11 @@ html.lenis {
 /* --- News Feed Grid (Moved from Inline) --- */
 #news-feed-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 24px);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     #news-feed-container {
         grid-template-columns: repeat(2, 1fr);
     }

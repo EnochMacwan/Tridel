@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/products']) || {};
 
-  function render(mainEl) {
+  function render(mainEl, params) {
     var html = '';
 
     // Page header with breadcrumb
@@ -34,7 +34,7 @@
 
     // Load products grid dynamically
     if (typeof renderProductsGrid === 'function') {
-      renderProductsGrid();
+      renderProductsGrid(document.getElementById('dynamic-products-container'), params && params.section);
     }
 
     // Initialize scroll reveal

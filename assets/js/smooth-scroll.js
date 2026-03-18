@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
             smoothTouch: false,
             touchMultiplier: 2,
         });
+        window.__lenis = lenis;
 
         function raf(time) {
             lenis.raf(time);

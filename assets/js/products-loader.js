@@ -148,7 +148,18 @@ window.renderProductsMegaMenu = function(container) {
  * Renders the Products Page Grid
  * Exported as window.renderProductsGrid for SPA router usage.
  */
-window.renderProductsGrid = function(container) {
+function scrollToProductSection(sectionId) {
+    if (!sectionId) return;
+
+    var target = document.getElementById(sectionId);
+    if (!target) return;
+
+    var headerOffset = 96;
+    var top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+window.renderProductsGrid = function(container, targetSectionId) {
     if (!container) container = document.getElementById('dynamic-products-container');
     // Support both variable names
     const data = typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : (typeof productsData !== 'undefined' ? productsData : null);
@@ -162,16 +173,19 @@ window.renderProductsGrid = function(container) {
     // Define Sections corresponding to the page layout
     const sections = [
         {
+            id: 'survey-monitoring-platforms',
             title: 'Survey & Monitoring Platforms',
             subtitle: 'Robust hardware solutions engineering for the marine environment.',
             categories: ['Buoys', 'Vessels', 'Equipment'] // Grouping hardware
         },
         {
+            id: 'survey-monitoring-softwares',
             title: 'Survey & Monitoring Softwares',
             subtitle: 'Advanced software platforms for data management and analysis.',
             categories: ['Software']
         },
         {
+            id: 'integrated-solutions',
             title: 'Integrated Solutions',
             subtitle: 'Comprehensive solutions for environmental and operational intelligence.',
             categories: ['Integrated Solutions']
@@ -182,9 +196,7 @@ window.renderProductsGrid = function(container) {
         // Create Section HTML
         const sectionEl = document.createElement('section');
         sectionEl.className = index % 2 === 0 ? 'section section--light-bg' : 'section'; // Alternate/Check ID styling
-        // Note: products.html used section--light-bg for first, white for second, etc.
-        // Let's mimic specific IDs if needed, but generic classes are safer.
-        if (section.title === 'Integrated Solutions') sectionEl.id = 'integrated-solutions';
+        sectionEl.id = section.id;
 
         let sectionContent = `
             <div class="container">
@@ -237,6 +249,12 @@ window.renderProductsGrid = function(container) {
         sectionEl.innerHTML = sectionContent;
         container.appendChild(sectionEl);
     });
+
+    if (targetSectionId) {
+        window.requestAnimationFrame(function () {
+            scrollToProductSection(targetSectionId);
+        });
+    }
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---

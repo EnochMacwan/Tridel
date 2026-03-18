@@ -42,6 +42,23 @@ body {
     min-height: 100vh;
 }
 
+html.admin-auth-pending .admin-header,
+html.admin-auth-pending .admin-container,
+html.admin-auth-pending .modal-overlay,
+html.admin-auth-pending .toast-container,
+html.admin-auth-pending .bulk-action-bar,
+html.admin-auth-pending #login-overlay,
+html.admin-auth-locked .admin-header,
+html.admin-auth-locked .admin-container,
+html.admin-auth-locked .modal-overlay,
+html.admin-auth-locked .toast-container,
+html.admin-auth-locked .bulk-action-bar,
+html.admin-auth-locked #login-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 /* --- Header --- */
 .admin-header {
     background: linear-gradient(135deg, #0099cc 0%, #006699 100%);

@@ -9,6 +9,30 @@
   var currentCleanup = null;
   var currentRoute = null;
 
+  function resetScrollPosition() {
+    function scrollTopNow() {
+      if (window.__lenis && typeof window.__lenis.scrollTo === 'function') {
+        window.__lenis.scrollTo(0, { immediate: true, force: true });
+      }
+
+      window.scrollTo(0, 0);
+
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }
+
+    scrollTopNow();
+
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(scrollTopNow);
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(scrollTopNow);
+      });
+    }
+
+    setTimeout(scrollTopNow, 80);
+  }
+
   /**
    * Register a route
    * @param {string} path - Route path (e.g., '/about', '/products/detail')
@@ -124,7 +148,7 @@
     }
 
     // Scroll to top
-    window.scrollTo(0, 0);
+    resetScrollPosition();
 
     // Re-init scroll reveal for new content
     if (typeof window.initScrollReveal === 'function') {
@@ -205,6 +229,10 @@
 
   // Initialize router on DOM ready
   window.initRouter = function () {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     // Set default hash if none
     if (!window.location.hash || window.location.hash === '#') {
       window.location.hash = '#/';

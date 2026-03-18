@@ -10,6 +10,28 @@
     });
   };
 
+  function getCurrentPath() {
+    if (typeof window.parseHash === 'function') {
+      return window.parseHash().path;
+    }
+
+    var hash = window.location.hash.replace(/^#/, '') || '/';
+    var qIndex = hash.indexOf('?');
+    return qIndex >= 0 ? hash.substring(0, qIndex) : hash;
+  }
+
+  function updateLogoState(path) {
+    var isHome = path === '/';
+    document.querySelectorAll('.header__logo, .footer__logo').forEach(function (logo) {
+      logo.classList.toggle('logo-link--current', isHome);
+      if (isHome) {
+        logo.setAttribute('aria-current', 'page');
+      } else {
+        logo.removeAttribute('aria-current');
+      }
+    });
+  }
+
   /**
    * Render the header into #header-root
    */
@@ -48,10 +70,10 @@
             '<ul class="header__nav-list">' + navItems + '</ul>' +
           '</nav>' +
           '<div class="header__actions">' +
-            '<button type="button" id="theme-toggle" class="button button--icon theme-toggle-btn" aria-label="Toggle Dark Mode">' +
+            '<button type="button" id="theme-toggle" class="button button--icon theme-toggle-btn" aria-label="Switch to dark mode" title="Switch to dark mode">' +
               '<i class="fas fa-moon"></i>' +
             '</button>' +
-            '<a class="button button--primary" href="#/contact">Enquire Now</a>' +
+            '<a class="button button--primary" href="#/contact?focus=form&subject=General%20Enquiry">Enquire Now</a>' +
             '<button type="button" class="header__menu-toggle menu-trigger" aria-label="Open menu">' +
               '<span class="icon-menu"><i class="fas fa-bars"></i></span>' +
               '<span class="icon-close"><i class="fas fa-times"></i></span>' +
@@ -132,6 +154,7 @@
       link.classList.toggle('active', isActive);
     });
 
+    updateLogoState(path);
   };
 
   /**
@@ -170,5 +193,7 @@
       var servicesContainer = document.querySelector('.mm-services');
       if (servicesContainer) window.renderServicesMegaMenu(servicesContainer);
     }
+
+    updateLogoState(getCurrentPath());
   };
 })();

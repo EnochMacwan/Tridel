@@ -14,6 +14,10 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/contact']) || {};
 
+  function isExternalUrl(value) {
+    return typeof value === 'string' && /^(https?:)?\/\//i.test(value);
+  }
+
   // ── Map state for cleanup ──
   var _contactMapInstance = null;
   var _mapResizeTimeout = null;
@@ -71,15 +75,51 @@
     return html;
   }
 
-  function render(mainEl) {
+  function scrollToContactForm() {
+    var formCard = document.getElementById('project-enquiry-card');
+    if (!formCard) return;
+
+    var headerOffset = 96;
+    var top = formCard.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    if (window.__lenis && typeof window.__lenis.scrollTo === 'function') {
+      window.__lenis.scrollTo(Math.max(0, top), { force: true });
+    } else {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  }
+
+  function applyContactRouteParams(params) {
+    if (!params) return;
+
+    var subjectField = document.querySelector('#contact-form input[name="_subject"]');
+    if (subjectField && params.subject) {
+      subjectField.value = params.subject;
+    }
+
+    if (params.focus === 'form' || params.subject) {
+      setTimeout(scrollToContactForm, 120);
+    }
+  }
+
+  function render(mainEl, params) {
     var config = (typeof CONTACT_PAGE_CONFIG !== 'undefined') ? CONTACT_PAGE_CONFIG : {};
     var faqData = (typeof CONTACT_FAQ_DATA !== 'undefined') ? CONTACT_FAQ_DATA : [];
 
     var hero = config.hero || {};
     var enquiry = config.enquiry || {};
+    var contactSocial = (typeof CONTACT_DATA !== 'undefined' && CONTACT_DATA && CONTACT_DATA.social) ? CONTACT_DATA.social : {};
     var offices = config.offices || { label: 'Our Offices', locations: [] };
     var guarantee = config.responseGuarantee || {};
     var sectorOpts = config.sectorOptions || ['Product Enquiry', 'Service Enquiry', 'Custom Solution', 'Partnership', 'General Question'];
+    var linkedInUrl = enquiry.linkedinUrl ||
+      contactSocial.linkedin ||
+      (isExternalUrl(enquiry.linkedin) ? enquiry.linkedin : '') ||
+      ((typeof FOOTER_DATA !== 'undefined' && FOOTER_DATA && FOOTER_DATA.linkedIn) ? FOOTER_DATA.linkedIn : '') ||
+      '#';
+    var linkedInLabel = enquiry.linkedinLabel ||
+      (!isExternalUrl(enquiry.linkedin) && enquiry.linkedin ? enquiry.linkedin : '') ||
+      'Tridel Technologies';
 
     var html = '';
 
@@ -106,7 +146,7 @@
     // ── LEFT: Form Card ──
     if (showForm)
     html +=
-      '<div class="contact-form-card">' +
+      '<div class="contact-form-card" id="project-enquiry-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
         '<h2 class="contact-form-title">Project Enquiry</h2>' +
         '<form id="contact-form" class="contact-form" action="' + esc(enquiry.formAction || '#') + '" method="POST">' +
@@ -198,7 +238,7 @@
           '<div class="contact-info-icon"><i class="fab fa-linkedin"></i></div>' +
           '<div>' +
             '<h4>LinkedIn</h4>' +
-            '<a href="' + esc(enquiry.linkedin || '#') + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(enquiry.linkedin || 'Follow us on LinkedIn') + '</a>' +
+            '<a href="' + esc(linkedInUrl) + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(linkedInLabel) + '</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -235,6 +275,7 @@
 
     // Initialize form validation
     initContactForm();
+    applyContactRouteParams(params);
 
     // Initialize offices map
     if (offices.locations.length) {
@@ -267,19 +308,15 @@
       if (typeof L !== 'undefined') return cb();
 
       // Load Leaflet CSS
-      if (!document.querySelector('link[href*="leaflet"]')) {
+      if (!document.querySelector('link[href$="assets/vendor/leaflet/leaflet.css"]')) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = 'anonymous';
+        link.href = 'assets/vendor/leaflet/leaflet.css';
         document.head.appendChild(link);
       }
 
       var script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = 'anonymous';
+      script.src = 'assets/vendor/leaflet/leaflet.js';
       script.onload = cb;
       document.head.appendChild(script);
     }

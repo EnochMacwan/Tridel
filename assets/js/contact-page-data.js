@@ -51,7 +51,8 @@ var CONTACT_PAGE_CONFIG = {
   },
   enquiry: {
     email: 'info@trideltechnologies.com',
-    linkedin: 'Tridel Technologies'
+    linkedinLabel: 'Tridel Technologies',
+    linkedinUrl: 'https://www.linkedin.com/company/tridel-technologies-company/'
   },
   phone: '+971 4 609 1461',
   responseGuarantee: {

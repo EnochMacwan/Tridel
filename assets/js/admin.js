@@ -448,7 +448,16 @@ async function testGitHubConnection() {
 
 var authToken = sessionStorage.getItem('adminToken') || null;
 
+function useModernAdminAuth() {
+    return typeof AdminAuth !== 'undefined';
+}
+
 async function checkAuth() {
+    if (useModernAdminAuth()) {
+        hideLogin();
+        return;
+    }
+
     var isGitHubPages = !window.location.hostname.includes('localhost') &&
         !window.location.hostname.includes('127.0.0.1');
 
@@ -530,12 +539,25 @@ async function doLogout() {
 }
 
 function showLogin() {
+    if (useModernAdminAuth()) {
+        if (typeof AdminAuth.renderLoginModal === 'function') {
+            AdminAuth.renderLoginModal();
+        }
+        return;
+    }
+
     document.getElementById('login-overlay').style.display = 'flex';
     document.getElementById('login-password').value = '';
     document.getElementById('login-error').style.display = 'none';
 }
 
 function hideLogin() {
+    if (useModernAdminAuth()) {
+        var legacyOverlay = document.getElementById('login-overlay');
+        if (legacyOverlay) legacyOverlay.style.display = 'none';
+        return;
+    }
+
     document.getElementById('login-overlay').style.display = 'none';
 }
 
@@ -3327,7 +3349,7 @@ function saveVisibility() {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async function () {
-    checkAuth();
+    await checkAuth();
     initNavigation();
 
     // Update theme icon now that DOM is ready

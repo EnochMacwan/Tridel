@@ -6,6 +6,11 @@
  *   window.renderProductDetail(container, productId)
  */
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var formatAllowedInlineHtml = typeof formatAllowedInlineHtml === 'function'
+    ? formatAllowedInlineHtml
+    : function(text) {
+        return esc(text == null ? '' : text).replace(/&lt;(\/?)strong&gt;/gi, '<$1strong>');
+    };
 
 /**
  * Renders a Product Detail page into the given container.
@@ -41,7 +46,7 @@ window.renderProductDetail = function(container, productId) {
         featuresHtml = `
             <h3>Key Features</h3>
             <ul class="detail-layout__list">
-                ${product.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+                ${product.features.map(f => `<li>${formatAllowedInlineHtml(f)}</li>`).join('')}
             </ul>
         `;
     }

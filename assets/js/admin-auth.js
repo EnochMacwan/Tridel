@@ -4,11 +4,19 @@
  * note: This is not server-side secure but prevents casual access.
  */
 
+document.documentElement.classList.add('admin-auth-pending');
+
 const AdminAuth = {
     // Fallback hash for offline/GitHub Pages mode only (server-side auth is preferred)
     // SHA-256 Hash of 'tridel2026' — used ONLY when server is unreachable
     FALLBACK_HASH: 'd4de1e781e29cf9ea1e9fbe380017478bfb37554d53a9094a836e22e2b605c7c',
     SESSION_KEY: 'tridel_secure_session_v1',
+
+    setAuthState(state) {
+        const root = document.documentElement;
+        root.classList.remove('admin-auth-pending', 'admin-auth-locked', 'admin-auth-ready');
+        root.classList.add(state);
+    },
 
     init() {
         // Simple session check
@@ -84,6 +92,12 @@ const AdminAuth = {
     },
 
     renderLoginModal() {
+        this.setAuthState('admin-auth-locked');
+
+        if (document.querySelector('.auth-overlay')) {
+            return;
+        }
+
         // Hide main content initially
         document.body.style.overflow = 'hidden';
         const mainContainer = document.querySelector('.admin-container');
@@ -152,6 +166,7 @@ const AdminAuth = {
     },
 
     showContent() {
+        this.setAuthState('admin-auth-ready');
         document.body.style.overflow = '';
         const mainContainer = document.querySelector('.admin-container');
         if(mainContainer) {
