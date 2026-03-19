@@ -236,15 +236,14 @@ In simple words:
 
 ## Important Authentication Note
 
-The admin panel now uses the Express server to check the password.
+The admin panel now prefers the Express server to check the password, but static hosting also includes a public hash-based fallback.
 
 In simple words:
 
-- The admin page does not keep its own backup password in the browser anymore.
-- The server is the only place that decides whether the password is correct.
-- If the server is not running, admin login will not work.
-- Running the public site as static files is fine, but secure admin login still needs the Express server.
-- For any real deployment, set `TRIDEL_ADMIN_PASSWORD_HASH` on the server before starting the app.
+- If the Express server is available, it handles the login.
+- If the site is running as static files only, `assets/js/admin-auth.js` contains a public SHA-256 fallback hash for browser-side login.
+- That static fallback is less secure, because the hash is shipped to every browser and can be brute-forced offline.
+- For any real deployment, prefer `TRIDEL_ADMIN_PASSWORD_HASH` on the server and treat the browser fallback as convenience only.
 
 ## GitHub Token Requirements
 

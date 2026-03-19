@@ -7,9 +7,47 @@ document.documentElement.classList.add('admin-auth-pending');
 
 const AdminAuth = {
     SESSION_KEY: 'tridel_secure_session_v1',
+    // Public fallback for static hosting only. This is intentionally weaker than server-side auth.
+    FALLBACK_HASH: 'b7e109ffa35bfdf3ec2b32ce41b266d6cb39d80d76ac43f7b8d4fc7d95447a7b',
 
     createSessionMarker() {
         return 'auth_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+    },
+
+    async sha256(message) {
+        if (!window.crypto || !window.crypto.subtle) {
+            throw new Error('Web Crypto is unavailable in this browser.');
+        }
+
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    },
+
+    completeLogin(token) {
+        if (token) {
+            sessionStorage.setItem('adminToken', token);
+        }
+        sessionStorage.setItem(this.SESSION_KEY, this.createSessionMarker());
+        this.removeModal();
+        this.showContent();
+        return { ok: true };
+    },
+
+    async tryFallbackLogin(password) {
+        try {
+            const hash = await this.sha256(password);
+            if (hash === this.FALLBACK_HASH) {
+                return this.completeLogin();
+            }
+            return { ok: false, message: 'Invalid password.' };
+        } catch (e) {
+            return {
+                ok: false,
+                message: 'Login fallback is unavailable in this browser.'
+            };
+        }
     },
 
     setAuthState(state) {
@@ -42,13 +80,7 @@ const AdminAuth = {
             const data = await res.json().catch(() => ({}));
 
             if (res.ok) {
-                if (data.token) {
-                    sessionStorage.setItem('adminToken', data.token);
-                }
-                sessionStorage.setItem(this.SESSION_KEY, this.createSessionMarker());
-                this.removeModal();
-                this.showContent();
-                return { ok: true };
+                return this.completeLogin(data.token);
             }
 
             if (res.status === 401 || res.status === 429) {
@@ -58,16 +90,10 @@ const AdminAuth = {
                 };
             }
 
-            return {
-                ok: false,
-                message: 'Admin login is unavailable right now. Please try again later.'
-            };
+            return this.tryFallbackLogin(password);
         } catch (e) {
-            console.warn('Admin login requires the Tridel server API.');
-            return {
-                ok: false,
-                message: 'Admin login requires the Tridel server. Start server.js and set TRIDEL_ADMIN_PASSWORD.'
-            };
+            console.warn('Admin login server is unavailable. Falling back to public hash check.');
+            return this.tryFallbackLogin(password);
         }
     },
 
@@ -95,7 +121,7 @@ const AdminAuth = {
             <div class="auth-card">
                 <img src="assets/images/logo/tridel.png" alt="Tridel Logo" class="auth-logo">
                 <h2 class="auth-title">Admin Access</h2>
-                <p class="auth-subtitle">Enter the server admin password to continue</p>
+                <p class="auth-subtitle">Enter the admin password to continue</p>
 
                 <form class="auth-form" onsubmit="AdminAuth.handleSubmit(event)">
                     <div class="auth-input-group">
