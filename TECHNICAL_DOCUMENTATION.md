@@ -129,7 +129,7 @@ Use this mode if the admin panel should:
 ### PowerShell Example
 
 ```powershell
-$env:TRIDEL_ADMIN_PASSWORD="replace-with-strong-password"
+$env:TRIDEL_ADMIN_PASSWORD_HASH="replace-with-scrypt-hash"
 $env:TRIDEL_GITHUB_OWNER="EnochMacwan"
 $env:TRIDEL_GITHUB_REPO="Tridel"
 $env:TRIDEL_GITHUB_BRANCH="main"
@@ -142,7 +142,7 @@ node server.js
 ### Bash Example
 
 ```bash
-export TRIDEL_ADMIN_PASSWORD="replace-with-strong-password"
+export TRIDEL_ADMIN_PASSWORD_HASH="replace-with-scrypt-hash"
 export TRIDEL_GITHUB_OWNER="EnochMacwan"
 export TRIDEL_GITHUB_REPO="Tridel"
 export TRIDEL_GITHUB_BRANCH="main"
@@ -182,22 +182,32 @@ Use this mode if only the public site is being hosted and no Express process wil
 
 ## Required Passphrases and Environment Variables
 
+For local development, the server now reads environment values from `.env` or `.env.local` in the project root before falling back to generated defaults.
+
 ### Required in Production
 
 ### `TRIDEL_ADMIN_PASSWORD`
 
 - Purpose: Admin login password for the Express API.
-- Required for production Express deployment.
+- Optional plaintext password input for local development or compatibility.
+- Prefer `TRIDEL_ADMIN_PASSWORD_HASH` for persistent environments.
+- If both are set, `TRIDEL_ADMIN_PASSWORD_HASH` is used.
+
+### `TRIDEL_ADMIN_PASSWORD_HASH`
+
+- Purpose: Hashed admin login secret for the Express API.
+- Preferred setting for production Express deployment.
 - If missing in production, `server.js` exits.
 - If missing in local development, `server.js` creates a random temporary admin password and prints it in the terminal when the server starts.
 
 In simple words:
 
-- If you set `TRIDEL_ADMIN_PASSWORD`, that is the admin password.
+- If you set `TRIDEL_ADMIN_PASSWORD_HASH`, the server checks your password against that hash.
+- If you set `TRIDEL_ADMIN_PASSWORD`, the server uses the plain value directly.
 - If you do not set it on a local machine, the server makes a random password for you.
 - That random password works only for the current server run.
 - If you stop and restart the server, a new random password is created.
-- For staging or production, always set `TRIDEL_ADMIN_PASSWORD` yourself so the password stays stable.
+- For staging or production, always set `TRIDEL_ADMIN_PASSWORD_HASH` yourself so the password stays stable without storing it in plaintext.
 
 ### Optional but Recommended
 
@@ -234,7 +244,7 @@ In simple words:
 - The server is the only place that decides whether the password is correct.
 - If the server is not running, admin login will not work.
 - Running the public site as static files is fine, but secure admin login still needs the Express server.
-- For any real deployment, set `TRIDEL_ADMIN_PASSWORD` on the server before starting the app.
+- For any real deployment, set `TRIDEL_ADMIN_PASSWORD_HASH` on the server before starting the app.
 
 ## GitHub Token Requirements
 
@@ -281,7 +291,7 @@ Do not commit the token, store it in the repository, or send it in chat.
 1. Install Node.js and npm.
 2. Clone the repository.
 3. Run `npm ci`.
-4. Set `TRIDEL_ADMIN_PASSWORD`.
+4. Set `TRIDEL_ADMIN_PASSWORD_HASH` or `TRIDEL_ADMIN_PASSWORD`.
 5. If GitHub publishing is required, set:
    - `TRIDEL_GITHUB_OWNER`
    - `TRIDEL_GITHUB_REPO`

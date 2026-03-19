@@ -10,6 +10,33 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+function loadEnvFile(filePath) {
+    if (!fs.existsSync(filePath)) return;
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    content.split(/\r?\n/).forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) return;
+
+        const match = trimmed.match(/^([\w.-]+)\s*=\s*(.*)$/);
+        if (!match) return;
+
+        const key = match[1];
+        let value = match[2] || '';
+
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+        }
+
+        if (typeof process.env[key] === 'undefined') {
+            process.env[key] = value;
+        }
+    });
+}
+
+loadEnvFile(path.join(__dirname, '.env'));
+loadEnvFile(path.join(__dirname, '.env.local'));
+
 const app = express();
 const PORT = 3000;
 
@@ -24,17 +51,57 @@ function generateDevelopmentAdminPassword() {
     return crypto.randomBytes(18).toString('base64url');
 }
 
-let ADMIN_PASSWORD;
-if (process.env.TRIDEL_ADMIN_PASSWORD) {
+function hashAdminPassword(password, saltHex) {
+    const salt = saltHex || crypto.randomBytes(16).toString('hex');
+    const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
+    return `scrypt$${salt}$${derivedKey}`;
+}
+
+function verifyAdminPassword(password, storedHash) {
+    if (!password || !storedHash) return false;
+
+    const parts = String(storedHash).split('$');
+    if (parts.length !== 3 || parts[0] !== 'scrypt') return false;
+
+    const salt = parts[1];
+    const expected = Buffer.from(parts[2], 'hex');
+    const actual = crypto.scryptSync(password, salt, expected.length);
+
+    return expected.length === actual.length && crypto.timingSafeEqual(actual, expected);
+}
+
+function isSupportedAdminPasswordHash(storedHash) {
+    const parts = String(storedHash || '').split('$');
+    return parts.length === 3 && parts[0] === 'scrypt' && /^[0-9a-f]+$/i.test(parts[1]) && /^[0-9a-f]+$/i.test(parts[2]);
+}
+
+let ADMIN_PASSWORD = null;
+let ADMIN_PASSWORD_HASH = null;
+
+if (process.env.TRIDEL_ADMIN_PASSWORD_HASH) {
+    ADMIN_PASSWORD_HASH = process.env.TRIDEL_ADMIN_PASSWORD_HASH.trim();
+} else if (process.env.TRIDEL_ADMIN_PASSWORD) {
     ADMIN_PASSWORD = process.env.TRIDEL_ADMIN_PASSWORD;
 } else if (process.env.NODE_ENV === 'production') {
-    console.error('FATAL: TRIDEL_ADMIN_PASSWORD environment variable is required in production.');
+    console.error('FATAL: TRIDEL_ADMIN_PASSWORD_HASH or TRIDEL_ADMIN_PASSWORD environment variable is required in production.');
     process.exit(1);
 } else {
     ADMIN_PASSWORD = generateDevelopmentAdminPassword();
     console.warn('WARNING: TRIDEL_ADMIN_PASSWORD is not set.');
     console.warn(`Generated one-time development admin password for this server process: ${ADMIN_PASSWORD}`);
     console.warn('Set TRIDEL_ADMIN_PASSWORD to use a stable admin secret.');
+}
+
+if (ADMIN_PASSWORD_HASH && !isSupportedAdminPasswordHash(ADMIN_PASSWORD_HASH)) {
+    console.error('FATAL: TRIDEL_ADMIN_PASSWORD_HASH is not in the expected scrypt format.');
+    process.exit(1);
+}
+
+function isValidAdminPassword(password) {
+    if (ADMIN_PASSWORD_HASH) {
+        return verifyAdminPassword(password, ADMIN_PASSWORD_HASH);
+    }
+    return password === ADMIN_PASSWORD;
 }
 
 const SERVER_GITHUB_CONFIG = {
@@ -384,7 +451,7 @@ app.post('/api/login', (req, res) => {
     }
 
     const { password } = req.body;
-    if (password === ADMIN_PASSWORD) {
+    if (isValidAdminPassword(password)) {
         clearFailedAttempts(ip);
         const token = generateToken();
         sessions.set(token, Date.now() + 3600000); // 1 hour expiry
