@@ -15,6 +15,8 @@ It covers:
 
 This repository does not use a database or build pipeline. The public site is served from versioned HTML, CSS, JavaScript, image, and font files in the repo.
 
+There is no bundler, transpiler, or deployment build step in the current project.
+
 ## 2. Technology Stack
 
 ### Frontend
@@ -30,6 +32,13 @@ This repository does not use a database or build pipeline. The public site is se
 - Express 4
 - CORS
 - Native Node modules: `fs`, `path`, `crypto`
+
+### Package-Level Runtime
+
+Current `package.json` scripts:
+
+- `npm start` -> `node server.js`
+- `npm run dev` -> `node server.js`
 
 ### Frontend Libraries
 
@@ -65,6 +74,7 @@ In this mode:
 - `_headers`, `_redirects`, and `404.html` are part of the static-host setup
 - there is no live Express API
 - admin login can only use the browser-side fallback logic in `assets/js/admin-auth.js`
+- GitHub publishing from the admin cannot use server-managed secrets
 
 ### B. Express Server Mode
 
@@ -77,6 +87,7 @@ In this mode:
 - local file saving is available
 - server-managed GitHub publishing is available
 - CORS and response security headers are applied by Express
+- root-level deny rules and unknown extension-path `404` handling are enforced by the backend
 
 This is the recommended mode for any real admin workflow.
 
@@ -156,7 +167,21 @@ The admin supports:
 - local save flows through the Express server
 - GitHub-backed publish flows
 
-## 7. Local Development
+## 7. Admin API Surface
+
+Key backend routes exposed by `server.js`:
+
+- `POST /api/login`
+- `GET /api/check-auth`
+- `POST /api/logout`
+- `GET /api/github/config`
+- `POST /api/github/test`
+- `POST /api/github/load`
+- `POST /api/github/save`
+
+These routes are only available when the Express server is running.
+
+## 8. Local Development
 
 ### Prerequisites
 
@@ -177,12 +202,14 @@ npm start
 
 The server listens on port `3000`.
 
+`npm run dev` currently uses the same runtime entrypoint as `npm start`.
+
 Local URLs:
 
 - Site: `http://127.0.0.1:3000/`
 - Admin: `http://127.0.0.1:3000/admin.html`
 
-## 8. Environment Configuration
+## 9. Environment Configuration
 
 Before the server reads defaults, it loads:
 
@@ -227,6 +254,11 @@ These files are intended for local or server-specific configuration and should n
 
 - Optional comma-separated list of additional allowed origins for CORS
 
+#### `NODE_ENV`
+
+- Used by the server to determine production behavior
+- If `NODE_ENV=production` and no admin password variable is set, the server exits on startup
+
 ### Production Requirement
 
 In production, the server expects one of these to be configured:
@@ -240,7 +272,7 @@ Preferred production choice:
 
 If neither is set in production, `server.js` exits.
 
-## 9. Admin Authentication Model
+## 10. Admin Authentication Model
 
 ### Server-Backed Login
 
@@ -251,6 +283,17 @@ This is the stronger option because:
 - the secret stays on the server
 - rate limiting is applied
 - session state is created after server validation
+- the public site does not need to expose the effective login secret
+
+### Development Fallback in Express Mode
+
+If the Express server is started locally without `TRIDEL_ADMIN_PASSWORD_HASH` or `TRIDEL_ADMIN_PASSWORD` and `NODE_ENV` is not `production`:
+
+- the server generates a one-time random admin password
+- that password is printed to the terminal
+- it changes when the server restarts
+
+This behavior exists for local development convenience only.
 
 ### Static Fallback Login
 
@@ -264,6 +307,7 @@ Important:
 - it is weaker than server-side auth
 - it can be brute-forced offline
 - it should be treated as a convenience path, not the preferred security model
+- any password that matches the public fallback hash should be treated as effectively exposed
 
 ### Plain-Language Summary
 
@@ -271,7 +315,7 @@ Important:
 - If the site is hosted as static files only, the browser can fall back to the public hash in `assets/js/admin-auth.js`.
 - For secure deployment, use the Express server with `TRIDEL_ADMIN_PASSWORD_HASH`.
 
-## 10. Deployment Procedures
+## 11. Deployment Procedures
 
 ### Option A: Static Hosting Deployment
 
@@ -289,6 +333,7 @@ Use this for brochure-site hosting or GitHub Pages style deployment.
 - The public site works without Node.
 - Backend API routes do not exist in this mode.
 - Admin access depends on the public frontend fallback, not the Express API.
+- Static hosts such as GitHub Pages are suitable for brochure-site deployment, not for secure admin deployment.
 
 ### Option B: Express Deployment
 
@@ -336,7 +381,7 @@ Use one of:
 - Windows service wrapper
 - container/process supervisor
 
-## 11. GitHub Integration
+## 12. GitHub Integration
 
 The admin supports two GitHub patterns.
 
@@ -352,6 +397,8 @@ The admin supports two GitHub patterns.
 - the admin uses backend proxy endpoints
 - preferred when Express is running
 
+When server-managed GitHub mode is configured correctly, the admin should not require a browser-stored PAT for normal publish operations.
+
 ### Token Guidance
 
 Use a GitHub Personal Access Token with repository contents read/write permission for the target repo.
@@ -362,7 +409,7 @@ Do not:
 - store the token in tracked repo files
 - place the plaintext token in documentation
 
-## 12. Security Notes
+## 13. Security Notes
 
 Current code-level protections include:
 
@@ -372,20 +419,21 @@ Current code-level protections include:
 - request sanitization for admin payloads
 - deny rules for sensitive root files
 - 404 handling for blocked extension paths
+- environment-file loading from `.env` / `.env.local` without committing secrets
 
 Security limitations to be aware of:
 
 - static-host admin fallback is intentionally weaker because the hash is public
 - any real secure admin deployment should use the Express server
 
-## 13. Operational Notes
+## 14. Operational Notes
 
 - The project has no database migration process because content lives in versioned JS files.
 - There is no frontend build step.
 - Changes to content may require updating both data files and loader/rendering logic if schemas change.
 - Large image payloads increase repo size; some data files contain inline base64 assets.
 
-## 14. What Not to Store in the Repo
+## 15. What Not to Store in the Repo
 
 Do not store these as committed plaintext values:
 
@@ -395,7 +443,7 @@ Do not store these as committed plaintext values:
 
 Use environment variables on the deployment target instead.
 
-## 15. Quick Handoff Checklist
+## 16. Quick Handoff Checklist
 
 For a static public deployment:
 
@@ -410,3 +458,4 @@ For a secure admin deployment:
 3. Set GitHub environment variables if publish-to-repo is required.
 4. Serve the app over HTTPS.
 5. Verify `/api/login` and admin save routes work before handoff.
+6. Do not rely on the public static fallback if the deployment is meant to be secure.
