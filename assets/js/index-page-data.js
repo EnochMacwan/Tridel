@@ -47,7 +47,7 @@ var INDEX_WHAT_WE_DO = {
     {
       "icon": "fa-microchip",
       "title": "Proprietary Hardware Solutions",
-      "desc": "Custom-built dataloggers, buoys, survey vessels, and monitoring stations designed for harsh marine environments."
+      "desc": "Custom built hardware platforms for integrated Environment Monitoring, Surveying, and Research purposes in Terrestrial, Marine, and Subsea domain."
     },
     {
       "icon": "fa-laptop-code",
