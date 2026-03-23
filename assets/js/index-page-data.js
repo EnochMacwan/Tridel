@@ -51,8 +51,8 @@ var INDEX_WHAT_WE_DO = {
     },
     {
       "icon": "fa-laptop-code",
-      "title": "Software Platforms",
-      "desc": "TEMS and eSpecia — cloud-based platforms for real-time data management, analytics, and GIS integration."
+      "title": "Proprietary Software Platforms",
+      "desc": "On premises, cloud based software platforms for Environmental and Survey Data Management, analytics, and GIS integration."
     },
     {
       "icon": "fa-water",
