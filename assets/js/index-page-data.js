@@ -29,14 +29,14 @@ var INDEX_STATS = [
     "label": "Countries"
   },
   {
-    "target": 0,
-    "suffix": "",
-    "label": "New Stat"
-  },
-  {
     "target": 50,
     "suffix": "+",
     "label": "Govt. & Industry Clients"
+  },
+  {
+    "target": 5,
+    "suffix": "",
+    "label": "Global Offices"
   }
 ];
 
