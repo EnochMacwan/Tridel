@@ -46,7 +46,7 @@ var INDEX_WHAT_WE_DO = {
   "cards": [
     {
       "icon": "fa-microchip",
-      "title": "Hardware Solutions",
+      "title": "Proprietary Hardware Solutions",
       "desc": "Custom-built dataloggers, buoys, survey vessels, and monitoring stations designed for harsh marine environments."
     },
     {
