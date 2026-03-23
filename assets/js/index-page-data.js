@@ -27,6 +27,16 @@ var INDEX_STATS = [
     "target": 3,
     "suffix": "",
     "label": "Countries"
+  },
+  {
+    "target": 0,
+    "suffix": "",
+    "label": "New Stat"
+  },
+  {
+    "target": 50,
+    "suffix": "+",
+    "label": "Govt. & Industry Clients"
   }
 ];
 
