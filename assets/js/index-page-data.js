@@ -37,6 +37,11 @@ var INDEX_STATS = [
     "target": 5,
     "suffix": "",
     "label": "Global Offices"
+  },
+  {
+    "target": 170,
+    "suffix": "+",
+    "label": "Projects Delivered"
   }
 ];
 
