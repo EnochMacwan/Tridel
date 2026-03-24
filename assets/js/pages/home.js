@@ -319,7 +319,7 @@
       renderClientLogos();
     }
 
-    // Lazy-load Leaflet and testimonial map
+    // Render the testimonial card deck
     loadTestimonialMap();
 
     // Initialize scroll reveal
@@ -341,31 +341,16 @@
   }
 
   function loadTestimonialMap() {
-    // Check if Leaflet is already loaded
-    if (typeof L !== 'undefined') {
-      if (typeof renderTestimonialMap === 'function') {
-        renderTestimonialMap();
-      }
+    if (typeof renderTestimonialMap === 'function') {
+      renderTestimonialMap();
       return;
     }
 
-    // Load Leaflet CSS
-    if (!document.querySelector('link[href$="assets/vendor/leaflet/leaflet.css"]')) {
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'assets/vendor/leaflet/leaflet.css';
-      document.head.appendChild(link);
-    }
-
-    // Load Leaflet JS
-    var script = document.createElement('script');
-    script.src = 'assets/vendor/leaflet/leaflet.js';
-    script.onload = function () {
+    setTimeout(function () {
       if (typeof renderTestimonialMap === 'function') {
         renderTestimonialMap();
       }
-    };
-    document.head.appendChild(script);
+    }, 50);
   }
 
   window.registerRoute('/', {
