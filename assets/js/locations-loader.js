@@ -52,7 +52,7 @@ function renderGlobalPresence() {
                  listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
                       <h4>${escapeHtml(loc.country)}</h4>
-                      <p class="contact-location-address">${escapeHtml(loc.address)}</p>
+                      <p><strong>${escapeHtml(loc.name)}</strong></p>
                     </div>
                  `;
              });
@@ -63,9 +63,7 @@ function renderGlobalPresence() {
             groupedLocations[country].forEach(loc => {
                 listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
-                      ${loc.type !== 'Office' && loc.type !== 'Factory' ? '' : `<p><strong>${escapeHtml(loc.name)}</strong></p>`}
-                      ${loc.type === 'Registered Office' ? `<p class="contact-location-label">${escapeHtml(loc.name)}</p>` : ''}
-                      <p class="contact-location-address">${escapeHtml(loc.address)}</p>
+                      <p><strong>${escapeHtml(loc.name)}</strong></p>
                     </div>
                 `;
             });
@@ -152,7 +150,7 @@ function initMap(locations) {
     locations.forEach(loc => {
         if (loc.lat && loc.lng) {
             const marker = L.marker([loc.lat, loc.lng], { icon: iconNormal }).addTo(map);
-            marker.bindPopup(`<b>${escapeHtml(loc.name)}</b><br>${escapeHtml(loc.address)}`);
+            marker.bindPopup(`<b>${escapeHtml(loc.name)}</b>`);
             markers.push(marker);
         }
     });

@@ -52,9 +52,6 @@
       grouped[country].forEach(function (loc) {
         var iconClass = loc.type === 'Factory' ? 'fa-industry' :
                         loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
-        var cleanAddr = (loc.address || '')
-          .replace(/<br\s*\/?>/gi, ', ')
-          .replace(/Tridel Technologies Pvt Ltd,?\s*/gi, '');
 
         html +=
           '<div class="office-card" data-location-id="' + esc(loc.id) + '" ' +
@@ -62,8 +59,6 @@
             '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
             '<div class="office-card-body">' +
               '<div class="office-card-name">' + esc(loc.name) + '</div>' +
-              '<div class="office-card-meta">' + esc(loc.type) + '</div>' +
-              '<div class="office-card-address">' + esc(cleanAddr) + '</div>' +
             '</div>' +
           '</div>';
       });
