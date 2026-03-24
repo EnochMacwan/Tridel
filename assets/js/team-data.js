@@ -21,7 +21,7 @@ const TEAM_DATA = [
     "name": "Reema Shetty",
     "role": "Director-Commercial & Legal Affairs",
     "image": "assets/images/team/reema-shetty.jpg",
-    "bio": "Leading the commercial function, Reema Shetty combines expertise in financial management, procurement strategies, and vendor/subcontractor coordination with strong contract negotiation skills to ensure projects are executed seamlessly and efficiently."
+    "bio": "Leading the commercial function, Reema Shetty brings strong expertise in financial management and procurement strategy, complemented by robust contract negotiation capabilities.\nShe steers commercial strategy and legal governance with a clear focus on risk mitigation and sustainable growth, ensuring every engagement is commercially sound, legally compliant, and aligned with broader business objectives.\nWith sharp commercial insight and legal acumen, she effectively navigates complex cross-border projects—driving strategic deal-making, mitigating risks, and building high-value, compliant partnerships."
   },
   {
     "name": "Dr. John Luick",
