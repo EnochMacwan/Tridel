@@ -10,7 +10,7 @@ var ABOUT_DATA = {
     "imageAlt": "The Tridel team at an outdoor company event"
   },
   "pageHeader": {
-    "title": "Pioneering the Future of Maritime Intelligence",
-    "subtitle": "We are a team of engineers, scientists, and hydrographers dedicated to solving complex challenges in the marine environment."
+    "title": "Powered by People. Proven by Technology.",
+    "subtitle": "We are a team of Engineers, Scientists, and Hydrographers dedicated to solving complex challenges in the Marine Environment."
   }
 };
