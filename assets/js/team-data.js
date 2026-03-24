@@ -19,7 +19,7 @@ const TEAM_DATA = [
   },
   {
     "name": "Reema Shetty",
-    "role": "Commercial Manager",
+    "role": "Director-Commercial & Legal Affairs",
     "image": "assets/images/team/reema-shetty.jpg",
     "bio": "Leading the commercial function, Reema Shetty combines expertise in financial management, procurement strategies, and vendor/subcontractor coordination with strong contract negotiation skills to ensure projects are executed seamlessly and efficiently."
   },
