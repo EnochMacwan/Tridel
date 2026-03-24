@@ -26,7 +26,7 @@ var INDEX_STATS = [
   {
     "target": 3,
     "suffix": "",
-    "label": "Countries"
+    "label": "Global Offices"
   },
   {
     "target": 50,
@@ -37,6 +37,16 @@ var INDEX_STATS = [
     "target": 170,
     "suffix": "+",
     "label": "Projects Delivered"
+  },
+  {
+    "target": 10,
+    "suffix": "+",
+    "label": "Years"
+  },
+  {
+    "target": 14,
+    "suffix": "+",
+    "label": "Countries Served"
   }
 ];
 
