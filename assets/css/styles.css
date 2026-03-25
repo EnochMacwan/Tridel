@@ -3447,21 +3447,30 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 }
 
 .testimonial-deck__card {
-    min-height: 430px;
+    min-height: 370px;
 }
 
 .testimonial-deck__card .testimonial-card__header {
-    height: 112px;
-    padding: 16px;
+    height: 84px;
+    padding: 12px;
 }
 
 .testimonial-deck__card .testimonial-card__content {
-    padding: 20px;
+    padding: 16px;
 }
 
 .testimonial-deck__card .testimonial-card__quote {
-    line-height: 1.55;
-    margin-bottom: 18px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    margin-bottom: 14px;
+}
+
+.testimonial-deck__card .testimonial-deck__location {
+    margin-bottom: 12px;
+}
+
+.testimonial-deck__card .testimonial-card__author-info {
+    padding-top: 12px;
 }
 
 .testimonial-deck__card.is-active {
@@ -3514,11 +3523,11 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     }
 
     .testimonial-deck__card {
-        min-height: 400px;
+        min-height: 340px;
     }
 
     .testimonial-deck__card .testimonial-card__header {
-        height: 96px;
+        height: 72px;
     }
 
     .testimonial-deck__toolbar {
