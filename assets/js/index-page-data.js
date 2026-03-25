@@ -10,12 +10,12 @@ var INDEX_HERO = {
 var INDEX_STATS = [
   {
     "target": 26,
-    "suffix": "+",
+    "suffix": "",
     "label": "Products"
   },
   {
-    "target": 9,
-    "suffix": "+",
+    "target": 12,
+    "suffix": "",
     "label": "Services"
   },
   {
@@ -39,7 +39,7 @@ var INDEX_STATS = [
     "label": "Years"
   },
   {
-    "target": 14,
+    "target": 15,
     "suffix": "+",
     "label": "Countries Served"
   }
