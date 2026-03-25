@@ -72,7 +72,7 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=attide",
     "id": "attide",
     "category": "Software",
-    "description": "A hand-crafted, custom software for complex tidal analysis. We automate the process to minimise user error and provide the most reliable results on the market. \nDesigned for users responsible for monitoring and predicting tidal water\nlevels and currents, particularly in critical applications such as minimal\nunder-keel clearance, spatial tidal corrections, critical off shore operations which is impacted through tidal variations and tidal streams.",
+    "description": "ATtide is an advanced tidal analysis and prediction software developed for comprehensive processing, interpretation, and visualisation of tide data. It performs detailed harmonic analysis of observed tidal records, identifying and quantifying the individual tidal constituents that influence sea level variations. Using these constituents, ATtide can generate highly accurate tidal predictions for any specified time and location.\nBeyond prediction, the software offers a suite of analytical and visualisation tools that support in-depth examination of tidal behavior, long-term trends, and residual components which makes essential tool for coastal engineers, oceanographers, hydrographers, and environmental scientists involved in coastal modelling, harbor design, and sea-level research.",
     "longDescription": "A hand-crafted, custom software for complex tidal analysis. We automate the process to minimize user error and provide the most reliable results on the market.&lt;[...]",
     "name": "Tidal Analysis & Prediction Software (ATtide)",
     "gallery": [
@@ -242,7 +242,7 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=especia",
     "id": "especia",
     "category": "Software",
-    "description": "An efficient platform for collating and managing environmental and ecological data, selected for monitoring systems in protected areas like Sir Bo Naair Island.",
+    "description": "eSpecia application is used to visualise and manage species-related data, especially for marine and freshwater environments and plays a crucial role in understanding interactions between aquatic species and their environments, as well as predicting how ecosystems respond to climate change and human activities that shape species distributions, biodiversity patterns, and ecosystem dynamics.",
     "longDescription": "An efficient platform for collating and managing environmental and ecological data, selected for monitoring systems in protected areas like Sir Bo Naair Island.[...]",
     "name": "Biodiversity Platform (eSpecia)",
     "gallery": [
@@ -433,7 +433,7 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=t-sms",
     "id": "t-sms",
     "category": "Software",
-    "description": "Our survey workflow management and reporting software, designed for efficient project management and utilisation of survey data, as delivered for the Hydrograph.",
+    "description": "Tridel Survey Management Suite (TSMS) software is a standardised and fully integrated program covering key aspects of marine survey operations from planning to reporting, team and asset management, vessel management and crewing processes.",
     "longDescription": "Our survey workflow management and reporting software, designed for efficient project management and utilization of survey data, as delivered for the Hydrograph[...]",
     "name": "Survey Management System (TSMS)",
     "gallery": [
@@ -478,7 +478,7 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=tems",
     "id": "tems",
     "category": "Software",
-    "description": "A customised real-time data publishing platform that integrates multiple environmental monitoring systems. ",
+    "description": "Tridel Environmental Monitoring System (TEMS) is a customised real-time environmental data publishing software, wherein it enables integration of multiple environmental (oceanographic / meteorological / air quality / water quality ) monitoring systems and establishing central database with customised reporting and analysis tools.",
     "longDescription": "A customized real-time data publishing platform that integrates multiple environmental monitoring systems. Instrument and transmission-independent, available on[...]",
     "name": "Tridel Environmental Monitoring System (TEMS)",
     "gallery": [
@@ -575,7 +575,7 @@ const PRODUCTS_DATA = [
     "isNested": false
   },
   {
-    "name": "Telemetric Groundwater Monitoring System",
+    "name": "Telemetric Groundwater Monitoring System (TGWM)",
     "category": "Software",
     "parent": "",
     "description": "The Telemetric Ground Water Monitoring System Software enables collection of water quality data from various ground water monitoring stations and visualises the same in a smarter and interactive way, in line with the guidelines of Government of Dubai and Dubai Municipality (DM).",
