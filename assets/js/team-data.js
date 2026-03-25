@@ -7,7 +7,7 @@ const TEAM_DATA = [
   },
   {
     "name": "Cdr. Sanjeev Sharma, IN Retd.",
-    "role": "Chief Operating Officer (COO)",
+    "role": "Chief Executive Officer (CEO)",
     "image": "assets/images/team/sanjeev-sharma.jpg",
     "bio": "With extensive experience in marine operations and technology, Sanjeev provides strategic leadership to the organisation, driving innovation, operational excellence, and sustainable growth."
   },
