@@ -312,16 +312,16 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=monohull-vessel",
     "id": "monohull-vessel",
     "category": "Vessels",
-    "description": "Built for performance and comfort, this 11m fiberglass-reinforced hydrographic survey vessel is ideal for extended offshore missions. Powered by twin 250 HP Suzuki outboard engines, offering high speed and reliability.",
+    "description": "Built for performance and comfort, this 11m fiberglass-reinforced hydrographic survey vessel is ideal for extended offshore missions. Powered by twin outboard engines, offering high speed and reliability.",
     "longDescription": "Built for performance and comfort, this 11m fiberglass-reinforced hydrographic survey vessel is ideal for extended offshore missions. Powered by twin 250 HP Suzuki outboard engines, offering high speed and reliability.",
-    "name": "Monohull Vessel",
+    "name": "Monohull Survey Vessel",
     "gallery": [
       "assets/images/products/monohull-vessel/monohull-new.png"
     ],
     "features": [
       "<strong>Rugged Hull:</strong> 11m fiberglass-reinforced hull designed for durability and stability.",
       "<strong>Offshore Capable:</strong> Engineered specifically for extended offshore missions.",
-      "<strong>Powerful Propulsion:</strong> Twin 250 HP Suzuki outboard engines for high-speed performance.",
+      "<strong>Powerful Propulsion:</strong> Twin outboard engines for high-speed performance.",
       "<strong>Extended Range:</strong> Dual 300L fuel tanks ensure long-range operational capability.",
       "<strong>Comfortable Operations:</strong> Climate-controlled cabin with 12,000 BTU marine AC.",
       "<strong>High Capacity:</strong> Accommodates 10 passengers plus 2 crew members comfortably.",
