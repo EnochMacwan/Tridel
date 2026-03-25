@@ -23,7 +23,7 @@ var CONTACT_INFO_CARDS = [
 var CONTACT_FAQ_DATA = [
   {
     "question": "What industries does Tridel serve?",
-    "answer": "Tridel Technologies serves a wide range of industries including oil & gas, marine construction, port development, environmental monitoring, government agencies, and coastal infrastructure management across the UAE, India, and Australia."
+    "answer": "Tridel Technologies serves a wide range of industries including oil & gas, marine construction, port development, environmental monitoring, government agencies, and coastal infrastructure management across varied geographies."
   },
   {
     "question": "Do you offer custom solutions?",
@@ -57,7 +57,7 @@ var CONTACT_PAGE_CONFIG = {
   "phone": "+971 4 288 4395",
   "responseGuarantee": {
     "title": "Quick Response",
-    "desc": "Our team responds to all messages within 24-48 business hours."
+    "desc": "Our team responds to all project enquiries within 24–48 business hours."
   },
   "offices": {
     "label": "Our Offices",
