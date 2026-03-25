@@ -1509,7 +1509,7 @@ function getFormHTML(type, data) {
                 '<label>Description</label>' +
                 '<textarea class="form-control" id="field-description" placeholder="Project description...">' + (data.description || '') + '</textarea>' +
                 '</div>' +
-                getSingleImageFieldHTML('Project Image <span style="color:red">*</span>', 'field-image', data.image);
+                getSingleImageFieldHTML('Project Image <small class="text-muted-sm">(Optional)</small>', 'field-image', data.image);
 
         case 'home':
             return '<div class="form-group">' +
@@ -1645,7 +1645,7 @@ function validateForm(type) {
         products: ['field-name', 'field-image'],
         services: ['field-title', 'field-image'],
         clients: ['field-name', 'field-logo'],
-        stories: ['field-title', 'field-image'],
+        stories: ['field-title'],
         home: ['field-title', 'field-image'],
         team: ['field-name', 'field-image'],
         testimonials: ['field-quote', 'field-logo']

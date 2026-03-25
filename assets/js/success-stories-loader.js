@@ -65,12 +65,8 @@ window.renderSuccessStories = function(container) {
 
         stories.forEach(story => {
             html += `
-                <div class="grid-card-wrapper">
-                    <div class="grid-card-visual">
-                        <img loading="lazy" alt="${escapeHtml(story.title)}" class="story-card__image"
-                            src="${escapeHtml(story.image || 'assets/images/logo/tridel.png')}">
-                    </div>
-                    <div class="grid-content-outside">
+                <div class="grid-card-wrapper success-story-card">
+                    <div class="grid-content-outside success-story-card__content">
                         <h3 class="story-card__title">
                             ${escapeHtml(story.title)}
                         </h3>
