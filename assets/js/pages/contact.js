@@ -50,6 +50,8 @@
       html += '<div class="office-country-label">' + esc(country) + '</div>';
 
       grouped[country].forEach(function (loc) {
+        var officeName = loc.companyName || loc.name;
+        var officeDesignation = loc.designation || loc.type || '';
         var iconClass = loc.type === 'Factory' ? 'fa-industry' :
                         loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
 
@@ -58,7 +60,8 @@
                'data-lat="' + parseFloat(loc.lat) + '" data-lng="' + parseFloat(loc.lng) + '" tabindex="0" role="button">' +
             '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
             '<div class="office-card-body">' +
-              '<div class="office-card-name">' + esc(loc.name) + '</div>' +
+              '<div class="office-card-name">' + esc(officeName) + '</div>' +
+              (officeDesignation ? '<div class="office-card-meta">' + esc(officeDesignation) + '</div>' : '') +
             '</div>' +
           '</div>';
       });
@@ -143,9 +146,8 @@
     html +=
       '<div class="contact-form-card" id="project-enquiry-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
-        '<h2 class="contact-form-title">Project Enquiry</h2>' +
         '<form id="contact-form" class="contact-form" action="' + esc(enquiry.formAction || '#') + '" method="POST">' +
-          '<input type="hidden" name="_subject" value="New Contact Enquiry - Tridel Website">' +
+          '<input type="hidden" name="_subject" value="New Contact Message - Tridel Website">' +
           '<input type="hidden" name="_captcha" value="false">' +
           '<input type="hidden" name="_template" value="table">' +
           '<div class="contact-form-row">' +
@@ -177,11 +179,11 @@
             '</select>' +
           '</div>' +
           '<div class="form-group">' +
-            '<label for="contact-message">Tell Us About Your Project <span class="required">*</span></label>' +
-            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Describe your project, timeline, and any specific requirements..." required></textarea>' +
-            '<span class="form-error">Please describe your project</span>' +
+            '<label for="contact-message">Message <span class="required">*</span></label>' +
+            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Share your requirements, questions, or message..." required></textarea>' +
+            '<span class="form-error">Please enter your message</span>' +
           '</div>' +
-          '<button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Enquiry</button>' +
+          '<button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>' +
         '</form>' +
         '<div id="contact-success" class="eoi-success" style="display:none;">' +
           '<i class="fas fa-check-circle"></i>' +

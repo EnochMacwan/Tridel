@@ -57,7 +57,7 @@ var CONTACT_PAGE_CONFIG = {
   "phone": "+971 4 288 4395",
   "responseGuarantee": {
     "title": "Quick Response",
-    "desc": "Our team responds to all project enquiries within 24–48 business hours."
+    "desc": "Our team responds to all messages within 24-48 business hours."
   },
   "offices": {
     "label": "Our Offices",

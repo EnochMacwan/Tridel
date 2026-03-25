@@ -49,10 +49,13 @@ function renderGlobalPresence() {
         if (country === 'UAE') {
              // UAE usually has a specific style in the original
              groupedLocations[country].forEach(loc => {
+                 var officeName = escapeHtml(loc.companyName || loc.name);
+                 var officeDesignation = escapeHtml(loc.designation || loc.type || '');
                  listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
                       <h4>${escapeHtml(loc.country)}</h4>
-                      <p><strong>${escapeHtml(loc.name)}</strong></p>
+                      <p><strong>${officeName}</strong></p>
+                      ${officeDesignation ? `<p class="contact-text-secondary">${officeDesignation}</p>` : ''}
                     </div>
                  `;
              });
@@ -61,9 +64,12 @@ function renderGlobalPresence() {
             listHTML += `<h4 class="contact-location-label">${escapeHtml(country)}</h4>`;
             
             groupedLocations[country].forEach(loc => {
+                var officeName = escapeHtml(loc.companyName || loc.name);
+                var officeDesignation = escapeHtml(loc.designation || loc.type || '');
                 listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
-                      <p><strong>${escapeHtml(loc.name)}</strong></p>
+                      <p><strong>${officeName}</strong></p>
+                      ${officeDesignation ? `<p class="contact-text-secondary">${officeDesignation}</p>` : ''}
                     </div>
                 `;
             });
@@ -150,7 +156,9 @@ function initMap(locations) {
     locations.forEach(loc => {
         if (loc.lat && loc.lng) {
             const marker = L.marker([loc.lat, loc.lng], { icon: iconNormal }).addTo(map);
-            marker.bindPopup(`<b>${escapeHtml(loc.name)}</b>`);
+            var popupName = escapeHtml(loc.companyName || loc.name);
+            var popupDesignation = escapeHtml(loc.designation || loc.type || '');
+            marker.bindPopup(`<b>${popupName}</b>${popupDesignation ? `<br><span class="contact-text-secondary">${popupDesignation}</span>` : ''}`);
             markers.push(marker);
         }
     });

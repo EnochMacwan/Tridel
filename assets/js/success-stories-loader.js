@@ -65,21 +65,35 @@ window.renderSuccessStories = function(container) {
 
         stories.forEach(story => {
             var hasImage = !!(story.image && String(story.image).trim());
+            var hasDescription = !!(story.description && String(story.description).trim());
+            var escapedTitle = escapeHtml(story.title);
+            var escapedDescription = escapeHtml(story.description || '');
             html += `
-                <div class="grid-card-wrapper success-story-card ${hasImage ? 'success-story-card--with-image' : 'success-story-card--text-only'}">
+                <div class="grid-card-wrapper success-story-card ${hasImage ? 'success-story-card--with-image' : 'success-story-card--text-only'}"${hasImage ? ' tabindex="0"' : ''}>
                     ${hasImage ? `
                     <div class="grid-card-visual success-story-card__visual">
-                        <img loading="lazy" alt="${escapeHtml(story.title)}" class="story-card__image"
+                        <img loading="lazy" alt="${escapedTitle}" class="story-card__image"
                             src="${escapeHtml(story.image)}" onerror="this.onerror=null;this.closest('.success-story-card__visual').remove();this.closest('.success-story-card').classList.remove('success-story-card--with-image');this.closest('.success-story-card').classList.add('success-story-card--text-only');">
+                        ${hasDescription ? `
+                        <div class="success-story-card__overlay">
+                            <div class="success-story-card__overlay-inner">
+                                <span class="success-story-card__overlay-label">Brief</span>
+                                <p class="success-story-card__overlay-brief">${escapedDescription}</p>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     ` : ''}
                     <div class="grid-content-outside success-story-card__content">
                         <h3 class="story-card__title">
-                            ${escapeHtml(story.title)}
+                            ${escapedTitle}
                         </h3>
-                        <p>
-                            ${escapeHtml(story.description)}
-                        </p>
+                        ${hasImage && hasDescription ? `
+                        <p class="success-story-card__hover-hint">Hover to view brief</p>
+                        <p class="success-story-card__brief">${escapedDescription}</p>
+                        ` : hasDescription ? `
+                        <p>${escapedDescription}</p>
+                        ` : ''}
                     </div>
                 </div>
             `;

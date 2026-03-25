@@ -3789,6 +3789,7 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     padding: clamp(22px, 2.8vw, 30px);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     border-top: 4px solid rgba(0, 170, 231, 0.25);
+    position: relative;
 }
 
 .page-success-stories .success-story-card--text-only {
@@ -3803,12 +3804,19 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .page-success-stories .success-story-card__visual {
     aspect-ratio: 4 / 3;
+    position: relative;
+    overflow: hidden;
 }
 
 .page-success-stories .success-story-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-float);
     border-top-color: var(--color-accent);
+}
+
+.page-success-stories .success-story-card:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
 }
 
 .page-success-stories .success-story-card__content {
@@ -3825,6 +3833,68 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .page-success-stories .success-story-card p {
     margin-bottom: 0;
+}
+
+.page-success-stories .success-story-card--with-image .story-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+}
+
+.page-success-stories .success-story-card__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: clamp(20px, 2.8vw, 28px);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.82) 100%);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.page-success-stories .success-story-card__overlay-inner {
+    color: #fff;
+}
+
+.page-success-stories .success-story-card__overlay-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.page-success-stories .success-story-card__overlay-brief {
+    color: #fff;
+    line-height: 1.65;
+}
+
+.page-success-stories .success-story-card__hover-hint {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent, #00AAE7);
+}
+
+.page-success-stories .success-story-card--with-image .success-story-card__brief {
+    display: none;
+}
+
+.page-success-stories .success-story-card--with-image:hover .story-card__image,
+.page-success-stories .success-story-card--with-image:focus .story-card__image {
+    transform: scale(1.05);
+}
+
+.page-success-stories .success-story-card--with-image:hover .success-story-card__overlay,
+.page-success-stories .success-story-card--with-image:focus .success-story-card__overlay {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 [data-theme="dark"] .page-success-stories .success-story-card {
@@ -3845,6 +3915,21 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
     .page-success-stories .success-stories-category-subtitle {
         max-width: 32ch;
+    }
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 768px) {
+    .page-success-stories .success-story-card__overlay {
+        display: none;
+    }
+
+    .page-success-stories .success-story-card--with-image .success-story-card__brief {
+        display: block;
+        margin-top: 12px;
+    }
+
+    .page-success-stories .success-story-card--with-image .success-story-card__hover-hint {
+        display: none;
     }
 }
 
