@@ -3791,6 +3791,20 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     border-top: 4px solid rgba(0, 170, 231, 0.25);
 }
 
+.page-success-stories .success-story-card--text-only {
+    padding: clamp(22px, 2.8vw, 30px);
+}
+
+.page-success-stories .success-story-card--with-image {
+    padding: 0;
+    overflow: hidden;
+    gap: 20px;
+}
+
+.page-success-stories .success-story-card__visual {
+    aspect-ratio: 4 / 3;
+}
+
 .page-success-stories .success-story-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-float);
@@ -3799,6 +3813,10 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .page-success-stories .success-story-card__content {
     padding: 0;
+}
+
+.page-success-stories .success-story-card--with-image .success-story-card__content {
+    padding: 0 clamp(22px, 2.8vw, 30px) clamp(22px, 2.8vw, 30px);
 }
 
 .page-success-stories .success-story-card .story-card__title {
