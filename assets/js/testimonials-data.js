@@ -143,7 +143,7 @@ const TESTIMONIALS_DATA = [
     "name": "NEOM",
     "author": "",
     "role": "",
-    "location": "",
+    "location": "KSA",
     "lat": 0,
     "lng": 0,
     "quote": "Tridel demonstrated strong technical capability and a proactive approach throughout the Marine Buoys Reactivation project. Deliverables were provided in a professional format and aligned to the agreed scope and milestones, with responsive follow‑up on clarifications. We appreciate the team’s cooperative attitude and solutions‑focused mindset, which helped us progress efficiently to closeout. We would be pleased to consider Tridel for similar environmental works in the future. Sajith’s role on this was pivotal to navigate the project requirements and challenges.",
