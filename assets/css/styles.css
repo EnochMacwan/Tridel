@@ -3447,7 +3447,21 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 }
 
 .testimonial-deck__card {
-    min-height: 500px;
+    min-height: 430px;
+}
+
+.testimonial-deck__card .testimonial-card__header {
+    height: 112px;
+    padding: 16px;
+}
+
+.testimonial-deck__card .testimonial-card__content {
+    padding: 20px;
+}
+
+.testimonial-deck__card .testimonial-card__quote {
+    line-height: 1.55;
+    margin-bottom: 18px;
 }
 
 .testimonial-deck__card.is-active {
@@ -3497,6 +3511,14 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 @media (max-width: 600px) {
     .testimonial-card {
         flex: 0 0 280px;
+    }
+
+    .testimonial-deck__card {
+        min-height: 400px;
+    }
+
+    .testimonial-deck__card .testimonial-card__header {
+        height: 96px;
     }
 
     .testimonial-deck__toolbar {
