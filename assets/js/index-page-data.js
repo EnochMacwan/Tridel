@@ -3,8 +3,8 @@
  * Content data for the home page hero, stats, value props, case study, and CTA
  */
 var INDEX_HERO = {
-  "title": "Pioneering the Future of Maritime Intelligence",
-  "subtitle": "We deliver integrated hardware, software, and services for the comprehensive maritime domain."
+  "title": "Pioneering the Future of Environmental & Maritime Intelligence",
+  "subtitle": "We deliver Integrated Hardware, Software, and Services for the Comprehensive Environment & Maritime Domain."
 };
 
 var INDEX_STATS = [
