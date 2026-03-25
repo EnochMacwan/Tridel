@@ -54,7 +54,7 @@ var CONTACT_PAGE_CONFIG = {
     "linkedinLabel": "Tridel Technologies",
     "linkedinUrl": "https://www.linkedin.com/company/tridel-technologies-company/"
   },
-  "phone": "+971 4 609 1461",
+  "phone": "+971 4 288 4395",
   "responseGuarantee": {
     "title": "Quick Response",
     "desc": "Our team responds to all project enquiries within 24–48 business hours."
