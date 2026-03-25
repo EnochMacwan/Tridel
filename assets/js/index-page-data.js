@@ -57,17 +57,17 @@ var INDEX_WHAT_WE_DO = {
     {
       "icon": "fa-laptop-code",
       "title": "Proprietary Software Platforms",
-      "desc": "On premises, cloud based software platforms for Environmental and Survey Data Management, analytics, and GIS integration."
+      "desc": "On premises and/or cloud based software platforms for Environmental and Survey Data Management, analytics, and GIS integration."
     },
     {
       "icon": "fa-water",
       "title": "Surveying Services",
-      "desc": "Hydrographic, geophysical, and environmental surveys with full project lifecycle management."
+      "desc": "Hydrographic, Geophysical, and Environmental Surveys with full project lifecycle management."
     },
     {
       "icon": "fa-chart-line",
       "title": "Data Analytics",
-      "desc": "Advanced environmental data processing, interpretation, and integration with GIS databases for informed decision making."
+      "desc": "Advanced environmental data processing, statistical / map-based analysis, interpretation, and integration with GIS databases for informed decision making."
     }
   ]
 };
@@ -108,7 +108,7 @@ var INDEX_WHY_CHOOSE = {
     {
       "icon": "fa-award",
       "title": "Proven Expertise",
-      "desc": "Our team brings deep industry experience and technical mastery."
+      "desc": "Our team brings deep industry knowledge, experience and technical mastery."
     },
     {
       "icon": "fa-lightbulb",
