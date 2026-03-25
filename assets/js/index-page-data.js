@@ -19,11 +19,6 @@ var INDEX_STATS = [
     "label": "Services"
   },
   {
-    "target": 26,
-    "suffix": "+",
-    "label": "Global Clients"
-  },
-  {
     "target": 3,
     "suffix": "",
     "label": "Global Offices"
