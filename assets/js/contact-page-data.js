@@ -47,7 +47,7 @@ var CONTACT_PAGE_CONFIG = {
   "hero": {
     "label": "Get in Touch",
     "title": "Let's Work Together",
-    "subtitle": "Have a project in mind? We'd love to hear about it. Reach out and let's explore how we can help."
+    "subtitle": "We'd love to hear from you. Reach out and let's explore how we can work together."
   },
   "enquiry": {
     "email": "mail@trideltechnologies.com",
