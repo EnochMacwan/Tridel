@@ -27,8 +27,17 @@ window.renderClientLogos = function(container) {
     // Function to create logo element
     const createLogo = (client) => {
         const div = document.createElement('div');
+        const slug = String(client.name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
         div.className = 'client-logo';
-        div.innerHTML = `<img loading="lazy" alt="${escapeHtml(client.name)}" src="${client.logo}">`;
+        div.dataset.clientSlug = slug;
+        div.dataset.clientLabel = client.name || '';
+        if (slug === 'behbehani-brothers' || slug === 'dp-world') {
+            div.classList.add('client-logo--needs-label');
+        }
+        div.innerHTML = `<img loading="lazy" alt="${esc(client.name)}" src="${client.logo}">`;
         return div;
     };
 

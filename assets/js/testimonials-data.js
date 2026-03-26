@@ -52,7 +52,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 25.2048,
     "lng": 55.2708,
-    "name": "DDCR",
+    "name": "Dubai Desert Conservation Reserve",
     "location": "Dubai, UAE",
     "logo": "assets/images/testimonials/ddcr.png",
     "quote": "During the whole study of 'Biodiversity Baseline Survey for Dubai Emirate', Tridel team demonstrated excellent work ethics and professional skills supporting the research activities.",
@@ -62,7 +62,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 15.2993,
     "lng": 74.124,
-    "name": "NIO",
+    "name": "National Institute of Oceanography",
     "location": "Goa, India",
     "logo": "assets/images/testimonials/nio.png",
     "quote": "I must complement the Tridel Management for their striving to be fully committed... the best asset created for Dubai Municipality.",
@@ -72,7 +72,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 30.3165,
     "lng": 78.0322,
-    "name": "CEDAR",
+    "name": "Centre for Ecology, Development and Research",
     "location": "Dehradun, India",
     "logo": "assets/images/testimonials/cedar.png",
     "quote": "My experience working with Tridel Technologies... has been extremely positive. This project has been very challenging... However, the team has been up to the task.",
@@ -102,7 +102,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 24.4539,
     "lng": 54.3773,
-    "name": "NMDC",
+    "name": "National Marine Dredging Company",
     "location": "Abu Dhabi, UAE",
     "logo": "assets/images/testimonials/nmdc.png",
     "quote": "The customized Tidal analysis and modelling tool build by Tridel meets with our expectation. Best wishes to the Tridel team.",
@@ -112,7 +112,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 25.3463,
     "lng": 55.4209,
-    "name": "EPAA",
+    "name": "Environment and Protected Areas Authority",
     "location": "Sharjah, UAE",
     "logo": "assets/images/testimonials/epaa.png",
     "quote": "We see Tridel eSpecia GIS application as an efficient platform for collating and managing environmental and ecological data.",
@@ -132,7 +132,7 @@ const TESTIMONIALS_DATA = [
   {
     "lat": 24.9857,
     "lng": 55.0712,
-    "name": "ENOC",
+    "name": "Emirates National Oil Company",
     "location": "Jebel Ali, Dubai",
     "logo": "assets/images/testimonials/enoc.png",
     "quote": "We are satisfied by the services offered by M/s Tridel. The odour monitoring station supplied meets requirement.",

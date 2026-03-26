@@ -31,6 +31,39 @@ function getProductDataLookupId(product) {
     return '';
 }
 
+function getProductGallery(product) {
+    var rawGallery = Array.isArray(product && product.gallery) ? product.gallery : [];
+    var sourceImages = rawGallery.length
+        ? rawGallery
+        : (product && product.image ? [product.image] : []);
+    var seen = Object.create(null);
+    var uniqueImages = [];
+
+    sourceImages.forEach(function(image) {
+        if (!image) {
+            return;
+        }
+
+        var normalized = String(image).trim();
+        if (!normalized) {
+            return;
+        }
+
+        var dedupeKey = normalized.indexOf('data:') === 0
+            ? normalized.slice(0, 128) + '::' + normalized.length
+            : normalized.toLowerCase();
+
+        if (seen[dedupeKey]) {
+            return;
+        }
+
+        seen[dedupeKey] = true;
+        uniqueImages.push(normalized);
+    });
+
+    return uniqueImages;
+}
+
 /**
  * Renders a Product Detail page into the given container.
  * Exported as window.renderProductDetail for SPA router usage.
@@ -75,9 +108,10 @@ window.renderProductDetail = function(container, productId) {
 
     // Build Gallery
     let galleryHtml = '';
-    if (product.gallery && product.gallery.length > 0) {
-        const mainImage = product.gallery[0];
-        const thumbsHtml = product.gallery.map((img, index) => `
+    const galleryImages = getProductGallery(product);
+    if (galleryImages.length > 0) {
+        const mainImage = galleryImages[0];
+        const thumbsHtml = galleryImages.map((img, index) => `
             <img loading="lazy" src="${img}" onclick="changeImage('${img}')" onkeydown="if(event.key==='Enter')changeImage('${img}')" tabindex="0" role="button" ${img === mainImage ? 'class="active"' : ''} alt="${escapeHtml(product.name)} - Image ${index + 1}">
         `).join('');
 
