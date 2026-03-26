@@ -418,6 +418,12 @@ textarea.form-control {
     font-size: 14px;
 }
 
+.dashboard-meta {
+    margin: -10px 0 30px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 /* --- Empty State --- */
 .empty-state {
     text-align: center;

@@ -499,6 +499,14 @@
       });
       if (!valid) {
         e.preventDefault();
+        return;
+      }
+
+      if (typeof window.trackSiteEnquiry === 'function') {
+        window.trackSiteEnquiry({
+          path: '/contact',
+          interest: (form.querySelector('[name="interest"]') || {}).value || 'General'
+        });
       }
     });
   }

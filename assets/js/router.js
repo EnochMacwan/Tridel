@@ -8,6 +8,111 @@
   var routes = {};
   var currentCleanup = null;
   var currentRoute = null;
+  var siteMetricsDisabled = window.location.protocol === 'file:';
+
+  function safeStorage(storageName) {
+    try {
+      return window[storageName];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getStoredId(storageName, key) {
+    var storage = safeStorage(storageName);
+    if (!storage) return '';
+    try {
+      return storage.getItem(key) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function setStoredId(storageName, key, value) {
+    var storage = safeStorage(storageName);
+    if (!storage) return;
+    try {
+      storage.setItem(key, value);
+    } catch (e) {
+      // Ignore storage write failures
+    }
+  }
+
+  function generateTrackingId(prefix) {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return prefix + window.crypto.randomUUID();
+    }
+    return prefix + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+
+  function getVisitorId() {
+    var key = 'tridel.visitorId';
+    var visitorId = getStoredId('localStorage', key);
+    if (!visitorId) {
+      visitorId = generateTrackingId('v_');
+      setStoredId('localStorage', key, visitorId);
+    }
+    return visitorId;
+  }
+
+  function getVisitSessionId() {
+    var key = 'tridel.visitSessionId';
+    var sessionId = getStoredId('sessionStorage', key);
+    if (!sessionId) {
+      sessionId = generateTrackingId('s_');
+      setStoredId('sessionStorage', key, sessionId);
+    }
+    return sessionId;
+  }
+
+  function postSiteMetric(endpoint, payload, useBeacon) {
+    if (siteMetricsDisabled) return;
+
+    var body = JSON.stringify(payload || {});
+
+    if (useBeacon && navigator.sendBeacon) {
+      try {
+        var ok = navigator.sendBeacon(endpoint, new Blob([body], { type: 'application/json' }));
+        if (ok) return;
+      } catch (e) {
+        // Fall back to fetch below
+      }
+    }
+
+    if (typeof fetch !== 'function') return;
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: body,
+      keepalive: true
+    }).then(function(response) {
+      if (!response.ok) {
+        siteMetricsDisabled = true;
+      }
+    }).catch(function() {
+      siteMetricsDisabled = true;
+    });
+  }
+
+  function trackSiteVisit(pathName) {
+    postSiteMetric('/api/metrics/visit', {
+      visitorId: getVisitorId(),
+      sessionId: getVisitSessionId(),
+      path: pathName || '/',
+      title: document.title || ''
+    }, false);
+  }
+
+  window.trackSiteEnquiry = function(details) {
+    var payload = details && typeof details === 'object' ? details : {};
+    payload.visitorId = getVisitorId();
+    payload.sessionId = getVisitSessionId();
+    payload.path = payload.path || (parseHash().path || '/contact');
+    postSiteMetric('/api/metrics/enquiry', payload, true);
+  };
 
   function resetScrollPosition() {
     function scrollTopNow() {
@@ -187,6 +292,7 @@
     }, 100);
 
     currentRoute = parsed.path;
+    trackSiteVisit(parsed.path);
   }
 
   // Intercept clicks on internal links to use SPA navigation

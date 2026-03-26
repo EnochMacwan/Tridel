@@ -767,6 +767,65 @@ function showSection(section) {
 // 7. DASHBOARD
 // ==========================================
 
+function renderDashboardStatCards(containerId, stats) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = (stats || []).map(function (s) {
+        return '<div class="stat-card">' +
+            '<i class="fas ' + s.icon + '"></i>' +
+            '<div class="value">' + s.value + '</div>' +
+            '<div class="label">' + s.label + '</div>' +
+            '</div>';
+    }).join('');
+}
+
+function formatDashboardTimestamp(value) {
+    if (!value) return 'Not recorded yet';
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return 'Not recorded yet';
+    return date.toLocaleString();
+}
+
+async function loadWebsiteActivityMetrics() {
+    var metaEl = document.getElementById('website-activity-meta');
+    renderDashboardStatCards('website-activity-grid', [
+        { icon: 'fa-users', value: '...', label: 'Unique Visitors' },
+        { icon: 'fa-door-open', value: '...', label: 'Visits' },
+        { icon: 'fa-eye', value: '...', label: 'Page Views' },
+        { icon: 'fa-envelope', value: '...', label: 'Enquiries' }
+    ]);
+    if (metaEl) metaEl.textContent = 'Loading website activity...';
+
+    try {
+        var res = await fetch('/api/dashboard/metrics', {
+            headers: getAdminAuthHeaders()
+        });
+        if (!res.ok) throw new Error('Metrics API unavailable');
+
+        var metrics = await res.json();
+        renderDashboardStatCards('website-activity-grid', [
+            { icon: 'fa-users', value: metrics.uniqueVisitors || 0, label: 'Unique Visitors' },
+            { icon: 'fa-door-open', value: metrics.totalVisits || 0, label: 'Visits' },
+            { icon: 'fa-eye', value: metrics.totalPageViews || 0, label: 'Page Views' },
+            { icon: 'fa-envelope', value: metrics.totalEnquiries || 0, label: 'Enquiries' }
+        ]);
+
+        if (metaEl) {
+            metaEl.textContent = 'Last visit: ' + formatDashboardTimestamp(metrics.lastVisitAt) +
+                ' | Last enquiry: ' + formatDashboardTimestamp(metrics.lastEnquiryAt);
+        }
+    } catch (err) {
+        renderDashboardStatCards('website-activity-grid', [
+            { icon: 'fa-users', value: 0, label: 'Unique Visitors' },
+            { icon: 'fa-door-open', value: 0, label: 'Visits' },
+            { icon: 'fa-eye', value: 0, label: 'Page Views' },
+            { icon: 'fa-envelope', value: 0, label: 'Enquiries' }
+        ]);
+        if (metaEl) metaEl.textContent = 'Website activity stats are available only when the Express admin API is running.';
+    }
+}
+
 function renderDashboard() {
     var products = getDataArray('products');
 
@@ -783,13 +842,8 @@ function renderDashboard() {
         { icon: 'fa-users', value: (getDataArray('team') || []).length, label: 'Team' }
     ];
 
-    document.getElementById('stats-grid').innerHTML = stats.map(function (s) {
-        return '<div class="stat-card">' +
-            '<i class="fas ' + s.icon + '"></i>' +
-            '<div class="value">' + s.value + '</div>' +
-            '<div class="label">' + s.label + '</div>' +
-            '</div>';
-    }).join('');
+    renderDashboardStatCards('stats-grid', stats);
+    loadWebsiteActivityMetrics();
 }
 
 // ==========================================

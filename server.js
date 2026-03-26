@@ -39,8 +39,188 @@ loadEnvFile(path.join(__dirname, '.env.local'));
 
 const app = express();
 const PORT = 3000;
+const METRICS_FILE = path.join(__dirname, 'logs', 'site-metrics.json');
 
 app.disable('x-powered-by');
+
+function getDefaultSiteMetrics() {
+    return {
+        totals: {
+            visits: 0,
+            pageViews: 0,
+            enquiries: 0
+        },
+        visitors: {},
+        pages: {},
+        enquiryInterests: {},
+        recentEnquiries: [],
+        meta: {
+            lastVisitAt: null,
+            lastEnquiryAt: null
+        }
+    };
+}
+
+function normalizeSiteMetrics(rawMetrics) {
+    const defaults = getDefaultSiteMetrics();
+    const metrics = rawMetrics && typeof rawMetrics === 'object' ? rawMetrics : {};
+
+    return {
+        totals: {
+            visits: Number(metrics.totals && metrics.totals.visits) || 0,
+            pageViews: Number(metrics.totals && metrics.totals.pageViews) || 0,
+            enquiries: Number(metrics.totals && metrics.totals.enquiries) || 0
+        },
+        visitors: metrics.visitors && typeof metrics.visitors === 'object' ? metrics.visitors : {},
+        pages: metrics.pages && typeof metrics.pages === 'object' ? metrics.pages : {},
+        enquiryInterests: metrics.enquiryInterests && typeof metrics.enquiryInterests === 'object' ? metrics.enquiryInterests : {},
+        recentEnquiries: Array.isArray(metrics.recentEnquiries) ? metrics.recentEnquiries.slice(0, 20) : [],
+        meta: {
+            lastVisitAt: metrics.meta && metrics.meta.lastVisitAt ? metrics.meta.lastVisitAt : defaults.meta.lastVisitAt,
+            lastEnquiryAt: metrics.meta && metrics.meta.lastEnquiryAt ? metrics.meta.lastEnquiryAt : defaults.meta.lastEnquiryAt
+        }
+    };
+}
+
+function ensureSiteMetricsFile() {
+    const dir = path.dirname(METRICS_FILE);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(METRICS_FILE)) {
+        fs.writeFileSync(METRICS_FILE, JSON.stringify(getDefaultSiteMetrics(), null, 2), 'utf8');
+    }
+}
+
+function readSiteMetrics() {
+    ensureSiteMetricsFile();
+    try {
+        const raw = fs.readFileSync(METRICS_FILE, 'utf8');
+        return normalizeSiteMetrics(JSON.parse(raw));
+    } catch (err) {
+        console.warn('Could not read site metrics file, resetting it:', err.message);
+        const fallback = getDefaultSiteMetrics();
+        writeSiteMetrics(fallback);
+        return fallback;
+    }
+}
+
+function writeSiteMetrics(metrics) {
+    ensureSiteMetricsFile();
+    fs.writeFileSync(METRICS_FILE, JSON.stringify(normalizeSiteMetrics(metrics), null, 2), 'utf8');
+}
+
+function sanitizeMetricId(value, maxLength) {
+    const cleaned = String(value || '').trim();
+    if (!cleaned || cleaned.length > (maxLength || 120)) return '';
+    return /^[A-Za-z0-9._-]+$/.test(cleaned) ? cleaned : '';
+}
+
+function sanitizeMetricText(value, maxLength) {
+    const cleaned = String(value || '')
+        .replace(/[\u0000-\u001F\u007F]+/g, ' ')
+        .trim()
+        .slice(0, maxLength || 160);
+    return cleaned;
+}
+
+function sanitizeMetricPath(value) {
+    let cleaned = sanitizeMetricText(value || '/', 140);
+    if (!cleaned) return '/';
+    const qIndex = cleaned.indexOf('?');
+    if (qIndex >= 0) cleaned = cleaned.slice(0, qIndex);
+    if (!cleaned.startsWith('/')) cleaned = '/' + cleaned.replace(/^#?\/?/, '');
+    return cleaned || '/';
+}
+
+function buildSiteMetricsSummary(metrics) {
+    const safeMetrics = normalizeSiteMetrics(metrics);
+    const topPages = Object.entries(safeMetrics.pages)
+        .map(([pathName, views]) => ({
+            path: pathName,
+            views: Number(views) || 0
+        }))
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 5);
+
+    return {
+        uniqueVisitors: Object.keys(safeMetrics.visitors).length,
+        totalVisits: safeMetrics.totals.visits,
+        totalPageViews: safeMetrics.totals.pageViews,
+        totalEnquiries: safeMetrics.totals.enquiries,
+        lastVisitAt: safeMetrics.meta.lastVisitAt,
+        lastEnquiryAt: safeMetrics.meta.lastEnquiryAt,
+        topPages
+    };
+}
+
+function recordSiteVisit(payload) {
+    const visitorId = sanitizeMetricId(payload.visitorId, 120);
+    const sessionId = sanitizeMetricId(payload.sessionId, 120);
+    if (!visitorId || !sessionId) {
+        return buildSiteMetricsSummary(readSiteMetrics());
+    }
+
+    const metrics = readSiteMetrics();
+    const now = new Date().toISOString();
+    const pagePath = sanitizeMetricPath(payload.path);
+    const pageTitle = sanitizeMetricText(payload.title, 160);
+
+    const visitor = metrics.visitors[visitorId] || {
+        firstSeenAt: now,
+        lastSeenAt: now,
+        visitCount: 0,
+        pageViews: 0,
+        lastSessionId: '',
+        lastPath: '/'
+    };
+
+    if (visitor.lastSessionId !== sessionId) {
+        visitor.visitCount += 1;
+        visitor.lastSessionId = sessionId;
+        metrics.totals.visits += 1;
+    }
+
+    visitor.lastSeenAt = now;
+    visitor.lastPath = pagePath;
+    if (pageTitle) {
+        visitor.lastTitle = pageTitle;
+    }
+    visitor.pageViews += 1;
+
+    metrics.visitors[visitorId] = visitor;
+    metrics.pages[pagePath] = (Number(metrics.pages[pagePath]) || 0) + 1;
+    metrics.totals.pageViews += 1;
+    metrics.meta.lastVisitAt = now;
+
+    writeSiteMetrics(metrics);
+    return buildSiteMetricsSummary(metrics);
+}
+
+function recordSiteEnquiry(payload) {
+    const metrics = readSiteMetrics();
+    const now = new Date().toISOString();
+    const visitorId = sanitizeMetricId(payload.visitorId, 120);
+    const pagePath = sanitizeMetricPath(payload.path || '/contact');
+    const interest = sanitizeMetricText(payload.interest || 'General', 80) || 'General';
+
+    metrics.totals.enquiries += 1;
+    metrics.meta.lastEnquiryAt = now;
+    metrics.enquiryInterests[interest] = (Number(metrics.enquiryInterests[interest]) || 0) + 1;
+    metrics.recentEnquiries.unshift({
+        at: now,
+        path: pagePath,
+        interest
+    });
+    metrics.recentEnquiries = metrics.recentEnquiries.slice(0, 10);
+
+    if (visitorId && metrics.visitors[visitorId]) {
+        metrics.visitors[visitorId].lastEnquiryAt = now;
+    }
+
+    writeSiteMetrics(metrics);
+    return buildSiteMetricsSummary(metrics);
+}
 
 // ============================================
 // SECURITY: Password Configuration
@@ -479,6 +659,36 @@ app.get('/api/check-auth', (req, res) => {
     } else {
         if (token) sessions.delete(token);
         res.json({ authenticated: false });
+    }
+});
+
+app.post('/api/metrics/visit', (req, res) => {
+    try {
+        recordSiteVisit(req.body || {});
+        res.status(204).end();
+    } catch (err) {
+        console.error('Failed to record site visit:', err.message);
+        res.status(204).end();
+    }
+});
+
+app.post('/api/metrics/enquiry', (req, res) => {
+    try {
+        recordSiteEnquiry(req.body || {});
+        res.status(204).end();
+    } catch (err) {
+        console.error('Failed to record site enquiry:', err.message);
+        res.status(204).end();
+    }
+});
+
+app.get('/api/dashboard/metrics', requireAuth, (req, res) => {
+    try {
+        const metrics = readSiteMetrics();
+        res.json(buildSiteMetricsSummary(metrics));
+    } catch (err) {
+        console.error('Failed to read dashboard metrics:', err.message);
+        res.status(500).json({ error: 'Failed to load dashboard metrics' });
     }
 });
 
