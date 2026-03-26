@@ -26,6 +26,7 @@
     try { if (typeof CONTACT_FAQ_DATA !== 'undefined') window.CONTACT_FAQ_DATA = CONTACT_FAQ_DATA; } catch(e){}
     try { if (typeof CONTACT_PAGE_CONFIG !== 'undefined') window.CONTACT_PAGE_CONFIG = CONTACT_PAGE_CONFIG; } catch(e){}
     try { if (typeof NAV_LINKS !== 'undefined') window.NAV_LINKS = NAV_LINKS; } catch(e){}
+    try { if (typeof MEGA_MENU_CONFIG !== 'undefined') window.MEGA_MENU_CONFIG = MEGA_MENU_CONFIG; } catch(e){}
     try { if (typeof FOOTER_DATA !== 'undefined') window.FOOTER_DATA = FOOTER_DATA; } catch(e){}
     try { if (typeof PAGE_META !== 'undefined') window.PAGE_META = PAGE_META; } catch(e){}
     try { if (typeof INDEX_WHY_CHOOSE !== 'undefined') window.INDEX_WHY_CHOOSE = INDEX_WHY_CHOOSE; } catch(e){}
@@ -2075,6 +2076,7 @@ async function publishAllChanges() {
             } else if (type === 'layout') {
                 data = {
                     NAV_LINKS: window.NAV_LINKS || [],
+                    MEGA_MENU_CONFIG: ensureMegaMenuConfig(),
                     FOOTER_DATA: window.FOOTER_DATA || {},
                     PAGE_META: window.PAGE_META || {}
                 };
@@ -3363,9 +3365,84 @@ function savePageContentAll() {
 // ==========================================
 
 function loadNavigationToForm() {
+    ensureMegaMenuConfig();
     renderNavLinksEditor();
+    renderMegaMenuEditor();
     renderFooterEditor();
     renderPageSeoEditor();
+}
+
+function deepCloneData(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
+function getDefaultMegaMenuConfig() {
+    return {
+        products: {
+            columns: [
+                { key: 'Buoys', title: 'Buoys', icon: 'fas fa-life-ring' },
+                { key: 'Vessels', title: 'Vessels', icon: 'fas fa-ship' },
+                { key: 'Equipment', title: 'Equipment', icon: 'fas fa-screwdriver-wrench' },
+                { key: 'Software', title: 'Software', icon: 'fas fa-laptop-code' },
+                { key: 'Integrated Solutions', title: 'Integrated Solutions', icon: 'fas fa-layer-group' }
+            ],
+            spotlight: {
+                tag: 'Featured',
+                title: 'Tridel Aquilon 8000',
+                description: 'Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.',
+                link: '#/products/detail?id=aquilon-8000',
+                buttonText: 'Learn More',
+                image: 'assets/images/products/aquilon-8000/aquilon-8000-01.jpg'
+            }
+        },
+        services: {
+            columns: [
+                { key: 'Environmental Monitoring', title: 'Environmental Monitoring', icon: 'fas fa-satellite-dish', excludeSubcategories: [] },
+                { key: 'Environmental Surveying', title: 'Environmental Surveying', icon: 'fas fa-map-marked-alt', excludeSubcategories: ['Geoscience Studies'] }
+            ],
+            spotlight: {
+                tag: 'Featured',
+                title: 'Comprehensive Solutions',
+                description: 'End-to-end expertise from feasibility to real-time monitoring.',
+                link: '#/services',
+                buttonText: 'Learn More',
+                image: 'assets/images/services/port-monitoring.png'
+            }
+        }
+    };
+}
+
+function normalizeMegaMenuConfig(config) {
+    var defaults = getDefaultMegaMenuConfig();
+    var merged = deepCloneData(defaults);
+
+    ['products', 'services'].forEach(function (scope) {
+        var source = config && config[scope] ? config[scope] : {};
+        var defaultSection = defaults[scope];
+        var defaultColumnsByKey = {};
+
+        defaultSection.columns.forEach(function (column) {
+            defaultColumnsByKey[column.key] = column;
+        });
+
+        if (Array.isArray(source.columns) && source.columns.length) {
+            merged[scope].columns = source.columns.map(function (column, index) {
+                var fallback = defaultColumnsByKey[column.key] || defaultSection.columns[index] || {};
+                return Object.assign({}, fallback, column);
+            });
+        }
+
+        if (source.spotlight && typeof source.spotlight === 'object') {
+            merged[scope].spotlight = Object.assign({}, defaultSection.spotlight, source.spotlight);
+        }
+    });
+
+    return merged;
+}
+
+function ensureMegaMenuConfig() {
+    window.MEGA_MENU_CONFIG = normalizeMegaMenuConfig(window.MEGA_MENU_CONFIG);
+    return window.MEGA_MENU_CONFIG;
 }
 
 function renderNavLinksEditor() {
@@ -3375,11 +3452,17 @@ function renderNavLinksEditor() {
     var html = '';
     links.forEach(function (link, i) {
         html += '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">' +
-            '<div style="display:flex;gap:10px;align-items:center;">' +
+            '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">' +
                 '<div style="flex:2"><label style="font-size:12px;">Label</label><input type="text" class="form-control" id="nav-label-' + i + '" value="' + escapeHTML(link.label || '') + '"></div>' +
                 '<div style="flex:2"><label style="font-size:12px;">Href</label><input type="text" class="form-control" id="nav-href-' + i + '" value="' + escapeHTML(link.href || '') + '"></div>' +
                 '<div style="flex:1"><label style="font-size:12px;">Icon</label><input type="text" class="form-control" id="nav-icon-' + i + '" value="' + escapeHTML(link.icon || '') + '"></div>' +
+                '<div style="flex:1"><label style="font-size:12px;">Short Label</label><input type="text" class="form-control" id="nav-short-label-' + i + '" value="' + escapeHTML(link.shortLabel || '') + '"></div>' +
                 '<button type="button" class="btn btn-danger btn-sm" onclick="removeNavLinkItem(' + i + ')" style="margin-top:18px;"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+            '<div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;margin-top:12px;">' +
+                '<div style="min-width:170px;"><label style="font-size:12px;">Mega Menu Class</label><input type="text" class="form-control" id="nav-mega-class-' + i + '" value="' + escapeHTML(link.megaMenuClass || '') + '" placeholder="mm-products"></div>' +
+                '<label style="display:flex;align-items:center;gap:8px;margin:0 0 8px;"><input type="checkbox" id="nav-has-mega-' + i + '" ' + (link.hasMegaMenu ? 'checked' : '') + '> Has Mega Menu</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;margin:0 0 8px;"><input type="checkbox" id="nav-chevron-' + i + '" ' + (link.chevron ? 'checked' : '') + '> Show Chevron</label>' +
             '</div>' +
         '</div>';
     });
@@ -3388,7 +3471,7 @@ function renderNavLinksEditor() {
 
 function addNavLink() {
     if (!window.NAV_LINKS) window.NAV_LINKS = [];
-    window.NAV_LINKS.push({ label: 'New Link', href: '#/', icon: 'fa-link', key: '/' });
+    window.NAV_LINKS.push({ label: 'New Link', href: '#/', icon: 'fa-link', key: '/', hasMegaMenu: false, megaMenuClass: '', chevron: false });
     renderNavLinksEditor();
 }
 
@@ -3396,6 +3479,57 @@ function removeNavLinkItem(index) {
     if (!confirm('Remove this nav link?')) return;
     window.NAV_LINKS.splice(index, 1);
     renderNavLinksEditor();
+}
+
+function renderMegaMenuEditor() {
+    var container = document.getElementById('mega-menu-editor');
+    if (!container) return;
+
+    var config = ensureMegaMenuConfig();
+    container.innerHTML = [
+        renderMegaMenuScopeEditor('products', 'Products', config.products),
+        renderMegaMenuScopeEditor('services', 'Services', config.services)
+    ].join('');
+}
+
+function renderMegaMenuScopeEditor(scopeKey, label, config) {
+    var html = '<div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;background:var(--bg-secondary);">' +
+        '<h4 style="margin:0 0 16px;font-size:16px;">' + escapeHTML(label) + ' Mega Menu</h4>' +
+        '<div style="display:grid;gap:12px;">';
+
+    (config.columns || []).forEach(function (column, index) {
+        html += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--card-bg);">' +
+            '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Source Group: ' + escapeHTML(column.key || '') + '</div>' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<div style="flex:2;min-width:180px;"><label style="font-size:12px;">Column Title</label><input type="text" class="form-control" id="mega-' + scopeKey + '-col-title-' + index + '" value="' + escapeHTML(column.title || '') + '"></div>' +
+                '<div style="flex:1;min-width:180px;"><label style="font-size:12px;">Icon Class</label><input type="text" class="form-control" id="mega-' + scopeKey + '-col-icon-' + index + '" value="' + escapeHTML(column.icon || '') + '" placeholder="fas fa-ship"></div>' +
+            '</div>';
+
+        if (Array.isArray(column.excludeSubcategories) && column.excludeSubcategories.length) {
+            html += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px;">Excluded subcategories: ' + escapeHTML(column.excludeSubcategories.join(', ')) + '</div>';
+        }
+
+        html += '</div>';
+    });
+
+    html += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--card-bg);">' +
+        '<h5 style="margin:0 0 12px;font-size:14px;">Spotlight Card</h5>' +
+        '<div style="display:grid;gap:10px;">' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<div style="flex:1;min-width:150px;"><label style="font-size:12px;">Tag</label><input type="text" class="form-control" id="mega-' + scopeKey + '-spotlight-tag" value="' + escapeHTML((config.spotlight || {}).tag || '') + '"></div>' +
+                '<div style="flex:2;min-width:220px;"><label style="font-size:12px;">Title</label><input type="text" class="form-control" id="mega-' + scopeKey + '-spotlight-title" value="' + escapeHTML((config.spotlight || {}).title || '') + '"></div>' +
+            '</div>' +
+            '<div><label style="font-size:12px;">Description</label><textarea class="form-control" id="mega-' + scopeKey + '-spotlight-description" rows="3">' + escapeHTML((config.spotlight || {}).description || '') + '</textarea></div>' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<div style="flex:2;min-width:220px;"><label style="font-size:12px;">Link</label><input type="text" class="form-control" id="mega-' + scopeKey + '-spotlight-link" value="' + escapeHTML((config.spotlight || {}).link || '') + '"></div>' +
+                '<div style="flex:1;min-width:150px;"><label style="font-size:12px;">Button Text</label><input type="text" class="form-control" id="mega-' + scopeKey + '-spotlight-button-text" value="' + escapeHTML((config.spotlight || {}).buttonText || '') + '"></div>' +
+            '</div>' +
+            '<div><label style="font-size:12px;">Image Path</label><input type="text" class="form-control" id="mega-' + scopeKey + '-spotlight-image" value="' + escapeHTML((config.spotlight || {}).image || '') + '"></div>' +
+        '</div>' +
+    '</div>' +
+    '</div></div>';
+
+    return html;
 }
 
 function renderFooterEditor() {
@@ -3475,9 +3609,42 @@ function saveNavigation() {
         links[i].label = (document.getElementById('nav-label-' + i) || {}).value || '';
         links[i].href = (document.getElementById('nav-href-' + i) || {}).value || '';
         links[i].icon = (document.getElementById('nav-icon-' + i) || {}).value || '';
-        links[i].key = links[i].href.replace('#', '');
+        links[i].shortLabel = (document.getElementById('nav-short-label-' + i) || {}).value || '';
+        links[i].hasMegaMenu = !!((document.getElementById('nav-has-mega-' + i) || {}).checked);
+        links[i].megaMenuClass = (document.getElementById('nav-mega-class-' + i) || {}).value || '';
+        links[i].chevron = !!((document.getElementById('nav-chevron-' + i) || {}).checked);
+        links[i].key = (links[i].href || '').replace(/^#/, '') || '/';
+        if (!links[i].shortLabel) delete links[i].shortLabel;
+        if (!links[i].hasMegaMenu) {
+            delete links[i].hasMegaMenu;
+            delete links[i].megaMenuClass;
+            delete links[i].chevron;
+        } else if (!links[i].megaMenuClass) {
+            links[i].megaMenuClass = links[i].href && links[i].href.indexOf('/products') !== -1 ? 'mm-products' : 'mm-services';
+        }
     }
     window.NAV_LINKS = links;
+
+    var megaConfig = ensureMegaMenuConfig();
+    ['products', 'services'].forEach(function (scopeKey) {
+        var scope = megaConfig[scopeKey] || {};
+        scope.columns = (scope.columns || []).map(function (column, index) {
+            return Object.assign({}, column, {
+                title: (document.getElementById('mega-' + scopeKey + '-col-title-' + index) || {}).value || column.title || column.key || '',
+                icon: (document.getElementById('mega-' + scopeKey + '-col-icon-' + index) || {}).value || column.icon || ''
+            });
+        });
+        scope.spotlight = Object.assign({}, scope.spotlight || {}, {
+            tag: (document.getElementById('mega-' + scopeKey + '-spotlight-tag') || {}).value || '',
+            title: (document.getElementById('mega-' + scopeKey + '-spotlight-title') || {}).value || '',
+            description: (document.getElementById('mega-' + scopeKey + '-spotlight-description') || {}).value || '',
+            link: (document.getElementById('mega-' + scopeKey + '-spotlight-link') || {}).value || '',
+            buttonText: (document.getElementById('mega-' + scopeKey + '-spotlight-button-text') || {}).value || '',
+            image: (document.getElementById('mega-' + scopeKey + '-spotlight-image') || {}).value || ''
+        });
+        megaConfig[scopeKey] = scope;
+    });
+    window.MEGA_MENU_CONFIG = megaConfig;
 
     // Save footer data
     if (!window.FOOTER_DATA) window.FOOTER_DATA = {};
@@ -3511,7 +3678,7 @@ function saveNavigation() {
     window.PAGE_META = meta;
 
     markAsPending('layout');
-    showToast('Navigation & footer saved!', 'success');
+    showToast('Navigation, mega menu, and footer saved!', 'success');
 }
 
 function parseLayoutData(content) {
@@ -3536,6 +3703,17 @@ function parseLayoutData(content) {
             window.FOOTER_DATA = JSON.parse(raw2);
         } catch (e) { console.warn('Could not parse FOOTER_DATA:', e.message); }
     }
+    // Parse MEGA_MENU_CONFIG
+    var matchMega = content.match(/var\s+MEGA_MENU_CONFIG\s*=\s*(\{[\s\S]*?\});/);
+    if (matchMega) {
+        try {
+            var rawMega = matchMega[1].replace(/\/\/.*$/gm, '').replace(/,\s*([\]}])/g, '$1');
+            rawMega = rawMega.replace(/([{,]\s*)(?!")([A-Za-z0-9_\/-]+)\s*:/g, '$1"$2":');
+            window.MEGA_MENU_CONFIG = normalizeMegaMenuConfig(JSON.parse(rawMega));
+        } catch (e) { console.warn('Could not parse MEGA_MENU_CONFIG:', e.message); }
+    } else {
+        ensureMegaMenuConfig();
+    }
     // Parse PAGE_META
     var match3 = content.match(/var\s+PAGE_META\s*=\s*(\{[\s\S]*\});?\s*$/m);
     if (match3) {
@@ -3557,6 +3735,8 @@ function serializeLayoutData() {
     lines.push(' * Layout Data \u2014 Navigation links, footer data, and page metadata');
     lines.push(' */');
     lines.push('var NAV_LINKS = ' + JSON.stringify(window.NAV_LINKS || [], null, 2) + ';');
+    lines.push('');
+    lines.push('var MEGA_MENU_CONFIG = ' + JSON.stringify(ensureMegaMenuConfig(), null, 2) + ';');
     lines.push('');
     lines.push('var FOOTER_DATA = ' + JSON.stringify(window.FOOTER_DATA || {}, null, 2) + ';');
     lines.push('');

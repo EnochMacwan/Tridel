@@ -944,13 +944,15 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
             contactLines.push('');
             content = contactLines.join('\n');
         } else if (type === 'layout') {
-            // Multi-var: NAV_LINKS + FOOTER_DATA + PAGE_META
+            // Multi-var: NAV_LINKS + MEGA_MENU_CONFIG + FOOTER_DATA + PAGE_META
             const layoutLines = [
                 '/**',
                 ' * Layout Data \u2014 Navigation links, footer data, and page metadata',
                 ' */',
             ];
             layoutLines.push(`var NAV_LINKS = ${JSON.stringify(data.NAV_LINKS || [], null, 2)};`);
+            layoutLines.push('');
+            layoutLines.push(`var MEGA_MENU_CONFIG = ${JSON.stringify(data.MEGA_MENU_CONFIG || {}, null, 2)};`);
             layoutLines.push('');
             layoutLines.push(`var FOOTER_DATA = ${JSON.stringify(data.FOOTER_DATA || {}, null, 2)};`);
             layoutLines.push('');
@@ -1048,6 +1050,8 @@ app.post('/api/save-all', requireAuth, (req, res) => {
                     } else if (type === 'layout') {
                         const lines = ['/**', ' * Layout Data', ' */'];
                         lines.push(`var NAV_LINKS = ${JSON.stringify(data.NAV_LINKS || [], null, 2)};`);
+                        lines.push('');
+                        lines.push(`var MEGA_MENU_CONFIG = ${JSON.stringify(data.MEGA_MENU_CONFIG || {}, null, 2)};`);
                         lines.push('');
                         lines.push(`var FOOTER_DATA = ${JSON.stringify(data.FOOTER_DATA || {}, null, 2)};`);
                         lines.push('');

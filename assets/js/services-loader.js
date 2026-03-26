@@ -15,6 +15,54 @@ function getServiceDisplayName(service) {
     return String((service && (service.title || service.name)) || '').trim();
 }
 
+function normalizeServiceMegaMenuIcon(iconClass, fallbackIcon) {
+    var icon = String(iconClass || '').trim();
+    if (!icon) return fallbackIcon;
+    if (/\bfa[srlbd]\b/.test(icon)) return icon;
+    if (icon.indexOf('fa-') !== -1) return 'fas ' + icon;
+    return fallbackIcon;
+}
+
+function getServicesMegaMenuConfig() {
+    var defaults = {
+        columns: [
+            { key: 'Environmental Monitoring', title: 'Environmental Monitoring', icon: 'fas fa-satellite-dish', excludeSubcategories: [] },
+            { key: 'Environmental Surveying', title: 'Environmental Surveying', icon: 'fas fa-map-marked-alt', excludeSubcategories: ['Geoscience Studies'] }
+        ],
+        spotlight: typeof featuredService !== 'undefined' ? featuredService : {
+            tag: 'Featured',
+            title: 'Comprehensive Solutions',
+            description: 'End-to-end expertise from feasibility to real-time monitoring.',
+            link: '#/services',
+            buttonText: 'Learn More',
+            image: 'assets/images/services/port-monitoring.png'
+        }
+    };
+    var rootConfig = typeof MEGA_MENU_CONFIG !== 'undefined' ? MEGA_MENU_CONFIG : (window.MEGA_MENU_CONFIG || {});
+    var source = rootConfig && rootConfig.services ? rootConfig.services : {};
+    var defaultColumnsByKey = {};
+
+    defaults.columns.forEach(function (column) {
+        defaultColumnsByKey[column.key] = column;
+    });
+
+    var columns = Array.isArray(source.columns) && source.columns.length
+        ? source.columns.map(function (column, index) {
+            var fallback = defaultColumnsByKey[column.key] || defaults.columns[index] || {};
+            return Object.assign({}, fallback, column, {
+                key: column.key || fallback.key || '',
+                title: column.title || fallback.title || column.key || '',
+                icon: normalizeServiceMegaMenuIcon(column.icon, fallback.icon || 'fas fa-cube')
+            });
+        })
+        : defaults.columns;
+
+    return {
+        columns: columns,
+        spotlight: Object.assign({}, defaults.spotlight, source.spotlight || {})
+    };
+}
+
 function saveServicesListState() {
     var hash = window.location.hash || '#/services';
     if (!hash || hash.indexOf('#/services') !== 0 || hash.indexOf('#/services/detail') === 0) return;
@@ -147,48 +195,41 @@ window.renderServicesMegaMenu = function(containerElement) {
 
 
     container.innerHTML = '';
+    const megaMenuConfig = getServicesMegaMenuConfig();
 
-    // Define Columns with Filter (!s.isNested)
-    const columns = {
-        'Environmental Monitoring': data.filter(s => s.category === 'Environmental Monitoring' && !s.isNested),
-        'Environmental Surveying': data.filter(s => s.category === 'Environmental Surveying' && s.subcategory !== 'Geoscience Studies' && !s.isNested)
-    };
+    megaMenuConfig.columns.forEach(function (column) {
+        const col = document.createElement('div');
+        const excludedSubcategories = Array.isArray(column.excludeSubcategories) ? column.excludeSubcategories : [];
+        const items = data.filter(function (service) {
+            return service.category === column.key &&
+                !service.isNested &&
+                excludedSubcategories.indexOf(service.subcategory) === -1;
+        });
 
-    // 1. Environmental Monitoring
-    const col1 = document.createElement('div');
-    col1.className = 'glass-col';
-    col1.innerHTML = `<h4>${getIconForCategory('Environmental Monitoring')} Environmental Monitoring</h4>`;
-    columns['Environmental Monitoring'].forEach(s => {
-        var displayName = getServiceDisplayName(s);
-        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(displayName)}</a>`;
+        col.className = 'glass-col';
+        col.innerHTML = `<h4><i class="${column.icon}"></i> ${column.title}</h4>`;
+        items.forEach(function (service) {
+            var displayName = getServiceDisplayName(service);
+            col.innerHTML += `<a href="${service.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(service.description)}" data-img="${escapeHtml(service.image)}">${escapeHtml(displayName)}</a>`;
+        });
+        container.appendChild(col);
     });
-    container.appendChild(col1);
 
-    // 2. Environmental Surveying
-    const col2 = document.createElement('div');
-    col2.className = 'glass-col';
-    col2.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Environmental Surveying</h4>`;
-    columns['Environmental Surveying'].forEach(s => {
-        var displayName = getServiceDisplayName(s);
-        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(displayName)}</a>`;
-    });
-    container.appendChild(col2);
-
-    // Spotlight Card (Column 4)
-    if (typeof featuredService !== 'undefined') {
+    if (megaMenuConfig.spotlight) {
+        const spotlightData = megaMenuConfig.spotlight;
         const spotlight = document.createElement('div');
         spotlight.className = 'glass-spotlight';
         spotlight.innerHTML = `
             <div class="spotlight-content">
-                <span class="spotlight-tag">${escapeHtml(featuredService.tag)}</span>
-                <h3 class="spotlight-title">${escapeHtml(featuredService.title)}</h3>
-                <p class="spotlight-desc">${escapeHtml(featuredService.description)}</p>
-                <a href="${featuredService.link}" class="spotlight-btn">
-                    ${escapeHtml(featuredService.buttonText)} <i class="fas fa-arrow-right"></i>
+                <span class="spotlight-tag">${escapeHtml(spotlightData.tag)}</span>
+                <h3 class="spotlight-title">${escapeHtml(spotlightData.title)}</h3>
+                <p class="spotlight-desc">${escapeHtml(spotlightData.description)}</p>
+                <a href="${spotlightData.link}" class="spotlight-btn">
+                    ${escapeHtml(spotlightData.buttonText)} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             <div class="spotlight-image">
-                <img src="${featuredService.image}" alt="${escapeHtml(featuredService.title)}">
+                <img src="${spotlightData.image}" alt="${escapeHtml(spotlightData.title)}">
             </div>
         `;
         container.appendChild(spotlight);

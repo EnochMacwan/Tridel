@@ -20,6 +20,57 @@ function getProductCategorySectionId(categoryName) {
         .replace(/^-+|-+$/g, '');
 }
 
+function normalizeProductMegaMenuIcon(iconClass, fallbackIcon) {
+    var icon = String(iconClass || '').trim();
+    if (!icon) return fallbackIcon;
+    if (/\bfa[srlbd]\b/.test(icon)) return icon;
+    if (icon.indexOf('fa-') !== -1) return 'fas ' + icon;
+    return fallbackIcon;
+}
+
+function getProductsMegaMenuConfig() {
+    var defaults = {
+        columns: [
+            { key: 'Buoys', title: 'Buoys', icon: 'fas fa-life-ring' },
+            { key: 'Vessels', title: 'Vessels', icon: 'fas fa-ship' },
+            { key: 'Equipment', title: 'Equipment', icon: 'fas fa-screwdriver-wrench' },
+            { key: 'Software', title: 'Software', icon: 'fas fa-laptop-code' },
+            { key: 'Integrated Solutions', title: 'Integrated Solutions', icon: 'fas fa-layer-group' }
+        ],
+        spotlight: typeof featuredProduct !== 'undefined' ? featuredProduct : {
+            tag: 'Featured',
+            title: 'Tridel Aquilon 8000',
+            description: 'Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.',
+            link: '#/products/detail?id=aquilon-8000',
+            buttonText: 'Learn More',
+            image: 'assets/images/products/aquilon-8000/aquilon-8000-01.jpg'
+        }
+    };
+    var rootConfig = typeof MEGA_MENU_CONFIG !== 'undefined' ? MEGA_MENU_CONFIG : (window.MEGA_MENU_CONFIG || {});
+    var source = rootConfig && rootConfig.products ? rootConfig.products : {};
+    var defaultColumnsByKey = {};
+
+    defaults.columns.forEach(function (column) {
+        defaultColumnsByKey[column.key] = column;
+    });
+
+    var columns = Array.isArray(source.columns) && source.columns.length
+        ? source.columns.map(function (column, index) {
+            var fallback = defaultColumnsByKey[column.key] || defaults.columns[index] || {};
+            return {
+                key: column.key || fallback.key || '',
+                title: column.title || fallback.title || column.key || '',
+                icon: normalizeProductMegaMenuIcon(column.icon, fallback.icon || 'fas fa-cube')
+            };
+        })
+        : defaults.columns;
+
+    return {
+        columns: columns,
+        spotlight: Object.assign({}, defaults.spotlight, source.spotlight || {})
+    };
+}
+
 function getProductHref(item) {
     if (item && item.id) {
         return '#/products/detail?id=' + encodeURIComponent(item.id);
@@ -146,15 +197,8 @@ window.renderProductsMegaMenu = function(container) {
     }
 
     container.innerHTML = ''; // Clear existing
-
-    // Define Columns
-    const columns = [
-        { title: 'Buoys', icon: 'fas fa-life-ring', category: 'Buoys' },
-        { title: 'Vessels', icon: 'fas fa-ship', category: 'Vessels' },
-        { title: 'Equipment', icon: 'fas fa-screwdriver-wrench', category: 'Equipment' },
-        { title: 'Software', icon: 'fas fa-laptop-code', category: 'Software' },
-        { title: 'Integrated Solutions', icon: 'fas fa-layer-group', category: 'Integrated Solutions' }
-    ];
+    const megaMenuConfig = getProductsMegaMenuConfig();
+    const columns = megaMenuConfig.columns;
 
     // Build 5 Columns
     columns.forEach(col => {
@@ -165,7 +209,7 @@ window.renderProductsMegaMenu = function(container) {
         colDiv.innerHTML = `<h4><i class="${col.icon}"></i> ${col.title}</h4>`;
 
         // Items - Case Insensitive Comparison, filtering out nested items
-        const items = data.filter(p => p.category.toLowerCase() === col.category.toLowerCase() && !p.isNested);
+        const items = data.filter(p => p.category.toLowerCase() === String(col.key || '').toLowerCase() && !p.isNested);
 
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {
@@ -188,18 +232,19 @@ window.renderProductsMegaMenu = function(container) {
     });
 
     // Spotlight Card (Column 6)
-    if (typeof featuredProduct !== 'undefined') {
+    if (megaMenuConfig.spotlight) {
+        const spotlightData = megaMenuConfig.spotlight;
         const spotlight = document.createElement('div');
         spotlight.className = 'glass-spotlight';
         spotlight.innerHTML = `
             <div class="spotlight-content">
-                <span class="spotlight-tag">${escapeHtml(featuredProduct.tag)}</span>
-                <h3>${escapeHtml(featuredProduct.title)}</h3>
-                <p>${escapeHtml(featuredProduct.description)}</p>
-                <a href="${featuredProduct.link}" class="spotlight-btn">${escapeHtml(featuredProduct.buttonText)} <i class="fas fa-arrow-right"></i></a>
+                <span class="spotlight-tag">${escapeHtml(spotlightData.tag)}</span>
+                <h3>${escapeHtml(spotlightData.title)}</h3>
+                <p>${escapeHtml(spotlightData.description)}</p>
+                <a href="${spotlightData.link}" class="spotlight-btn">${escapeHtml(spotlightData.buttonText)} <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="spotlight-image">
-                <img src="${featuredProduct.image}" alt="${escapeHtml(featuredProduct.title)}">
+                <img src="${spotlightData.image}" alt="${escapeHtml(spotlightData.title)}">
             </div>
         `;
         container.appendChild(spotlight);

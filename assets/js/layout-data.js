@@ -53,6 +53,72 @@ var NAV_LINKS = [
   }
 ];
 
+var MEGA_MENU_CONFIG = {
+  "products": {
+    "columns": [
+      {
+        "key": "Buoys",
+        "title": "Buoys",
+        "icon": "fas fa-life-ring"
+      },
+      {
+        "key": "Vessels",
+        "title": "Vessels",
+        "icon": "fas fa-ship"
+      },
+      {
+        "key": "Equipment",
+        "title": "Equipment",
+        "icon": "fas fa-screwdriver-wrench"
+      },
+      {
+        "key": "Software",
+        "title": "Software",
+        "icon": "fas fa-laptop-code"
+      },
+      {
+        "key": "Integrated Solutions",
+        "title": "Integrated Solutions",
+        "icon": "fas fa-layer-group"
+      }
+    ],
+    "spotlight": {
+      "tag": "Featured",
+      "title": "Tridel Aquilon 8000",
+      "description": "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
+      "link": "#/products/detail?id=aquilon-8000",
+      "buttonText": "Learn More",
+      "image": "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
+    }
+  },
+  "services": {
+    "columns": [
+      {
+        "key": "Environmental Monitoring",
+        "title": "Environmental Monitoring",
+        "icon": "fas fa-satellite-dish",
+        "excludeSubcategories": []
+      },
+      {
+        "key": "Environmental Surveying",
+        "title": "Environmental Surveying",
+        "icon": "fas fa-map-marked-alt",
+        "excludeSubcategories": [
+          "Geoscience Studies"
+        ]
+      }
+    ],
+    "spotlight": {
+      "tag": "Featured",
+      "title": "Comprehensive Solutions",
+      "description": "End-to-end expertise from feasibility to real-time monitoring.",
+      "link": "#/services",
+      "buttonText": "Learn More",
+      "image": "assets/images/services/port-monitoring.png"
+    }
+  }
+};
+
 var FOOTER_DATA = {
   "tagline": "Connecting Environmental Science, Engineering, and Technology",
   "quickLinks": [
