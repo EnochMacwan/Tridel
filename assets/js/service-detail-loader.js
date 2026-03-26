@@ -12,6 +12,26 @@ var formatAllowedInlineHtml = typeof formatAllowedInlineHtml === 'function'
         return esc(text == null ? '' : text).replace(/&lt;(\/?)strong&gt;/gi, '<$1strong>');
     };
 
+function getServiceBackLink(service) {
+    if (!service) {
+        return '#/services';
+    }
+
+    var sectionId = '';
+
+    if (service.subcategory && !service.isNested && typeof getServiceSubcategorySectionId === 'function') {
+        sectionId = getServiceSubcategorySectionId(service.subcategory);
+    }
+
+    if (!sectionId && service.category && typeof getServiceCategorySectionId === 'function') {
+        sectionId = getServiceCategorySectionId(service.category);
+    }
+
+    return sectionId
+        ? '#/services?section=' + encodeURIComponent(sectionId)
+        : '#/services';
+}
+
 /**
  * Renders a Service Detail page into the given container.
  * Exported as window.renderServiceDetail for SPA router usage.
@@ -34,6 +54,8 @@ window.renderServiceDetail = function(container, serviceId) {
         container.innerHTML = '<div style="text-align:center;"><h2>Service Not Found</h2><p>The requested service ID does not exist.</p><a href="#/services" class="button button--primary">View All Services</a></div>';
         return;
     }
+
+    var backToServicesHref = getServiceBackLink(service);
 
     // Update Page Title
     document.title = `${service.name} | TRIDEL`;
@@ -61,7 +83,7 @@ window.renderServiceDetail = function(container, serviceId) {
 
             <div class="product-actions">
               <a class="button button--primary" href="#/contact?subject=Service Inquiry: ${encodeURIComponent(service.name)}">Request Service</a>
-              <a href="#/services" class="button button--soft">Back to Services</a>
+              <a href="${backToServicesHref}" class="button button--soft">Back to Services</a>
             </div>
           </div>
           <div class="detail-layout__image">

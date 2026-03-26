@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/services']) || {};
 
-  function render(mainEl) {
+  function render(mainEl, params) {
     var html = '';
 
     // Page header with breadcrumb
@@ -34,7 +34,7 @@
 
     // Load services grid dynamically
     if (typeof renderServicesGrid === 'function') {
-      renderServicesGrid();
+      renderServicesGrid(document.getElementById('dynamic-services-container'), params && params.section);
     }
 
     // Initialize scroll reveal
