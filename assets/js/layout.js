@@ -133,7 +133,6 @@
         '<div class="footer__bottom">' +
           '<div class="container">' +
             '<p>' + esc(FOOTER_DATA.copyright) + '</p>' +
-            '<a href="admin.html" class="footer__admin-link"><i class="fas fa-cog"></i> Admin</a>' +
           '</div>' +
         '</div>' +
       '</footer>';
