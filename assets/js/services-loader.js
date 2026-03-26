@@ -15,6 +15,38 @@ function getServiceDisplayName(service) {
     return String((service && (service.title || service.name)) || '').trim();
 }
 
+function getServiceGallery(service) {
+    var rawGallery = Array.isArray(service && service.gallery) ? service.gallery : [];
+    var sourceImages = rawGallery.length
+        ? rawGallery
+        : (service && service.image ? [service.image] : []);
+    var seen = Object.create(null);
+    var uniqueImages = [];
+
+    sourceImages.forEach(function(image) {
+        if (!image) return;
+
+        var normalized = String(image).trim();
+        if (!normalized) return;
+
+        var dedupeKey = normalized.indexOf('data:') === 0
+            ? normalized.slice(0, 128) + '::' + normalized.length
+            : normalized.toLowerCase();
+
+        if (seen[dedupeKey]) return;
+
+        seen[dedupeKey] = true;
+        uniqueImages.push(normalized);
+    });
+
+    return uniqueImages;
+}
+
+function getServicePrimaryImage(service) {
+    var gallery = getServiceGallery(service);
+    return gallery[0] || 'assets/images/logo/tridel.png';
+}
+
 function normalizeServiceMegaMenuIcon(iconClass, fallbackIcon) {
     var icon = String(iconClass || '').trim();
     if (!icon) return fallbackIcon;
@@ -210,7 +242,7 @@ window.renderServicesMegaMenu = function(containerElement) {
         col.innerHTML = `<h4><i class="${column.icon}"></i> ${column.title}</h4>`;
         items.forEach(function (service) {
             var displayName = getServiceDisplayName(service);
-            col.innerHTML += `<a href="${service.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(service.description)}" data-img="${escapeHtml(service.image)}">${escapeHtml(displayName)}</a>`;
+            col.innerHTML += `<a href="${service.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(service.description)}" data-img="${escapeHtml(getServicePrimaryImage(service))}">${escapeHtml(displayName)}</a>`;
         });
         container.appendChild(col);
     });
@@ -300,7 +332,7 @@ window.renderServicesGrid = function(container) {
             sectionContent += `
                 <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(displayName)}">
                     <div class="product-card-visual">
-                        <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${item.image}">
+                        <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${getServicePrimaryImage(item)}">
                     </div>
                     <div class="product-content-outside">
                         <h4>${escapeHtml(displayName)}</h4>
@@ -332,7 +364,7 @@ window.renderServicesGrid = function(container) {
                 sectionContent += `
                     <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(displayName)}">
                         <div class="product-card-visual">
-                            <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${item.image}">
+                            <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${getServicePrimaryImage(item)}">
                         </div>
                         <div class="product-content-outside">
                             <h4>${escapeHtml(displayName)}</h4>

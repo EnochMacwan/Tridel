@@ -16,6 +16,38 @@ function getServiceDisplayName(service) {
     return String((service && (service.title || service.name)) || '').trim();
 }
 
+function getServiceGallery(service) {
+    var rawGallery = Array.isArray(service && service.gallery) ? service.gallery : [];
+    var sourceImages = rawGallery.length
+        ? rawGallery
+        : (service && service.image ? [service.image] : []);
+    var seen = Object.create(null);
+    var uniqueImages = [];
+
+    sourceImages.forEach(function(image) {
+        if (!image) return;
+
+        var normalized = String(image).trim();
+        if (!normalized) return;
+
+        var dedupeKey = normalized.indexOf('data:') === 0
+            ? normalized.slice(0, 128) + '::' + normalized.length
+            : normalized.toLowerCase();
+
+        if (seen[dedupeKey]) return;
+
+        seen[dedupeKey] = true;
+        uniqueImages.push(normalized);
+    });
+
+    return uniqueImages;
+}
+
+function getServicePrimaryImage(service) {
+    var gallery = getServiceGallery(service);
+    return gallery[0] || 'assets/images/logo/tridel.png';
+}
+
 /**
  * Renders a Service Detail page into the given container.
  * Exported as window.renderServiceDetail for SPA router usage.
@@ -57,6 +89,28 @@ window.renderServiceDetail = function(container, serviceId) {
         `;
     }
 
+    const galleryImages = getServiceGallery(service);
+    const mainImage = getServicePrimaryImage(service);
+    const thumbsHtml = galleryImages.map((img, index) => `
+        <img loading="lazy" src="${img}" onclick="changeImage('${img}')" onkeydown="if(event.key==='Enter')changeImage('${img}')" tabindex="0" role="button" ${img === mainImage ? 'class="active"' : ''} alt="${escapeHtml(serviceName)} - Image ${index + 1}">
+    `).join('');
+
+    const galleryHtml = `
+        <div class="product-gallery">
+          <div class="gallery-main" onclick="openLightbox(this)" onkeydown="if(event.key==='Enter')openLightbox(this)" tabindex="0" role="button">
+            <img loading="lazy" id="main-product-image" src="${mainImage}"
+              alt="${escapeHtml(serviceName)}" class="product-image-style">
+            <div class="enlarge-hint">
+              <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          ${thumbsHtml ? `<div class="gallery-thumbs">${thumbsHtml}</div>` : ''}
+        </div>
+    `;
+
     // Render Template
     container.innerHTML = `
         <div class="detail-layout">
@@ -71,18 +125,7 @@ window.renderServiceDetail = function(container, serviceId) {
             </div>
           </div>
           <div class="detail-layout__image">
-            <div class="product-gallery">
-              <div class="gallery-main" onclick="openLightbox(this)" onkeydown="if(event.key==='Enter')openLightbox(this)" tabindex="0" role="button">
-                <img loading="lazy" id="main-product-image" src="${service.image}"
-                  alt="${escapeHtml(serviceName)}" class="product-image-style">
-                <div class="enlarge-hint">
-                  <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
-                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                  </svg>
-                  Click to Enlarge
-                </div>
-              </div>
-            </div>
+            ${galleryHtml}
           </div>
         </div>
 
@@ -101,7 +144,7 @@ window.renderServiceDetail = function(container, serviceId) {
                         return `
                         <a href="#/services/detail?id=${sub.id}" class="product-grid-wrapper" style="text-decoration:none; color:inherit;" aria-label="View details about ${escapeHtml(subName)}">
                             <div class="product-card-visual">
-                                <img loading="lazy" alt="${escapeHtml(subName)}" class="product-item__image product-image-style" src="${sub.image || service.image}">
+                                <img loading="lazy" alt="${escapeHtml(subName)}" class="product-item__image product-image-style" src="${getServicePrimaryImage(sub) || mainImage}">
                             </div>
                             <div class="product-content-outside">
                                 <h4>${escapeHtml(subName)}</h4>
