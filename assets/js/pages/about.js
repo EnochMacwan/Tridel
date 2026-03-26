@@ -34,14 +34,17 @@
     // Who We Are section
     if (isSectionVisible('about', 'whoWeAre'))
     html +=
-      '<section class="section" id="who-we-are">' +
-        '<div class="container">' +
-          '<div class="section__header">' +
-            '<h2 class="section__title">' + esc(whoWeAre.title || 'Who We Are') + '</h2>' +
+      '<section class="section about-who-we-are-section reveal" id="who-we-are">' +
+        '<div class="container--wide">' +
+          '<div class="about-who-we-are-layout">' +
+            '<div class="about-who-we-are-media">' +
+              '<img loading="lazy" alt="' + esc(whoWeAre.imageAlt || 'The Tridel team') + '" class="about-who-we-are-image" src="' + esc(whoWeAre.image || 'assets/images/team/team.jpg') + '">' +
+            '</div>' +
+            '<div class="about-who-we-are-copy">' +
+              '<h2 class="sr-only">' + esc(whoWeAre.title || 'Who We Are') + '</h2>' +
+              '<p class="about-who-we-are-text">' + esc(whoWeAre.text || '') + '</p>' +
+            '</div>' +
           '</div>' +
-          '<p>' + esc(whoWeAre.text || '') + '</p>' +
-          '<img loading="lazy" alt="' + esc(whoWeAre.imageAlt || 'The Tridel team') + '" src="' + esc(whoWeAre.image || 'assets/images/team/team.jpg') + '"' +
-            ' style="width: 100%; border-radius: var(--radius-lg); margin-top: var(--space-lg); box-shadow: var(--shadow-md);">' +
         '</div>' +
       '</section>';
 
