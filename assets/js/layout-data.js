@@ -110,11 +110,11 @@ var MEGA_MENU_CONFIG = {
     ],
     "spotlight": {
       "tag": "Featured",
-      "title": "Comprehensive Solutions",
-      "description": "End-to-end expertise from feasibility to real-time monitoring.",
+      "title": "Air Quality Monitoring",
+      "description": "Precision air quality monitoring for offshore and coastal projects. Our setups measure key pollutants and meteorological parameters to ensure compliance with environmental regulations and safeguard operational health.",
       "link": "#/services",
       "buttonText": "Learn More",
-      "image": ""
+      "image": "assets/images/Integrated Solutions/AQMS/aqms.png"
     }
   }
 };
