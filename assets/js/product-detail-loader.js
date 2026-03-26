@@ -12,6 +12,25 @@ var formatAllowedInlineHtml = typeof formatAllowedInlineHtml === 'function'
         return esc(text == null ? '' : text).replace(/&lt;(\/?)strong&gt;/gi, '<$1strong>');
     };
 
+function getProductDataLookupId(product) {
+    if (product && product.id) {
+        return String(product.id).trim();
+    }
+
+    if (product && product.link) {
+        var match = String(product.link).match(/[?&]id=([^&]+)/i);
+        if (match && match[1]) {
+            try {
+                return decodeURIComponent(match[1]).trim();
+            } catch (e) {
+                return String(match[1]).trim();
+            }
+        }
+    }
+
+    return '';
+}
+
 /**
  * Renders a Product Detail page into the given container.
  * Exported as window.renderProductDetail for SPA router usage.
@@ -28,7 +47,10 @@ window.renderProductDetail = function(container, productId) {
         return;
     }
 
-    const product = data.find(p => p.id === productId);
+    var requestedProductId = String(productId).trim().toLowerCase();
+    const product = data.find(function(p) {
+        return getProductDataLookupId(p).toLowerCase() === requestedProductId;
+    });
 
     if (!product) {
         container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="#/products" class="button button--primary">View All Products</a></div>';
