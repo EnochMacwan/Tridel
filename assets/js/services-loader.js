@@ -11,6 +11,10 @@
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 var SERVICES_LIST_STATE_KEY = 'tridel.servicesListState';
 
+function getServiceDisplayName(service) {
+    return String((service && (service.title || service.name)) || '').trim();
+}
+
 function saveServicesListState() {
     var hash = window.location.hash || '#/services';
     if (!hash || hash.indexOf('#/services') !== 0 || hash.indexOf('#/services/detail') === 0) return;
@@ -155,7 +159,8 @@ window.renderServicesMegaMenu = function(containerElement) {
     col1.className = 'glass-col';
     col1.innerHTML = `<h4>${getIconForCategory('Environmental Monitoring')} Environmental Monitoring</h4>`;
     columns['Environmental Monitoring'].forEach(s => {
-        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(s.name)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(s.name)}</a>`;
+        var displayName = getServiceDisplayName(s);
+        col1.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(displayName)}</a>`;
     });
     container.appendChild(col1);
 
@@ -164,7 +169,8 @@ window.renderServicesMegaMenu = function(containerElement) {
     col2.className = 'glass-col';
     col2.innerHTML = `<h4>${getIconForCategory('Environmental Surveying')} Environmental Surveying</h4>`;
     columns['Environmental Surveying'].forEach(s => {
-        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(s.name)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(s.name)}</a>`;
+        var displayName = getServiceDisplayName(s);
+        col2.innerHTML += `<a href="${s.link}" class="glass-link" data-title="${escapeHtml(displayName)}" data-desc="${escapeHtml(s.description)}" data-img="${escapeHtml(s.image)}">${escapeHtml(displayName)}</a>`;
     });
     container.appendChild(col2);
 
@@ -249,13 +255,14 @@ window.renderServicesGrid = function(container) {
 
         // Render main services (without subcategory)
         mainItems.forEach(item => {
+            var displayName = getServiceDisplayName(item);
             sectionContent += `
-                <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
+                <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(displayName)}">
                     <div class="product-card-visual">
-                        <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image product-image-style" src="${item.image}">
+                        <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${item.image}">
                     </div>
                     <div class="product-content-outside">
-                        <h4>${escapeHtml(item.name)}</h4>
+                        <h4>${escapeHtml(displayName)}</h4>
                         <p class="product-item__excerpt">${escapeHtml(item.description)}</p>
                         <span class="button button--secondary">View Details</span>
                     </div>
@@ -280,13 +287,14 @@ window.renderServicesGrid = function(container) {
             `;
 
             subItems.forEach(item => {
+                var displayName = getServiceDisplayName(item);
                 sectionContent += `
-                    <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
+                    <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(displayName)}">
                         <div class="product-card-visual">
-                            <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image product-image-style" src="${item.image}">
+                            <img loading="lazy" alt="${escapeHtml(displayName)}" class="product-item__image product-image-style" src="${item.image}">
                         </div>
                         <div class="product-content-outside">
-                            <h4>${escapeHtml(item.name)}</h4>
+                            <h4>${escapeHtml(displayName)}</h4>
                             <p class="product-item__excerpt">${escapeHtml(item.description)}</p>
                             <span class="button button--secondary">View Details</span>
                         </div>

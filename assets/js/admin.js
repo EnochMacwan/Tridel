@@ -1803,6 +1803,10 @@ function saveItem() {
                 if (input.value.trim()) sFeatures.push(input.value.trim());
             });
             if (sFeatures.length > 0) data.features = sFeatures;
+
+            // The website renders service names from `name`, while the admin form edits `title`.
+            if (data.title) data.name = data.title;
+            else if (data.name) data.title = data.name;
         }
 
         // Gallery
