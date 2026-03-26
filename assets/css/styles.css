@@ -6101,6 +6101,19 @@ html.lenis {
     }
 }
 
+@media (max-width: 600px) {
+    .offices-card-list {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .office-card-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+}
+
 .contact-text-secondary {
     display: block;
     font-size: 0.85rem;
