@@ -85,7 +85,7 @@ var MEGA_MENU_CONFIG = {
     "spotlight": {
       "tag": "Featured",
       "title": "Tridel Aquilon 8000",
-      "description": "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
+      "description": "Our flagship USV for advanced autonomous hydrographic surveys.",
       "link": "#/products/detail?id=aquilon-8000",
       "buttonText": "Learn More",
       "image": "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
@@ -114,7 +114,7 @@ var MEGA_MENU_CONFIG = {
       "description": "End-to-end expertise from feasibility to real-time monitoring.",
       "link": "#/services",
       "buttonText": "Learn More",
-      "image": "assets/images/services/port-monitoring.png"
+      "image": ""
     }
   }
 };
