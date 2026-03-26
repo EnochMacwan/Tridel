@@ -132,7 +132,7 @@
         '</div>' +
         '<div class="footer__bottom">' +
           '<div class="container">' +
-            '<p>' + esc(FOOTER_DATA.copyright) + '</p>' +
+            '<p style="text-align:center">' + esc(FOOTER_DATA.copyright) + '</p>' +
           '</div>' +
         '</div>' +
       '</footer>';
