@@ -9,6 +9,59 @@
  *   window.renderProductsGrid(container)
  */
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var PRODUCTS_LIST_STATE_KEY = 'tridel.productsListState';
+
+function saveProductsListState() {
+    var hash = window.location.hash || '#/products';
+    if (!hash || hash.indexOf('#/products') !== 0 || hash.indexOf('#/products/detail') === 0) return;
+
+    var state = {
+        hash: hash,
+        scrollY: window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+    };
+
+    try {
+        sessionStorage.setItem(PRODUCTS_LIST_STATE_KEY, JSON.stringify(state));
+    } catch (e) {
+        // Ignore sessionStorage issues
+    }
+}
+
+function readProductsListState() {
+    try {
+        var raw = sessionStorage.getItem(PRODUCTS_LIST_STATE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+window.saveProductsListState = saveProductsListState;
+
+window.restoreProductsListState = function() {
+    var state = readProductsListState();
+    if (!state || typeof state.scrollY !== 'number') return false;
+
+    function restoreScroll() {
+        if (window.__lenis && typeof window.__lenis.scrollTo === 'function') {
+            window.__lenis.scrollTo(state.scrollY, { immediate: true, force: true });
+        } else {
+            window.scrollTo({ top: state.scrollY, behavior: 'auto' });
+        }
+    }
+
+    [120, 260, 520].forEach(function(delay) {
+        window.setTimeout(restoreScroll, delay);
+    });
+
+    try {
+        sessionStorage.removeItem(PRODUCTS_LIST_STATE_KEY);
+    } catch (e) {
+        // Ignore sessionStorage issues
+    }
+
+    return true;
+};
 
 /**
  * Helper: Get Icon for Product Category

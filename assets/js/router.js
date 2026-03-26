@@ -47,6 +47,15 @@
    * @param {string} hash - Full hash (e.g., '#/about' or '#/products/detail?id=buoy')
    */
   window.navigate = function (hash) {
+    if (
+      currentRoute === '/products' &&
+      typeof hash === 'string' &&
+      hash.indexOf('#/products/detail') === 0 &&
+      typeof window.saveProductsListState === 'function'
+    ) {
+      window.saveProductsListState();
+    }
+
     window.location.hash = hash;
   };
 
@@ -98,6 +107,7 @@
   function handleRoute() {
     var parsed = parseHash();
     var match = findRoute(parsed.path);
+    var shouldRestoreProductsList = currentRoute === '/products/detail' && parsed.path === '/products';
 
     if (!match) return;
 
@@ -149,6 +159,10 @@
 
     // Scroll to top
     resetScrollPosition();
+
+    if (shouldRestoreProductsList && typeof window.restoreProductsListState === 'function') {
+      window.restoreProductsListState();
+    }
 
     // Re-init scroll reveal for new content
     if (typeof window.initScrollReveal === 'function') {
