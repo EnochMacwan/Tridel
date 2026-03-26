@@ -11,23 +11,6 @@
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 var SERVICES_LIST_STATE_KEY = 'tridel.servicesListState';
 
-function slugifyServiceSection(value) {
-    return String(value || '')
-        .trim()
-        .toLowerCase()
-        .replace(/&/g, 'and')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-}
-
-function getServiceCategorySectionId(categoryName) {
-    return 'service-category-' + slugifyServiceSection(categoryName);
-}
-
-function getServiceSubcategorySectionId(subcategoryName) {
-    return 'service-subcategory-' + slugifyServiceSection(subcategoryName);
-}
-
 function saveServicesListState() {
     var hash = window.location.hash || '#/services';
     if (!hash || hash.indexOf('#/services') !== 0 || hash.indexOf('#/services/detail') === 0) return;
@@ -79,27 +62,6 @@ window.restoreServicesListState = function() {
 
     return true;
 };
-
-function scrollToServiceSection(sectionId) {
-    if (!sectionId) return;
-
-    var target = document.getElementById(sectionId);
-    if (!target) return;
-
-    var headerOffset = 96;
-    var top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-}
-
-function scheduleServiceSectionScroll(sectionId) {
-    if (!sectionId) return;
-
-    [160, 420, 900].forEach(function(delay) {
-        window.setTimeout(function() {
-            scrollToServiceSection(sectionId);
-        }, delay);
-    });
-}
 
 /**
  * Helper: Get Icon Class for Category
@@ -239,7 +201,7 @@ window.renderServicesMegaMenu = function(containerElement) {
  * Renders the Services Page Grid
  * Exported as window.renderServicesGrid for SPA router usage.
  */
-window.renderServicesGrid = function(container, targetSectionId) {
+window.renderServicesGrid = function(container) {
     if (!container) container = document.getElementById('dynamic-services-container');
     // Support both variable names
     const data = typeof SERVICES_DATA !== 'undefined' ? SERVICES_DATA : (typeof servicesData !== 'undefined' ? servicesData : null);
@@ -268,7 +230,6 @@ window.renderServicesGrid = function(container, targetSectionId) {
     sections.forEach((section, index) => {
         const sectionEl = document.createElement('section');
         sectionEl.className = `section ${section.bgClass || ''}`;
-        sectionEl.id = getServiceCategorySectionId(section.category);
 
         // Get all items for this category, excluding nested items
         const items = data.filter(s => s.category === section.category && !s.isNested);
@@ -311,7 +272,7 @@ window.renderServicesGrid = function(container, targetSectionId) {
             const subItems = items.filter(s => s.subcategory === subcat);
 
             sectionContent += `
-                <div class="product-category" id="${getServiceSubcategorySectionId(subcat)}">
+                <div class="product-category">
                     <h3 class="product-category__title">
                         <i class="fas fa-globe-americas"></i> ${subcat}
                     </h3>
@@ -346,8 +307,6 @@ window.renderServicesGrid = function(container, targetSectionId) {
         sectionEl.innerHTML = sectionContent;
         container.appendChild(sectionEl);
     });
-
-    scheduleServiceSectionScroll(targetSectionId);
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---

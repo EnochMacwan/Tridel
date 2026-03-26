@@ -31,20 +31,6 @@ function getProductDataLookupId(product) {
     return '';
 }
 
-function getProductBackLink(product) {
-    if (!product || !product.category) {
-        return '#/products';
-    }
-
-    var sectionId = typeof getProductCategorySectionId === 'function'
-        ? getProductCategorySectionId(product.category)
-        : '';
-
-    return sectionId
-        ? '#/products?section=' + encodeURIComponent(sectionId)
-        : '#/products';
-}
-
 /**
  * Renders a Product Detail page into the given container.
  * Exported as window.renderProductDetail for SPA router usage.
@@ -70,8 +56,6 @@ window.renderProductDetail = function(container, productId) {
         container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="#/products" class="button button--primary">View All Products</a></div>';
         return;
     }
-
-    var backToProductsHref = getProductBackLink(product);
 
     // Update Page Title
     document.title = `${product.name} | TRIDEL`;
@@ -123,7 +107,7 @@ window.renderProductDetail = function(container, productId) {
 
             <div class="product-actions">
               <a class="button button--primary" href="#/contact?subject=Quote for ${encodeURIComponent(product.name)}">Request Quote</a>
-              <a href="${backToProductsHref}" class="button button--soft">Back to Products</a>
+              <a href="#/products" class="button button--soft">Back to Products</a>
             </div>
           </div>
           <div class="detail-layout__image">
