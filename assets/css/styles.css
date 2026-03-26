@@ -3676,8 +3676,19 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 }
 
 @media (max-width: 600px) {
+    .container--wide {
+        width: calc(100% - 32px);
+        max-width: none;
+    }
+
+    .testimonial-scroll-container {
+        gap: 16px;
+        padding: 6px 0 32px;
+    }
+
     .testimonial-card {
-        flex: 0 0 calc(100vw - 32px);
+        flex: 0 0 100%;
+        min-width: 0;
     }
 
     .testimonial-deck__card {
@@ -3698,6 +3709,13 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     .testimonial-deck__toolbar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .testimonial-deck__controls {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 
