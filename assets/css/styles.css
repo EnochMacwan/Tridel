@@ -5891,6 +5891,22 @@ html.lenis {
     transform: translateX(5px);
 }
 
+.contact-info-copy {
+    font-size: 1rem;
+    color: var(--color-text-main, #001220);
+    line-height: 1.65;
+}
+
+.contact-info-copy a {
+    color: var(--color-accent, #00AAE7);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.contact-info-copy a:hover {
+    text-decoration: underline;
+}
+
 .response-guarantee {
     display: flex;
     align-items: center;

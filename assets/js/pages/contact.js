@@ -30,6 +30,32 @@
     return html;
   }
 
+  function buildContactInfoCards(cards) {
+    if (!cards || !cards.length) return '';
+
+    var html = '<div class="contact-sidebar-card">';
+    cards.forEach(function (card) {
+      var iconClass = (card.icon || '').trim();
+      if (!iconClass) {
+        iconClass = 'fas fa-circle-info';
+      } else if (!/^(fas|far|fab|fal|fad|fa-solid|fa-regular|fa-brands)\s/.test(iconClass)) {
+        iconClass = 'fas ' + iconClass;
+      }
+
+      html +=
+        '<div class="contact-info-item">' +
+          '<div class="contact-info-icon"><i class="' + esc(iconClass) + '"></i></div>' +
+          '<div>' +
+            '<h4>' + esc(card.title || 'Info') + '</h4>' +
+            '<div class="contact-info-copy">' + (card.detail || '') + '</div>' +
+          '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+
+    return html;
+  }
+
   function buildOfficesMapCard(label, locations) {
     var html = '';
     html += '<div class="contact-sidebar-card contact-offices-map-card">';
@@ -110,6 +136,7 @@
 
   function render(mainEl, params) {
     var config = (typeof CONTACT_PAGE_CONFIG !== 'undefined') ? CONTACT_PAGE_CONFIG : {};
+    var infoCards = (typeof CONTACT_INFO_CARDS !== 'undefined' && Array.isArray(CONTACT_INFO_CARDS)) ? CONTACT_INFO_CARDS : [];
     var faqData = (typeof CONTACT_FAQ_DATA !== 'undefined') ? CONTACT_FAQ_DATA : [];
 
     var hero = config.hero || {};
@@ -215,6 +242,8 @@
           '</div>' +
         '</div>';
     }
+
+    html += buildContactInfoCards(infoCards);
 
     // Contact info card
     html +=

@@ -940,7 +940,13 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
             contactLines.push('');
             contactLines.push(`var CONTACT_FAQ_DATA = ${JSON.stringify(data.CONTACT_FAQ_DATA || [], null, 2)};`);
             contactLines.push('');
-            contactLines.push(`var CONTACT_PAGE_CONFIG = ${JSON.stringify(data.CONTACT_PAGE_CONFIG || {}, null, 2)};`);
+            const configCopy = JSON.parse(JSON.stringify(data.CONTACT_PAGE_CONFIG || {}));
+            if (configCopy.offices) {
+                configCopy.offices.locations = '__LOCATIONS_DATA_REF__';
+            }
+            let configStr = JSON.stringify(configCopy, null, 2);
+            configStr = configStr.replace('"__LOCATIONS_DATA_REF__"', "(typeof LOCATIONS_DATA !== 'undefined') ? LOCATIONS_DATA : []");
+            contactLines.push(`var CONTACT_PAGE_CONFIG = ${configStr};`);
             contactLines.push('');
             content = contactLines.join('\n');
         } else if (type === 'layout') {
@@ -1045,7 +1051,13 @@ app.post('/api/save-all', requireAuth, (req, res) => {
                         lines.push('');
                         lines.push(`var CONTACT_FAQ_DATA = ${JSON.stringify(data.CONTACT_FAQ_DATA || [], null, 2)};`);
                         lines.push('');
-                        lines.push(`var CONTACT_PAGE_CONFIG = ${JSON.stringify(data.CONTACT_PAGE_CONFIG || {}, null, 2)};`);
+                        const configCopy = JSON.parse(JSON.stringify(data.CONTACT_PAGE_CONFIG || {}));
+                        if (configCopy.offices) {
+                            configCopy.offices.locations = '__LOCATIONS_DATA_REF__';
+                        }
+                        let configStr = JSON.stringify(configCopy, null, 2);
+                        configStr = configStr.replace('"__LOCATIONS_DATA_REF__"', "(typeof LOCATIONS_DATA !== 'undefined') ? LOCATIONS_DATA : []");
+                        lines.push(`var CONTACT_PAGE_CONFIG = ${configStr};`);
                         content = lines.join('\n');
                     } else if (type === 'layout') {
                         const lines = ['/**', ' * Layout Data', ' */'];

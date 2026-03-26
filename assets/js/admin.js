@@ -299,7 +299,7 @@ async function loadDataFromGitHub() {
 
     showToast('Loading data from GitHub...', 'success');
 
-    var types = ['products', 'services', 'clients', 'stories', 'home', 'news', 'team', 'testimonials', 'locations', 'settings'];
+    var types = ['products', 'services', 'clients', 'stories', 'home', 'news', 'team', 'testimonials', 'locations', 'settings', 'form_settings'];
 
     for (var i = 0; i < types.length; i++) {
         var type = types[i];
@@ -2063,7 +2063,9 @@ async function publishAllChanges() {
                     INDEX_STATS: window.INDEX_STATS || [],
                     INDEX_WHAT_WE_DO: window.INDEX_WHAT_WE_DO || {},
                     INDEX_CASE_STUDY: window.INDEX_CASE_STUDY || {},
-                    INDEX_CTA: window.INDEX_CTA || {}
+                    INDEX_CTA: window.INDEX_CTA || {},
+                    INDEX_WHY_CHOOSE: window.INDEX_WHY_CHOOSE || {},
+                    INDEX_SECTION_ORDER: window.INDEX_SECTION_ORDER || []
                 };
             } else if (type === 'about_content') {
                 data = window.ABOUT_DATA || {};
@@ -2340,17 +2342,19 @@ function renderHealthResults(results) {
 // ==========================================
 
 function loadSettingsToForm() {
-    if (typeof CONTACT_DATA !== 'undefined') {
-        document.getElementById('setting-address').value = CONTACT_DATA.address || '';
-        document.getElementById('setting-phone').value = CONTACT_DATA.phone || '';
-        document.getElementById('setting-email').value = CONTACT_DATA.email || '';
+    var legacyContact = (window.CONTACT_DATA && typeof window.CONTACT_DATA === 'object' && !Array.isArray(window.CONTACT_DATA))
+        ? window.CONTACT_DATA
+        : {};
+    var config = window.CONTACT_PAGE_CONFIG || {};
+    var enquiry = config.enquiry || {};
+    var social = legacyContact.social || {};
 
-        if (CONTACT_DATA.social) {
-            document.getElementById('setting-linkedin').value = CONTACT_DATA.social.linkedin || '';
-            document.getElementById('setting-youtube').value = CONTACT_DATA.social.youtube || '';
-            document.getElementById('setting-instagram').value = CONTACT_DATA.social.instagram || '';
-        }
-    }
+    document.getElementById('setting-address').value = legacyContact.address || '';
+    document.getElementById('setting-phone').value = config.phone || legacyContact.phone || '';
+    document.getElementById('setting-email').value = enquiry.email || legacyContact.email || '';
+    document.getElementById('setting-linkedin').value = enquiry.linkedinUrl || social.linkedin || '';
+    document.getElementById('setting-youtube').value = social.youtube || '';
+    document.getElementById('setting-instagram').value = social.instagram || '';
 
     if (typeof SETTINGS_DATA !== 'undefined') {
         document.getElementById('form-contact-email').value = SETTINGS_DATA.contactEmail || '';
@@ -2385,11 +2389,21 @@ async function saveGlobalSettings() {
         return;
     }
 
+    if (!window.CONTACT_PAGE_CONFIG) window.CONTACT_PAGE_CONFIG = {};
+    if (!window.CONTACT_PAGE_CONFIG.enquiry) window.CONTACT_PAGE_CONFIG.enquiry = {};
+
     window.CONTACT_DATA = newContactSettings;
-    window.SETTINGS_DATA = newFormSettings;
+    window.SETTINGS_DATA = Object.assign({}, window.SETTINGS_DATA || {}, newFormSettings);
+    window.CONTACT_PAGE_CONFIG.phone = newContactSettings.phone;
+    window.CONTACT_PAGE_CONFIG.enquiry.email = newContactSettings.email;
+    window.CONTACT_PAGE_CONFIG.enquiry.linkedinUrl = newContactSettings.social.linkedin;
+    if (!window.CONTACT_PAGE_CONFIG.enquiry.linkedinLabel) {
+        window.CONTACT_PAGE_CONFIG.enquiry.linkedinLabel = 'Tridel Technologies';
+    }
 
     markAsPending('settings');
     markAsPending('form_settings');
+    markAsPending('contact_content');
 
     showToast('Settings draft saved. Click "Publish Website" to apply changes to the website.', 'success');
 }
