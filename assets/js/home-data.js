@@ -25,7 +25,7 @@ const HOME_CARDS_DATA = [
   {
     "title": "Ongoing Product Development",
     "excerpt": "Ongoing development of Uncrewed Surface Vessels (USV) applying AI and machine learning for autonomous operations.",
-    "link": "#/products",
+    "link": "#/products?section=product-category-vessels",
     "linkText": "Explore Developments",
     "image": "assets/images/products/aquilon-5600a/aquilon-5600-new.png",
     "description": ""
