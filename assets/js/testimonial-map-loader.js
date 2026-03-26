@@ -73,6 +73,11 @@
     _destroyed = false;
 
     var testimonials = typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA.slice() : [];
+    testimonials.sort(function (a, b) {
+      var nameA = String((a && a.name) || '').trim();
+      var nameB = String((b && b.name) || '').trim();
+      return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+    });
     container.innerHTML = '';
 
     if (!testimonials.length) {
