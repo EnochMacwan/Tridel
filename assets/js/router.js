@@ -161,6 +161,15 @@
       window.saveProductsListState();
     }
 
+    if (
+      currentRoute === '/services' &&
+      typeof hash === 'string' &&
+      hash.indexOf('#/services/detail') === 0 &&
+      typeof window.saveServicesListState === 'function'
+    ) {
+      window.saveServicesListState();
+    }
+
     window.location.hash = hash;
   };
 
@@ -213,6 +222,7 @@
     var parsed = parseHash();
     var match = findRoute(parsed.path);
     var shouldRestoreProductsList = currentRoute === '/products/detail' && parsed.path === '/products';
+    var shouldRestoreServicesList = currentRoute === '/services/detail' && parsed.path === '/services';
 
     if (!match) return;
 
@@ -267,6 +277,10 @@
 
     if (shouldRestoreProductsList && typeof window.restoreProductsListState === 'function') {
       window.restoreProductsListState();
+    }
+
+    if (shouldRestoreServicesList && typeof window.restoreServicesListState === 'function') {
+      window.restoreServicesListState();
     }
 
     // Re-init scroll reveal for new content

@@ -89,7 +89,6 @@ window.renderSuccessStories = function(container) {
                             ${escapedTitle}
                         </h3>
                         ${hasImage && hasDescription ? `
-                        <p class="success-story-card__hover-hint">Hover to view brief</p>
                         <p class="success-story-card__brief">${escapedDescription}</p>
                         ` : hasDescription ? `
                         <p>${escapedDescription}</p>

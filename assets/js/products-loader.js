@@ -11,6 +11,14 @@
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 var PRODUCTS_LIST_STATE_KEY = 'tridel.productsListState';
 
+function getProductHref(item) {
+    if (item && item.id) {
+        return '#/products/detail?id=' + encodeURIComponent(item.id);
+    }
+
+    return item && item.link ? item.link : '#/products';
+}
+
 function saveProductsListState() {
     var hash = window.location.hash || '#/products';
     if (!hash || hash.indexOf('#/products') !== 0 || hash.indexOf('#/products/detail') === 0) return;
@@ -153,7 +161,7 @@ window.renderProductsMegaMenu = function(container) {
         // Limit items in menu if too many? (Optional, currently showing all)
         items.forEach(item => {
             const link = document.createElement('a');
-            link.href = item.link;
+            link.href = getProductHref(item);
             link.className = 'glass-link';
             link.dataset.title = item.name;
             link.dataset.desc = item.description;
@@ -291,8 +299,9 @@ window.renderProductsGrid = function(container, targetSectionId) {
             sectionContent += `<div class="product-list-grid">`;
 
             items.forEach(item => {
+                const itemHref = getProductHref(item);
                 sectionContent += `
-                    <a href="${item.link}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
+                    <a href="${itemHref}" class="product-grid-wrapper" aria-label="View details about ${escapeHtml(item.name)}">
                         <div class="product-card-visual">
                             <img loading="lazy" alt="${escapeHtml(item.name)}" class="product-item__image" src="${item.image}">
                         </div>

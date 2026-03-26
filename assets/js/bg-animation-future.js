@@ -12,7 +12,6 @@
   var canvas, ctx, w, h;
   var animationId;
   var globalTime = 0;
-  var mouse = { x: 0, y: 0 };
 
   var config = {
     colors: {
@@ -174,11 +173,7 @@
 
     // Sonar scan
     var scanLen = 200;
-    var dx = mouse.x - x;
-    var dy = mouse.y - y;
-    var effectiveDy = Math.max(dy, 20);
-    var worldAngle = Math.atan2(effectiveDy, dx);
-    var localAngle = worldAngle - angle;
+    var localAngle = Math.PI / 2;
 
     ctx.globalCompositeOperation = 'screen';
     ctx.fillStyle = 'rgba(0, 255, 204, 0.08)';
@@ -326,15 +321,6 @@
     resizeHandler = resize;
     window.addEventListener('resize', resizeHandler);
 
-    mousemoveHandler = function (e) {
-      var rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    };
-    window.addEventListener('mousemove', mousemoveHandler);
-
-    mouse.x = w / 2;
-    mouse.y = h / 2;
     globalTime = 0;
     boat = { x: -150, y: 0, speed: 0.6, targetSpeed: 0.6, tilt: 0 };
     engineTrail = [];

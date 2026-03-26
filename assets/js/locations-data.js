@@ -47,7 +47,7 @@ const LOCATIONS_DATA = [
         id: "australia",
         country: "Australia",
         name: "Tridel Technologies Pty Ltd",
-        designation: "Australia Office",
+        designation: "Asia-Pacific Regional Office",
         address: "Eden Hills, Adelaide, SA",
         type: "Office",
         lat: -34.9285,
