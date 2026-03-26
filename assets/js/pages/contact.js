@@ -134,6 +134,16 @@
     }
   }
 
+  function getContactFormAction(enquiry) {
+    if (typeof SETTINGS_DATA !== 'undefined' && SETTINGS_DATA && SETTINGS_DATA.contactEmail) {
+      return 'https://formsubmit.co/' + SETTINGS_DATA.contactEmail;
+    }
+    if (isExternalUrl(enquiry && enquiry.formAction)) {
+      return enquiry.formAction;
+    }
+    return 'https://formsubmit.co/mail@trideltechnologies.com';
+  }
+
   function render(mainEl, params) {
     var config = (typeof CONTACT_PAGE_CONFIG !== 'undefined') ? CONTACT_PAGE_CONFIG : {};
     var infoCards = (typeof CONTACT_INFO_CARDS !== 'undefined' && Array.isArray(CONTACT_INFO_CARDS)) ? CONTACT_INFO_CARDS : [];
@@ -181,7 +191,7 @@
     html +=
       '<div class="contact-form-card" id="project-enquiry-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
-        '<form id="contact-form" class="contact-form" action="' + esc(enquiry.formAction || '#') + '" method="POST">' +
+        '<form id="contact-form" class="contact-form" data-form-type="contact" action="' + esc(getContactFormAction(enquiry)) + '" method="POST">' +
           '<input type="hidden" name="_subject" value="New Contact Message - Tridel Website">' +
           '<input type="hidden" name="_captcha" value="false">' +
           '<input type="hidden" name="_template" value="table">' +

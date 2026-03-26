@@ -156,11 +156,17 @@
 
     var method = config.method || 'POST';
 
+    var formAttrs = '';
+    if (config.formId) formAttrs += ' id="' + esc(config.formId) + '"';
+    if (config.formClass) formAttrs += ' class="' + esc(config.formClass) + '"';
+    if (config.formType) formAttrs += ' data-form-type="' + esc(config.formType) + '"';
+
     return (
       '<div class="contact-form">' +
         (config.title ? '<div class="section__header" style="text-align:left;"><h2 class="section__title">' + esc(config.title) + '</h2></div>' : '') +
         (config.subtitle ? '<p style="margin-bottom:var(--space-lg);color:var(--color-text-muted);">' + esc(config.subtitle) + '</p>' : '') +
         '<form action="' + esc(config.action) + '" method="' + esc(method) + '"' +
+          formAttrs +
           (config.enctype ? ' enctype="' + esc(config.enctype) + '"' : '') + '>' +
           '<input type="hidden" name="_captcha" value="false">' +
           fieldsHtml +

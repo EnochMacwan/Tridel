@@ -29,16 +29,17 @@ window.applyFormSettings = function () {
 
     var config = SETTINGS_DATA;
     var formSubmitBase = 'https://formsubmit.co/';
-    var hash = window.location.hash || '';
-
-    var forms = document.querySelectorAll('form[action*="formsubmit.co"]');
+    var forms = document.querySelectorAll('form[data-form-type], #contact-form, #careers-form, form[action*="formsubmit.co"]');
     forms.forEach(function (form) {
-        var isContact = hash.includes('/contact') || document.querySelector('.page-contact');
-        var isCareers = hash.includes('/careers') || document.querySelector('.page-careers');
+        var formType = form.getAttribute('data-form-type');
+        if (!formType) {
+            if (form.id === 'contact-form') formType = 'contact';
+            if (form.id === 'careers-form') formType = 'careers';
+        }
 
-        if (isContact && config.contactEmail) {
+        if (formType === 'contact' && config.contactEmail) {
             form.action = formSubmitBase + config.contactEmail;
-        } else if (isCareers && config.careersEmail) {
+        } else if (formType === 'careers' && config.careersEmail) {
             form.action = formSubmitBase + config.careersEmail;
         }
     });

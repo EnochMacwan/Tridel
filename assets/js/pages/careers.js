@@ -7,6 +7,13 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/careers']) || {};
 
+  function getCareersFormAction() {
+    if (typeof SETTINGS_DATA !== 'undefined' && SETTINGS_DATA && SETTINGS_DATA.careersEmail) {
+      return 'https://formsubmit.co/' + SETTINGS_DATA.careersEmail;
+    }
+    return 'https://formsubmit.co/geminibaba1@gmail.com';
+  }
+
   function render(mainEl) {
     var html = '';
 
@@ -32,9 +39,11 @@
           '</div>';
 
     html += window.renderForm({
-      action: 'https://formsubmit.co/geminibaba1@gmail.com',
+      action: getCareersFormAction(),
       method: 'POST',
       enctype: 'multipart/form-data',
+      formId: 'careers-form',
+      formType: 'careers',
       fields: [
         {
           type: 'text',
