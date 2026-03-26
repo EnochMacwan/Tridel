@@ -49,7 +49,7 @@ function renderGlobalPresence() {
         if (country === 'UAE') {
              // UAE usually has a specific style in the original
              groupedLocations[country].forEach(loc => {
-                 var officeName = escapeHtml(loc.companyName || loc.name);
+                 var officeName = escapeHtml(loc.name || loc.companyName);
                  var officeDesignation = escapeHtml(loc.designation || loc.type || '');
                  listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
@@ -64,7 +64,7 @@ function renderGlobalPresence() {
             listHTML += `<h4 class="contact-location-label">${escapeHtml(country)}</h4>`;
             
             groupedLocations[country].forEach(loc => {
-                var officeName = escapeHtml(loc.companyName || loc.name);
+                var officeName = escapeHtml(loc.name || loc.companyName);
                 var officeDesignation = escapeHtml(loc.designation || loc.type || '');
                 listHTML += `
                     <div id="location-${loc.id}" class="contact-location-group" onclick="focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" onkeydown="if(event.key==='Enter')focusMap(${parseFloat(loc.lat)}, ${parseFloat(loc.lng)})" tabindex="0" role="button">
@@ -156,7 +156,7 @@ function initMap(locations) {
     locations.forEach(loc => {
         if (loc.lat && loc.lng) {
             const marker = L.marker([loc.lat, loc.lng], { icon: iconNormal }).addTo(map);
-            var popupName = escapeHtml(loc.companyName || loc.name);
+            var popupName = escapeHtml(loc.name || loc.companyName);
             var popupDesignation = escapeHtml(loc.designation || loc.type || '');
             marker.bindPopup(`<b>${popupName}</b>${popupDesignation ? `<br><span class="contact-text-secondary">${popupDesignation}</span>` : ''}`);
             markers.push(marker);

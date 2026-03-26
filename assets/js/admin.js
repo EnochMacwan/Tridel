@@ -1622,7 +1622,11 @@ function getFormHTML(type, data) {
         case 'locations':
             return '<div class="form-group">' +
                 '<label>Location Name <span style="color:red">*</span></label>' +
-                '<input type="text" class="form-control" id="field-name" value="' + (data.name || '') + '" placeholder="e.g. Mumbai Office">' +
+                '<input type="text" class="form-control" id="field-name" value="' + (data.name || data.companyName || '') + '" placeholder="e.g. Tridel Technologies FZCO">' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label>Office Designation</label>' +
+                '<input type="text" class="form-control" id="field-designation" value="' + (data.designation || data.type || '') + '" placeholder="e.g. Head Office - UAE">' +
                 '</div>' +
                 '<div class="form-group">' +
                 '<label>Country</label>' +
@@ -1807,6 +1811,13 @@ function saveItem() {
             // The website renders service names from `name`, while the admin form edits `title`.
             if (data.title) data.name = data.title;
             else if (data.name) data.title = data.name;
+        }
+
+        if (currentEditType === 'locations') {
+            if (data.name) data.companyName = data.name;
+            else if (data.companyName) data.name = data.companyName;
+
+            if (!data.designation && data.type) data.designation = data.type;
         }
 
         // Gallery

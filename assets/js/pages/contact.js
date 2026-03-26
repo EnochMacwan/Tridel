@@ -58,7 +58,7 @@
       html += '<div class="office-country-label">' + esc(country) + '</div>';
 
       grouped[country].forEach(function (loc) {
-        var officeName = loc.companyName || loc.name;
+        var officeName = loc.name || loc.companyName;
         var officeDesignation = loc.designation || loc.type || '';
         var iconClass = loc.type === 'Factory' ? 'fa-industry' :
                         loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
