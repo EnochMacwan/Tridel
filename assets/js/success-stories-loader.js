@@ -51,14 +51,14 @@ window.renderSuccessStories = function(container) {
         const section = document.createElement('section');
         section.className = 'section product-category';
         const categoryMeta = SUCCESS_STORY_CATEGORY_META[categoryName] || {
-            subtitle: 'Selected projects showcasing Tridel expertise across marine, environmental, and engineering domains.'
+            subtitle: ''
         };
 
         let html = `
             <div class="container">
                 <div class="section__header success-stories-category-header">
                     <h2 class="section__title success-stories-category-title">${escapeHtml(categoryName)}</h2>
-                    <p class="section__subtitle success-stories-category-subtitle">${escapeHtml(categoryMeta.subtitle)}</p>
+                    ${categoryMeta.subtitle ? `<p class="section__subtitle success-stories-category-subtitle">${escapeHtml(categoryMeta.subtitle)}</p>` : ''}
                 </div>
                 <div class="product-list-grid">
         `;
