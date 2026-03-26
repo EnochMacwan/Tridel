@@ -1898,6 +1898,56 @@ function deleteItem(type, index) {
 
 var pendingChanges = new Set();
 
+function getPublishTargets() {
+    var targets = [];
+    var config = getEffectiveGitHubConfig();
+
+    if (authToken) {
+        targets.push({
+            key: 'server',
+            label: (window.location.origin || 'this site') + ' server'
+        });
+    }
+
+    if (hasConfiguredGitHub()) {
+        targets.push({
+            key: 'github',
+            label: (config.owner || 'GitHub') + '/' + (config.repo || 'repo') + '@' + (config.branch || 'main')
+        });
+    }
+
+    return targets;
+}
+
+function updatePublishBanner() {
+    var banner = document.getElementById('publish-status-banner');
+    if (!banner) return;
+
+    var targets = getPublishTargets();
+    var targetText = targets.map(function (target) {
+        return '<strong>' + escapeHTML(target.label) + '</strong>';
+    }).join(' and ');
+
+    if (pendingChanges.size > 0) {
+        if (targets.length > 0) {
+            banner.innerHTML = '<strong>Draft only:</strong> these admin changes are not on the website yet. Click <strong>Publish Website</strong> to send them to ' + targetText + '.';
+        } else {
+            banner.innerHTML = '<strong>Draft only:</strong> changes are saved only in this admin session. Configure GitHub Settings or use the server-backed admin to update the website.';
+        }
+        banner.style.display = 'block';
+        return;
+    }
+
+    if (targets.length > 0) {
+        banner.innerHTML = 'Publish target: ' + targetText + '. After you save edits, click <strong>Publish Website</strong> to update the website.';
+        banner.style.display = 'block';
+        return;
+    }
+
+    banner.innerHTML = '<strong>Draft-only mode:</strong> no GitHub or server publish target is configured, so website updates will not go live from this screen.';
+    banner.style.display = 'block';
+}
+
 function markAsPending(type) {
     pendingChanges.add(type);
     updatePublishButton();
@@ -1905,7 +1955,7 @@ function markAsPending(type) {
     var undoBtn = document.getElementById('undo-btn-' + type);
     if (undoBtn) undoBtn.style.display = 'inline-block';
 
-    showToast('Changes saved locally. Click "Publish All" to push to GitHub.', 'success');
+    showToast('Draft saved in admin only. Click "Publish Website" to update the website.', 'success');
 }
 
 function updatePublishButton() {
@@ -1918,7 +1968,7 @@ function updatePublishButton() {
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-success');
         btn.style.opacity = '1';
-        btn.title = 'Save pending changes';
+        btn.title = 'Publish pending changes to the website';
 
         if (badge) {
             badge.style.display = 'inline-flex';
@@ -1928,31 +1978,63 @@ function updatePublishButton() {
         btn.classList.remove('btn-success');
         btn.classList.add('btn-secondary');
         btn.style.opacity = '0.7';
-        btn.title = 'No pending changes';
+        btn.title = 'No draft changes to publish';
 
         if (badge) {
             badge.style.display = 'none';
         }
     }
+
+    updatePublishBanner();
+}
+
+async function publishPendingChangeToServer(serverType, data) {
+    var response = await fetch('/api/data/' + serverType, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Auth-Token': authToken
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+        return response.json().catch(function () { return {}; });
+    }
+
+    if (response.status === 401) {
+        showToast('Session expired - please login again', 'error');
+        showLogin();
+        throw new Error('Session expired - please login again');
+    }
+
+    var err = await response.json().catch(function () { return {}; });
+    throw new Error(err.error || ('Server publish failed (' + response.status + ')'));
 }
 
 async function publishAllChanges() {
     if (pendingChanges.size === 0) {
-        showToast('No pending changes to save', 'info');
+        showToast('No draft changes to publish', 'info');
         return;
     }
 
     var btn = document.getElementById('publish-btn');
     var originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
     btn.disabled = true;
 
     try {
         var successCount = 0;
         var types = Array.from(pendingChanges);
-
         var useGitHub = hasConfiguredGitHub();
-        var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        var canUseServerApi = !!authToken;
+        var targets = getPublishTargets();
+
+        if (!useGitHub && !canUseServerApi) {
+            showToast('Draft saved only in admin. Configure GitHub Settings to publish to the website.', 'error');
+            openGitHubConfig();
+            return;
+        }
 
         for (var i = 0; i < types.length; i++) {
             var type = types[i];
@@ -1990,21 +2072,8 @@ async function publishAllChanges() {
             // Map admin 'linkedin' type to server 'news' type
             var serverType = (type === 'linkedin') ? 'news' : type;
 
-            if (isLocal && authToken) {
-                try {
-                    var res = await fetch('/api/data/' + serverType, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-Auth-Token': authToken },
-                        body: JSON.stringify(data)
-                    });
-                    if (!res.ok && res.status === 401) {
-                        showToast('Session expired - please login again', 'error');
-                        showLogin();
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('Local server save failed:', e.message);
-                }
+            if (canUseServerApi) {
+                await publishPendingChangeToServer(serverType, data);
             }
 
             if (useGitHub) {
@@ -2021,10 +2090,13 @@ async function publishAllChanges() {
         }
         updatePublishButton();
 
-        var mode = useGitHub ? 'GitHub' : 'Local Server';
-        showToast('Successfully saved ' + successCount + ' update(s) to ' + mode + '!', 'success');
+        var targetText = targets.map(function (target) {
+            return target.label;
+        }).join(' and ');
+        var deploymentNote = useGitHub ? ' Static website deployments may take 1-3 minutes to refresh.' : '';
+        showToast('Published ' + successCount + ' update(s) to ' + targetText + '.' + deploymentNote, 'success');
     } catch (error) {
-        showToast('Error saving: ' + error.message, 'error');
+        showToast('Error publishing: ' + error.message, 'error');
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -2302,7 +2374,7 @@ async function saveGlobalSettings() {
     markAsPending('settings');
     markAsPending('form_settings');
 
-    showToast('Settings saved! Remember to Publish All to apply changes.', 'success');
+    showToast('Settings draft saved. Click "Publish Website" to apply changes to the website.', 'success');
 }
 
 // ==========================================
@@ -3590,6 +3662,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     renderDashboard();
     renderAllSections();
     loadSettingsToForm();
+    updatePublishButton();
 
     // Close modals on overlay click
     document.getElementById('modal-overlay').addEventListener('click', function (e) {

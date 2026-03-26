@@ -43,12 +43,14 @@ body {
 }
 
 html.admin-auth-pending .admin-header,
+html.admin-auth-pending .publish-status-banner,
 html.admin-auth-pending .admin-container,
 html.admin-auth-pending .modal-overlay,
 html.admin-auth-pending .toast-container,
 html.admin-auth-pending .bulk-action-bar,
 html.admin-auth-pending #login-overlay,
 html.admin-auth-locked .admin-header,
+html.admin-auth-locked .publish-status-banner,
 html.admin-auth-locked .admin-container,
 html.admin-auth-locked .modal-overlay,
 html.admin-auth-locked .toast-container,
@@ -85,6 +87,19 @@ html.admin-auth-locked #login-overlay {
     display: flex;
     gap: 12px;
     align-items: center;
+}
+
+.publish-status-banner {
+    padding: 12px 40px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--warning) 14%, var(--bg-card));
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.publish-status-banner strong {
+    color: var(--warning);
 }
 
 /* --- Layout --- */
@@ -888,6 +903,10 @@ textarea.form-control {
 
     .admin-header {
         padding: 16px 20px;
+    }
+
+    .publish-status-banner {
+        padding: 12px 20px;
     }
 
     .main-content {
