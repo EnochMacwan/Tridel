@@ -37,8 +37,8 @@ function renderGlobalPresence() {
     
     let listHTML = '';
     
-    // Force specific order: UAE, India, Australia (as per original design)
-    const preferredOrder = ['UAE', 'India', 'Australia'];
+    // Force requested order: Australia, India, UAE
+    const preferredOrder = ['Australia', 'India', 'UAE'];
     const otherCountries = Object.keys(groupedLocations).filter(c => !preferredOrder.includes(c));
     const sortedCountries = [...preferredOrder, ...otherCountries];
     

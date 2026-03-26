@@ -45,7 +45,15 @@
       grouped[country].push(loc);
     });
 
-    Object.keys(grouped).forEach(function (country) {
+    var preferredOrder = ['Australia', 'India', 'UAE'];
+    var otherCountries = Object.keys(grouped).filter(function (country) {
+      return preferredOrder.indexOf(country) === -1;
+    });
+    var sortedCountries = preferredOrder.concat(otherCountries);
+
+    sortedCountries.forEach(function (country) {
+      if (!grouped[country]) return;
+
       html += '<div class="office-country-group">';
       html += '<div class="office-country-label">' + esc(country) + '</div>';
 
