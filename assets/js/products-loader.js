@@ -11,6 +11,15 @@
 var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 var PRODUCTS_LIST_STATE_KEY = 'tridel.productsListState';
 
+function getProductCategorySectionId(categoryName) {
+    return 'product-category-' + String(categoryName || '')
+        .trim()
+        .toLowerCase()
+        .replace(/&/g, 'and')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
 function getProductHref(item) {
     if (item && item.id) {
         return '#/products/detail?id=' + encodeURIComponent(item.id);
@@ -290,7 +299,7 @@ window.renderProductsGrid = function(container, targetSectionId) {
 
             const showSubSelect = section.categories.length > 1;
 
-            sectionContent += `<div class="product-category">`;
+            sectionContent += `<div class="product-category" id="${getProductCategorySectionId(catName)}">`;
 
             if (showSubSelect) {
                 sectionContent += `<h3 class="product-category__title">${getIconForProductCategory(catName)} ${catName}</h3>`;
