@@ -59,13 +59,13 @@ const SERVICES_DATA = [
         "id": "vibro-coring"
       },
       {
-        "id": "navigational-charting"
-      },
-      {
         "id": "gravity-coring"
       },
       {
         "id": "marine-boreholes"
+      },
+      {
+        "id": "navigational-charting"
       }
     ],
     "isNested": false,
