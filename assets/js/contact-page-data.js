@@ -16,7 +16,7 @@ var CONTACT_INFO_CARDS = [
   {
     "icon": "fa-globe",
     "title": "Global Offices",
-    "detail": "UAE &middot; India &middot; Australia"
+    "detail": "Australia &middot; India &middot; UAE"
   }
 ];
 
