@@ -212,7 +212,7 @@ const PRODUCTS_DATA = [
     "link": "#/products/detail?id=ecfs",
     "id": "ecfs",
     "category": "Integrated Solutions",
-    "description": "ECFS provides the most direct measure of turbulent heat and momentum fluxes. It caters to the removal of bulk-flux parameterisations. \nIt directly measures air–sea exchanges of momentum, heat, and CO₂ fluxes using a rugged, ship-based Eddy Covariance FluxSystem— especially in remote, high-latitude oceans.\n\nIt has been deployed on RV Sagar Nidhi, INCOIS, India\n",
+    "description": "ECFS provides the most direct measure of turbulent heat and momentum fluxes. It caters to the removal of bulk-flux parameterisations. \nDirectly measures air–sea exchanges of momentum, heat, and CO₂ fluxes using a rugged, ship-based Eddy Covariance FluxSystem— especially in remote, high-latitude oceans.\n\nIt has been deployed on RV Sagar Nidhi, INCOIS, India",
     "longDescription": "Electronic Charting & Forecasting System.",
     "name": "Eddy Covariance Flux System (ECFS)",
     "gallery": [
