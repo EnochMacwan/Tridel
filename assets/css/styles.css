@@ -4398,7 +4398,7 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     inset: 0;
     display: flex;
     align-items: flex-end;
-    padding: clamp(20px, 2.8vw, 28px);
+    padding: clamp(18px, 2.4vw, 24px);
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.82) 100%);
     opacity: 0;
     transform: translateY(12px);
@@ -4408,11 +4408,15 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .page-success-stories .success-story-card__overlay-inner {
     color: #fff;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .page-success-stories .success-story-card__overlay-label {
     display: inline-block;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -4422,7 +4426,9 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
 .page-success-stories .success-story-card__overlay-brief {
     color: #fff;
-    line-height: 1.65;
+    font-size: clamp(0.92rem, 0.2vw + 0.82rem, 1rem);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .page-success-stories .success-story-card--with-image .success-story-card__brief {
@@ -4458,6 +4464,36 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
 
     .page-success-stories .success-stories-category-subtitle {
         max-width: 32ch;
+    }
+}
+
+@media (max-width: 1440px) {
+    .page-success-stories .success-story-card__visual {
+        aspect-ratio: 1.16 / 1;
+    }
+
+    .page-success-stories .success-story-card__overlay {
+        padding: 18px;
+    }
+
+    .page-success-stories .success-story-card__overlay-brief {
+        font-size: 0.92rem;
+        line-height: 1.42;
+    }
+}
+
+@media (max-width: 1200px) {
+    .page-success-stories .success-story-card__visual {
+        aspect-ratio: 1.08 / 1;
+    }
+
+    .page-success-stories .success-story-card__overlay {
+        padding: 16px;
+    }
+
+    .page-success-stories .success-story-card__overlay-brief {
+        font-size: 0.88rem;
+        line-height: 1.38;
     }
 }
 
