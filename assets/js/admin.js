@@ -1235,7 +1235,7 @@ function renderLinkedIn() {
     }
 
     grid.innerHTML = '<div class="items-grid">' + data.map(function (post, i) {
-        var embedUrl = post.embedUrl || '';
+        var embedUrl = normalizeLinkedInEmbedUrl(post.embedUrl || '');
         var displayUrl = embedUrl.length > 70
             ? escapeHTML(embedUrl.substring(0, 67)) + '...'
             : escapeHTML(embedUrl);
@@ -1442,7 +1442,7 @@ function getFormHTML(type, data) {
                 '</div>' +
                 '<div class="form-group">' +
                 '<label>Description</label>' +
-                '<textarea class="form-control" id="field-description" placeholder="Product description...">' + (data.description || '') + '</textarea>' +
+                '<textarea class="form-control" id="field-description" placeholder="Product description...">' + (data.description || data.longDescription || '') + '</textarea>' +
                 '</div>' +
                 '<div class="form-group">' +
                 '<label>Key Features</label>' +
@@ -1583,9 +1583,10 @@ function getFormHTML(type, data) {
 
         case 'linkedin':
             var liData = data || {};
+            var normalizedLinkedInUrl = normalizeLinkedInEmbedUrl(liData.embedUrl || '');
             return '<div class="form-group">' +
                 '<label>LinkedIn Embed URL <span style="color:red">*</span></label>' +
-                '<input type="text" class="form-control" id="field-embedUrl" value="' + escapeHTML(liData.embedUrl || '') + '" ' +
+                '<input type="text" class="form-control" id="field-embedUrl" value="' + escapeHTML(normalizedLinkedInUrl) + '" ' +
                 'placeholder="https://www.linkedin.com/embed/feed/update/urn:li:share:1234567890" ' +
                 'oninput="previewLinkedInEmbed(this.value)">' +
                 '<small style="color: var(--text-muted); display: block; margin-top: 8px;">' +
@@ -1599,8 +1600,8 @@ function getFormHTML(type, data) {
                 '<div class="form-group">' +
                 '<label>Preview</label>' +
                 '<div id="linkedin-embed-preview" style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px; min-height:100px; display:flex; align-items:center; justify-content:center;">' +
-                (liData.embedUrl
-                    ? '<iframe src="' + escapeHTML(liData.embedUrl) + '" height="400" width="100%" frameborder="0" style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>'
+                (normalizedLinkedInUrl
+                    ? '<iframe src="' + escapeHTML(normalizedLinkedInUrl) + '" height="400" width="100%" frameborder="0" style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>'
                     : '<span style="color:var(--text-muted);"><i class="fab fa-linkedin" style="font-size:2rem; opacity:0.3; margin-right:10px;"></i> Enter an embed URL above to preview</span>') +
                 '</div>' +
                 '</div>';
@@ -1654,12 +1655,46 @@ function getFormHTML(type, data) {
 // 15. FORM HELPERS
 // ==========================================
 
+function normalizeLinkedInEmbedUrl(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+
+    var srcMatch = raw.match(/src\s*=\s*["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1]) {
+        raw = srcMatch[1].trim();
+    }
+
+    var embedMatch = raw.match(/https:\/\/www\.linkedin\.com\/embed\/feed\/update\/urn:li:(?:share|ugcPost):\d+(?:\?[^"'\s<>]*)?/i);
+    if (embedMatch && embedMatch[0]) {
+        raw = embedMatch[0];
+    } else {
+        var activityMatch = raw.match(/linkedin\.com\/posts\/[^?\s/]+(?:-[^?\s/]+)*-activity-(\d+)/i);
+        if (activityMatch && activityMatch[1]) {
+            raw = 'https://www.linkedin.com/embed/feed/update/urn:li:share:' + activityMatch[1];
+        }
+    }
+
+    raw = raw.replace(/["'<>\s].*$/, '');
+
+    if (raw.indexOf('linkedin.com/embed/feed/update/urn:li:') === -1) {
+        return '';
+    }
+
+    if (raw.indexOf('?') === -1) {
+        raw += '?collapsed=1';
+    } else if (!/[?&]collapsed=/i.test(raw)) {
+        raw += '&collapsed=1';
+    }
+
+    return raw;
+}
+
 // Live preview helper for LinkedIn embed URL input
 function previewLinkedInEmbed(url) {
     var container = document.getElementById('linkedin-embed-preview');
     if (!container) return;
 
-    url = (url || '').trim();
+    url = normalizeLinkedInEmbedUrl(url);
     if (url && url.includes('linkedin.com/embed/')) {
         container.innerHTML = '<iframe src="' + escapeHTML(url) + '" height="400" width="100%" frameborder="0" ' +
             'style="border:none; border-radius:4px;" loading="lazy" title="LinkedIn Preview"></iframe>';
@@ -1751,8 +1786,10 @@ function saveItem() {
             return;
         }
     } else {
-        var embedUrlVal = document.getElementById('field-embedUrl').value.trim();
+        var embedUrlField = document.getElementById('field-embedUrl');
+        var embedUrlVal = normalizeLinkedInEmbedUrl(embedUrlField.value);
         if (!embedUrlVal) { showToast('Validation Error: LinkedIn Embed URL is required', 'error'); return; }
+        embedUrlField.value = embedUrlVal;
         if (!embedUrlVal.includes('linkedin.com/embed/')) {
             showToast('Warning: URL should be a LinkedIn embed URL (linkedin.com/embed/...)', 'info');
         }
@@ -1762,7 +1799,9 @@ function saveItem() {
 
     // LinkedIn
     if (currentEditType === 'linkedin') {
-        var embedUrl = document.getElementById('field-embedUrl').value.trim();
+        var embedUrlField = document.getElementById('field-embedUrl');
+        var embedUrl = normalizeLinkedInEmbedUrl(embedUrlField.value);
+        embedUrlField.value = embedUrl;
         var postObj = { embedUrl: embedUrl };
 
         if (currentEditIndex !== null) {
@@ -1799,6 +1838,11 @@ function saveItem() {
                 }
             });
             if (features.length > 0) data.features = features;
+
+            // The admin exposes a single product description field, while some
+            // website views may still read longDescription. Keep them aligned.
+            if (data.description) data.longDescription = data.description;
+            else if (data.longDescription) data.description = data.longDescription;
         }
 
         // Features (Services)

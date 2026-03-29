@@ -445,14 +445,17 @@
         markers[loc.id] = marker;
 
         marker.on('click', function () {
-          setActiveLocation(loc.id);
+          setActiveLocation(loc.id, { scrollCard: true });
         });
       });
 
       // Active state management
       var activeId = null;
 
-      function setActiveLocation(id) {
+      function setActiveLocation(id, options) {
+        options = options || {};
+        var shouldScrollCard = !!options.scrollCard;
+
         // Reset previous
         if (activeId && markers[activeId]) {
           markers[activeId].setIcon(pinNormal);
@@ -467,14 +470,31 @@
           markers[id].setIcon(pinActive);
           markers[id].setZIndexOffset(1000);
           var ll = markers[id].getLatLng();
-          map.flyTo(ll, 8, { animate: true, duration: 1200 });
+          map.stop();
+          if (map.getZoom() < 8) {
+            map.flyTo(ll, 8, {
+              animate: true,
+              duration: 0.7,
+              easeLinearity: 0.2,
+              noMoveStart: true
+            });
+          } else {
+            map.panTo(ll, {
+              animate: true,
+              duration: 0.6,
+              easeLinearity: 0.2,
+              noMoveStart: true
+            });
+          }
         }
 
         var escapedId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(id) : id.replace(/(["\\])/g, '\\$1');
         var newCard = document.querySelector('.office-card[data-location-id="' + escapedId + '"]');
         if (newCard) {
           newCard.classList.add('active');
-          newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (shouldScrollCard) {
+            newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }
         }
       }
 

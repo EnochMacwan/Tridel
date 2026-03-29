@@ -148,7 +148,7 @@ window.renderServiceDetail = function(container, serviceId) {
                             </div>
                             <div class="product-content-outside">
                                 <h4>${escapeHtml(subName)}</h4>
-                                <p class="product-item__excerpt">${escapeHtml((sub.description || '').substring(0, 100))}...</p>
+                                <p class="product-item__excerpt">${escapeHtml(sub.description || '')}</p>
                                 <span class="button button--secondary">View Details</span>
                             </div>
                         </a>

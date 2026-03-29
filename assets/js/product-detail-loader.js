@@ -64,6 +64,17 @@ function getProductGallery(product) {
     return uniqueImages;
 }
 
+function getProductDetailDescription(product) {
+    var description = String((product && product.description) || '').trim();
+    var longDescription = String((product && product.longDescription) || '').trim();
+
+    if (!description) return longDescription;
+    if (!longDescription) return description;
+    if (longDescription.indexOf('[...]') !== -1) return description;
+    if (description.length >= longDescription.length) return description;
+    return longDescription;
+}
+
 /**
  * Renders a Product Detail page into the given container.
  * Exported as window.renderProductDetail for SPA router usage.
@@ -93,7 +104,7 @@ window.renderProductDetail = function(container, productId) {
     // Update Page Title
     document.title = `${product.name} | TRIDEL`;
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.content = product.description;
+    if (metaDesc) metaDesc.content = getProductDetailDescription(product);
 
     // Build Features List
     let featuresHtml = '';
@@ -136,7 +147,7 @@ window.renderProductDetail = function(container, productId) {
         <div class="detail-layout">
           <div class="detail-layout__content">
             <h1 class="detail-layout__title">${escapeHtml(product.name)}</h1>
-            <p class="detail-layout__description">${escapeHtml(product.longDescription || product.description)}</p>
+            <p class="detail-layout__description">${escapeHtml(getProductDetailDescription(product))}</p>
             ${featuresHtml}
 
             <div class="product-actions">
@@ -167,7 +178,7 @@ window.renderProductDetail = function(container, productId) {
                             </div>
                             <div class="product-content-outside">
                                 <h4>${escapeHtml(sub.name)}</h4>
-                                <p class="product-item__excerpt">${escapeHtml((sub.description || '').substring(0, 100))}...</p>
+                                <p class="product-item__excerpt">${escapeHtml(getProductDetailDescription(sub))}</p>
                                 <span class="button button--secondary">View Details</span>
                             </div>
                         </a>
