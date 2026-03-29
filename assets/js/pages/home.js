@@ -262,20 +262,28 @@
           '</section>'
         );
       },
-      clients: function () {
-        return (
-          '<section class="section reveal" id="clients">' +
-            '<div class="container">' +
-              '<div class="section__header">' +
-                '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
+        clients: function () {
+          return (
+            '<section class="section reveal" id="clients">' +
+              '<div class="container">' +
+                '<div class="section__header">' +
+                  '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
+                '</div>' +
               '</div>' +
-            '</div>' +
             '<div class="client-logos">' +
-              '<div class="client-logo-track"></div>' +
-            '</div>' +
-          '</section>'
-        );
-      },
+                '<button class="client-logos__control client-logos__control--prev" type="button" aria-label="Show previous clients and partners">' +
+                  '<span aria-hidden="true">&larr;</span>' +
+                '</button>' +
+                '<div class="client-logos__viewport">' +
+                  '<div class="client-logo-track"></div>' +
+                '</div>' +
+                '<button class="client-logos__control client-logos__control--next" type="button" aria-label="Show next clients and partners">' +
+                  '<span aria-hidden="true">&rarr;</span>' +
+                '</button>' +
+              '</div>' +
+            '</section>'
+          );
+        },
       caseStudy: function () {
         if (!caseStudy || !isSectionVisible('home', 'caseStudy')) return '';
         return buildCaseStudyHtml(caseStudy);

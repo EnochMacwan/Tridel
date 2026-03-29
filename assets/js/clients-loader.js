@@ -21,6 +21,11 @@ window.renderClientLogos = function(container) {
     }
     if (!container) return;
 
+    const shell = container.closest('.client-logos');
+    const viewport = shell ? shell.querySelector('.client-logos__viewport') : null;
+    const prevButton = shell ? shell.querySelector('.client-logos__control--prev') : null;
+    const nextButton = shell ? shell.querySelector('.client-logos__control--next') : null;
+
     // Clear existing static content
     container.innerHTML = '';
 
@@ -41,22 +46,38 @@ window.renderClientLogos = function(container) {
         return div;
     };
 
-    // 1. Render Original Set
     data.forEach(client => {
         container.appendChild(createLogo(client));
     });
 
-    // 2. Render Duplicate Set (for seamless scroll)
-    // We typically duplicate the list enough times to fill the specific width.
-    // For CSS infinite scroll, we usually need at least 2 sets.
-    data.forEach(client => {
-        container.appendChild(createLogo(client));
-    });
+    if (!viewport || !prevButton || !nextButton) return;
 
-    // 3. Triplicate (as in original HTML for wide screens)
-    data.forEach(client => {
-        container.appendChild(createLogo(client));
-    });
+    const getScrollStep = () => {
+        const firstCard = container.querySelector('.client-logo');
+        if (!firstCard) return viewport.clientWidth * 0.8;
+        const gap = parseFloat(window.getComputedStyle(container).columnGap || window.getComputedStyle(container).gap || '0') || 0;
+        return firstCard.getBoundingClientRect().width + gap;
+    };
+
+    const syncControls = () => {
+        const maxScrollLeft = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+        prevButton.disabled = viewport.scrollLeft <= 4;
+        nextButton.disabled = viewport.scrollLeft >= (maxScrollLeft - 4);
+    };
+
+    if (!viewport.dataset.clientControlsBound) {
+        prevButton.addEventListener('click', () => {
+            viewport.scrollBy({ left: -getScrollStep() * 2, behavior: 'smooth' });
+        });
+        nextButton.addEventListener('click', () => {
+            viewport.scrollBy({ left: getScrollStep() * 2, behavior: 'smooth' });
+        });
+        viewport.addEventListener('scroll', syncControls, { passive: true });
+        viewport.dataset.clientControlsBound = 'true';
+    }
+
+    viewport.scrollLeft = 0;
+    requestAnimationFrame(syncControls);
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---

@@ -42,6 +42,15 @@ function normalizeLinkedInNewsEmbedUrl(value) {
     return raw;
 }
 
+function getLinkedInPostUrl(embedUrl) {
+    var normalized = normalizeLinkedInNewsEmbedUrl(embedUrl);
+    if (!normalized) return 'https://www.linkedin.com/company/tridel-technologies-company/';
+    return normalized
+        .replace('/embed/feed/update/', '/feed/update/')
+        .replace(/[?&]collapsed=1/ig, '')
+        .replace(/\?$/, '');
+}
+
 function deactivateLinkedInCards(exceptCard) {
     document.querySelectorAll('.linkedin-embed-card.linkedin-embed-card--interactive').forEach(function (card) {
         if (exceptCard && card === exceptCard) return;
@@ -87,6 +96,7 @@ window.renderNewsFeed = function (container) {
     data.forEach(function (item, index) {
         var embedSrc = normalizeLinkedInNewsEmbedUrl(item.embedUrl || item);
         if (!embedSrc || typeof embedSrc !== 'string') return;
+        var postUrl = getLinkedInPostUrl(embedSrc);
 
         var card = document.createElement('div');
         card.className = 'linkedin-embed-card reveal';
@@ -105,9 +115,13 @@ window.renderNewsFeed = function (container) {
             '<div class="linkedin-embed-card__chrome">' +
             '<div class="linkedin-embed-card__brand">' +
             '<i class="fab fa-linkedin"></i>' +
-            '<span>LinkedIn Update</span>' +
             '</div>' +
-            '<div class="linkedin-embed-card__meta">Tridel Technologies</div>' +
+            '<div class="linkedin-embed-card__chrome-actions">' +
+              '<a href="' + _newsEsc(postUrl) + '" target="_blank" rel="noopener noreferrer" class="linkedin-embed-card__readmore">' +
+                '<span>Read full post</span>' +
+                '<i class="fas fa-arrow-up-right-from-square"></i>' +
+              '</a>' +
+            '</div>' +
             '</div>' +
             '<div class="linkedin-embed-card__viewport">' +
               shimmer +
@@ -124,7 +138,7 @@ window.renderNewsFeed = function (container) {
               '></iframe>' +
               '<button type="button" class="linkedin-embed-card__activate" aria-label="Activate LinkedIn post interaction">' +
                 '<i class="fas fa-hand-pointer"></i>' +
-                '<span>Click to interact</span>' +
+                '<span>Interact</span>' +
               '</button>' +
             '</div>';
 
