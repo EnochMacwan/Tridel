@@ -12,7 +12,7 @@ const NEWS_DATA = [
     "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7439749828437483520?collapsed=1"
   },
   {
-    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7424105142175645696?collapsed=1"
+    "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7419606449523335168?collapsed=1"
   },
   {
     "embedUrl": "https://www.linkedin.com/embed/feed/update/urn:li:share:7432804652133433344?collapsed=1"
