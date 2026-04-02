@@ -337,15 +337,17 @@
    * Convert old HTML filenames to hash routes
    */
   function htmlToHash(href) {
-    var map = {
-      'index.html': '#/',
-      'about.html': '#/about',
-      'products.html': '#/products',
-      'services.html': '#/services',
-      'success-stories.html': '#/success-stories',
-      'contact.html': '#/contact',
-      'careers.html': '#/careers'
-    };
+      var map = {
+        'index.html': '#/',
+        'about.html': '#/about',
+        'products.html': '#/products',
+        'services.html': '#/services',
+        'success-stories.html': '#/success-stories',
+        'articles-blogs.html': '#/articles-blogs',
+        'honors-awards.html': '#/honors-awards',
+        'contact.html': '#/contact',
+        'careers.html': '#/careers'
+      };
 
     // Handle query params (e.g., product-detail.html?id=X)
     var qIndex = href.indexOf('?');

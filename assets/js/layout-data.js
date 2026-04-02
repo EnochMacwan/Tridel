@@ -137,6 +137,14 @@ var FOOTER_DATA = {
   ],
   "companyLinks": [
     {
+      "label": "Articles & Blogs",
+      "href": "#/articles-blogs"
+    },
+    {
+      "label": "Honors & Awards",
+      "href": "#/honors-awards"
+    },
+    {
       "label": "Success Stories",
       "href": "#/success-stories"
     },
@@ -184,15 +192,25 @@ var PAGE_META = {
     "description": "Detailed information about Tridel services.",
     "bodyClass": "page-service-detail"
   },
-  "/success-stories": {
-    "title": "Success Stories | Tridel Projects",
-    "description": "Explore our portfolio of successful projects, showcasing our expertise in environmental monitoring, hydrographic surveying, and custom solution development.",
-    "bodyClass": "page-success-stories"
-  },
-  "/contact": {
-    "title": "Contact Us | TRIDEL",
-    "description": "Get in touch with the Tridel team. Enquire about our products, services, or solutions. Find contact details for our offices in the UAE, India, and Australia.",
-    "bodyClass": "page-contact"
+    "/success-stories": {
+      "title": "Success Stories | Tridel Projects",
+      "description": "Explore our portfolio of successful projects, showcasing our expertise in environmental monitoring, hydrographic surveying, and custom solution development.",
+      "bodyClass": "page-success-stories"
+    },
+    "/articles-blogs": {
+      "title": "Articles & Blogs | Tridel",
+      "description": "Read Tridel updates, industry notes, and LinkedIn posts from across our environmental, marine, and engineering work.",
+      "bodyClass": "page-articles-blogs"
+    },
+    "/honors-awards": {
+      "title": "Honors & Awards | Tridel",
+      "description": "Explore Tridel's awards, recognitions, and event highlights across environmental monitoring, surveying, and engineering delivery.",
+      "bodyClass": "page-honors-awards"
+    },
+    "/contact": {
+      "title": "Contact Us | TRIDEL",
+      "description": "Get in touch with the Tridel team. Enquire about our products, services, or solutions. Find contact details for our offices in the UAE, India, and Australia.",
+      "bodyClass": "page-contact"
   },
   "/careers": {
     "title": "Join Our Team | TRIDEL Careers",

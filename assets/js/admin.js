@@ -1160,25 +1160,7 @@ function renderClients() {
 }
 
 function renderStories() {
-    var data = getDataArray('stories');
-    if (!data) return;
-    var grid = document.getElementById('stories-grid');
-    if (!grid) return;
-
-    grid.innerHTML = data.map(function (s, i) {
-        return '<div class="item-card">' +
-            '<div class="item-card-header"><div>' +
-            '<h3>' + escapeHTML(s.title) + '</h3>' +
-            '<span class="category">' + escapeHTML(s.category || 'Story') + '</span>' +
-            '</div></div>' +
-            '<p>' + escapeHTML(s.description || '').substring(0, 100) + '...</p>' +
-            '<div class="item-card-actions">' +
-            '<button type="button" class="btn btn-secondary btn-icon" onclick="editItem(\'stories\', ' + i + ')">' +
-            '<i class="fas fa-edit"></i> Edit</button>' +
-            '<button type="button" class="btn btn-danger btn-icon" onclick="deleteItem(\'stories\', ' + i + ')">' +
-            '<i class="fas fa-trash"></i></button>' +
-            '</div></div>';
-    }).join('');
+    renderDataGrid('stories', 'SUCCESS_STORIES_DATA', 'stories-grid');
 }
 
 function renderLocations() {
@@ -3101,6 +3083,9 @@ function loadAboutContentToForm() {
     var data = window.ABOUT_DATA || {};
     var header = data.pageHeader || {};
     var wwa = data.whoWeAre || {};
+    var gallery = Array.isArray(wwa.gallery) && wwa.gallery.length
+        ? wwa.gallery
+        : (wwa.image ? [wwa.image] : []);
     var el;
     el = document.getElementById('about-header-title'); if (el) el.value = header.title || '';
     el = document.getElementById('about-header-subtitle'); if (el) el.value = header.subtitle || '';
@@ -3108,18 +3093,31 @@ function loadAboutContentToForm() {
     el = document.getElementById('about-wwa-text'); if (el) el.value = wwa.text || '';
     el = document.getElementById('about-wwa-image'); if (el) el.value = wwa.image || '';
     el = document.getElementById('about-wwa-image-alt'); if (el) el.value = wwa.imageAlt || '';
+    el = document.getElementById('about-wwa-gallery'); if (el) el.value = gallery.join('\n');
 }
 
 function saveAboutContent() {
     if (!window.ABOUT_DATA) window.ABOUT_DATA = {};
     if (!window.ABOUT_DATA.pageHeader) window.ABOUT_DATA.pageHeader = {};
     if (!window.ABOUT_DATA.whoWeAre) window.ABOUT_DATA.whoWeAre = {};
+    var primaryImage = (document.getElementById('about-wwa-image') || {}).value || '';
+    var galleryValue = (document.getElementById('about-wwa-gallery') || {}).value || '';
+    var gallery = galleryValue
+        .split(/\r?\n/)
+        .map(function (item) { return item.trim(); })
+        .filter(Boolean);
+
+    if (!gallery.length && primaryImage) {
+        gallery = [primaryImage];
+    }
+
     window.ABOUT_DATA.pageHeader.title = (document.getElementById('about-header-title') || {}).value || '';
     window.ABOUT_DATA.pageHeader.subtitle = (document.getElementById('about-header-subtitle') || {}).value || '';
     window.ABOUT_DATA.whoWeAre.title = (document.getElementById('about-wwa-title') || {}).value || '';
     window.ABOUT_DATA.whoWeAre.text = (document.getElementById('about-wwa-text') || {}).value || '';
-    window.ABOUT_DATA.whoWeAre.image = (document.getElementById('about-wwa-image') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.image = primaryImage || gallery[0] || '';
     window.ABOUT_DATA.whoWeAre.imageAlt = (document.getElementById('about-wwa-image-alt') || {}).value || '';
+    window.ABOUT_DATA.whoWeAre.gallery = gallery;
     markAsPending('about_content');
 }
 
