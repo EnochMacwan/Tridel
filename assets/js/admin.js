@@ -66,12 +66,8 @@ function getDataArray(type) {
 // 2. SECURITY
 // ==========================================
 
-function escapeHTML(str) {
-    if (typeof str !== 'string') return str;
-    return str.replace(/[&<>'"]/g, function (tag) {
-        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[tag];
-    });
-}
+// Canonical implementation lives in utils.js (escapeHtml); alias for local call-sites.
+var escapeHTML = escapeHtml;
 
 // ==========================================
 // 3. THEME TOGGLE
