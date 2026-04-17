@@ -5,7 +5,7 @@
  * Exports:
  *   window.renderClientLogos(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 
 /**
  * Renders the Client Logos into the track element

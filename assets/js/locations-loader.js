@@ -2,7 +2,7 @@
  * locations-loader.js
  * Loads locations from LOCATIONS_DATA and renders them into the Global Presence section.
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 
 document.addEventListener('DOMContentLoaded', function() {
     renderGlobalPresence();

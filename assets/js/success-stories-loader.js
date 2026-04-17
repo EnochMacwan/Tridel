@@ -5,7 +5,7 @@
  * Exports:
  *   window.renderSuccessStories(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 
 var SUCCESS_STORY_CATEGORY_META = {
     'Environmental Monitoring': {

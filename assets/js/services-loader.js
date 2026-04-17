@@ -8,7 +8,7 @@
  *   window.renderServicesMegaMenu(container)
  *   window.renderServicesGrid(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 var SERVICES_LIST_STATE_KEY = 'tridel.servicesListState';
 
 function getServiceCategorySectionId(categoryName) {

@@ -8,7 +8,7 @@
  *   window.renderProductsMegaMenu(container)
  *   window.renderProductsGrid(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 var PRODUCTS_LIST_STATE_KEY = 'tridel.productsListState';
 
 function getProductCategorySectionId(categoryName) {
