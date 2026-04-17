@@ -866,7 +866,7 @@ function renderItemCard(type, item, index, isChild) {
 
     var imageHtml = imageUrl ?
         '<div class="card-preview-image">' +
-        '<img src="' + escapeHTML(imageUrl) + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img loading="lazy" src="' + escapeHTML(imageUrl) + '" alt="' + title + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         '</div>' : '';
 
     return '<div class="item-card ' + (isChild ? 'nested-card' : '') + '">' +
@@ -1614,6 +1614,14 @@ function deleteItem(type, index) {
 
 var pendingChanges = new Set();
 
+// Warn before leaving with unsaved changes
+window.addEventListener('beforeunload', function (e) {
+    if (pendingChanges.size > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
 // [getPublishTargets moved to admin-publish.js]
 
 // [updatePublishBanner moved to admin-publish.js]
@@ -1709,7 +1717,7 @@ function showPreview() {
 
     var previewHTML = '<div class="preview-card">' +
         '<div class="preview-image">' +
-        '<img src="' + escapeHTML(mainImage) + '" alt="' + escapeHTML(name) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
+        '<img loading="lazy" src="' + escapeHTML(mainImage) + '" alt="' + escapeHTML(name) + '" onerror="this.src=\'assets/images/logo/tridel.png\'">' +
         (gallery.length > 1 ? '<span class="preview-gallery-count"><i class="fas fa-images"></i> ' + gallery.length + ' images</span>' : '') +
         '</div>' +
         '<div class="preview-content">' +
