@@ -869,6 +869,31 @@ function renderAllSections() {
     loadVisibilityEditor();
 }
 
+/**
+ * Targeted section re-render — avoids full page rebuild after a single
+ * add/edit/delete. Falls back to renderAllSections() for unknown types
+ * so behaviour stays correct even if a new section is added later.
+ */
+function renderSection(type) {
+    switch (type) {
+        case 'products':     renderProducts();     break;
+        case 'services':     renderServices();     break;
+        case 'clients':      renderClients();      break;
+        case 'team':         renderTeam();         break;
+        case 'stories':      renderStories();      break;
+        case 'testimonials': renderTestimonials(); break;
+        case 'locations':    renderLocations();    break;
+        case 'home':         renderHomeCards();    break;
+        case 'linkedin':
+        case 'news':         renderLinkedIn();     break;
+        default:
+            // Unknown / cross-section change — fall back to a full rebuild.
+            renderAllSections();
+            return;
+    }
+    renderDashboard();
+}
+
 // ==========================================
 // 9. SELECTION & BULK ACTIONS
 // ==========================================
@@ -1921,8 +1946,7 @@ function saveItem() {
 
     markAsPending(currentEditType);
     closeModal();
-    renderAllSections();
-    renderDashboard();
+    renderSection(currentEditType);
 }
 
 function deleteItem(type, index) {
@@ -1930,8 +1954,7 @@ function deleteItem(type, index) {
     var arr = getDataArray(type);
     arr.splice(index, 1);
     markAsPending(type);
-    renderAllSections();
-    renderDashboard();
+    renderSection(type);
 }
 
 // ==========================================

@@ -69,6 +69,7 @@
   <script src="assets/js/services-data.js"></script>
   <script src="assets/js/home-data.js"></script>
   <script src="assets/js/news-data.js"></script>
+  <script src="assets/js/blogs-data.js"></script>
   <script src="assets/js/clients-data.js"></script>
   <script src="assets/js/success-stories-data.js"></script>
   <script src="assets/js/team-data.js"></script>
@@ -90,6 +91,7 @@
   <script src="assets/js/services-loader.js"></script>
   <script src="assets/js/home-loader.js"></script>
   <script src="assets/js/news-loader.js"></script>
+  <script src="assets/js/blogs-loader.js"></script>
   <script src="assets/js/clients-loader.js"></script>
   <script src="assets/js/success-stories-loader.js"></script>
   <script src="assets/js/team-loader.js"></script>
@@ -109,18 +111,9 @@
   <!-- 7. Router (defines registerRoute, navigate, initRouter) -->
   <script src="assets/js/router.js"></script>
 
-  <!-- 8. Page Renderers (call registerRoute to register their routes) -->
+  <!-- 8. Page Renderers — only home is eager; everything else is lazy-loaded
+       on demand by router.js (see PAGE_SCRIPTS map). -->
   <script src="assets/js/pages/home.js"></script>
-  <script src="assets/js/pages/about.js"></script>
-  <script src="assets/js/pages/products.js"></script>
-  <script src="assets/js/pages/product-detail.js"></script>
-  <script src="assets/js/pages/services.js"></script>
-  <script src="assets/js/pages/service-detail.js"></script>
-  <script src="assets/js/pages/success-stories.js"></script>
-  <script src="assets/js/pages/articles-blogs.js"></script>
-  <script src="assets/js/pages/honors-awards.js"></script>
-  <script src="assets/js/pages/contact.js"></script>
-  <script src="assets/js/pages/careers.js"></script>
 
   <!-- 9. Smooth Scroll (Lenis) -->
   <script src="assets/vendor/lenis/lenis.min.js"></script>
