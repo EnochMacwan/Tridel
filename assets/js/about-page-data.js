@@ -1,6 +1,12 @@
 /**
  * About Page Data
- * Content for the Who We Are section
+ * Content for the Who We Are section.
+ *
+ * `gallery` is an ordered list of group photos shown in the sliding deck on
+ * the About page. Add as many entries as you like — when there are 2+ images
+ * the slider activates with auto-rotation, prev/next controls, and dot nav.
+ * Replace placeholder paths with your own group photos under
+ * `assets/images/team/`.
  */
 var ABOUT_DATA = {
   "whoWeAre": {
@@ -8,9 +14,11 @@ var ABOUT_DATA = {
     "text": "At Tridel Technologies Group, we combine environmental science, engineering excellence, and innovative technology to deliver integrated environmental solutions. Our services cover the complete lifecycle of environmental monitoring, surveying, and mapping, from data collection and processing to charting, deliverables management, GIS integration, and tailored software development. We enable organisations to transform complex environmental data into reliable intelligence that supports efficient and strategic decision-making.",
     "image": "assets/images/team/team.jpg",
     "gallery": [
+      "assets/images/team/team.jpg",
+      "assets/images/projects/project-1.jpg",
       "assets/images/team/team.jpg"
     ],
-    "imageAlt": "The Tridel team at an outdoor company event"
+    "imageAlt": "The Tridel team at company events and project sites"
   },
   "pageHeader": {
     "title": "Powered by People. Proven by Technology.",

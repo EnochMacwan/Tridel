@@ -585,7 +585,35 @@ textarea.form-control {
 .flex-2 { flex: 2; }
 .nested-card { background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border); }
 .checkbox-sm { width: 18px; height: 18px; cursor: pointer; }
-.drag-handle-icon { cursor: grab; color: var(--text-muted); }
+.drag-handle-icon {
+    cursor: grab;
+    color: var(--text-muted);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    font-size: 14px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+    touch-action: none;
+}
+.drag-handle-icon:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0, 170, 231, 0.08);
+}
+.drag-handle-icon:active { cursor: grabbing; }
+.sortable-ghost { opacity: 0.45; }
+.sortable-chosen { box-shadow: 0 0 0 2px var(--accent); }
+.reorder-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+.reorder-hint i { color: var(--accent); }
 .item-header-content { display: flex; gap: 10px; align-items: center; }
 
 /* --- Pending Badge --- */
