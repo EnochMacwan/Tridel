@@ -215,48 +215,27 @@
       },
       news: function () {
         return (
-          '<section class="section linkedin-section reveal">' +
+          '<section class="section articles-blogs-home reveal">' +
             '<div class="container--wide">' +
-              '<div class="linkedin-feed">' +
-                '<div class="section__header linkedin-section__header">' +
-                  '<div class="linkedin-section__intro">' +
-                    '<div class="linkedin-section__badge">' +
-                      '<i class="fab fa-linkedin"></i>' +
-                    '</div>' +
-                    '<div class="linkedin-section__copy">' +
-                      '<h2 class="section__title">Latest from LinkedIn</h2>' +
-                      '<p class="section__subtitle">Stay connected with our latest updates, insights, and milestone announcements.</p>' +
-                    '</div>' +
+              '<div class="section__header articles-blogs-home__header">' +
+                '<h2 class="section__title">Articles &amp; Blogs</h2>' +
+                '<p class="section__subtitle">Recent posts from LinkedIn alongside long-form articles and case studies from our team.</p>' +
+                '<a class="articles-blogs-home__cta" href="#/articles-blogs">View all <i class="fas fa-arrow-up-right-from-square"></i></a>' +
+              '</div>' +
+              '<div class="articles-blogs-home__panel">' +
+                '<div class="articles-blogs-home__column articles-blogs-home__column--linkedin">' +
+                  '<div class="articles-blogs-home__column-head">' +
+                    '<i class="fab fa-linkedin"></i>' +
+                    '<span>Latest from LinkedIn</span>' +
                   '</div>' +
-                  '<a class="linkedin-section__corner-link" href="#/articles-blogs">Articles / Blogs <i class="fas fa-arrow-up-right-from-square"></i></a>' +
+                  '<div id="news-feed-container" class="articles-blogs-home__feed"></div>' +
                 '</div>' +
-                '<div id="news-feed-container" class="linkedin-feed__grid">' +
-                  '<div class="linkedin-feed__loading">' +
-                    '<div class="linkedin-embed-card">' +
-                      '<div class="linkedin-embed-card__shimmer">' +
-                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
-                      '</div>' +
-                    '</div>' +
-                    '<div class="linkedin-embed-card">' +
-                      '<div class="linkedin-embed-card__shimmer">' +
-                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
-                      '</div>' +
-                    '</div>' +
-                    '<div class="linkedin-embed-card">' +
-                      '<div class="linkedin-embed-card__shimmer">' +
-                        '<div class="shimmer-bar shimmer-bar--header"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--text shimmer-bar--short"></div>' +
-                        '<div class="shimmer-bar shimmer-bar--image"></div>' +
-                      '</div>' +
-                    '</div>' +
+                '<div class="articles-blogs-home__column articles-blogs-home__column--blogs">' +
+                  '<div class="articles-blogs-home__column-head">' +
+                    '<i class="fas fa-book-open"></i>' +
+                    '<span>Articles &amp; Blogs</span>' +
                   '</div>' +
+                  '<div id="blogs-feed-container" class="articles-blogs-home__feed"></div>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -322,7 +301,10 @@
       renderHomeCards();
     }
     if (typeof renderNewsFeed === 'function') {
-      renderNewsFeed();
+      renderNewsFeed(document.getElementById('news-feed-container'), { limit: 3, showFollowCta: false });
+    }
+    if (typeof renderBlogCards === 'function') {
+      renderBlogCards(document.getElementById('blogs-feed-container'), { limit: 3 });
     }
     if (typeof renderClientLogos === 'function') {
       renderClientLogos();

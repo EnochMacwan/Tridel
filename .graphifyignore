@@ -1,0 +1,6 @@
+# Vendor libraries and minified assets add noise without architectural value.
+assets/vendor/
+*.min.js
+*.min.css
+*.map
+graphify-out/cache/

@@ -74,9 +74,11 @@ function bindLinkedInInteractionDismiss() {
     });
 }
 
-window.renderNewsFeed = function (container) {
+window.renderNewsFeed = function (container, options) {
     if (!container) container = document.getElementById('news-feed-container');
     var data = typeof NEWS_DATA !== 'undefined' ? NEWS_DATA : null;
+    var limit = (options && typeof options.limit === 'number') ? options.limit : 0;
+    var showFollowCta = !options || options.showFollowCta !== false;
 
     if (!container || !data || !data.length) {
         if (container) {
@@ -92,8 +94,10 @@ window.renderNewsFeed = function (container) {
     // Clear loading placeholder
     container.innerHTML = '';
 
+    var items = limit > 0 ? data.slice(0, limit) : data;
+
     // Build cards
-    data.forEach(function (item, index) {
+    items.forEach(function (item, index) {
         var embedSrc = normalizeLinkedInNewsEmbedUrl(item.embedUrl || item);
         if (!embedSrc || typeof embedSrc !== 'string') return;
         var postUrl = getLinkedInPostUrl(embedSrc);
@@ -169,7 +173,7 @@ window.renderNewsFeed = function (container) {
 
     // Add "Follow on LinkedIn" CTA below the feed
     var ctaExists = container.parentElement && container.parentElement.querySelector('.linkedin-follow-cta');
-    if (!ctaExists && container.parentElement) {
+    if (showFollowCta && !ctaExists && container.parentElement) {
         var cta = document.createElement('div');
         cta.className = 'linkedin-follow-cta reveal';
         cta.innerHTML =

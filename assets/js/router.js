@@ -10,6 +10,59 @@
   var currentRoute = null;
   var siteMetricsDisabled = window.location.protocol === 'file:';
 
+  // Lazy-loaded page renderer scripts. Each script self-registers a route via
+  // window.registerRoute on load. Home is eager (loaded directly in index.html)
+  // so the default route renders without an extra round-trip.
+  var PAGE_SCRIPTS = {
+    '/about':            'assets/js/pages/about.js',
+    '/products':         'assets/js/pages/products.js',
+    '/products/detail':  'assets/js/pages/product-detail.js',
+    '/services':         'assets/js/pages/services.js',
+    '/services/detail':  'assets/js/pages/service-detail.js',
+    '/success-stories':  'assets/js/pages/success-stories.js',
+    '/articles-blogs':   'assets/js/pages/articles-blogs.js',
+    '/honors-awards':    'assets/js/pages/honors-awards.js',
+    '/contact':          'assets/js/pages/contact.js',
+    '/careers':          'assets/js/pages/careers.js'
+  };
+  var loadedScripts = {};
+  var inFlightScripts = {};
+
+  function loadScript(src) {
+    if (loadedScripts[src]) return Promise.resolve();
+    if (inFlightScripts[src]) return inFlightScripts[src];
+
+    var promise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = false;
+      s.onload = function () {
+        loadedScripts[src] = true;
+        delete inFlightScripts[src];
+        resolve();
+      };
+      s.onerror = function () {
+        delete inFlightScripts[src];
+        reject(new Error('Failed to load ' + src));
+      };
+      document.head.appendChild(s);
+    });
+
+    inFlightScripts[src] = promise;
+    return promise;
+  }
+
+  function findLazyScript(path) {
+    if (PAGE_SCRIPTS[path]) return PAGE_SCRIPTS[path];
+    var segments = path.split('/').filter(Boolean);
+    while (segments.length > 0) {
+      var test = '/' + segments.join('/');
+      if (PAGE_SCRIPTS[test]) return PAGE_SCRIPTS[test];
+      segments.pop();
+    }
+    return null;
+  }
+
   function safeStorage(storageName) {
     try {
       return window[storageName];
@@ -220,6 +273,30 @@
    */
   function handleRoute() {
     var parsed = parseHash();
+
+    // Lazy-load page renderer if the route hasn't registered yet but a
+    // matching script is known. After the script loads it self-registers,
+    // and we re-enter handleRoute to render normally.
+    if (!routes[parsed.path]) {
+      var lazySrc = findLazyScript(parsed.path);
+      if (lazySrc && !loadedScripts[lazySrc]) {
+        var mainEl = document.getElementById('main-content');
+        if (mainEl && !inFlightScripts[lazySrc]) {
+          mainEl.innerHTML =
+            '<div style="text-align:center;padding:120px 20px;color:var(--color-text-muted);">' +
+              '<i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Loading page&hellip;' +
+            '</div>';
+        }
+        loadScript(lazySrc).then(handleRoute).catch(function (e) {
+          console.error('Lazy page load failed:', e);
+          if (mainEl) {
+            mainEl.innerHTML = '<div class="empty-state" style="padding:100px 20px;text-align:center;"><h2>Page failed to load</h2><p>Please refresh and try again.</p></div>';
+          }
+        });
+        return;
+      }
+    }
+
     var match = findRoute(parsed.path);
     var shouldRestoreProductsList = currentRoute === '/products/detail' && parsed.path === '/products';
     var shouldRestoreServicesList = currentRoute === '/services/detail' && parsed.path === '/services';
