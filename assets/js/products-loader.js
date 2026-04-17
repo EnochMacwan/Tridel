@@ -405,7 +405,7 @@ window.renderProductsMegaMenu = function(container) {
         var featureHtml = featureItem ? (
             '<aside class="mega-hub__feature-card">' +
                 '<div class="mega-hub__feature-media">' +
-                    '<img src="' + escapeHtml(featureItem.image || '') + '" alt="' + escapeHtml(featureItem.name) + '">' +
+                    '<img loading="lazy" src="' + escapeHtml(featureItem.image || '') + '" alt="' + escapeHtml(featureItem.name) + '">' +
                 '</div>' +
                 '<div class="mega-hub__feature-body">' +
 

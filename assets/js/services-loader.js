@@ -433,7 +433,7 @@ window.renderServicesMegaMenu = function(containerElement) {
         var featureHtml = featureItem ? (
             '<aside class="mega-hub__feature-card">' +
                 '<div class="mega-hub__feature-media">' +
-                    '<img src="' + escapeHtml(getServicePrimaryImage(featureItem)) + '" alt="' + escapeHtml(getServiceDisplayName(featureItem)) + '">' +
+                    '<img loading="lazy" src="' + escapeHtml(getServicePrimaryImage(featureItem)) + '" alt="' + escapeHtml(getServiceDisplayName(featureItem)) + '">' +
                 '</div>' +
                 '<div class="mega-hub__feature-body">' +
 

@@ -97,7 +97,7 @@
       return (
         '<article class="testimonial-card testimonial-deck__card" data-index="' + index + '">' +
           '<div class="testimonial-card__header">' +
-            '<img class="testimonial-card__logo" src="' + logo + '" alt="' + esc(item.name) + ' logo" onerror="this.onerror=null;this.src=\'assets/images/logo/tridel.png\'">' +
+            '<img loading="lazy" class="testimonial-card__logo" src="' + logo + '" alt="' + esc(item.name) + ' logo" onerror="this.onerror=null;this.src=\'assets/images/logo/tridel.png\'">' +
           '</div>' +
           '<div class="testimonial-card__content">' +
             '<div>' +

@@ -301,7 +301,11 @@
     var shouldRestoreProductsList = currentRoute === '/products/detail' && parsed.path === '/products';
     var shouldRestoreServicesList = currentRoute === '/services/detail' && parsed.path === '/services';
 
-    if (!match) return;
+    if (!match) {
+      // Unknown hash — redirect to home rather than blank page
+      window.location.hash = '#/';
+      return;
+    }
 
     var route = match.route;
     var mainEl = document.getElementById('main-content');
