@@ -512,17 +512,6 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     overflow: hidden;
 }
 
-.linkedin-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #0077B5, #00AAE7, #0077B5);
-    opacity: 0.6;
-}
-
 .linkedin-feed {
     position: relative;
 }
