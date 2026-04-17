@@ -589,6 +589,44 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     outline: none;
 }
 
+/* Compact inline header variant — used on home page */
+.linkedin-section__header--compact {
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: clamp(20px, 2.4vw, 32px);
+    gap: clamp(12px, 2vw, 24px);
+}
+
+.linkedin-section__header--compact .linkedin-section__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text-strong, #0b1a2b);
+    text-align: left;
+}
+
+.linkedin-section__title-icon {
+    color: #0077b5;
+    font-size: 1.25em;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+@media (max-width: 680px) {
+    .linkedin-section__header--compact {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .linkedin-section__header--compact .linkedin-section__title {
+        font-size: 1.25rem;
+    }
+}
+
 /* Honors teaser on Success Stories page */
 .success-stories-honors {
     background: var(--color-bg-muted, #f6f8fc);
