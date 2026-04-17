@@ -1,5 +1,6 @@
 /**
  * Admin Panel UI Interactions
+ * Exports: toggleSidebar(), showToast(message, type)
  */
 
 // Mobile Sidebar Toggle
@@ -11,6 +12,29 @@ function toggleSidebar() {
     // const overlay = document.querySelector('.sidebar-overlay');
     // if(overlay) overlay.classList.toggle('active');
 }
+
+// ==========================================
+// TOAST NOTIFICATIONS
+// ==========================================
+
+function showToast(message, type) {
+    type = type || 'success';
+    var container = document.getElementById('toast-container');
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    var safeMessage = escapeHTML(message);
+    toast.innerHTML =
+        '<i class="fas ' +
+        (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') +
+        '"></i>' +
+        '<span>' + safeMessage + '</span>';
+    container.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 3000);
+}
+
+// ==========================================
+// SIDEBAR
+// ==========================================
 
 // Close sidebar when clicking outside on mobile
 document.addEventListener('click', function(event) {

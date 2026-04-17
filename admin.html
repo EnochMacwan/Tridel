@@ -144,6 +144,18 @@
 
     <header class="admin-header">
       <h1><i class="fas fa-rocket"></i> Tridel Admin</h1>
+      <div class="admin-global-search">
+        <i class="fas fa-search admin-global-search__icon" aria-hidden="true"></i>
+        <input
+          type="search"
+          id="admin-global-search-input"
+          class="admin-global-search__input"
+          placeholder="Search all sections…"
+          autocomplete="off"
+          oninput="adminGlobalSearch(this.value)"
+        />
+        <ul id="admin-global-search-results" class="admin-global-search__results" hidden></ul>
+      </div>
       <div class="header-actions">
         <button
           type="button"
@@ -1560,6 +1572,7 @@
     <script src="assets/js/layout-data.js"></script>
 
     <!-- Admin Logic -->
+    <script src="assets/js/admin-ui.js"></script>
     <script src="assets/js/admin-github.js"></script>
     <script src="assets/js/admin-form-rows.js"></script>
     <script src="assets/js/admin-publish.js"></script>
