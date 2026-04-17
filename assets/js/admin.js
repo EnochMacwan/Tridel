@@ -273,8 +273,7 @@ async function loadDataFromGitHub() {
         }
     }
 
-    renderDashboard();
-    renderAllSections();
+    renderAllSections(); // includes renderDashboard()
     showToast('Data loaded from GitHub!', 'success');
 }
 
@@ -775,10 +774,11 @@ function renderSection(type) {
         case 'news':         renderLinkedIn();     break;
         default:
             // Unknown / cross-section change — fall back to a full rebuild.
+            // renderAllSections() includes renderDashboard(); skip the call below.
             renderAllSections();
             return;
     }
-    renderDashboard();
+    renderDashboard(); // targeted path only — default branch returns early above
 }
 
 // ==========================================
@@ -3110,8 +3110,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         await loadDataFromGitHub();
     }
 
-    renderDashboard();
-    renderAllSections();
+    renderAllSections(); // includes renderDashboard()
     loadSettingsToForm();
     updatePublishButton();
 
