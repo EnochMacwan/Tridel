@@ -136,7 +136,7 @@
     };
   }
 
-  function render(mainEl) {
+  function renderAboutPage(mainEl) {
     var data = (typeof ABOUT_DATA !== 'undefined') ? ABOUT_DATA : {};
     var header = data.pageHeader || {};
     var whoWeAre = data.whoWeAre || {};
@@ -196,7 +196,7 @@
   }
 
   window.registerRoute('/about', {
-    render: render,
+    render: renderAboutPage,
     title: meta.title || 'About Us | TRIDEL',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-about'

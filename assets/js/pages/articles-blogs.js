@@ -73,7 +73,7 @@
     );
   }
 
-  function render(mainEl) {
+  function renderArticlesBlogsPage(mainEl) {
     var html = '';
 
     html += window.renderPageHeader({
@@ -118,7 +118,7 @@
   }
 
   window.registerRoute('/articles-blogs', {
-    render: render,
+    render: renderArticlesBlogsPage,
     title: meta.title || 'Articles & Blogs | Tridel',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-articles-blogs'

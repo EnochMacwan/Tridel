@@ -145,7 +145,6 @@ var GITHUB_VAR_NAMES = {
     'layout': 'NAV_LINKS'
 };
 
-// [getAdminAuthHeaders moved to admin-github.js]
 
 async function loadServerGitHubConfig() {
     try {
@@ -161,17 +160,6 @@ async function loadServerGitHubConfig() {
     }
 }
 
-// [isServerGitHubManaged moved to admin-github.js]
-
-// [getEffectiveGitHubConfig moved to admin-github.js]
-
-// [getGitHubFormConfig moved to admin-github.js]
-
-// [hasConfiguredGitHub moved to admin-github.js]
-
-// [buildGitHubProxyPayload moved to admin-github.js]
-
-// [updateGitHubConfigUI moved to admin-github.js]
 
 async function fetchGitHubFileContent(filePath) {
     if (serverGitHubProxyAvailable) {
@@ -317,13 +305,6 @@ function parseIndexPageContent(content) {
     });
 }
 
-// [saveToGitHub moved to admin-publish.js]
-
-// [openGitHubConfig moved to admin-github.js]
-
-// [closeGitHubConfig moved to admin-github.js]
-
-// [saveGitHubConfig moved to admin-github.js]
 
 async function testGitHubConnection() {
     var formConfig = getGitHubFormConfig();
@@ -1117,11 +1098,6 @@ function closeModal() {
 // 14. FORM GENERATION
 // ==========================================
 
-// [getSingleImageFieldHTML moved to admin-form-rows.js]
-
-// [renderSingleImagePreview moved to admin-form-rows.js]
-
-// [getGalleryHTML moved to admin-form-rows.js]
 
 function getParentOptions(type, currentId) {
     var arr = getDataArray(type);
@@ -1382,14 +1358,9 @@ function getFormHTML(type, data) {
 // 15. FORM HELPERS
 // ==========================================
 
-// [normalizeLinkedInEmbedUrl moved to admin-github.js]
 
 // Live preview helper for LinkedIn embed URL input
-// [previewLinkedInEmbed moved to admin-github.js]
 
-// [addFeature moved to admin-form-rows.js]
-
-// [addServiceFeature moved to admin-form-rows.js]
 
 function validateForm(type) {
     var errors = [];
@@ -1622,13 +1593,6 @@ window.addEventListener('beforeunload', function (e) {
     }
 });
 
-// [getPublishTargets moved to admin-publish.js]
-
-// [updatePublishBanner moved to admin-publish.js]
-
-// [markAsPending moved to admin-publish.js]
-
-// [updatePublishButton moved to admin-publish.js]
 
 async function publishPendingChangeToServer(serverType, data) {
     var response = await fetch('/api/data/' + serverType, {
@@ -1654,11 +1618,6 @@ async function publishPendingChangeToServer(serverType, data) {
     throw new Error(err.error || ('Server publish failed (' + response.status + ')'));
 }
 
-// [publishAllChanges moved to admin-publish.js]
-
-// [reloadSectionData moved to admin-publish.js]
-
-// [undoChanges moved to admin-publish.js]
 
 // ==========================================
 // 18. SAVE TO SERVER
@@ -1900,9 +1859,6 @@ async function saveGlobalSettings() {
 // 22. EXPORT
 // ==========================================
 
-// [exportAllData moved to admin-publish.js]
-
-// [downloadFile moved to admin-publish.js]
 
 // ==========================================
 // 23. TOAST
@@ -1924,17 +1880,6 @@ function showToast(message, type) {
 // 24. GALLERY MANAGEMENT
 // ==========================================
 
-// [addGalleryImage moved to admin-form-rows.js]
-
-// [handleFileUpload moved to admin-form-rows.js]
-
-// [compressImage moved to admin-form-rows.js]
-
-// [removeGalleryImage moved to admin-form-rows.js]
-
-// [renderGalleryThumbs moved to admin-form-rows.js]
-
-// [initGalleryDragDrop moved to admin-form-rows.js]
 
 // ==========================================
 // 25. PAGE CONTENT MANAGEMENT
@@ -2056,23 +2001,6 @@ function renderSectionOrderList() {
     }
 }
 
-// [renderStatsRows moved to admin-form-rows.js]
-
-// [addStatRow moved to admin-form-rows.js]
-
-// [removeStatRow moved to admin-form-rows.js]
-
-// [renderWwdCards moved to admin-form-rows.js]
-
-// [addWwdCard moved to admin-form-rows.js]
-
-// [removeWwdCard moved to admin-form-rows.js]
-
-// [renderWhyChooseReasons moved to admin-form-rows.js]
-
-// [addWhyChooseReason moved to admin-form-rows.js]
-
-// [removeWhyChooseReason moved to admin-form-rows.js]
 
 function savePageContent() {
     // Hero
@@ -2297,23 +2225,9 @@ function loadContactContentToForm() {
     renderContactConfigEditor();
 }
 
-// [renderContactInfoCards moved to admin-form-rows.js]
-
-// [addContactInfoCard moved to admin-form-rows.js]
-
-// [removeContactInfoCard moved to admin-form-rows.js]
-
-// [renderContactFaqRows moved to admin-form-rows.js]
-
-// [addContactFaq moved to admin-form-rows.js]
-
-// [removeContactFaq moved to admin-form-rows.js]
 
 // ── Dynamic Config Editor (auto-generates fields from CONTACT_PAGE_CONFIG) ──
 
-// [formatConfigLabel moved to admin-form-rows.js]
-
-// [renderContactConfigEditor moved to admin-form-rows.js]
 
 function readContactConfigFromForm() {
     var config = window.CONTACT_PAGE_CONFIG || {};
@@ -2463,33 +2377,6 @@ function savePageContentAll() {
 // 30. NAVIGATION & FOOTER MANAGEMENT
 // ==========================================
 
-// [loadNavigationToForm moved to admin-form-rows.js]
-
-// [deepCloneData moved to admin-form-rows.js]
-
-// [getDefaultMegaMenuConfig moved to admin-form-rows.js]
-
-// [normalizeMegaMenuConfig moved to admin-form-rows.js]
-
-// [ensureMegaMenuConfig moved to admin-form-rows.js]
-
-// [renderNavLinksEditor moved to admin-form-rows.js]
-
-// [addNavLink moved to admin-form-rows.js]
-
-// [removeNavLinkItem moved to admin-form-rows.js]
-
-// [renderMegaMenuEditor moved to admin-form-rows.js]
-
-// [renderMegaMenuScopeEditor moved to admin-form-rows.js]
-
-// [renderFooterEditor moved to admin-form-rows.js]
-
-// [addFooterLink moved to admin-form-rows.js]
-
-// [removeFooterLink moved to admin-form-rows.js]
-
-// [renderPageSeoEditor moved to admin-form-rows.js]
 
 function saveNavigation() {
     // Save nav links from form

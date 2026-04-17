@@ -85,7 +85,7 @@
     });
   }
 
-  function render(mainEl) {
+  function renderHonorsAwardsPage(mainEl) {
     var data = (typeof HONORS_AWARDS_DATA !== 'undefined') ? HONORS_AWARDS_DATA : {};
     var header = data.pageHeader || {};
     var eventsIntro = data.eventsIntro || {};
@@ -155,7 +155,7 @@
   }
 
   window.registerRoute('/honors-awards', {
-    render: render,
+    render: renderHonorsAwardsPage,
     title: meta.title || 'Honors & Awards | Tridel',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-honors-awards'

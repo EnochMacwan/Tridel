@@ -77,7 +77,7 @@
     counters.forEach(function (c) { observer.observe(c); });
   }
 
-  function render(mainEl) {
+  function renderHomePage(mainEl) {
     var hero = (typeof INDEX_HERO !== 'undefined') ? INDEX_HERO : { title: 'Pioneering the Future of Maritime Intelligence', subtitle: 'We deliver integrated hardware, software, and services for the comprehensive maritime domain.' };
     var stats = (typeof INDEX_STATS !== 'undefined') ? INDEX_STATS : [];
     var whatWeDo = (typeof INDEX_WHAT_WE_DO !== 'undefined') ? INDEX_WHAT_WE_DO : null;
@@ -274,7 +274,7 @@
   }
 
   window.registerRoute('/', {
-    render: render,
+    render: renderHomePage,
     title: meta.title || 'Tridel Technologies',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-home'

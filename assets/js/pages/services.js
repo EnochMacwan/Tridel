@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/services']) || {};
 
-  function render(mainEl) {
+  function renderServicesPage(mainEl) {
     var html = '';
     var hashParts = String(window.location.hash || '').split('?');
     var params = new URLSearchParams(hashParts[1] || '');
@@ -52,7 +52,7 @@
   }
 
   window.registerRoute('/services', {
-    render: render,
+    render: renderServicesPage,
     title: meta.title || 'Services | TRIDEL',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-services'
