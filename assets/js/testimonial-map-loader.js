@@ -10,7 +10,6 @@
   'use strict';
 
   var _testimonialTimer = null;
-  var _progressTimer = null;
   var _resizeHandler = null;
   var _scrollHandler = null;
   var _destroyed = false;
@@ -19,10 +18,6 @@
     if (_testimonialTimer) {
       clearInterval(_testimonialTimer);
       _testimonialTimer = null;
-    }
-    if (_progressTimer) {
-      clearTimeout(_progressTimer);
-      _progressTimer = null;
     }
   }
 
@@ -140,9 +135,6 @@
           '<div class="testimonial-scroll-container testimonial-deck__track" id="testimonial-card-track">' +
             cardsHtml +
           '</div>' +
-          '<div class="testimonial-deck__progress">' +
-            '<div class="testimonial-deck__progress-fill" id="testimonial-progress-fill"></div>' +
-          '</div>' +
         '</div>' +
       '</div>';
 
@@ -151,7 +143,6 @@
     var track = document.getElementById('testimonial-card-track');
     var cards = Array.prototype.slice.call(track.querySelectorAll('.testimonial-deck__card'));
     var counterEl = document.getElementById('testimonial-current-count');
-    var progressEl = document.getElementById('testimonial-progress-fill');
     var prevBtn = document.getElementById('testimonial-prev');
     var nextBtn = document.getElementById('testimonial-next');
     var activeIndex = 0;
@@ -179,29 +170,14 @@
       });
     }
 
-    function resetProgress() {
-      if (!progressEl) return;
-      progressEl.style.transition = 'none';
-      progressEl.style.width = '0%';
-      if (_progressTimer) clearTimeout(_progressTimer);
-      _progressTimer = setTimeout(function () {
-        if (_destroyed) return;
-        progressEl.style.transition = 'width ' + autoplayDelay + 'ms linear';
-        progressEl.style.width = '100%';
-        _progressTimer = null;
-      }, 40);
-    }
-
     function startAutoplay() {
       clearTimers();
-      resetProgress();
       _testimonialTimer = setInterval(function () {
         var nextIndex = activeIndex + getCardsPerView();
         if (nextIndex >= cards.length) {
           nextIndex = 0;
         }
         scrollToIndex(nextIndex, 'smooth');
-        resetProgress();
       }, autoplayDelay);
     }
 
