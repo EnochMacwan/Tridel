@@ -5,7 +5,7 @@
  * Exports:
  *   window.renderNewsFeed(container)
  */
-var _newsEsc = typeof escapeHtml === 'function' ? escapeHtml : function(s) { return String(s).replace(/[&<>"']/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; }); };
+var _newsEsc = escapeHtml;
 var _linkedInInteractionBound = false;
 
 function normalizeLinkedInNewsEmbedUrl(value) {

@@ -5,7 +5,7 @@
  * Exports:
  *   window.renderServiceDetail(container, serviceId)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 var formatAllowedInlineHtml = typeof formatAllowedInlineHtml === 'function'
     ? formatAllowedInlineHtml
     : function(text) {

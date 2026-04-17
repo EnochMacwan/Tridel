@@ -6,11 +6,7 @@
 (function () {
   'use strict';
 
-  var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) {
-    return String(s).replace(/[&<>"']/g, function (m) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
-    });
-  };
+  var esc = escapeHtml;
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/']) || {};
 
