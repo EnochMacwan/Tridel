@@ -12,6 +12,7 @@
   var _testimonialTimer = null;
   var _resizeHandler = null;
   var _scrollHandler = null;
+  var _keydownHandler = null;
   var _destroyed = false;
 
   function clearTimers() {
@@ -57,6 +58,11 @@
     if (track && _scrollHandler) {
       track.removeEventListener('scroll', _scrollHandler);
       _scrollHandler = null;
+    }
+
+    if (_keydownHandler) {
+      document.removeEventListener('keydown', _keydownHandler);
+      _keydownHandler = null;
     }
   };
 
@@ -218,6 +224,21 @@
 
     track.addEventListener('mouseenter', clearTimers);
     track.addEventListener('mouseleave', startAutoplay);
+
+    _keydownHandler = function (e) {
+      var section = document.getElementById('testimonials-section');
+      if (!section) return;
+      if (e.key === 'ArrowLeft') {
+        var prev = activeIndex - getCardsPerView();
+        scrollToIndex(prev < 0 ? 0 : prev, 'smooth');
+        startAutoplay();
+      } else if (e.key === 'ArrowRight') {
+        var next = activeIndex + getCardsPerView();
+        scrollToIndex(next >= cards.length ? 0 : next, 'smooth');
+        startAutoplay();
+      }
+    };
+    document.addEventListener('keydown', _keydownHandler);
 
     _resizeHandler = function () {
       scrollToIndex(activeIndex, 'auto');

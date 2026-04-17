@@ -689,7 +689,89 @@ function executeBulkDelete() {
 }
 
 // ==========================================
-// 10. FILTERING
+// 10. GLOBAL SEARCH
+// ==========================================
+
+var _globalSearchTimeout = null;
+
+function adminGlobalSearch(query) {
+    var resultsList = document.getElementById('admin-global-search-results');
+    if (!resultsList) return;
+
+    clearTimeout(_globalSearchTimeout);
+
+    var q = String(query || '').trim().toLowerCase();
+    if (!q) {
+        resultsList.innerHTML = '';
+        resultsList.hidden = true;
+        return;
+    }
+
+    _globalSearchTimeout = setTimeout(function () {
+        var matches = [];
+
+        var searchSets = [
+            { section: 'products',     label: 'Product',       arr: window.PRODUCTS_DATA || [],      fields: ['name', 'category', 'description'] },
+            { section: 'services',     label: 'Service',       arr: window.SERVICES_DATA || [],      fields: ['name', 'category', 'description'] },
+            { section: 'team',         label: 'Team Member',   arr: window.TEAM_DATA || [],          fields: ['name', 'role', 'bio'] },
+            { section: 'testimonials', label: 'Testimonial',   arr: window.TESTIMONIALS_DATA || [],  fields: ['name', 'author', 'role', 'quote'] },
+            { section: 'clients',      label: 'Client',        arr: window.CLIENTS_DATA || [],       fields: ['name', 'description'] },
+            { section: 'stories',      label: 'Success Story', arr: window.SUCCESS_STORIES_DATA || [], fields: ['title', 'client', 'description'] },
+            { section: 'news',         label: 'News Post',     arr: window.NEWS_DATA || [],          fields: ['title', 'summary', 'content'] }
+        ];
+
+        searchSets.forEach(function (set) {
+            if (!Array.isArray(set.arr)) return;
+            set.arr.forEach(function (item) {
+                if (!item) return;
+                var hit = set.fields.some(function (f) {
+                    var val = String(item[f] || '').toLowerCase();
+                    return val.indexOf(q) !== -1;
+                });
+                if (hit && matches.length < 10) {
+                    var displayName = item.name || item.title || item.author || '(unnamed)';
+                    matches.push({ section: set.section, label: set.label, name: displayName });
+                }
+            });
+        });
+
+        if (!matches.length) {
+            resultsList.innerHTML = '<li class="admin-global-search__no-results">No results for "' + escapeHTML(query) + '"</li>';
+        } else {
+            resultsList.innerHTML = matches.map(function (m) {
+                return '<li class="admin-global-search__result" onclick="adminGlobalSearchNavigate(\'' + escapeHTML(m.section) + '\')">' +
+                    '<span class="admin-global-search__result-type">' + escapeHTML(m.label) + '</span>' +
+                    '<span class="admin-global-search__result-name">' + escapeHTML(m.name) + '</span>' +
+                '</li>';
+            }).join('');
+        }
+        resultsList.hidden = false;
+    }, 150);
+}
+
+function adminGlobalSearchNavigate(section) {
+    var resultsList = document.getElementById('admin-global-search-results');
+    var input = document.getElementById('admin-global-search-input');
+    if (resultsList) { resultsList.innerHTML = ''; resultsList.hidden = true; }
+    if (input) input.value = '';
+
+    // Activate the section in the sidebar nav
+    var link = document.querySelector('.sidebar-nav a[data-section="' + section + '"]');
+    if (link) link.click();
+}
+
+// Close search results when clicking outside
+document.addEventListener('click', function (e) {
+    var container = document.querySelector('.admin-global-search');
+    var resultsList = document.getElementById('admin-global-search-results');
+    if (resultsList && container && !container.contains(e.target)) {
+        resultsList.innerHTML = '';
+        resultsList.hidden = true;
+    }
+});
+
+// ==========================================
+// 11. FILTERING
 // ==========================================
 
 var filterState = {
@@ -1864,17 +1946,7 @@ async function saveGlobalSettings() {
 // 23. TOAST
 // ==========================================
 
-function showToast(message, type) {
-    type = type || 'success';
-    var container = document.getElementById('toast-container');
-    var toast = document.createElement('div');
-    toast.className = 'toast ' + type;
-    var safeMessage = escapeHTML(message);
-    toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + '"></i>' +
-        '<span>' + safeMessage + '</span>';
-    container.appendChild(toast);
-    setTimeout(function () { toast.remove(); }, 3000);
-}
+// showToast() -> admin-ui.js
 
 // ==========================================
 // 24. GALLERY MANAGEMENT
@@ -2645,4 +2717,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (e.target.id === 'preview-overlay') closePreview();
         });
     }
+
+    // Ctrl/Cmd+S — quick publish
+    document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            publishAllChanges();
+        }
+    });
 });
