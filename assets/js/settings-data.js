@@ -6,7 +6,7 @@ const SETTINGS_DATA = {
       "hero": true,
       "stats": true,
       "whatWeDo": true,
-      "whyChoose": true,
+      "whyChoose": false,
       "caseStudy": false,
       "cta": false
     },
