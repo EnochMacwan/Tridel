@@ -218,16 +218,11 @@
           '<section class="section linkedin-section reveal">' +
             '<div class="container--wide">' +
               '<div class="linkedin-feed">' +
-                '<div class="section__header linkedin-section__header">' +
-                  '<div class="linkedin-section__intro">' +
-                    '<div class="linkedin-section__badge">' +
-                      '<i class="fab fa-linkedin"></i>' +
-                    '</div>' +
-                    '<div class="linkedin-section__copy">' +
-                      '<h2 class="section__title">Latest from LinkedIn</h2>' +
-                      '<p class="section__subtitle">Stay connected with our latest updates, insights, and milestone announcements.</p>' +
-                    '</div>' +
-                  '</div>' +
+                '<div class="section__header linkedin-section__header linkedin-section__header--compact">' +
+                  '<h2 class="linkedin-section__title">' +
+                    '<i class="fab fa-linkedin linkedin-section__title-icon" aria-hidden="true"></i>' +
+                    '<span>Latest from LinkedIn</span>' +
+                  '</h2>' +
                   '<a class="linkedin-section__corner-link" href="#/articles-blogs">Articles / Blogs <i class="fas fa-arrow-up-right-from-square"></i></a>' +
                 '</div>' +
                 '<div id="news-feed-container" class="linkedin-feed__grid">' +
