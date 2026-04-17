@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/services/detail']) || {};
 
-  function render(mainEl, params) {
+  function renderServiceDetailPage(mainEl, params) {
     var html = '';
 
     // Service detail container with loading spinner
@@ -38,7 +38,7 @@
   }
 
   window.registerRoute('/services/detail', {
-    render: render,
+    render: renderServiceDetailPage,
     title: meta.title || 'Service Details | Tridel',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-service-detail'

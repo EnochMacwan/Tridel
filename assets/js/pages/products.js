@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/products']) || {};
 
-  function render(mainEl, params) {
+  function renderProductsPage(mainEl, params) {
     var html = '';
 
     // Page header with breadcrumb
@@ -49,7 +49,7 @@
   }
 
   window.registerRoute('/products', {
-    render: render,
+    render: renderProductsPage,
     title: meta.title || 'Products | TRIDEL',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-products'

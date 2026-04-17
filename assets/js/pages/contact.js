@@ -140,7 +140,7 @@
     return 'https://formsubmit.co/mail@trideltechnologies.com';
   }
 
-  function render(mainEl, params) {
+  function renderContactPage(mainEl, params) {
     var config = (typeof CONTACT_PAGE_CONFIG !== 'undefined') ? CONTACT_PAGE_CONFIG : {};
     var infoCards = (typeof CONTACT_INFO_CARDS !== 'undefined' && Array.isArray(CONTACT_INFO_CARDS)) ? CONTACT_INFO_CARDS : [];
     var faqData = (typeof CONTACT_FAQ_DATA !== 'undefined') ? CONTACT_FAQ_DATA : [];
@@ -588,7 +588,7 @@
   }
 
   window.registerRoute('/contact', {
-    render: render,
+    render: renderContactPage,
     title: meta.title || 'Contact Us | TRIDEL',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-contact'

@@ -14,7 +14,7 @@
     return 'https://formsubmit.co/geminibaba1@gmail.com';
   }
 
-  function render(mainEl) {
+  function renderCareersPage(mainEl) {
     var html = '';
 
     // Page header with breadcrumb
@@ -127,7 +127,7 @@
   }
 
   window.registerRoute('/careers', {
-    render: render,
+    render: renderCareersPage,
     title: meta.title || 'Join Our Team | TRIDEL Careers',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-careers'

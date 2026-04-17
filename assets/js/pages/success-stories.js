@@ -57,7 +57,7 @@
     );
   }
 
-  function render(mainEl) {
+  function renderSuccessStoriesPage(mainEl) {
     var html = '';
 
     // Page header with breadcrumb
@@ -102,7 +102,7 @@
   }
 
   window.registerRoute('/success-stories', {
-    render: render,
+    render: renderSuccessStoriesPage,
     title: meta.title || 'Success Stories | Tridel',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-success-stories'
