@@ -190,5 +190,9 @@
     }
 
     updateLogoState(getCurrentPath());
+
+    if (window.viewportDetector && typeof window.viewportDetector.refresh === 'function') {
+      window.viewportDetector.refresh('layout-ready');
+    }
   };
 })();
