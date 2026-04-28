@@ -76,7 +76,6 @@
 
     return (
       '<aside class="hero__panel" data-depth="3">' +
-        '<p class="hero__panel-kicker">Mission stack</p>' +
         '<h2 class="hero__panel-title">Field systems, survey execution, and analytics in one delivery loop.</h2>' +
         '<div class="hero__panel-metrics">' + metrics + '</div>' +
         '<ul class="hero__signals">' + signals + '</ul>' +
