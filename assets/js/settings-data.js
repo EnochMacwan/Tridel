@@ -6,9 +6,9 @@ const SETTINGS_DATA = {
       "hero": true,
       "stats": true,
       "whatWeDo": true,
-      "whyChoose": false,
-      "caseStudy": false,
-      "cta": false
+      "whyChoose": true,
+      "caseStudy": true,
+      "cta": true
     },
     "about": {
       "pageHeader": true,
