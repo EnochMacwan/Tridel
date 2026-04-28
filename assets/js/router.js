@@ -348,6 +348,10 @@
       mainEl.innerHTML = '<div class="empty-state" style="padding:100px 20px;text-align:center;"><h2>Page Error</h2><p>Something went wrong loading this page.</p></div>';
     }
 
+    if (window.viewportDetector && typeof window.viewportDetector.refresh === 'function') {
+      window.viewportDetector.refresh('route-rendered');
+    }
+
     // Update active nav
     if (typeof window.updateActiveNav === 'function') {
       window.updateActiveNav(parsed.path);
