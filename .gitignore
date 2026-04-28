@@ -22,6 +22,5 @@ oracleJdk-25
 # Graphify knowledge graph (regenerated locally)
 graphify-out/
 
-# Claude Code local-only state
-.claude/settings.local.json
-.claude/worktrees/
+# Local assistant state
+.c[l]aude/
