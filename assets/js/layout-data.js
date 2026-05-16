@@ -40,6 +40,15 @@ var NAV_LINKS = [
     "shortLabel": "Stories"
   },
   {
+    "label": "Hormuz Simulation",
+    "href": "https://enochmacwan.github.io/Strait-of-Hormuz/",
+    "icon": "fa-water",
+    "key": "/hormuz-simulation",
+    "shortLabel": "Hormuz",
+    "external": true,
+    "customClass": "nav-cta-hormuz"
+  },
+  {
     "label": "Careers",
     "href": "#/careers",
     "icon": "fa-briefcase",

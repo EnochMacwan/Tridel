@@ -299,6 +299,32 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     width: 100%;
 }
 
+/* Hormuz Simulation CTA — red badge in the top nav, between Success Stories
+   and Careers. Pulls visual attention to the live external simulation. */
+.header__nav-link.nav-cta-hormuz {
+    background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+    color: #fff !important;
+    padding: 6px 14px;
+    margin: 0 4px;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.35);
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.header__nav-link.nav-cta-hormuz:hover {
+    background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(229, 57, 53, 0.5);
+}
+
+/* Suppress the default underline pseudo-element on the CTA — the red pill
+   already provides its own emphasis treatment. */
+.header__nav-link.nav-cta-hormuz::after {
+    display: none;
+}
+
 .header__menu-toggle {
     display: none;
 }
