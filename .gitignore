@@ -19,8 +19,9 @@ Thumbs.db
 archive/git_auth.txt
 oracleJdk-25
 
-# Graphify knowledge graph (regenerated locally)
-graphify-out/
+# Graphify knowledge graph outputs
+graphify-out/.graphify_python
+graphify-out/cost.json
 
 # Local assistant state
 .c[l]aude/
