@@ -970,8 +970,8 @@ function drawBgParticles() {
      Dashes are short with small gaps to read as "moving marks" not solid lines. */
   drawCurrentLayer("surface", 1.2, 0.95, [5, 4]);
   drawCurrentLayer("depth", 1.0, 0.65, [4, 4]);
-  /* Wind: longer orange dashes — distinct from the current pattern. */
-  drawBatchLayer("wind", "rgba(255, 190, 86, 0.95)", 1.4, [9, 6]);
+  /* Wind: longer amber dashes — distinct from the current pattern. */
+  drawBatchLayer("wind", "rgba(255, 191, 64, 0.95)", 1.4, [9, 6]);
   for (const particle of bgParticles) {
     particle.prevOK = false;
   }

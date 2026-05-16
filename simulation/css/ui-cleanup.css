@@ -1784,9 +1784,9 @@ body:not(.compact-reference-ui) .legend-swatch-current {
   box-shadow: 0 0 6px rgba(70, 236, 255, 0.28) !important;
 }
 
-/* Wind vector: white streak. */
+/* Wind vector: amber streak. */
 body:not(.compact-reference-ui) .legend-swatch-wind {
-  background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.95)) !important;
+  background: linear-gradient(90deg, rgba(255, 191, 64, 0.18), rgba(255, 191, 64, 0.96)) !important;
   height: 4px !important;
   margin-top: 6px !important;
 }
