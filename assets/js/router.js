@@ -399,6 +399,17 @@
     var link = e.target.closest('a[href]');
     if (!link) return;
 
+    // Respect links that explicitly want to leave the SPA — anything with
+    // target=_blank (open in new tab), target=_top, or any custom target
+    // should reach the browser unmodified. Otherwise the SPA would hijack
+    // a click meant for an embedded/detached sub-app (e.g. /simulation/).
+    var target = link.getAttribute('target');
+    if (target && target !== '_self') return;
+
+    // Modifier-clicks (cmd/ctrl/shift/middle-click) — let the browser do
+    // its normal "open in new tab/window" thing.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+
     var href = link.getAttribute('href');
     if (!href) return;
 
