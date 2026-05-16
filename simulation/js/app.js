@@ -1,0 +1,3419 @@
+/* app.js - UI, map, animation, analytics, and orchestration
+ * ---------------------------------------------------------------------
+ * Depends on: field.js, drift.js, Leaflet, Plotly
+ *
+ * This is the "glue layer" for the entire browser application. It does not
+ * own the physical forcing data (field.js) or the particle equations
+ * themselves (drift.js / weathering.js). Instead it coordinates everything:
+ *
+ * 1. Boot the map and cache DOM references.
+ * 2. Draw the current field and animated background tracers.
+ * 3. Launch ensemble runs and capture snapshots/metrics.
+ * 4. Reconstruct any playback frame from the stored tracks.
+ * 5. Update the UI, charts, exports, and scenario controls.
+ *
+ * When you want to understand "what happens when I press Run?" or "what is
+ * redrawn every animation frame?", this is the file to read.
+ */
+
+/* Preset bundles map user-friendly scenario buttons to concrete model inputs.
+   They are intentionally opinionated starting points, not exhaustive physics
+   definitions. */
+const SCENARIO_PRESETS = {
+  leeway: [
+    { id: "sar_fast", label: "S&R fast response", category: "piw_light", relRadius: 80, diffK: 8, durHours: 24, nEns: 300, useWind: true, guide: "Best for a recent person-in-water release where the first-day search box matters most." },
+    { id: "sar_uncertain", label: "Wide uncertainty search", category: "raft_4_6", relRadius: 250, diffK: 18, durHours: 36, nEns: 500, useWind: true, guide: "Use when the release location or target type is uncertain and the planning question is search-area growth." },
+    { id: "sar_long", label: "Long horizon drifting object", category: "debris", relRadius: 180, diffK: 14, durHours: 72, nEns: 600, useWind: true, guide: "Use for floating debris or delayed discovery where longer shoreline-risk timing is more important than fine early motion." },
+  ],
+  oil: [
+    { id: "oil_diesel", label: "Diesel leak", oilType: "diesel", oilVol: 10, relRadius: 120, diffK: 10, durHours: 24, nEns: 320, useWind: true, guide: "Best for a small, volatile spill where evaporation and first-day movement dominate." },
+    { id: "oil_light", label: "Light crude release", oilType: "light_crude", oilVol: 150, relRadius: 220, diffK: 14, durHours: 48, nEns: 420, useWind: true, guide: "Use for a medium release where both transport and surface mass loss matter." },
+    { id: "oil_heavy", label: "Heavy fuel shoreline risk", oilType: "heavy_fuel", oilVol: 800, relRadius: 260, diffK: 18, durHours: 72, nEns: 520, useWind: true, guide: "Use for persistent heavy fuel where shoreline contact and response timing are the main questions." },
+  ],
+};
+
+/* Global runtime state for playback, current run output, and UI toggles.
+   This file intentionally uses a small shared-state model instead of a full
+   framework so the browser app stays portable and dependency-light. */
+let tIdx = 0;
+let playing = true;
+let playSpeed = 1.5;
+let timelineStepHours = 3;
+let nParticles = 1800;
+let fieldLayer = null;
+let releasePoint = null;
+let activeScenario = "leeway";
+let activeRun = null;
+let oilSlickModel = null;
+let oilBudgetModel = null;
+let runTimer = null;
+let focusMode = false;
+let mapChromeHidden = false;
+let expertToolsOpen = false;
+let frameCache = null;
+let lastResultsKey = null;
+let lastPlotMarkerKey = null;
+let pendingFieldChunkKey = "";
+let bgParticles = [];
+
+const overlayState = {
+  currents: true,
+  tracers: true,
+  trails: true,
+  density: false,
+  uncertainty: false,
+  release: true,
+  oilRadius: true,
+};
+const els = {};
+
+/* Leaflet owns the geographic view and projection math. Canvas overlays are
+   layered above it for field rendering, tracers, and drift results. */
+const DEFAULT_CONTEXT_CENTER = [25.661, 55.778];
+const DEFAULT_CONTEXT_ZOOM = 7;
+const WIDE_GULF_CONTEXT_BOUNDS = {
+  south: 21.45,
+  west: 46.55,
+  north: 31.05,
+  east: 60.35,
+};
+
+const map = L.map("map", {
+  zoomControl: false,
+  preferCanvas: true,
+  attributionControl: false,
+  zoomSnap: 0.25,
+  zoomDelta: 0.5,
+}).setView(DEFAULT_CONTEXT_CENTER, DEFAULT_CONTEXT_ZOOM);
+map.getContainer().classList.add("greenpeace-reference-map");
+
+/* Greenpeace's Hormuz page uses this Mapbox style:
+   mapbox://styles/greenpeacegmh/cmmafi82g002z01pbhzceg6m3.
+   Its raster tiles are restricted to the Greenpeace domain, so localhost and
+   GitHub Pages fall back to a public dark CARTO basemap unless an authorized
+   token is supplied through window.TRIDEL_MAPBOX_TOKEN or ?mapbox_token=... */
+const GREENPEACE_MAPBOX_STYLE = {
+  owner: "greenpeacegmh",
+  id: "cmmafi82g002z01pbhzceg6m3",
+};
+const mapboxToken = window.TRIDEL_MAPBOX_TOKEN || new URLSearchParams(window.location.search).get("mapbox_token");
+const publicDarkAttribution = "&copy; OpenStreetMap contributors &copy; CARTO";
+
+function addPublicDarkBasemap() {
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
+    attribution: publicDarkAttribution,
+    className: "greenpeace-reference-base",
+    detectRetina: true,
+    maxZoom: 20,
+    subdomains: "abcd",
+  }).addTo(map);
+}
+
+if (mapboxToken) {
+  let exactMapFailed = false;
+  const exactGreenpeaceLayer = L.tileLayer(
+    `https://api.mapbox.com/styles/v1/${GREENPEACE_MAPBOX_STYLE.owner}/${GREENPEACE_MAPBOX_STYLE.id}/tiles/512/{z}/{x}/{y}?access_token=${encodeURIComponent(mapboxToken)}`,
+    {
+      attribution: "&copy; Mapbox &copy; OpenStreetMap",
+      className: "greenpeace-reference-base",
+      maxZoom: 20,
+      tileSize: 512,
+      zoomOffset: -1,
+    }
+  ).addTo(map);
+
+  exactGreenpeaceLayer.once("tileerror", () => {
+    if (exactMapFailed) return;
+    exactMapFailed = true;
+    map.removeLayer(exactGreenpeaceLayer);
+    addPublicDarkBasemap();
+  });
+} else {
+  addPublicDarkBasemap();
+}
+
+/* Keep country, city, and shoreline names readable above the animated current
+   field by rendering labels in a dedicated pane over the canvas overlays. */
+const labelsPane = map.createPane("labels");
+labelsPane.style.zIndex = "650";
+labelsPane.style.pointerEvents = "none";
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png", {
+  pane: "labels",
+  attribution: publicDarkAttribution,
+  className: "greenpeace-reference-labels",
+  detectRetina: true,
+  maxZoom: 20,
+  opacity: 1,
+  subdomains: "abcd",
+}).addTo(map);
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+/* MarineTraffic does not expose a reliable public Leaflet tile endpoint for
+   live AIS density here, so the app opens a synced external MarineTraffic view
+   instead of adding a broken in-map tile layer. */
+const MARINE_TRAFFIC_BASE_URL = "https://www.marinetraffic.com/en/ais/home";
+
+/* OpenSeaMap seamark overlay - free nautical chart with lighthouses, channels,
+   port boundaries. Useful sub-layer for marine-domain context. */
+const seamarkLayer = L.tileLayer(
+  "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
+  { maxZoom: 18, opacity: 0.9, attribution: "Seamarks (c) OpenSeaMap contributors" }
+);
+
+/* Approximate incident context from the Khaleej Times / New York Times report:
+   slick west of Kharg Island, larger than 20 square miles, drifting southward.
+   This is deliberately labeled as contextual geometry, not source satellite
+   segmentation. */
+const KHARG_SLICK_CONTEXT = {
+  island: { lat: 29.245, lon: 50.323 },
+  center: { lat: 29.205, lon: 50.215 },
+  areaKm2: 52,
+  radiusLongM: 6600,
+  radiusShortM: 2500,
+  reportUrl: "https://www.khaleejtimes.com/world/mena/us-iran-war-large-oil-slick-off-iran-island-kharg",
+};
+const khargSlickLayer = L.featureGroup();
+let khargSlickBuilt = false;
+
+/* Visual-only alignment calibration for the forcing overlay. The model, export,
+   release point, and data coordinates remain unchanged; this only nudges the
+   rendered current field/tracer canvas to better sit on the imagery basemap. */
+const FORCING_VISUAL_OFFSET = {
+  xCells: 0,
+  yCells: 0.5,
+};
+
+function fitMapToDataDomain() {
+  if (!Field.loaded || !Field.grid.lats?.length || !Field.grid.lons?.length) return;
+  const latSpan = Math.max(0.01, Field.grid.latMax - Field.grid.latMin);
+  const lonSpan = Math.max(0.01, Field.grid.lonMax - Field.grid.lonMin);
+  const bounds = L.latLngBounds(
+    [
+      Math.min(WIDE_GULF_CONTEXT_BOUNDS.south, Field.grid.latMin - latSpan * 0.08),
+      Math.min(WIDE_GULF_CONTEXT_BOUNDS.west, Field.grid.lonMin - lonSpan * 0.08),
+    ],
+    [
+      Math.max(WIDE_GULF_CONTEXT_BOUNDS.north, Field.grid.latMax + latSpan * 0.07),
+      Math.max(WIDE_GULF_CONTEXT_BOUNDS.east, Field.grid.lonMax + lonSpan * 0.12),
+    ]
+  );
+  map.fitBounds(bounds, {
+    paddingTopLeft: [36, 36],
+    paddingBottomRight: [36, 48],
+    maxZoom: DEFAULT_CONTEXT_ZOOM,
+    animate: false,
+  });
+  map.setView(DEFAULT_CONTEXT_CENTER, DEFAULT_CONTEXT_ZOOM, { animate: false });
+}
+
+function ellipseLatLngs(center, radiusLongM, radiusShortM, steps = 96, rotationRad = 0) {
+  const points = [];
+  for (let i = 0; i < steps; i += 1) {
+    const theta = (i / steps) * Math.PI * 2;
+    const along = Math.cos(theta) * radiusLongM;
+    const across = Math.sin(theta) * radiusShortM;
+    const northM = along * Math.cos(rotationRad) - across * Math.sin(rotationRad);
+    const eastM = along * Math.sin(rotationRad) + across * Math.cos(rotationRad);
+    points.push([
+      center.lat + northM / mPerDegLat(center.lat),
+      center.lon + eastM / mPerDegLon(center.lat),
+    ]);
+  }
+  return points;
+}
+
+function ensureKhargSlickLayer() {
+  if (khargSlickBuilt) {
+    return;
+  }
+
+  const slickCenter = KHARG_SLICK_CONTEXT.center;
+  const slickShape = L.polygon(
+    ellipseLatLngs(
+      slickCenter,
+      KHARG_SLICK_CONTEXT.radiusLongM,
+      KHARG_SLICK_CONTEXT.radiusShortM,
+      96,
+      -0.18
+    ),
+    {
+      color: "#ff7a2f",
+      weight: 2,
+      opacity: 0.95,
+      fillColor: "#ff3d2e",
+      fillOpacity: 0.28,
+      dashArray: "8 7",
+      interactive: true,
+    }
+  );
+
+  const slickCore = L.circle([slickCenter.lat, slickCenter.lon], {
+    radius: 2600,
+    color: "#ffd35a",
+    weight: 1.5,
+    opacity: 0.8,
+    fillColor: "#ff7a2f",
+    fillOpacity: 0.18,
+  });
+
+  const driftArrow = L.polyline(
+    [
+      [slickCenter.lat + 0.045, slickCenter.lon],
+      [slickCenter.lat - 0.22, slickCenter.lon + 0.01],
+    ],
+    { color: "#ffd35a", weight: 3, opacity: 0.95, dashArray: "10 8" }
+  );
+  const arrowHead = L.polygon(
+    [
+      [slickCenter.lat - 0.245, slickCenter.lon + 0.01],
+      [slickCenter.lat - 0.195, slickCenter.lon - 0.025],
+      [slickCenter.lat - 0.197, slickCenter.lon + 0.045],
+    ],
+    { color: "#ffd35a", weight: 1, opacity: 0.95, fillOpacity: 0.85 }
+  );
+
+  const khargMarker = L.circleMarker([KHARG_SLICK_CONTEXT.island.lat, KHARG_SLICK_CONTEXT.island.lon], {
+    radius: 6,
+    color: "#00e5ff",
+    weight: 2,
+    fillColor: "#00e5ff",
+    fillOpacity: 0.45,
+  }).bindTooltip("Kharg Island oil terminal area", { direction: "top" });
+
+  const popupHtml = `
+    <div class="incident-popup">
+      <strong>Reported Kharg oil slick</strong>
+      <span>Approximate context overlay west of Kharg Island.</span>
+      <span>Report estimate: more than 20 sq mi / about ${KHARG_SLICK_CONTEXT.areaKm2} km2, drifting southward.</span>
+      <a href="${KHARG_SLICK_CONTEXT.reportUrl}" target="_blank" rel="noopener">Open source report</a>
+    </div>
+  `;
+
+  slickShape.bindPopup(popupHtml);
+  slickCore.bindPopup(popupHtml);
+  [slickShape, slickCore, driftArrow, arrowHead, khargMarker].forEach((layer) => khargSlickLayer.addLayer(layer));
+  khargSlickBuilt = true;
+}
+
+function forcingVisualOffsetPx(grid) {
+  if (!grid || grid.nLat < 2 || grid.nLon < 2) {
+    return { x: 0, y: 0 };
+  }
+  const origin = map.latLngToContainerPoint([grid.lats[grid.nLat - 1], grid.lons[0]]);
+  const east = map.latLngToContainerPoint([grid.lats[grid.nLat - 1], grid.lons[1]]);
+  const south = map.latLngToContainerPoint([grid.lats[grid.nLat - 2], grid.lons[0]]);
+  return {
+    x: (east.x - origin.x) * FORCING_VISUAL_OFFSET.xCells,
+    y: (south.y - origin.y) * FORCING_VISUAL_OFFSET.yCells,
+  };
+}
+
+/* Three stacked canvases:
+   - field: colorized current vectors
+   - part: ambient background tracers that make the field feel alive
+   - drift: actual scenario output (particles, trails, density, uncertainty)
+*/
+const DualCanvasLayer = L.Layer.extend({
+  onAdd(m) {
+    this._map = m;
+    const pane = m.getPanes().overlayPane;
+    this._field = L.DomUtil.create("canvas", "overlay", pane);
+    this._part = L.DomUtil.create("canvas", "overlay", pane);
+    this._drift = L.DomUtil.create("canvas", "overlay", pane);
+    m.on("moveend zoomend resize", this._reset, this);
+    this._reset();
+  },
+  _reset() {
+    const size = this._map.getSize();
+    const topLeft = this._map.containerPointToLayerPoint([0, 0]);
+    for (const canvas of [this._field, this._part, this._drift]) {
+      canvas.width = size.x;
+      canvas.height = size.y;
+      L.DomUtil.setPosition(canvas, topLeft);
+    }
+    this._part.getContext("2d").clearRect(0, 0, size.x, size.y);
+    this._drift.getContext("2d").clearRect(0, 0, size.x, size.y);
+    
+    // Reproject geographic trails to pixel space after map transform changes
+    if (typeof projectTrails === 'function') projectTrails();
+
+    // Force a full redraw of all layers on the next tick
+    if (typeof tick !== "undefined") tick._lastTIdx = -1;
+  },
+  fieldCtx() { return this._field.getContext("2d"); },
+  partCtx() { return this._part.getContext("2d"); },
+  driftCtx() { return this._drift.getContext("2d"); },
+  size() { return this._map.getSize(); },
+});
+
+/* Timeline helper functions convert between Leaflet/UI-friendly slider indices
+   and the absolute second-based timestamps used by the simulation. */
+function maxDataSec() {
+  return Field.t0Unix + (Field.times.length - 1) * Field.dtSec;
+}
+
+function maxRunHoursFrom(startSec) {
+  return Math.max(0, Math.floor((maxDataSec() - startSec) / 3600));
+}
+
+function constrainedDurationHours(startSec, requestedHours, updateInput = false) {
+  const maxHours = maxRunHoursFrom(startSec);
+  const safeMax = Math.max(1, maxHours);
+  const duration = clamp(requestedHours, 1, safeMax);
+  if (updateInput && els.durHours) {
+    els.durHours.max = String(safeMax);
+    els.durHours.value = String(duration);
+  }
+  return duration;
+}
+
+function tIdxToSec(ti) {
+  return Field.t0Unix + ti * Field.dtSec;
+}
+
+function secToTIdx(sec) {
+  return (sec - Field.t0Unix) / Field.dtSec;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function numericInputValue(element, fallback) {
+  const raw = Number(element.value);
+  const min = Number.isFinite(Number(element.min)) ? Number(element.min) : -Infinity;
+  const max = Number.isFinite(Number(element.max)) ? Number(element.max) : Infinity;
+  const value = Number.isFinite(raw) ? raw : fallback;
+  const clipped = clamp(value, min, max);
+  element.value = String(clipped);
+  return clipped;
+}
+
+function fmt(value, digits) {
+  return Number.isFinite(value) ? value.toFixed(digits) : "-";
+}
+
+function formatPercent(value) {
+  return Number.isFinite(value) ? `${value.toFixed(0)}%` : "-";
+}
+
+function formatRunOffset(hours) {
+  return `${hours >= 0 ? "+" : "-"}${Math.abs(hours).toFixed(1)} h`;
+}
+
+function directionHue(screenX, screenY) {
+  const angle = Math.atan2(screenY, screenX);
+  return ((angle + Math.PI) / (2 * Math.PI)) * 360;
+}
+
+function getScenarioLabel(scenario) {
+  return scenario === "oil" ? "Oil spill" : "Man overboard";
+}
+
+function selectedPreset() {
+  return SCENARIO_PRESETS[activeScenario].find((preset) => preset.id === els.scenarioPreset.value) || null;
+}
+
+function resetFrameCache() {
+  frameCache = null;
+  lastResultsKey = null;
+  lastPlotMarkerKey = null;
+}
+
+function updateBodyState() {
+  document.body.classList.toggle("focus-mode", focusMode);
+  document.body.classList.toggle("map-chrome-hidden", mapChromeHidden);
+  document.body.classList.toggle("expert-tools-open", expertToolsOpen);
+  document.body.classList.toggle("oil-scenario", activeScenario === "oil");
+  if (els.expertToggleBtn) {
+    els.expertToggleBtn.setAttribute("aria-expanded", String(expertToolsOpen));
+    els.expertToggleBtn.textContent = expertToolsOpen ? "Hide expert tools" : "Show expert tools";
+  }
+  syncExpertVisibility();
+}
+
+function setStatus(message) {
+  els.runStatus.textContent = message || "";
+}
+
+/* Paint a slider's cyan progress fill — WebKit has no native ::-webkit-range-
+   progress pseudo, so we set a CSS var that the track gradient interpolates. */
+function paintSliderProgress(slider) {
+  if (!slider) return;
+  const min = Number(slider.min || 0);
+  const max = Number(slider.max || 100);
+  const val = Number(slider.value || 0);
+  const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+  slider.style.setProperty("--slider-pct", `${pct}%`);
+}
+
+function setChunkStatus(message, isLoading = false) {
+  if (!els.mapChipChunk) return;
+  els.mapChipChunk.textContent = message;
+  els.mapChipChunk.classList.toggle("loading", isLoading);
+}
+
+function syncExpertVisibility() {
+  const expertSelectors = [
+    ".release-physics-card",
+    ".visual-overlay-card",
+    ".data-quality-card",
+    ".intro-card",
+    ".marinetraffic-card",
+    ".webgnome-card",
+    ".data-provenance-card",
+    ".caveat-card",
+    ".label-mission",
+    ".label-run-outputs",
+  ];
+  document.querySelectorAll(expertSelectors.join(",")).forEach((node) => {
+    if (expertToolsOpen) {
+      node.style.removeProperty("display");
+    } else {
+      node.style.setProperty("display", "none", "important");
+    }
+  });
+  if (els.responseCard) {
+    const shouldShowResponse = expertToolsOpen && activeScenario === "oil";
+    if (shouldShowResponse) {
+      els.responseCard.style.removeProperty("display");
+    } else {
+      els.responseCard.style.setProperty("display", "none", "important");
+    }
+  }
+}
+
+function setRunProgress(percent, label, detail) {
+  if (!els.runProgress) {
+    return;
+  }
+  els.runProgress.hidden = false;
+  els.progressFill.style.width = `${clamp(percent, 0, 100)}%`;
+  els.progressLabel.textContent = label;
+  els.progressDetail.textContent = detail || "";
+  els.runProgress.dataset.done = percent >= 100 ? "true" : "false";
+}
+
+function hideRunProgress() {
+  if (els.runProgress) {
+    els.runProgress.hidden = true;
+    els.progressFill.style.width = "0%";
+    els.runProgress.dataset.done = "false";
+  }
+}
+
+function parseUtc(value) {
+  if (!value) return NaN;
+  const text = String(value).trim().replace(" ", "T");
+  if (/[zZ]|[+-]\d\d:\d\d$/.test(text)) return Date.parse(text);
+  return Date.parse(`${text}Z`);
+}
+
+function formatAge(ms) {
+  if (!Number.isFinite(ms)) return "unknown age";
+  const abs = Math.abs(ms);
+  const hours = Math.round(abs / 36e5);
+  if (hours < 1) return "updated this hour";
+  if (hours < 48) return `${hours} h ${ms >= 0 ? "old" : "ahead"}`;
+  return `${Math.round(hours / 24)} days ${ms >= 0 ? "old" : "ahead"}`;
+}
+
+function dataSourceKind() {
+  const source = Field.meta?.source || "";
+  if (/rtofs/i.test(source)) return "NOAA RTOFS fallback";
+  if (/cmems|copernicus/i.test(source)) return "CMEMS authenticated";
+  return "Unknown source";
+}
+
+function currentSpeedStats() {
+  const metaStats = Field.meta?.current_speed_stats;
+  if (metaStats) {
+    return {
+      median: Number(metaStats.median) || 0,
+      p90: Number(metaStats.p90) || 0,
+      max: Number(metaStats.max) || 0,
+    };
+  }
+  if (!Field.u || !Field.v) return null;
+  const speeds = [];
+  Field.u.forEach((slice, ti) => {
+    slice.forEach((row, j) => {
+      row.forEach((u, i) => {
+        const v = Field.v[ti]?.[j]?.[i];
+        if (u !== null && v !== null && Number.isFinite(u) && Number.isFinite(v)) {
+          speeds.push(Math.hypot(u, v));
+        }
+      });
+    });
+  });
+  if (!speeds.length) return null;
+  speeds.sort((a, b) => a - b);
+  return {
+    median: speeds[Math.floor(speeds.length * 0.5)],
+    p90: speeds[Math.floor(speeds.length * 0.9)],
+    max: speeds[speeds.length - 1],
+  };
+}
+
+function timelinePhaseFor(sec) {
+  const nowSec = Date.now() / 1000;
+  if (sec < nowSec - 6 * 3600) return "Hindcast";
+  if (sec <= nowSec + 3600) return "Near real time";
+  return "Forecast";
+}
+
+function updateDataQualityPanel() {
+  if (!Field.loaded || !Field.meta) return;
+  const meta = Field.meta;
+  const generatedMs = parseUtc(meta.generated_utc);
+  const nowMs = Date.now();
+  const sourceKind = dataSourceKind();
+  const interpolated = meta.source_time_step_sec && meta.source_time_step_sec !== meta.time_step_sec;
+  const stats = currentSpeedStats();
+  const dataAge = Number.isFinite(generatedMs) ? formatAge(nowMs - generatedMs) : "generation time unknown";
+
+  if (els.dataSourceChip) els.dataSourceChip.textContent = sourceKind;
+  if (els.summaryData) els.summaryData.textContent = sourceKind;
+  if (els.mapChipSource) els.mapChipSource.textContent = sourceKind;
+  if (els.dataFreshness) els.dataFreshness.textContent = dataAge;
+  if (els.dataHealth) els.dataHealth.textContent = sourceKind.includes("fallback") ? "Fallback live data" : "Primary live data";
+  if (els.dataWindow) els.dataWindow.textContent = `${meta.time_start} to ${meta.time_end} UTC`;
+  if (els.dataResolution) {
+    const sourceStep = interpolated ? ` from ${Math.round(meta.source_time_step_sec / 3600)} h source` : "";
+    els.dataResolution.textContent = `${Math.round(meta.time_step_sec / 3600)} h${sourceStep}`;
+    if (els.mapChipResolution) els.mapChipResolution.textContent = `${Math.round(meta.time_step_sec / 3600)} hr resolution`;
+  }
+  if (els.mapChipChunk) {
+    const loadedChunks = Field.chunked ? Field.chunks.filter((chunk) => chunk.loaded).length : 0;
+    const chunkText = Field.chunked ? `${loadedChunks}/${Field.chunks.length} chunks cached` : "Single data file";
+    setChunkStatus(chunkText, false);
+  }
+  if (els.dataGenerated) els.dataGenerated.textContent = `${meta.generated_utc || "-"} (${dataAge})`;
+  if (els.dataGrid) els.dataGrid.textContent = `${meta.n_lat} x ${meta.n_lon} cells | ${meta.n_times} frames`;
+  if (els.speedScaleMid && stats) els.speedScaleMid.textContent = `Median ${stats.median.toFixed(2)} m/s`;
+  if (els.speedScaleMax && stats) els.speedScaleMax.textContent = `Max ${stats.max.toFixed(2)} m/s`;
+  if (els.dataQualityNote) {
+    const windText = Field.hasWind ? `Wind: ${meta.wind_source}.` : "Wind is not embedded in this dataset.";
+    const interpText = interpolated ? " Hourly browser frames are linearly interpolated from source forecast snapshots." : "";
+    els.dataQualityNote.textContent = `${sourceKind}. ${windText}${interpText}`;
+  }
+}
+
+/* Fail loudly in the UI when data cannot be loaded so users are not forced to
+   diagnose the issue from console output alone. */
+function showStartupError(message) {
+  setStatus(message);
+  els.timeLabel.textContent = "server required";
+  els.dataMeta.textContent = "Open this app through http://localhost:8000, not file://";
+  els.releaseInfo.textContent = "Startup failed. Use start_local_server.bat or python -m http.server 8000.";
+  els.results.innerHTML = '<div class="result-card wide"><span class="result-label">Startup</span><span class="result-value">Data unavailable</span><span class="result-subvalue">This page was opened without a local web server.</span></div>';
+  els.runBtn.disabled = true;
+  if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = true;
+  if (els.runTopBtn) els.runTopBtn.disabled = true;
+  els.useWind.disabled = true;
+  Plotly.purge(els.tsPlot);
+}
+
+/* Background particles are purely visual. They make the current field feel
+   alive before a scenario is run and while playback is paused. */
+function randomBgParticle() {
+  const grid = Field.grid;
+  const layer = Field.hasWind && Math.random() > 0.72
+    ? "wind"
+    : Math.random() > 0.58 ? "depth" : "surface";
+  for (let tries = 0; tries < 30; tries += 1) {
+    const lon = grid.lonMin + Math.random() * (grid.lonMax - grid.lonMin);
+    const lat = grid.latMin + Math.random() * (grid.latMax - grid.latMin);
+    const vector = layer === "wind"
+      ? Field.sampleWind(lon, lat, tIdxToSec(tIdx))
+      : Field.sampleCurrent(lon, lat, tIdxToSec(tIdx));
+    if (vector) {
+      return {
+        lon,
+        lat,
+        age: 320 + Math.random() * 420,
+        layer,
+      };
+    }
+  }
+  return {
+    lon: grid.lonMin + Math.random() * (grid.lonMax - grid.lonMin),
+    lat: grid.latMin + Math.random() * (grid.latMax - grid.latMin),
+    age: 1,
+    layer,
+  };
+}
+
+function makeBgParticles(n) {
+  bgParticles = [];
+  for (let i = 0; i < n; i += 1) {
+    bgParticles.push(randomBgParticle());
+  }
+}
+
+/* Advance the ambient tracer particles. These do not affect the simulation;
+   they are a Windy-style visual layer driven directly by the current field. */
+function stepBgParticles(dtReal) {
+  const tSec = tIdxToSec(tIdx);
+  const currentDt = dtReal * 3600 * 2;
+  const windDt = dtReal * 3600 * 0.38;
+  for (const particle of bgParticles) {
+    const vector = particle.layer === "wind"
+      ? Field.sampleWind(particle.lon, particle.lat, tSec)
+      : Field.sampleCurrent(particle.lon, particle.lat, tSec);
+    if (!vector || particle.age <= 0) {
+      Object.assign(particle, randomBgParticle());
+      continue;
+    }
+    particle.prevLon = particle.lon;
+    particle.prevLat = particle.lat;
+    particle.prevOK = true;
+    /* Persist the velocity sample so the renderer can tint current streaks by
+       direction (matching the compass hue mapping) and modulate width by speed. */
+    particle.vu = vector.u;
+    particle.vv = vector.v;
+    particle.spd = Math.hypot(vector.u, vector.v);
+    const dt = particle.layer === "wind" ? windDt : currentDt;
+    particle.lon += vector.u * dt / mPerDegLon(particle.lat);
+    particle.lat += vector.v * dt / mPerDegLat(particle.lat);
+    particle.age -= 1;
+    const grid = Field.grid;
+    if (particle.lon < grid.lonMin || particle.lon > grid.lonMax || particle.lat < grid.latMin || particle.lat > grid.latMax) {
+      particle.age = 0;
+    }
+  }
+}
+
+/* Offscreen low-res field buffer:
+ * we paint one pixel per model cell, then scale/blit it to the visible canvas.
+ * That is much cheaper than repainting thousands of screen-sized quads every
+ * frame and still produces a smooth-looking current layer. */
+/* Two small offscreen canvases let the visible current field cross-fade
+   between adjacent hourly frames instead of snapping from color to color. */
+const fieldSrcBuffers = [
+  { canvas: null, ctx: null, data: null, ti: -1 },
+  { canvas: null, ctx: null, data: null, ti: -1 },
+];
+
+function ensureFieldSrc(grid) {
+  if (
+    fieldSrcBuffers[0].canvas &&
+    fieldSrcBuffers[0].canvas.width === grid.nLon &&
+    fieldSrcBuffers[0].canvas.height === grid.nLat
+  ) return;
+  fieldSrcBuffers.forEach((buffer) => {
+    buffer.canvas = document.createElement("canvas");
+    buffer.canvas.width = grid.nLon;
+    buffer.canvas.height = grid.nLat;
+    buffer.ctx = buffer.canvas.getContext("2d");
+    buffer.data = buffer.ctx.createImageData(grid.nLon, grid.nLat);
+    buffer.ti = -1;
+  });
+}
+
+/* Paint a single time slice of the current field into the offscreen buffer. */
+function paintFieldSrc(ti, grid, buffer) {
+  if (ti === buffer.ti) return;
+  const uSlice = Field.slice("u", ti);
+  const vSlice = Field.slice("v", ti);
+  if (!uSlice || !vSlice) {
+    buffer.ctx.clearRect(0, 0, grid.nLon, grid.nLat);
+    buffer.ti = -1;
+    return;
+  }
+  const pix = buffer.data.data;
+  const nW = grid.nLon;
+  const nH = grid.nLat;
+  const nCells = nW * nH;
+
+  /* Pass 1 — paint water cells, mark land cells. We keep RGB channels
+   * separate so we can BFS-fill land pixels with the nearest water color.
+   * Alpha is 0 for land so bilinear blit lets the Leaflet basemap show
+   * through the coastline without any brown tint smearing into water.    */
+  const isWater = new Uint8Array(nCells);
+  for (let row = 0; row < nH; row += 1) {
+    const j = nH - 1 - row;       // image row 0 = northernmost lat
+    for (let i = 0; i < nW; i += 1) {
+      const u = uSlice[j][i];
+      const v = vSlice[j][i];
+      const cellIdx = row * nW + i;
+      const p = cellIdx * 4;
+      if (u === null || v === null) {
+        pix[p]     = 0;   // will be overwritten by BFS fill below
+        pix[p + 1] = 0;
+        pix[p + 2] = 0;
+        pix[p + 3] = 0;   // transparent → basemap shows through
+        continue;
+      }
+      const speed = Math.hypot(u, v);
+      const hue   = directionHue(u, -v);
+      const alpha = Math.min(speed / 0.8, 0.78);
+      const [r, g, b] = hslToRgb(hue / 360, 0.88, 0.56);
+      pix[p]     = r;
+      pix[p + 1] = g;
+      pix[p + 2] = b;
+      pix[p + 3] = Math.round(alpha * 255);
+      isWater[cellIdx] = 1;
+    }
+  }
+
+  /* Pass 2 — BFS from every water cell outward, copying its RGB (not
+   * alpha) into adjacent land cells. This propagates the nearest water
+   * color across the land mask so bilinear smoothing near coastlines
+   * blends water-hue → water-hue rather than water-hue → black.          */
+  const dist = new Int32Array(nCells).fill(1 << 30);
+  let head = 0;
+  const queue = new Int32Array(nCells);
+  let tail = 0;
+  for (let idx = 0; idx < nCells; idx += 1) {
+    if (isWater[idx]) {
+      dist[idx] = 0;
+      queue[tail++] = idx;
+    }
+  }
+  while (head < tail) {
+    const idx = queue[head++];
+    const y = (idx / nW) | 0;
+    const x = idx - y * nW;
+    const dNext = dist[idx] + 1;
+    const srcP = idx * 4;
+    const srcR = pix[srcP];
+    const srcG = pix[srcP + 1];
+    const srcB = pix[srcP + 2];
+    for (let k = 0; k < 4; k += 1) {
+      const nx = x + (k === 0 ? 1 : k === 1 ? -1 : 0);
+      const ny = y + (k === 2 ? 1 : k === 3 ? -1 : 0);
+      if (nx < 0 || nx >= nW || ny < 0 || ny >= nH) continue;
+      const nIdx = ny * nW + nx;
+      if (dist[nIdx] > dNext) {
+        dist[nIdx] = dNext;
+        const nP = nIdx * 4;
+        pix[nP]     = srcR;   // inherit water color
+        pix[nP + 1] = srcG;
+        pix[nP + 2] = srcB;
+        // pix[nP + 3] stays 0 (land remains transparent)
+        queue[tail++] = nIdx;
+      }
+    }
+  }
+
+  buffer.ctx.putImageData(buffer.data, 0, 0);
+  buffer.ti = ti;
+}
+
+/* Draw the colorized current field for the current playback instant. */
+function drawField() {
+  if (!fieldLayer || !Field.loaded) {
+    return;
+  }
+  const ctx  = fieldLayer.fieldCtx();
+  const size = fieldLayer.size();
+  if (!overlayState.currents) {
+    ctx.clearRect(0, 0, size.x, size.y);
+    return;
+  }
+  const ti0 = clamp(Math.floor(tIdx), 0, Field.times.length - 1);
+  const ti1 = clamp(ti0 + 1, 0, Field.times.length - 1);
+  const blend = clamp(tIdx - ti0, 0, 1);
+  const grid = Field.grid;
+
+  if (!Field.isTimeLoaded(ti0) || !Field.isTimeLoaded(ti1)) {
+    const chunkKey = `${ti0}-${ti1}`;
+    if (pendingFieldChunkKey !== chunkKey) {
+      pendingFieldChunkKey = chunkKey;
+      const loadedChunks = Field.chunked ? Field.chunks.filter((chunk) => chunk.loaded).length : 0;
+      setChunkStatus(`Loading field chunk ${loadedChunks + 1}/${Field.chunks.length}`, true);
+      if (els.dataMeta) {
+        els.dataMeta.textContent = "Loading forcing data…";
+      }
+    }
+    Field.ensureTimeRange(tIdxToSec(ti0), tIdxToSec(ti1)).then(() => {
+      fieldSrcBuffers.forEach((buffer) => { buffer.ti = -1; });
+      pendingFieldChunkKey = "";
+      updateDataQualityPanel();
+      drawField();
+    }).catch((err) => {
+      pendingFieldChunkKey = "";
+      setChunkStatus("Chunk load failed", false);
+      setStatus(`Current chunk load failed: ${err.message}`);
+    });
+    return;
+  }
+
+  /* Predictive prefetch: hide chunk-boundary stutter by warming the next chunk
+     once playback enters the last 25% of the current one. No-op if not needed. */
+  if (Field.chunked && typeof Field.prefetchNext === "function") {
+    Field.prefetchNext(ti1);
+  }
+
+  /* Memory hygiene — every so often, drop chunks far from the current
+     playback time. Service worker still has the JSON so reload is cheap. */
+  if (Field.chunked && typeof Field.evictDistantChunks === "function") {
+    if (!drawField._evictCounter) drawField._evictCounter = 0;
+    drawField._evictCounter += 1;
+    if (drawField._evictCounter % 120 === 0) {
+      Field.evictDistantChunks(ti0, 2, 2);
+    }
+  }
+
+  ctx.clearRect(0, 0, size.x, size.y);
+  ensureFieldSrc(grid);
+  paintFieldSrc(ti0, grid, fieldSrcBuffers[0]);
+  if (blend > 0 && ti1 !== ti0) {
+    paintFieldSrc(ti1, grid, fieldSrcBuffers[1]);
+  }
+
+  /* Destination rect aligned so that each source-pixel CENTER lands on its
+   * corresponding grid point. Grid point (i,j) = (lons[i], lats[j]).
+   * Pixel center in image coords is (i + 0.5, row + 0.5) where row = nLat-1-j.
+   *   X0,Y0 = screen coords of NW-most grid point (lats[nLat-1], lons[0])
+   *   X1,Y1 = screen coords of SE-most grid point (lats[0],       lons[nLon-1])
+   * dWidth  = nLon * (X1 - X0) / (nLon - 1)
+   * dHeight = nLat * (Y1 - Y0) / (nLat - 1)                                 */
+  const nw = map.latLngToContainerPoint([grid.lats[grid.nLat - 1], grid.lons[0]]);
+  const se = map.latLngToContainerPoint([grid.lats[0],             grid.lons[grid.nLon - 1]]);
+  const spanX = se.x - nw.x;
+  const spanY = se.y - nw.y;
+  const offset = forcingVisualOffsetPx(grid);
+  const dW = (grid.nLon * spanX) / (grid.nLon - 1);
+  const dH = (grid.nLat * spanY) / (grid.nLat - 1);
+  const dX = nw.x - (0.5 * spanX) / (grid.nLon - 1) + offset.x;
+  const dY = nw.y - (0.5 * spanY) / (grid.nLat - 1) + offset.y;
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.globalAlpha = 1 - blend;
+  ctx.drawImage(fieldSrcBuffers[0].canvas, dX, dY, dW, dH);
+  if (blend > 0 && ti1 !== ti0) {
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = blend;
+    ctx.drawImage(fieldSrcBuffers[1].canvas, dX, dY, dW, dH);
+  }
+  ctx.restore();
+}
+
+/* Draw streak-style background tracers by fading the previous frame slightly
+   and then drawing new short segments. That repeated partial fade is what
+   creates the visible trail effect. */
+function drawBgParticles() {
+  if (!fieldLayer) {
+    return;
+  }
+  const ctx = fieldLayer.partCtx();
+  const size = fieldLayer.size();
+  if (!overlayState.tracers) {
+    ctx.clearRect(0, 0, size.x, size.y);
+    return;
+  }
+  /* Gentler fade — leaves longer, more delicate streak trails (windy.com feel). */
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillStyle = "rgba(0, 0, 0, 0.045)";
+  ctx.fillRect(0, 0, size.x, size.y);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.lineCap = "round";
+  const offset = forcingVisualOffsetPx(Field.grid);
+
+  /* Single-color batched path (used for wind orange dashes). */
+  const drawBatchLayer = (layer, strokeStyle, lineWidth, dash = []) => {
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.setLineDash(dash);
+    ctx.beginPath();
+    for (const particle of bgParticles) {
+      if (!particle.prevOK || particle.layer !== layer) continue;
+      const a = map.latLngToContainerPoint([particle.prevLat, particle.prevLon]);
+      const b = map.latLngToContainerPoint([particle.lat, particle.lon]);
+      ctx.moveTo(a.x + offset.x, a.y + offset.y);
+      ctx.lineTo(b.x + offset.x, b.y + offset.y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  };
+
+  /* Hue-binned current streaks — group by 12 direction buckets so we only
+     issue ~12 strokes per layer (cheap) but each particle still reads as
+     "color = its direction". Matches the compass wheel hue mapping. */
+  const HUE_BINS = 12;
+  const drawCurrentLayer = (layer, lineWidth, alpha, dash) => {
+    ctx.lineWidth = lineWidth;
+    ctx.setLineDash(dash || []);
+    const bins = new Array(HUE_BINS);
+    for (let i = 0; i < HUE_BINS; i += 1) bins[i] = [];
+    for (const particle of bgParticles) {
+      if (!particle.prevOK || particle.layer !== layer) continue;
+      if (particle.vu == null || particle.vv == null) continue;
+      const hue = directionHue(particle.vu, -particle.vv);
+      const bin = Math.min(HUE_BINS - 1, Math.floor((hue / 360) * HUE_BINS));
+      bins[bin].push(particle);
+    }
+    for (let i = 0; i < HUE_BINS; i += 1) {
+      const list = bins[i];
+      if (!list.length) continue;
+      const hue = ((i + 0.5) / HUE_BINS) * 360;
+      /* Mostly-white with a directional tint so the field stays readable but
+         every streak carries a hint of its direction's hue. */
+      ctx.strokeStyle = `hsla(${hue.toFixed(0)}, 90%, 78%, ${alpha})`;
+      ctx.beginPath();
+      for (const particle of list) {
+        const a = map.latLngToContainerPoint([particle.prevLat, particle.prevLon]);
+        const b = map.latLngToContainerPoint([particle.lat, particle.lon]);
+        ctx.moveTo(a.x + offset.x, a.y + offset.y);
+        ctx.lineTo(b.x + offset.x, b.y + offset.y);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  };
+
+  /* Currents: dashed streaks (windy.com-style flow dashes) tinted by direction.
+     Dashes are short with small gaps to read as "moving marks" not solid lines. */
+  drawCurrentLayer("surface", 1.2, 0.95, [5, 4]);
+  drawCurrentLayer("depth", 1.0, 0.65, [4, 4]);
+  /* Wind: longer orange dashes — distinct from the current pattern. */
+  drawBatchLayer("wind", "rgba(255, 190, 86, 0.95)", 1.4, [9, 6]);
+  for (const particle of bgParticles) {
+    particle.prevOK = false;
+  }
+}
+
+/* Some drifters only append to track periodically, so this helper forces the
+   final state to exist in each track before playback reconstruction begins. */
+function ensureFinalTrackSamples(ensemble) {
+  for (const drifter of ensemble) {
+    const last = drifter.track[drifter.track.length - 1];
+    if (!last || last[2] !== drifter.t) {
+      drifter.track.push([drifter.lon, drifter.lat, drifter.t]);
+    }
+  }
+}
+
+/* Reconstruct a particle location at an arbitrary playback time by sampling
+   between stored track points rather than rerunning the integrator live. */
+function sampleTrackPosition(drifter, tSec) {
+  if (tSec <= drifter.t0) {
+    return { lon: drifter.lon0, lat: drifter.lat0, ageSec: 0, stranded: false, massFrac: 1 };
+  }
+
+  const computeMassFrac = (drifter, sampleSec, elapsed) => {
+    if (!drifter.tau_evap) return drifter.mass_frac;
+    if (!drifter.stranded || sampleSec <= drifter.t) {
+      return Math.exp(-elapsed / drifter.tau_evap);
+    }
+    // Evaporation significantly slows down once the oil is stranded on land
+    const floatingTime = Math.max(0, drifter.t - drifter.t0);
+    const beachedTime = sampleSec - drifter.t;
+    return Math.exp(-(floatingTime / drifter.tau_evap + beachedTime / (drifter.tau_evap * 4)));
+  };
+
+  const track = drifter.track;
+  const last = track[track.length - 1];
+  const sampleSec = Math.min(tSec, last[2]);
+  if (sampleSec >= last[2]) {
+    /* Mass weathering continues even after the drifter is stranded — base it
+       on the requested playback time (tSec - t0), not the truncated track
+       time. Otherwise drifters that strand at t=t0 would always read 100% */
+    const elapsed = Math.max(0, tSec - drifter.t0);
+    return {
+      lon: last[0],
+      lat: last[1],
+      ageSec: elapsed,
+      stranded: drifter.stranded && sampleSec >= drifter.t,
+      massFrac: computeMassFrac(drifter, tSec, elapsed),
+    };
+  }
+
+  let lo = 0;
+  let hi = track.length - 1;
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (track[mid][2] < sampleSec) {
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+
+  const nextIndex = Math.min(lo, track.length - 1);
+  const prevIndex = Math.max(0, nextIndex - 1);
+  const prev = track[prevIndex];
+  const next = track[nextIndex];
+  const span = Math.max(1, next[2] - prev[2]);
+  const f = clamp((sampleSec - prev[2]) / span, 0, 1);
+  const elapsed = Math.max(0, sampleSec - drifter.t0);
+  
+  return {
+    lon: prev[0] + (next[0] - prev[0]) * f,
+    lat: prev[1] + (next[1] - prev[1]) * f,
+    ageSec: elapsed,
+    stranded: drifter.stranded && sampleSec >= drifter.t,
+    massFrac: computeMassFrac(drifter, sampleSec, elapsed),
+  };
+}
+
+/* Reduce a cloud of particles into centroid/spread/stranding metrics for UI
+   cards, uncertainty drawing, and analytics plots. */
+function summarizePoints(points, tSec) {
+  if (!points.length) {
+    return {
+      total: 0,
+      drifting: 0,
+      stranded: 0,
+      centroidLon: null,
+      centroidLat: null,
+      sigmaKm: null,
+      maxAgeHours: 0,
+      massLeftPct: null,
+      ellipse: null,
+      tSec,
+    };
+  }
+
+  let sumLon = 0;
+  let sumLat = 0;
+  let stranded = 0;
+  let maxAge = 0;
+  let massTotal = 0;
+
+  for (const point of points) {
+    sumLon += point.lon;
+    sumLat += point.lat;
+    if (point.stranded) {
+      stranded += 1;
+    }
+    maxAge = Math.max(maxAge, point.ageSec);
+    massTotal += point.massFrac ?? 1;
+  }
+
+  const centroidLon = sumLon / points.length;
+  const centroidLat = sumLat / points.length;
+  const dx = [];
+  const dy = [];
+  for (const point of points) {
+    dx.push((point.lon - centroidLon) * mPerDegLon(centroidLat));
+    dy.push((point.lat - centroidLat) * mPerDegLat(centroidLat));
+  }
+
+  let covXX = 0;
+  let covYY = 0;
+  let covXY = 0;
+  for (let i = 0; i < dx.length; i += 1) {
+    covXX += dx[i] * dx[i];
+    covYY += dy[i] * dy[i];
+    covXY += dx[i] * dy[i];
+  }
+  covXX /= Math.max(1, dx.length);
+  covYY /= Math.max(1, dy.length);
+  covXY /= Math.max(1, dx.length);
+
+  const sigmaKm = Math.sqrt((covXX + covYY) / 2) / 1000;
+  const trace = covXX + covYY;
+  const detTerm = Math.sqrt(Math.max(0, (covXX - covYY) * (covXX - covYY) + 4 * covXY * covXY));
+  const lambda1 = Math.max(0, (trace + detTerm) / 2);
+  const lambda2 = Math.max(0, (trace - detTerm) / 2);
+  const angleRad = 0.5 * Math.atan2(2 * covXY, covXX - covYY);
+
+  // Ensemble footprint: 2-sigma uncertainty ellipse area (95% containment).
+  const sigmaMajorM = Math.sqrt(lambda1);
+  const sigmaMinorM = Math.sqrt(lambda2);
+  const footprintKm2 = (Math.PI * (2 * sigmaMajorM) * (2 * sigmaMinorM)) / 1e6;
+
+  return {
+    total: points.length,
+    drifting: points.length - stranded,
+    stranded,
+    centroidLon,
+    centroidLat,
+    sigmaKm,
+    footprintKm2,
+    maxAgeHours: maxAge / 3600,
+    massLeftPct: (massTotal / points.length) * 100,
+    ellipse: { majorM: 2 * Math.sqrt(lambda1), minorM: 2 * Math.sqrt(lambda2), angleRad },
+    tSec,
+  };
+}
+
+/* Compute the convex-hull area in km² for a list of {lon, lat} points using
+   Andrew's monotone chain algorithm. Used to estimate the total area swept by
+   particle trails over the run. */
+function convexHullAreaKm2(points) {
+  if (points.length < 3) return 0;
+  // Project to local-tangent metres around the centroid so polygon area is
+  // reasonably accurate for regional-scale clouds.
+  let cLon = 0;
+  let cLat = 0;
+  for (const p of points) { cLon += p.lon; cLat += p.lat; }
+  cLon /= points.length;
+  cLat /= points.length;
+  const mLat = mPerDegLat(cLat);
+  const mLon = mPerDegLon(cLat);
+  const xy = points.map((p) => [(p.lon - cLon) * mLon, (p.lat - cLat) * mLat]);
+  xy.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower = [];
+  for (const p of xy) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = xy.length - 1; i >= 0; i -= 1) {
+    const p = xy[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+    upper.push(p);
+  }
+  const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+  let area2 = 0;
+  for (let i = 0; i < hull.length; i += 1) {
+    const a = hull[i];
+    const b = hull[(i + 1) % hull.length];
+    area2 += a[0] * b[1] - b[0] * a[1];
+  }
+  return Math.abs(area2) / 2 / 1e6;
+}
+
+/* Trail-swept area: convex hull of every recorded track sample across the
+   ensemble up to the current playback time. */
+function trailSweptAreaKm2(ensemble, tSec) {
+  const pts = [];
+  for (const drifter of ensemble) {
+    for (const sample of drifter.track) {
+      if (sample[2] <= tSec) pts.push({ lon: sample[0], lat: sample[1] });
+    }
+  }
+  return convexHullAreaKm2(pts);
+}
+
+/* Build one snapshot of the ensemble at a requested time by sampling the saved
+   tracks of every particle. */
+function snapshotFromEnsemble(ensemble, tSec) {
+  const points = ensemble.map((drifter) => ({
+    lon: drifter.lon,
+    lat: drifter.lat,
+    ageSec: drifter.age,
+    stranded: drifter.stranded,
+    massFrac: drifter.mass_frac,
+  }));
+  return summarizePoints(points, tSec);
+}
+
+/* Playback cache. This is called constantly while scrubbing/playing, so frames
+   are memoized to avoid repeated whole-ensemble reconstruction work. */
+function getRunFrame(tSec) {
+  if (!activeRun || !activeRun.ensemble.length) {
+    return null;
+  }
+  if (tSec < activeRun.startSec) {
+    return {
+      preRun: true,
+      tSec,
+      points: [],
+      metrics: {
+        total: activeRun.ensemble.length,
+        drifting: activeRun.ensemble.length,
+        stranded: 0,
+        centroidLon: releasePoint ? releasePoint.lon : null,
+        centroidLat: releasePoint ? releasePoint.lat : null,
+        sigmaKm: 0,
+        footprintKm2: 0,
+        maxAgeHours: 0,
+        massLeftPct: 100,
+        ellipse: null,
+        tSec,
+      },
+      trailKm2: 0,
+    };
+  }
+
+  const viewSec = Math.min(tSec, activeRun.endSec);
+  const key = `${Math.round(viewSec)}:${activeRun.ensemble.length}`;
+  if (frameCache && frameCache.key === key) {
+    return frameCache.value;
+  }
+
+  const points = activeRun.ensemble.map((drifter) => sampleTrackPosition(drifter, viewSec));
+  const metrics = summarizePoints(points, viewSec);
+  const trailKm2 = trailSweptAreaKm2(activeRun.ensemble, viewSec);
+  const value = { preRun: false, tSec: viewSec, points, metrics, trailKm2 };
+  frameCache = { key, value };
+  return value;
+}
+
+/* Density is drawn as a soft heat/glow layer so the ensemble reads as a cloud
+   rather than a pile of equally important dots. */
+function drawDensity(ctx, points) {
+  const stride = Math.max(1, Math.ceil(points.length / 900));
+  const radiusPx = points.length > 1200 ? 16 : points.length > 600 ? 22 : 28;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  for (let i = 0; i < points.length; i += stride) {
+    const point = points[i];
+    if (point.stranded) {
+      continue;
+    }
+    const p = map.latLngToContainerPoint([point.lat, point.lon]);
+    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radiusPx);
+    gradient.addColorStop(0, "rgba(0, 229, 255, 0.6)");
+    gradient.addColorStop(0.5, "rgba(0, 229, 255, 0.15)");
+    gradient.addColorStop(1, "rgba(0, 229, 255, 0)");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radiusPx, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* Trajectory tails show where currently visible particles came from. */
+function drawTrails(ctx, tSec) {
+  if (!activeRun) {
+    return;
+  }
+  const stride = Math.max(1, Math.ceil(activeRun.ensemble.length / 700));
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 127, 0, 0.8)";
+  ctx.lineWidth = 1.1;
+  ctx.beginPath();
+
+  for (let i = 0; i < activeRun.ensemble.length; i += stride) {
+    const drifter = activeRun.ensemble[i];
+    const track = drifter.track;
+    if (!track.length || tSec <= drifter.t0) {
+      continue;
+    }
+
+    let started = false;
+    for (let j = 0; j < track.length; j += 1) {
+      const entry = track[j];
+      if (entry[2] > tSec) {
+        const sampled = sampleTrackPosition(drifter, tSec);
+        const sampledPoint = map.latLngToContainerPoint([sampled.lat, sampled.lon]);
+        /* Without an explicit moveTo, lineTo on an unstarted path connects to
+           wherever the previous drifter's trail ended, drawing a stray line
+           across the map. Anchor at the sampled point if the trail hasn't
+           been started yet. */
+        if (!started) {
+          ctx.moveTo(sampledPoint.x, sampledPoint.y);
+          started = true;
+        } else {
+          ctx.lineTo(sampledPoint.x, sampledPoint.y);
+        }
+        break;
+      }
+      
+      // Use pre-calculated pixel coordinates (projectTrails) to save CPU
+      if (entry[3] === undefined) {
+        const p = map.latLngToContainerPoint([entry[1], entry[0]]);
+        entry[3] = p.x; entry[4] = p.y;
+      }
+      
+      if (!started) {
+        ctx.moveTo(entry[3], entry[4]);
+        started = true;
+      } else {
+        ctx.lineTo(entry[3], entry[4]);
+      }
+    }
+  }
+
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* Uncertainty ellipse is a compact visual summary of the cloud orientation and
+   spread, useful when hundreds of particles would otherwise look noisy. */
+function drawUncertaintyEllipse(ctx, metrics) {
+  if (!metrics || !metrics.ellipse || !Number.isFinite(metrics.centroidLat) || !Number.isFinite(metrics.centroidLon)) {
+    return;
+  }
+  const center = map.latLngToContainerPoint([metrics.centroidLat, metrics.centroidLon]);
+  const east = map.latLngToContainerPoint([metrics.centroidLat, metrics.centroidLon + metrics.ellipse.majorM / mPerDegLon(metrics.centroidLat)]);
+  const north = map.latLngToContainerPoint([metrics.centroidLat + metrics.ellipse.minorM / mPerDegLat(metrics.centroidLat), metrics.centroidLon]);
+  ctx.save();
+  ctx.translate(center.x, center.y);
+  ctx.rotate(-metrics.ellipse.angleRad);
+  ctx.strokeStyle = "rgba(0, 170, 231, 0.9)";
+  ctx.fillStyle = "rgba(0, 170, 231, 0.1)";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, Math.abs(east.x - center.x), Math.abs(north.y - center.y), 0, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* Release marker anchors the user spatially once the ensemble has moved away
+   from the original release point. */
+function drawReleaseMarker(ctx) {
+  if (!releasePoint || !overlayState.release) {
+    return;
+  }
+  const p = map.latLngToContainerPoint([releasePoint.lat, releasePoint.lon]);
+  ctx.save();
+  ctx.strokeStyle = "#0081b0";
+  ctx.fillStyle = "rgba(0, 170, 231, 0.1)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(p.x - 10, p.y);
+  ctx.lineTo(p.x + 10, p.y);
+  ctx.moveTo(p.x, p.y - 10);
+  ctx.lineTo(p.x, p.y + 10);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* Master overlay renderer for scenario output. This composites density, tails,
+   uncertainty, active particles, stranded particles, and oil footprint cues. */
+function drawDrift() {
+  if (!fieldLayer) {
+    return;
+  }
+
+  const ctx = fieldLayer.driftCtx();
+  const size = fieldLayer.size();
+  ctx.clearRect(0, 0, size.x, size.y);
+
+  const frame = getRunFrame(tIdxToSec(tIdx));
+  if (frame && !frame.preRun) {
+    if (overlayState.density) {
+      drawDensity(ctx, frame.points);
+    }
+    if (overlayState.trails) {
+      drawTrails(ctx, frame.tSec);
+    }
+    if (overlayState.oilRadius && activeRun.scenario === "oil" && oilSlickModel && releasePoint) {
+      const ageSec = frame.tSec - activeRun.startSec;
+      if (ageSec > 0) {
+        const radiusM = oilSlickModel.radius(ageSec);
+        const center = map.latLngToContainerPoint([releasePoint.lat, releasePoint.lon]);
+        const edge = map.latLngToContainerPoint([releasePoint.lat, releasePoint.lon + radiusM / mPerDegLon(releasePoint.lat)]);
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 127, 0, 0.72)";
+        ctx.lineWidth = 1.4;
+        ctx.setLineDash([8, 5]);
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, Math.abs(edge.x - center.x), 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    if (overlayState.uncertainty) {
+      drawUncertaintyEllipse(ctx, frame.metrics);
+    }
+
+    const radius = frame.points.length > 1800 ? 1.6 : frame.points.length > 900 ? 2 : 2.4;
+    for (const point of frame.points) {
+      const p = map.latLngToContainerPoint([point.lat, point.lon]);
+      ctx.fillStyle = point.stranded ? "rgba(255, 51, 102, 0.9)" : activeRun.scenario === "oil" ? `rgba(0, 18, 32, ${Math.max(0.35, point.massFrac)})` : "rgba(255, 127, 0, 0.94)";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  drawReleaseMarker(ctx);
+}
+
+/* Cache Leaflet spherical mercator projection coordinates onto the track arrays
+   so we don't recalculate 50,000+ Math.sin/Math.log ops per frame during playback.
+   Only needs to be called when the run ends, or when the user zooms/pans. */
+function projectTrails() {
+  if (!activeRun || !activeRun.ensemble) return;
+  for (const drifter of activeRun.ensemble) {
+    if (!drifter.track) continue;
+    for (let j = 0; j < drifter.track.length; j++) {
+      const entry = drifter.track[j];
+      const p = map.latLngToContainerPoint([entry[1], entry[0]]);
+      entry[3] = p.x;
+      entry[4] = p.y;
+    }
+  }
+}
+
+/* Persist a lightweight summary snapshot so results plots/exporters do not
+   need to resample the entire ensemble from scratch later. */
+function recordSnapshot(run, tSec) {
+  const metrics = snapshotFromEnsemble(run.ensemble, tSec);
+  const snapshot = {
+    tSec,
+    drifting: metrics.drifting,
+    stranded: metrics.stranded,
+    sigmaKm: metrics.sigmaKm,
+    centroidLon: metrics.centroidLon,
+    centroidLat: metrics.centroidLat,
+    massLeftPct: metrics.massLeftPct,
+    oilRadiusKm: run.scenario === "oil" && oilSlickModel ? oilSlickModel.radius(tSec - run.startSec) / 1000 : null,
+  };
+  const prev = run.snapshots[run.snapshots.length - 1];
+  /* Strict monotonicity — drop snapshots whose time is at or before the last
+     one. The equality-only check let a stale interval (e.g. from a leaked
+     setInterval after a double-click on Run) push out-of-order rows into
+     the array, which then poisoned every analytics plot that assumes the
+     time axis is monotonically increasing. */
+  if (!prev || snapshot.tSec > prev.tSec) {
+    run.snapshots.push(snapshot);
+  }
+}
+
+/* Read the current scenario form into one canonical parameter object. */
+function collectScenarioParams() {
+  const params = {
+    release_radius_m: numericInputValue(els.relRadius, 100),
+    diffusion_K: numericInputValue(els.diffK, 10),
+    useWind: Boolean(els.useWind.checked && Field.hasWind),
+  };
+  if (activeScenario === "leeway") {
+    params.category = els.leewayCat.value;
+  } else {
+    params.oil_type = els.oilType.value;
+    params.volume_m3 = numericInputValue(els.oilVol, 10);
+  }
+  return params;
+}
+
+/* Read the response-option panel into the compact structure consumed by the
+   oil-budget model and export helpers. */
+function collectResponses() {
+  return {
+    skimming: {
+      active: els.skimActive.checked,
+      startH: Number(els.skimStart.value),
+      endH: Number(els.skimEnd.value),
+      rateM3h: Number(els.skimRate.value),
+      efficiency_pct: Number(els.skimEff.value),
+    },
+    burning: {
+      active: els.burnActive.checked,
+      startH: Number(els.burnStart.value),
+      endH: Number(els.burnEnd.value),
+      efficiency_pct: Number(els.burnEff.value),
+    },
+    dispersant: {
+      active: els.dispActive.checked,
+      startH: Number(els.dispStart.value),
+      endH: Number(els.dispEnd.value),
+      effectiveness_pct: Number(els.dispEff.value),
+    },
+  };
+}
+
+/* Render the stacked oil-budget chart after a completed oil run. */
+/* Canvas-based stacked area chart for the oil budget. Bypasses Plotly's SVG
+   paint issues inside the side panel by drawing directly. */
+function drawOilBudgetCanvas(container, history) {
+  if (!container || !history || !history.length) return;
+  let canvas = container.querySelector("canvas.budget-canvas");
+  if (!canvas) {
+    container.innerHTML = "";
+    canvas = document.createElement("canvas");
+    canvas.className = "budget-canvas";
+    canvas.style.display = "block";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    container.appendChild(canvas);
+  }
+  const rect = container.getBoundingClientRect();
+  const cssW = Math.max(160, rect.width);
+  const cssH = Math.max(160, rect.height || 220);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width = `${cssW}px`;
+  canvas.style.height = `${cssH}px`;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const pad = { l: 38, r: 12, t: 8, b: 28 };
+  const plotW = cssW - pad.l - pad.r;
+  const plotH = cssH - pad.t - pad.b;
+  if (plotW <= 0 || plotH <= 0) return;
+
+  const tMin = history[0].t_h;
+  const tMax = history[history.length - 1].t_h;
+  const tRange = Math.max(1e-6, tMax - tMin);
+  const xOf = (t) => pad.l + ((t - tMin) / tRange) * plotW;
+  const yOf = (p) => pad.t + (1 - p / 100) * plotH;
+
+  /* Grid + axis labels (drawn first so the stack fills paint over them). */
+  ctx.font = "10px Inter, system-ui, sans-serif";
+  ctx.fillStyle = "rgba(220, 235, 245, 0.55)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+  ctx.lineWidth = 1;
+  for (let p = 0; p <= 100; p += 20) {
+    const y = yOf(p);
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(pad.l + plotW, y);
+    ctx.stroke();
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillText(`${p}`, pad.l - 6, y);
+  }
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let i = 0; i <= 4; i += 1) {
+    const t = tMin + ((tMax - tMin) * i) / 4;
+    ctx.fillText(t.toFixed(0), xOf(t), pad.t + plotH + 6);
+  }
+  /* Axis titles. */
+  ctx.save();
+  ctx.translate(10, pad.t + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("% of spill", 0, 0);
+  ctx.restore();
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("Hours", pad.l + plotW / 2, cssH - 6);
+
+  /* Stack-order series — bottom-to-top in the legend's reading order. */
+  const series = [
+    { key: "surface", color: "rgba(255, 127, 0, 0.85)" },
+    { key: "evap",    color: "rgba(255, 160, 64, 0.78)" },
+    { key: "disp",    color: "rgba(0, 170, 231, 0.72)" },
+    { key: "beach",   color: "rgba(0, 129, 176, 0.72)" },
+    { key: "skim",    color: "rgba(0, 255, 204, 0.65)" },
+    { key: "burn",    color: "rgba(0, 18, 32, 0.78)" },
+  ];
+
+  const n = history.length;
+  const cum = new Array(n).fill(0);
+  for (const s of series) {
+    ctx.fillStyle = s.color;
+    ctx.beginPath();
+    for (let i = 0; i < n; i += 1) {
+      const v = Number(history[i][s.key]) || 0;
+      const x = xOf(history[i].t_h);
+      const y = yOf(cum[i] + v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    for (let i = n - 1; i >= 0; i -= 1) {
+      ctx.lineTo(xOf(history[i].t_h), yOf(cum[i]));
+    }
+    ctx.closePath();
+    ctx.fill();
+    for (let i = 0; i < n; i += 1) cum[i] += Number(history[i][s.key]) || 0;
+  }
+
+  /* Plot frame. */
+  ctx.strokeStyle = "rgba(70, 236, 255, 0.18)";
+  ctx.strokeRect(pad.l, pad.t, plotW, plotH);
+}
+
+function renderOilBudgetPlot() {
+  if (!oilBudgetModel || !oilBudgetModel.history.length) {
+    els.oilBudgetCard.style.setProperty("display", "none", "important");
+    els.oilBudgetInsights.innerHTML = "";
+    return;
+  }
+  els.oilBudgetCard.style.removeProperty("display");
+
+  const h = oilBudgetModel.history;
+  /* Plotly's SVG renderer is unreliable inside the side-panel's stacking
+     context (backdrop-filter + nested gradient backgrounds wipe paths from
+     paint). Draw the stacked-area chart directly on a 2-D canvas instead —
+     same data, far simpler, guaranteed to paint. */
+  drawOilBudgetCanvas(els.oilBudgetPlot, h);
+
+  // Summary stats
+  const final = oilBudgetModel.summary();
+  els.oilBudgetSummary.innerHTML = [
+    ["Surface",    formatPercent(final.surface_pct),  "#FF7F00"],
+    ["Evaporated", formatPercent(final.evap_pct),     "#FFA040"],
+    ["Dispersed",  formatPercent(final.disp_pct),     "#00AAE7"],
+    ["Beached",    formatPercent(final.beach_pct),    "#0081b0"],
+    ["Skimmed",    formatPercent(final.skim_pct),     "#00FFCC"],
+    ["Burned",     formatPercent(final.burn_pct),     "#001220"],
+  ].map(([label, value, color]) =>
+    `<div class="budget-stat"><span class="bs-label">${label}</span><span class="bs-value" style="color:${color}">${value}</span></div>`
+  ).join("");
+
+  const responses = collectResponses();
+  const activeResponses = [
+    responses.skimming.active ? `Skimming ${responses.skimming.startH}-${responses.skimming.endH} h` : null,
+    responses.burning.active ? `Burning ${responses.burning.startH}-${responses.burning.endH} h` : null,
+    responses.dispersant.active ? `Dispersant ${responses.dispersant.startH}-${responses.dispersant.endH} h` : null,
+  ].filter(Boolean);
+  els.oilBudgetInsights.innerHTML = [
+    `<span class="insight-pill">Final floating: ${formatPercent(final.surface_pct)}</span>`,
+    `<span class="insight-pill">Beached: ${formatPercent(final.beach_pct)}</span>`,
+    `<span class="insight-pill">Water: ${final.water_pct.toFixed(0)}%</span>`,
+    ...(activeResponses.length ? activeResponses.map((label) => `<span class="insight-pill active">${label}</span>`) : ['<span class="insight-pill muted">No response actions enabled</span>']),
+  ].join("");
+
+  // Emulsion note
+  els.emulsionNote.textContent = final.water_pct > 5
+    ? `Emulsion: ${final.water_pct.toFixed(0)}% water content (mousse). Increases effective volume and reduces burn/skim efficiency.`
+    : "";
+
+  // Show export button
+  els.exportBudgetCsvBtn.style.removeProperty("display");
+}
+
+/* Main simulation entry point.
+ * Important: the browser does not integrate particles in real time during
+ * playback. Instead, pressing Run precomputes the ensemble forward, stores
+ * tracks/snapshots, and then the UI plays back those stored results smoothly.
+ */
+async function runEnsemble() {
+  if (!releasePoint) {
+    setStatus("Click on the sea to set a release point first.");
+    hideRunProgress();
+    return;
+  }
+
+  /* Re-entry guard. A second click while we're still awaiting Field
+     chunk loads would otherwise leak the first setInterval forever
+     (clearInterval() runs against a null/old handle, both runs race on
+     activeRun, and recordSnapshot fires for stale runs). */
+  if (runEnsemble._running) {
+    setStatus("Run is already starting — please wait.");
+    return;
+  }
+  runEnsemble._running = true;
+
+  clearInterval(runTimer);
+  runTimer = null;
+  playing = false;
+  updatePlayButton();
+
+  const startIndex = Math.floor(tIdx);
+  const startSec = tIdxToSec(startIndex);
+  tIdx = startIndex;
+  const requestedDurationHours = numericInputValue(els.durHours, 24);
+  const maxHours = maxRunHoursFrom(startSec);
+  if (maxHours < 1) {
+    setStatus("Move the timeline earlier; there is less than 1 h of forcing data after this start time.");
+    hideRunProgress();
+    runEnsemble._running = false;
+    return;
+  }
+  const durationHours = constrainedDurationHours(startSec, requestedDurationHours, true);
+  const particleCount = numericInputValue(els.nEns, 300);
+  const params = collectScenarioParams();
+  if (durationHours < requestedDurationHours) {
+    setStatus(`Duration capped to ${durationHours} h because the loaded forcing ends at ${Field.times[Field.times.length - 1]} UTC.`);
+  } else {
+    setStatus("Loading current chunks for run...");
+  }
+  try {
+    await Field.ensureTimeRange(startSec, startSec + durationHours * 3600);
+    /* Background-fetch every remaining chunk so post-run scrubbing of the
+       full forcing timeline never hits the network. Fire-and-forget; the
+       in-flight `chunk.promise` map prevents duplicates and the service
+       worker caches the responses for the rest of the session. */
+    if (typeof Field.prefetchAll === "function") Field.prefetchAll();
+  } catch (err) {
+    setStatus(`Could not load current chunks for the run: ${err.message}`);
+    hideRunProgress();
+    runEnsemble._running = false;
+    return;
+  }
+  oilSlickModel = activeScenario === "oil" ? new OilSlick(params.volume_m3 || 10, params.oil_type) : null;
+  activeRun = {
+    scenario: activeScenario,
+    ensemble: [],
+    startSec,
+    endSec: startSec + durationHours * 3600,
+    durationHours,
+    params,
+    presetId: els.scenarioPreset.value,
+    snapshots: [],
+  };
+  resetFrameCache();
+  updateStoryCard();
+
+  const dt = 300;
+  const steps = Math.ceil((durationHours * 3600) / dt);
+  const snapshotEvery = Math.max(1, Math.round(3600 / dt));
+  let done = 0;
+  setStatus(`Running ${particleCount} particles across ${durationHours} h...`);
+  setRunProgress(0, "Preparing simulation", `${particleCount} particles | ${durationHours} h window`);
+
+  /* Release the re-entry guard now that the worker interval is installed.
+     The clearInterval at function entry handles cancellation of an existing
+     run on the next legitimate click. */
+  runEnsemble._running = false;
+
+  if (!window._physicsWorker) {
+    window._physicsWorker = new Worker('js/worker.js');
+    window._physicsWorker.postMessage({ action: 'init', payload: { manifestUrl: Field.manifestUrl } });
+  }
+
+  window._physicsWorker.onmessage = (e) => {
+    const msg = e.data;
+    if (msg.type === 'progress') {
+      const progress = Math.round((msg.done / msg.total) * 100);
+      setStatus(`Simulating ${progress}%...`);
+      setRunProgress(progress, "Running ensemble", `${msg.done} / ${msg.total} integration steps complete`);
+    } else if (msg.type === 'done') {
+      activeRun.ensemble = msg.drifters;
+      projectTrails();
+      
+      const snapshotEvery = Math.max(1, Math.round(3600 / dt));
+      for (let s = 0; s <= steps; s += snapshotEvery) {
+        recordSnapshot(activeRun, startSec + s * dt);
+      }
+      if (steps % snapshotEvery !== 0) {
+        recordSnapshot(activeRun, activeRun.endSec);
+      }
+
+      activeRun.summary = snapshotFromEnsemble(activeRun.ensemble, activeRun.endSec);
+      setStatus(`Done. ${activeRun.summary.drifting} drifting, ${activeRun.summary.stranded} stranded.`);
+      setRunProgress(100, "Simulation complete", `${activeRun.summary.drifting} drifting | ${activeRun.summary.stranded} stranded`);
+
+      /* ── Oil Budget integration ───────────────────────────── */
+      if (activeRun.scenario === "oil") {
+        const responses = collectResponses();
+        const beachSeries = [];
+        const beachSteps = Math.ceil(durationHours) + 1;
+        for (let h = 0; h < beachSteps; h++) {
+          const targetSec = startSec + h * 3600;
+          let best = null;
+          let bestDist = Infinity;
+          for (const s of activeRun.snapshots) {
+            const d = Math.abs(s.tSec - targetSec);
+            if (d < bestDist) { bestDist = d; best = s; }
+          }
+          beachSeries.push(best ? best.stranded / particleCount : 0);
+        }
+        let meanWind = 5;
+        if (Field.hasWind && releasePoint) {
+          let windSum = 0, windN = 0;
+          for (let h = 0; h < Math.min(durationHours, 24); h++) {
+            const w = Field.sampleWind(releasePoint.lon, releasePoint.lat, startSec + h * 3600);
+            if (w) { windSum += Math.hypot(w.u, w.v); windN++; }
+          }
+          if (windN > 0) meanWind = windSum / windN;
+        }
+        const oilKey = params.oil_type || "arabian_medium";
+        const adiosKey = { light_crude: "arabian_light", medium_crude: "arabian_medium", heavy_fuel: "hfo380", diesel: "diesel_mgo", condensate: "condensate" }[oilKey] || oilKey;
+        oilBudgetModel = OilBudget.runFull(
+          params.volume_m3 || 10, adiosKey, responses,
+          durationHours, beachSeries, meanWind
+        );
+        renderOilBudgetPlot();
+      } else {
+        oilBudgetModel = null;
+        els.oilBudgetCard.style.setProperty("display", "none", "important");
+        els.exportBudgetCsvBtn.style.setProperty("display", "none", "important");
+        els.oilBudgetInsights.innerHTML = "";
+      }
+
+      tIdx = secToTIdx(startSec);
+      resetFrameCache();
+      updateTimelinePill();
+      updateResultsPanel(true);
+      renderResultsPlot();
+      updateStoryCard();
+      playing = true;
+      updatePlayButton();
+      setTimeout(hideRunProgress, 2000);
+    } else if (msg.type === 'error') {
+      setStatus(`Worker error: ${msg.error}`);
+      hideRunProgress();
+    }
+  };
+
+  window._physicsWorker.postMessage({
+    action: 'runEnsemble',
+    payload: {
+      lon: releasePoint.lon,
+      lat: releasePoint.lat,
+      tSec: startSec,
+      /* spawnEnsemble in the worker reads `n` from the payload (and also
+         params.n_particles as a fallback). Without one of these the worker
+         silently produces an empty ensemble — "0 drifting | 0 stranded". */
+      n: particleCount,
+      params: { ...params, n_particles: particleCount },
+      scenario: activeScenario,
+      steps,
+      dt,
+      startSec,
+      endSec: startSec + durationHours * 3600
+    }
+  });
+}
+
+/* Reset scenario output while keeping the base field, release controls, and
+   ambient tracer animation alive. */
+function clearRun() {
+  clearInterval(runTimer);
+  runTimer = null;
+  activeRun = null;
+  oilSlickModel = null;
+  oilBudgetModel = null;
+  resetFrameCache();
+  setStatus("");
+  hideRunProgress();
+  updateTimelinePill();
+  updateResultsPanel(true);
+  renderResultsPlot();
+  updateStoryCard();
+  els.oilBudgetCard.style.setProperty("display", "none", "important");
+  els.exportBudgetCsvBtn.style.setProperty("display", "none", "important");
+  els.oilBudgetInsights.innerHTML = "";
+  if (els.oilBudgetPlot) els.oilBudgetPlot.innerHTML = "";
+}
+
+function buildAnalystSummary(metrics, frame) {
+  const strandedPct = metrics.total ? (metrics.stranded / metrics.total) * 100 : 0;
+  const risk = strandedPct >= 25 ? "high" : strandedPct >= 8 ? "elevated" : "low";
+  const ageHours = (frame.tSec - activeRun.startSec) / 3600;
+  const oilPhrase = activeRun.scenario === "oil" && Number.isFinite(metrics.massLeftPct)
+    ? ` Estimated floating mass is ${formatPercent(metrics.massLeftPct)}.`
+    : "";
+  return `At ${formatRunOffset(ageHours)}, shoreline risk is ${risk}: ${metrics.drifting} particles remain drifting, ${metrics.stranded} are stranded, and the cloud spread is ${fmt(metrics.sigmaKm, 2)} km.${oilPhrase}`;
+}
+
+/* Populate the metric cards for the current playback instant. */
+function updateResultsPanel(force) {
+  if (!activeRun) {
+    if (els.areaHud) els.areaHud.style.display = "none";
+    if (els.exportCsvBtn) els.exportCsvBtn.disabled = true;
+    els.results.innerHTML = '<div class="result-card wide empty-state"><span class="result-label">Ready</span><span class="result-value">No active run</span><span class="result-subvalue">Click open water to set a release point, then press <strong>Run</strong>.</span></div>';
+    els.results.dataset.renderedRun = "none";
+    return;
+  }
+  if (els.exportCsvBtn) els.exportCsvBtn.disabled = false;
+
+  const frame = getRunFrame(tIdxToSec(tIdx));
+  if (!frame) {
+    return;
+  }
+  const key = force ? "force" : Math.round(frame.tSec);
+  if (!force && lastResultsKey === key) {
+    return;
+  }
+  lastResultsKey = key;
+
+  const metrics = frame.metrics;
+  if (els.areaHud) {
+    els.areaHud.style.display = "";
+    els.hudFootprint.textContent = `${fmt(metrics.footprintKm2, 2)} km²`;
+    els.hudTrail.textContent = `${fmt(frame.trailKm2 ?? 0, 2)} km²`;
+  }
+
+  const centroidText = Number.isFinite(metrics.centroidLat) && Number.isFinite(metrics.centroidLon)
+    ? `${metrics.centroidLat.toFixed(3)}&nbsp;N, ${metrics.centroidLon.toFixed(3)}&nbsp;E`
+    : "Waiting for playback";
+
+  const runId = activeRun.startSec + "_" + activeRun.scenario;
+  const cards = els.results.querySelectorAll(".result-card");
+  
+  if (els.results.dataset.renderedRun !== runId || cards.length === 0) {
+    const oilCards = activeRun.scenario === "oil" && oilSlickModel ? `
+      <div class="result-card">
+        <span class="result-label">Oil radius</span>
+        <span class="result-value">${fmt(oilSlickModel.radius(Math.max(0, frame.tSec - activeRun.startSec)) / 1000, 2)} km</span>
+        <span class="result-subvalue">Fay gravity-viscous approximation</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Mass left</span>
+        <span class="result-value">${formatPercent(metrics.massLeftPct)}</span>
+        <span class="result-subvalue">Estimated remaining floating mass</span>
+      </div>` : "";
+
+    els.results.innerHTML = `
+      <div class="result-card wide analyst-card">
+        <span class="result-label">Analyst summary</span>
+        <span class="result-value">${activeRun.scenario === "oil" ? "Oil trajectory assessment" : "Search drift assessment"}</span>
+        <span class="result-subvalue">${buildAnalystSummary(metrics, frame)}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Particles</span>
+        <span class="result-value">${metrics.total}</span>
+        <span class="result-subvalue">${metrics.drifting} drifting / ${metrics.stranded} stranded</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Playback age</span>
+        <span class="result-value">${fmt(metrics.maxAgeHours, 1)} h</span>
+        <span class="result-subvalue">${formatRunOffset((frame.tSec - activeRun.startSec) / 3600)} from release</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Spread radius</span>
+        <span class="result-value">${fmt(metrics.sigmaKm, 2)} km</span>
+        <span class="result-subvalue">One-sigma ensemble spread</span>
+      </div>
+      <div class="result-card centroid-card">
+        <span class="result-label">Centroid</span>
+        <span class="result-value">${centroidText}</span>
+        <span class="result-subvalue">Current ensemble center</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Ensemble footprint</span>
+        <span class="result-value">${fmt(metrics.footprintKm2, 2)} km²</span>
+        <span class="result-subvalue">2σ uncertainty ellipse area (95% containment)</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Trail coverage</span>
+        <span class="result-value">${fmt(frame.trailKm2 ?? 0, 2)} km²</span>
+        <span class="result-subvalue">Convex-hull area swept by all particle trails</span>
+      </div>
+      ${oilCards}
+      <div class="result-card wide">
+        <span class="result-label">Interpretation</span>
+        <span class="result-subvalue">${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}</span>
+      </div>`;
+    els.results.dataset.renderedRun = runId;
+  } else {
+    // Diffing purely the values without blowing away the DOM tree
+    cards[0].querySelector(".result-subvalue").innerHTML = buildAnalystSummary(metrics, frame);
+    
+    cards[1].querySelector(".result-value").textContent = metrics.total;
+    cards[1].querySelector(".result-subvalue").textContent = `${metrics.drifting} drifting / ${metrics.stranded} stranded`;
+    
+    cards[2].querySelector(".result-value").textContent = `${fmt(metrics.maxAgeHours, 1)} h`;
+    cards[2].querySelector(".result-subvalue").textContent = `${formatRunOffset((frame.tSec - activeRun.startSec) / 3600)} from release`;
+    
+    cards[3].querySelector(".result-value").textContent = `${fmt(metrics.sigmaKm, 2)} km`;
+    
+    cards[4].querySelector(".result-value").innerHTML = centroidText;
+    
+    cards[5].querySelector(".result-value").textContent = `${fmt(metrics.footprintKm2, 2)} km²`;
+    
+    cards[6].querySelector(".result-value").textContent = `${fmt(frame.trailKm2 ?? 0, 2)} km²`;
+
+    if (activeRun.scenario === "oil" && oilSlickModel) {
+      cards[7].querySelector(".result-value").textContent = `${fmt(oilSlickModel.radius(Math.max(0, frame.tSec - activeRun.startSec)) / 1000, 2)} km`;
+      cards[8].querySelector(".result-value").textContent = formatPercent(metrics.massLeftPct);
+      cards[9].querySelector(".result-subvalue").innerHTML = `${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}`;
+    } else {
+      cards[7].querySelector(".result-subvalue").innerHTML = `${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}`;
+    }
+  }
+}
+
+/* Build the time-series analytics chart from stored snapshots. */
+function renderResultsPlot() {
+  if (!activeRun || !activeRun.snapshots.length) {
+    Plotly.purge(els.tsPlot);
+    return;
+  }
+
+  const snapshots = activeRun.snapshots;
+  const x = snapshots.map((snapshot) => new Date(snapshot.tSec * 1000));
+  const traces = [
+    { x, y: snapshots.map((snapshot) => (snapshot.drifting / activeRun.ensemble.length) * 100), type: "scatter", mode: "lines", name: "Drifting %", line: { color: "#FF7F00", width: 3 }, hovertemplate: "%{y:.0f}% drifting<extra></extra>" },
+    { x, y: snapshots.map((snapshot) => snapshot.sigmaKm), type: "scatter", mode: "lines", name: "Spread (km)", yaxis: "y2", line: { color: "#00AAE7", width: 2.2 }, hovertemplate: "%{y:.2f} km spread<extra></extra>" },
+  ];
+  if (activeRun.scenario === "oil") {
+    traces.push({ x, y: snapshots.map((snapshot) => snapshot.massLeftPct), type: "scatter", mode: "lines", name: "Mass left %", line: { color: "#FF3366", width: 2, dash: "dot" }, hovertemplate: "%{y:.0f}% mass left<extra></extra>" });
+  }
+
+  const markerTime = new Date(clamp(tIdxToSec(tIdx), activeRun.startSec, activeRun.endSec) * 1000);
+  Plotly.newPlot(els.tsPlot, traces, {
+    autosize: true,
+    margin: { l: 44, r: 44, t: 20, b: 36 },
+    paper_bgcolor: "rgba(255,255,255,0)",
+    plot_bgcolor: "rgba(255,255,255,0)",
+    font: { family: "Inter, sans-serif", color: "rgba(220,235,245,0.85)", size: 11 },
+    xaxis: { showgrid: true, gridcolor: "rgba(255,255,255,0.08)", zeroline: false },
+    yaxis: { title: "Drifting / mass (%)", rangemode: "tozero", showgrid: true, gridcolor: "rgba(255,255,255,0.08)", zeroline: false },
+    yaxis2: { title: "Spread (km)", overlaying: "y", side: "right", rangemode: "tozero", showgrid: false, zeroline: false },
+    legend: { orientation: "h", y: 1.12, x: 0 },
+    shapes: [{ type: "line", x0: markerTime, x1: markerTime, y0: 0, y1: 1, yref: "paper", line: { color: "#00AAE7", width: 1, dash: "dot" } }],
+  }, { displayModeBar: false, responsive: true });
+}
+
+/* Move the chart cursor to match the current playback time. */
+function updatePlotCursor(force) {
+  if (!activeRun || !activeRun.snapshots.length) {
+    return;
+  }
+  const currentSec = clamp(tIdxToSec(tIdx), activeRun.startSec, activeRun.endSec);
+  const key = force ? "force" : Math.round(currentSec);
+  if (!force && lastPlotMarkerKey === key) {
+    return;
+  }
+  lastPlotMarkerKey = key;
+  Plotly.relayout(els.tsPlot, {
+    shapes: [{ type: "line", x0: new Date(currentSec * 1000), x1: new Date(currentSec * 1000), y0: 0, y1: 1, yref: "paper", line: { color: "#00AAE7", width: 1, dash: "dot" } }],
+  });
+}
+
+function hslToRgb(h, s, l) {
+  let r;
+  let g;
+  let b;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    const hue2 = (p, q, t) => {
+      let next = t;
+      if (next < 0) next += 1;
+      if (next > 1) next -= 1;
+      if (next < 1 / 6) return p + (q - p) * 6 * next;
+      if (next < 1 / 2) return q;
+      if (next < 2 / 3) return p + (q - p) * (2 / 3 - next) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2(p, q, h + 1 / 3);
+    g = hue2(p, q, h);
+    b = hue2(p, q, h - 1 / 3);
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+/* Small helper for all text-based downloads (JSON, CSV, and generated helper
+   scripts such as the optional PyGNOME handoff). */
+function downloadText(filename, text, mimeType) {
+  const blob = new Blob([text], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* Serialize the current UI state into a shareable query-string model. */
+function buildShareParams() {
+  const params = new URLSearchParams();
+  params.set("scenario", activeScenario);
+  params.set("preset", els.scenarioPreset.value);
+  params.set("dur", els.durHours.value);
+  params.set("nEns", els.nEns.value);
+  params.set("relRadius", els.relRadius.value);
+  params.set("diffK", els.diffK.value);
+  params.set("useWind", els.useWind.checked ? "1" : "0");
+  if (activeScenario === "leeway") {
+    params.set("category", els.leewayCat.value);
+  } else {
+    params.set("oilType", els.oilType.value);
+    params.set("oilVol", els.oilVol.value);
+  }
+  if (releasePoint) {
+    params.set("lat", releasePoint.lat.toFixed(5));
+    params.set("lon", releasePoint.lon.toFixed(5));
+  }
+  return params;
+}
+
+function buildShareUrl() {
+  const url = new URL(window.location.href);
+  url.hash = buildShareParams().toString();
+  return url.toString();
+}
+
+async function copyTextToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    const fallback = document.createElement("textarea");
+    fallback.value = text;
+    document.body.appendChild(fallback);
+    fallback.select();
+    document.execCommand("copy");
+    fallback.remove();
+  }
+}
+
+async function copyShareLink() {
+  await copyTextToClipboard(buildShareUrl());
+  setStatus("Share link copied.");
+}
+
+/* Export the currently active run in machine-readable form for offline
+   analysis or handoff. */
+function exportRunJson() {
+  const payload = {
+    scenario: activeScenario,
+    preset: els.scenarioPreset.value,
+    releasePoint,
+    controls: {
+      durationHours: Number(els.durHours.value),
+      ensembleSize: Number(els.nEns.value),
+      releaseRadiusM: Number(els.relRadius.value),
+      diffusionK: Number(els.diffK.value),
+      useWind: Boolean(els.useWind.checked && Field.hasWind),
+    },
+    data: {
+      meta: Field.meta,
+      sourceKind: dataSourceKind(),
+      activeTimeUtc: Field.times[Math.floor(tIdx)] || null,
+    },
+    run: activeRun ? {
+      startUtc: new Date(activeRun.startSec * 1000).toISOString(),
+      endUtc: new Date(activeRun.endSec * 1000).toISOString(),
+      scenario: activeRun.scenario,
+      snapshots: activeRun.snapshots,
+      summary: activeRun.summary,
+    } : null,
+  };
+  downloadText("hormuz-drift-run.json", JSON.stringify(payload, null, 2), "application/json");
+  setStatus("Exported run JSON.");
+}
+
+/* Export the snapshot time series in spreadsheet-friendly format. */
+function exportRunCsv() {
+  if (!activeRun || !activeRun.snapshots.length) {
+    setStatus("Run a scenario before exporting CSV.");
+    return;
+  }
+  const lines = [
+    "utc,drifting,stranded,sigma_km,centroid_lat,centroid_lon,mass_left_pct,oil_radius_km",
+    ...activeRun.snapshots.map((snapshot) => [
+      new Date(snapshot.tSec * 1000).toISOString(),
+      snapshot.drifting,
+      snapshot.stranded,
+      fmt(snapshot.sigmaKm, 4),
+      fmt(snapshot.centroidLat, 6),
+      fmt(snapshot.centroidLon, 6),
+      snapshot.massLeftPct == null ? "" : fmt(snapshot.massLeftPct, 2),
+      snapshot.oilRadiusKm == null ? "" : fmt(snapshot.oilRadiusKm, 4),
+    ].join(",")),
+  ];
+  downloadText("hormuz-drift-run.csv", lines.join("\n"), "text/csv");
+  setStatus("Exported run CSV.");
+}
+
+/* Oil-specific export for the weathering/budget time history. */
+function exportOilBudgetCsv() {
+  if (!oilBudgetModel || !oilBudgetModel.history.length) {
+    setStatus("Run an oil scenario first.");
+    return;
+  }
+  const lines = [
+    "hours,surface_pct,evaporated_pct,dispersed_pct,beached_pct,skimmed_pct,burned_pct,water_pct",
+    ...oilBudgetModel.history.map((s) => [
+      s.t_h.toFixed(2),
+      s.surface.toFixed(2),
+      s.evap.toFixed(2),
+      s.disp.toFixed(2),
+      s.beach.toFixed(2),
+      s.skim.toFixed(2),
+      s.burn.toFixed(2),
+      s.water_pct.toFixed(2),
+    ].join(",")),
+  ];
+  downloadText("hormuz-oil-budget.csv", lines.join("\n"), "text/csv");
+  setStatus("Exported oil budget CSV.");
+}
+
+/* WebGNOME bridge helpers do not attempt to automate NOAA tooling. They package
+   the active browser scenario into a repeatable PyGNOME starter script and give
+   users a clean route into the official WebGNOME interface. */
+function openWebgnome() {
+  window.open("https://gnome.orr.noaa.gov/#config", "_blank", "noopener");
+  const wgStatus = document.getElementById("wg-status");
+  if (wgStatus) {
+    wgStatus.textContent = "WebGNOME opened in a new tab. Use the setup instructions to load the project currents and match the release point.";
+  }
+}
+
+function buildPygnomeScript() {
+  const lat = releasePoint ? releasePoint.lat.toFixed(5) : "26.45000";
+  const lon = releasePoint ? releasePoint.lon.toFixed(5) : "56.10000";
+  const startIndex = Field.loaded ? clamp(Math.floor(tIdx), 0, Field.times.length - 1) : 0;
+  const startSec = Field.loaded ? tIdxToSec(startIndex) : Field.t0Unix;
+  const durationHours = Field.loaded ? constrainedDurationHours(startSec, Number(els.durHours.value) || 24, true) : (Number(els.durHours.value) || 24);
+  const isOil = activeScenario === "oil";
+  const oilType = els.oilType ? els.oilType.value : "light_crude";
+  const oilVol = els.oilVol ? Number(els.oilVol.value) || 10 : 10;
+  const dataStartUtc = Field.loaded && Field.times.length ? Field.times[startIndex] : "2024-01-01T00:00:00";
+  const scenarioName = isOil ? "Oil spill" : "Man overboard / S&R";
+  const oilBlock = isOil ? `
+# -- Oil spill setup ---------------------------------------------------------
+# Replace the substance name with the closest ADIOS oil if needed.
+substance = gs.get_oil_props("${oilType}")
+spill = gs.surface_point_line_spill(
+    num_elements=1000,
+    start_position=(${lon}, ${lat}, 0.0),
+    release_time=start_time,
+    amount=${oilVol},
+    units="m^3",
+    substance=substance,
+)
+model.spills += spill
+` : `
+# -- Floating object / S&R-style drifter setup -------------------------------
+spill = gs.surface_point_line_spill(
+    num_elements=1000,
+    start_position=(${lon}, ${lat}, 0.0),
+    release_time=start_time,
+)
+model.spills += spill
+`;
+
+  return `#!/usr/bin/env python3
+"""
+pygnome_hormuz.py - PyGNOME starter generated by the Tridel Hormuz web model.
+
+Scenario : ${scenarioName}
+Release  : ${lat} N, ${lon} E
+Duration : ${durationHours} h
+Generated: ${new Date().toISOString()}
+
+Install  : conda install -c noaa-orr-erd gnome
+Run      : python pygnome_hormuz.py
+"""
+
+from datetime import datetime, timedelta
+import pathlib
+
+import gnome.scripting as gs
+from gnome.model import Model
+from gnome.maps import GnomeMap
+from gnome.movers import GridCurrentMover, PointWindMover
+from gnome.environment import Wind
+from gnome.outputters import Renderer, NetCDFOutput
+
+CMEMS_NC = pathlib.Path("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i_1776382234335.nc")
+OUTPUT_DIR = pathlib.Path("webgnome_output")
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+start_time = datetime.fromisoformat("${dataStartUtc}")
+duration = timedelta(hours=${durationHours})
+time_step = timedelta(minutes=15)
+
+model = Model(
+    start_time=start_time,
+    duration=duration,
+    time_step=time_step,
+    map=GnomeMap(),
+    uncertain=True,
+)
+
+if CMEMS_NC.exists():
+    current_mover = GridCurrentMover(
+        current_filename=str(CMEMS_NC),
+        grid_topology={"u_var": "utotal", "v_var": "vtotal"},
+    )
+    model.movers += current_mover
+    print(f"[OK] Loaded CMEMS currents from {CMEMS_NC}")
+else:
+    print(f"[WARN] CMEMS file not found: {CMEMS_NC}")
+    print("       Copy the NetCDF currents file beside this script before running.")
+
+# Replace this constant wind with GOODS/GFS or another wind file for production
+# studies. It is included only so the starter script runs as a complete model.
+wind = Wind(timeseries=[(start_time, (5.0, 45.0))], units="m/s")
+model.movers += PointWindMover(wind)
+${oilBlock}
+model.outputters += Renderer(
+    map_filename=None,
+    output_dir=str(OUTPUT_DIR),
+    image_size=(1200, 800),
+    output_timestep=timedelta(hours=1),
+)
+model.outputters += NetCDFOutput(
+    str(OUTPUT_DIR / "hormuz_trajectory.nc"),
+    which_data="all",
+    output_timestep=timedelta(hours=1),
+)
+
+print("Running PyGNOME model...")
+model.full_run()
+print(f"Done. Outputs in: {OUTPUT_DIR.resolve()}")
+`;
+}
+
+function downloadPygnomeScript() {
+  downloadText("pygnome_hormuz.py", buildPygnomeScript(), "text/x-python");
+  const wgStatus = document.getElementById("wg-status");
+  if (wgStatus) {
+    wgStatus.textContent = releasePoint
+      ? `PyGNOME script generated for ${releasePoint.lat.toFixed(4)} N, ${releasePoint.lon.toFixed(4)} E.`
+      : "PyGNOME script generated with default Hormuz centre coordinates. Click the map first for an exact release point.";
+  }
+}
+
+function buildOpenDriftCaseConfig() {
+  const preset = selectedPreset();
+  const meta = Field.meta || {};
+  const isOil = activeScenario === "oil";
+  const currentIndex = Field.loaded ? clamp(Math.floor(tIdx), 0, Field.times.length - 1) : 0;
+  const startSec = Field.loaded ? tIdxToSec(currentIndex) : Field.t0Unix;
+  const requestedDuration = numericInputValue(els.durHours, 24);
+  const durationHours = Field.loaded ? constrainedDurationHours(startSec, requestedDuration, true) : requestedDuration;
+  return {
+    runner: "scripts/run_opendrift_hormuz.py",
+    purpose: "Run the selected Tridel Hormuz web scenario in real OpenDrift/OpenOil.",
+    scenario: isOil ? "oil" : "leeway",
+    preset: preset ? preset.label : null,
+    release: {
+      lon: releasePoint ? Number(releasePoint.lon.toFixed(6)) : 56.1,
+      lat: releasePoint ? Number(releasePoint.lat.toFixed(6)) : 26.45,
+    },
+    start_time_utc: Field.loaded && Field.times.length ? Field.times[currentIndex] : null,
+    duration_hours: durationHours,
+    particles: Number(els.nEns.value) || 1000,
+    radius_m: Number(els.relRadius.value) || 100,
+    diffusion_k: Number(els.diffK.value) || 10,
+    forcing_json: "data/currents.json",
+    forcing_source: meta.source || "unknown",
+    wind_source: meta.wind_source || null,
+    output_dir: "opendrift_output",
+    oil: isOil ? {
+      oil_type: els.oilType ? els.oilType.value : "medium_crude",
+      volume_m3: els.oilVol ? Number(els.oilVol.value) || 10 : 10,
+      weathering_model: "noaa",
+    } : null,
+    leeway: !isOil ? {
+      category: els.leewayCat ? els.leewayCat.value : "piw_light",
+    } : null,
+    model_options: {
+      vertical_mixing: true,
+      time_step_minutes: 10,
+      output_step_minutes: 60,
+    },
+  };
+}
+
+function buildOpenDriftCommand(config) {
+  const parts = [
+    "python",
+    config.runner,
+    "--scenario", config.scenario,
+    "--lon", String(config.release.lon),
+    "--lat", String(config.release.lat),
+    "--start-time", `"${config.start_time_utc || ""}"`,
+    "--duration-hours", String(config.duration_hours),
+    "--particles", String(config.particles),
+    "--radius-m", String(config.radius_m),
+    "--diffusion-k", String(config.diffusion_k),
+    "--output-dir", config.output_dir,
+  ];
+  if (config.scenario === "oil" && config.oil) {
+    parts.push("--oil-type", config.oil.oil_type);
+    parts.push("--oil-volume-m3", String(config.oil.volume_m3));
+    parts.push("--weathering-model", config.oil.weathering_model);
+  } else if (config.leeway) {
+    parts.push("--category", config.leeway.category);
+  }
+  return parts.join(" ");
+}
+
+function downloadOpenDriftCase() {
+  const config = buildOpenDriftCaseConfig();
+  config.command = buildOpenDriftCommand(config);
+  downloadText("opendrift_hormuz_case.json", JSON.stringify(config, null, 2), "application/json");
+  const wgStatus = document.getElementById("wg-status");
+  if (wgStatus) {
+    wgStatus.textContent = `OpenDrift case downloaded. Run from the repo root: ${config.command}`;
+  }
+}
+
+function buildValidationSummary() {
+  const preset = selectedPreset();
+  const meta = Field.meta || {};
+  const openDriftConfig = buildOpenDriftCaseConfig();
+  const lines = [
+    "Hormuz Drift validation handoff",
+    `Scenario: ${getScenarioLabel(activeScenario)}${preset ? ` / ${preset.label}` : ""}`,
+    `Release: ${releasePoint ? `${releasePoint.lat.toFixed(5)} N, ${releasePoint.lon.toFixed(5)} E` : "not set"}`,
+    `Run duration: ${els.durHours.value} h`,
+    `Ensemble: ${els.nEns.value} particles`,
+    `Current source: ${meta.source || "unknown"}`,
+    `Wind source: ${meta.wind_source || "not embedded"}`,
+    `Data window: ${meta.time_start || "?"} UTC to ${meta.time_end || "?"} UTC`,
+    `Browser time step: ${meta.time_step_sec ? `${meta.time_step_sec / 3600} h` : "unknown"}`,
+    `Source step: ${meta.source_time_step_sec ? `${meta.source_time_step_sec / 3600} h` : "native/unknown"}`,
+    `OpenDrift command: ${buildOpenDriftCommand(openDriftConfig)}`,
+    "Compare in WebGNOME/OpenDrift: release coordinates, start time, current/wind forcing window, trajectory spread, oil budget, and first shoreline contact.",
+  ];
+  if (activeRun?.summary) {
+    lines.push(`Last browser run: ${activeRun.summary.drifting} drifting, ${activeRun.summary.stranded} stranded.`);
+  }
+  return lines.join("\n");
+}
+
+async function copyValidationSummary() {
+  await copyTextToClipboard(buildValidationSummary());
+  const wgStatus = document.getElementById("wg-status");
+  if (wgStatus) {
+    wgStatus.textContent = "Validation summary copied. Paste it beside the WebGNOME/OpenDrift run notes.";
+  }
+}
+
+function showWgModal() {
+  const modal = document.getElementById("webgnome-modal");
+  if (modal) modal.style.display = "flex";
+}
+
+function hideWgModal() {
+  const modal = document.getElementById("webgnome-modal");
+  if (modal) modal.style.display = "none";
+}
+
+function showMapToast(message, containerPoint) {
+  const existing = document.getElementById("map-toast");
+  if (existing) existing.remove();
+  const toast = document.createElement("div");
+  toast.id = "map-toast";
+  toast.className = "map-toast";
+  toast.textContent = message;
+  const mapContainer = map.getContainer();
+  toast.style.left = `${containerPoint.x}px`;
+  toast.style.top = `${containerPoint.y - 12}px`;
+  mapContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 2200);
+}
+
+function updatePlayButton() {
+  els.playBtn.textContent = playing ? "Pause" : "Play";
+}
+
+function syncLayerInputs() {
+  const pairs = [
+    ["currents", els.layerCurrents],
+    ["tracers", els.layerTracers],
+    ["trails", els.layerTrails],
+    ["density", els.layerDensity],
+    ["uncertainty", els.layerUncertainty],
+    ["release", els.layerRelease],
+    ["oilRadius", els.layerOilRadius],
+  ];
+  pairs.forEach(([key, input]) => {
+    if (input) input.checked = overlayState[key];
+  });
+}
+
+function updateScenarioBadges() {
+  const preset = selectedPreset();
+  const scenarioText = `${getScenarioLabel(activeScenario)}${preset ? ` | ${preset.label}` : ""}`;
+  if (els.controlScenario) els.controlScenario.textContent = scenarioText;
+  if (els.summaryScenario) els.summaryScenario.textContent = scenarioText;
+}
+
+/* Keep the release summary card in sync with the current map click. */
+function updateReleaseInfo() {
+  if (!releasePoint) {
+    els.releaseInfo.textContent = "Click on the map to set release point.";
+    if (els.summaryRelease) els.summaryRelease.textContent = "Release pending";
+    els.runBtn.disabled = true;
+    if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = true;
+  if (els.runTopBtn) els.runTopBtn.disabled = true;
+    updatePresetGuide();
+    return;
+  }
+  els.releaseInfo.textContent = `${releasePoint.lat.toFixed(4)} N, ${releasePoint.lon.toFixed(4)} E`;
+  if (els.summaryRelease) els.summaryRelease.textContent = `${releasePoint.lat.toFixed(3)} N, ${releasePoint.lon.toFixed(3)} E`;
+  els.runBtn.disabled = false;
+  if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = false;
+  if (els.runTopBtn) els.runTopBtn.disabled = false;
+  updatePresetGuide();
+}
+
+function formatTimelineUtc(value) {
+  if (!value) return "";
+  if (typeof value === "string") {
+    return value.replace("T", " ").slice(0, 16);
+  }
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  return date.toISOString().slice(0, 16).replace("T", " ");
+}
+
+function updateTimelinePill() {
+  const hasField = Field.loaded && Field.times.length;
+  if (!activeRun) {
+    els.timeWindowLabel.textContent = "Playback follows the forcing timeline.";
+    if (hasField) {
+      const currentIndex = Math.floor(tIdx);
+      const currentSec = tIdxToSec(currentIndex);
+      els.timelineStart.innerHTML = `<span class="meta-kicker">Start</span> ${formatTimelineUtc(Field.times[0])}`;
+      els.timelineEnd.innerHTML = `<span class="meta-kicker">End</span> ${formatTimelineUtc(Field.times[Field.times.length - 1])}`;
+      els.timelineCurrent.textContent = `${formatTimelineUtc(Field.times[currentIndex])} UTC`;
+      if (els.summaryWindow) els.summaryWindow.textContent = `${formatTimelineUtc(Field.times[0])} to ${formatTimelineUtc(Field.times[Field.times.length - 1])}`;
+      if (els.timelinePhase) els.timelinePhase.textContent = timelinePhaseFor(currentSec);
+      els.timelineEvents.innerHTML = "";
+    }
+    return;
+  }
+  const viewSec = clamp(tIdxToSec(tIdx), activeRun.startSec, activeRun.endSec);
+  const offsetHours = (viewSec - activeRun.startSec) / 3600;
+  els.timeWindowLabel.textContent = `Viewing ${formatRunOffset(offsetHours)} of ${activeRun.durationHours} h`;
+  els.timelineStart.innerHTML = `<span class="meta-kicker">Release</span> ${formatTimelineUtc(activeRun.startSec * 1000)}`;
+  els.timelineEnd.innerHTML = `<span class="meta-kicker">End</span> ${formatTimelineUtc(activeRun.endSec * 1000)}`;
+  els.timelineCurrent.textContent = `${formatRunOffset(offsetHours)} | ${formatTimelineUtc(viewSec * 1000)} UTC`;
+  if (els.summaryWindow) els.summaryWindow.textContent = `${activeRun.durationHours} h window`;
+  if (els.timelinePhase) els.timelinePhase.textContent = timelinePhaseFor(viewSec);
+  renderTimelineEvents();
+}
+
+function timelinePct(tSec) {
+  if (!activeRun) return 0;
+  return clamp(((tSec - activeRun.startSec) / Math.max(1, activeRun.endSec - activeRun.startSec)) * 100, 0, 100);
+}
+
+function renderTimelineEvents() {
+  if (!activeRun || !els.timelineEvents) {
+    return;
+  }
+  const markers = [
+    { label: "Release", tSec: activeRun.startSec, type: "release" },
+  ];
+  const firstBeach = activeRun.snapshots.find((snapshot) => snapshot.stranded > 0);
+  if (firstBeach) markers.push({ label: "First stranding", tSec: firstBeach.tSec, type: "risk" });
+  const maxSpread = activeRun.snapshots.reduce((best, snapshot) => snapshot.sigmaKm > (best?.sigmaKm ?? -Infinity) ? snapshot : best, null);
+  if (maxSpread) markers.push({ label: "Max spread", tSec: maxSpread.tSec, type: "spread" });
+  if (activeRun.scenario === "oil") {
+    const responses = collectResponses();
+    if (responses.skimming.active) markers.push({ label: "Skim start", tSec: activeRun.startSec + responses.skimming.startH * 3600, type: "response" });
+    if (responses.burning.active) markers.push({ label: "Burn start", tSec: activeRun.startSec + responses.burning.startH * 3600, type: "response" });
+    if (responses.dispersant.active) markers.push({ label: "Dispersant start", tSec: activeRun.startSec + responses.dispersant.startH * 3600, type: "response" });
+  }
+  els.timelineEvents.innerHTML = markers.map((marker) =>
+    `<span class="timeline-marker ${marker.type}" style="left:${timelinePct(marker.tSec)}%" title="${marker.label}"></span>`
+  ).join("");
+}
+
+/* Populate scenario-specific select boxes from the model lookup tables. */
+function buildLeewayOptions() {
+  els.leewayCat.innerHTML = LEEWAY_CATEGORIES.map((category) => `<option value="${category.id}">${category.label} (dw ${category.dw}% | cw ${category.cw}%)</option>`).join("");
+}
+
+function buildOilOptions() {
+  els.oilType.innerHTML = Object.entries(OIL_TYPES).map(([key, oil]) => `<option value="${key}">${oil.label}</option>`).join("");
+}
+
+function updateOilProperties() {
+  if (!els.oilType || !els.opApi || !els.opRho || !els.opEvap || !els.opEmuls) return;
+
+  const oilKey = els.oilType.value || "medium_crude";
+  const adiosKey = {
+    light_crude: "arabian_light",
+    medium_crude: "arabian_medium",
+    heavy_fuel: "hfo380",
+    diesel: "diesel_mgo",
+    condensate: "condensate",
+  }[oilKey] || oilKey;
+
+  const adiosOil = window.ADIOS_OILS?.[adiosKey];
+  const simpleOil = window.OIL_TYPES?.[oilKey];
+
+  if (adiosOil) {
+    els.opApi.textContent = String(adiosOil.api ?? "—");
+    els.opRho.textContent = Number.isFinite(adiosOil.rho) ? `${adiosOil.rho} kg/m³` : "—";
+    els.opEvap.textContent = Number.isFinite(adiosOil.f_max) ? `${adiosOil.f_max}%` : "—";
+    els.opEmuls.textContent = Number.isFinite(adiosOil.W_max) ? `${Math.round(adiosOil.W_max * 100)}%` : "—";
+
+    const sara = [
+      ["saraS", "saraPctS", adiosOil.saturates],
+      ["saraA", "saraPctA", adiosOil.aromatics],
+      ["saraR", "saraPctR", adiosOil.resins],
+      ["saraAs", "saraPctAs", adiosOil.asphaltenes],
+    ];
+    sara.forEach(([segKey, pctKey, value]) => {
+      const pct = Math.max(0, Math.min(100, (value || 0) * 100));
+      if (els[segKey]) {
+        els[segKey].style.width = `${pct}%`;
+      }
+      const pctEl = document.getElementById({ saraPctS: "sara-pct-S", saraPctA: "sara-pct-A", saraPctR: "sara-pct-R", saraPctAs: "sara-pct-As" }[pctKey]);
+      if (pctEl) {
+        pctEl.textContent = `${Math.round(pct)}%`;
+      }
+    });
+    if (els.opSara) {
+      els.opSara.title = `S ${Math.round((adiosOil.saturates || 0) * 100)}% | A ${Math.round((adiosOil.aromatics || 0) * 100)}% | R ${Math.round((adiosOil.resins || 0) * 100)}% | As ${Math.round((adiosOil.asphaltenes || 0) * 100)}%`;
+    }
+    return;
+  }
+
+  els.opApi.textContent = simpleOil?.label?.match(/API\s*(\d+)/i)?.[1] || "—";
+  els.opRho.textContent = Number.isFinite(simpleOil?.rho) ? `${simpleOil.rho} kg/m³` : "—";
+  els.opEvap.textContent = Number.isFinite(simpleOil?.tau_h) ? `t1/2 ${simpleOil.tau_h} h` : "—";
+  els.opEmuls.textContent = "—";
+  ["saraS", "saraA", "saraR", "saraAs"].forEach((key) => {
+    if (els[key]) {
+      els[key].style.width = "25%";
+    }
+  });
+  ["sara-pct-S", "sara-pct-A", "sara-pct-R", "sara-pct-As"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = "—";
+  });
+  if (els.opSara) {
+    els.opSara.title = "Detailed SARA unavailable for this fallback oil preset.";
+  }
+}
+
+function buildPresetOptions(preferredId) {
+  const presets = SCENARIO_PRESETS[activeScenario];
+  els.scenarioPreset.innerHTML = presets.map((preset) => `<option value="${preset.id}">${preset.label}</option>`).join("");
+  const nextId = preferredId && presets.some((preset) => preset.id === preferredId) ? preferredId : presets[0].id;
+  els.scenarioPreset.value = nextId;
+  renderPresetCards();
+  applyPreset(nextId, false);
+}
+
+function presetDescription(preset) {
+  return `${preset.durHours} h | ${preset.nEns} particles | ${preset.useWind ? "wind on" : "currents only"}`;
+}
+
+function updatePresetGuide() {
+  const preset = selectedPreset();
+  if (!els.presetGuide || !preset) return;
+  const releaseText = releasePoint
+    ? `Release at ${releasePoint.lat.toFixed(4)} N, ${releasePoint.lon.toFixed(4)} E.`
+    : "Click the map to anchor the release before running.";
+  els.presetGuide.innerHTML = `
+    <strong>${preset.label}</strong>
+    <span>${preset.guide || "Use this preset as a fast starting point, then tune duration, diffusion, and ensemble size."}</span>
+    <span>${presetDescription(preset)}. ${releaseText}</span>
+  `;
+}
+
+function renderPresetCards() {
+  if (!els.presetCards) return;
+  const presets = SCENARIO_PRESETS[activeScenario];
+  els.presetCards.innerHTML = presets.map((preset) => `
+    <button type="button" class="preset-card ${preset.id === els.scenarioPreset.value ? "active" : ""}" data-preset="${preset.id}">
+      <span class="preset-label">${preset.label}</span>
+      <span class="preset-meta">${presetDescription(preset)}</span>
+      <span class="preset-meta">${preset.guide}</span>
+    </button>
+  `).join("");
+  els.presetCards.querySelectorAll(".preset-card").forEach((card) => {
+    card.onclick = () => {
+      els.scenarioPreset.value = card.dataset.preset;
+      applyPreset(card.dataset.preset);
+    };
+  });
+}
+
+/* Push a preset's canned values into the live form controls. */
+function applyPreset(presetId, announce = true) {
+  const preset = SCENARIO_PRESETS[activeScenario].find((entry) => entry.id === presetId);
+  if (!preset) {
+    return;
+  }
+  if (preset.category) els.leewayCat.value = preset.category;
+  if (preset.oilType) els.oilType.value = preset.oilType;
+  if (preset.oilVol !== undefined) els.oilVol.value = preset.oilVol;
+  els.relRadius.value = preset.relRadius;
+  els.diffK.value = preset.diffK;
+  els.durHours.value = preset.durHours;
+  els.nEns.value = preset.nEns;
+  els.useWind.checked = Field.hasWind ? preset.useWind : false;
+  if (announce) setStatus(`Preset loaded: ${preset.label}.`);
+  renderPresetCards();
+  updatePresetGuide();
+  updateScenarioBadges();
+  updateOilProperties();
+  updateStoryCard();
+}
+
+/* Switch between S&R and oil modes and show/hide the matching controls. */
+function setScenario(scenario, preservePreset) {
+  activeScenario = scenario;
+  document.querySelectorAll(".scenario-tabs button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.scenario === scenario);
+  });
+  /* style.css has `#side * { display: block !important }`. Plain inline
+     `style.display = "none"` loses to that. Use setProperty with the
+     `important` priority flag so the inline rule wins. */
+  if (scenario === "leeway") {
+    els.leewayParams.style.setProperty("display", "block", "important");
+    els.oilParams.style.setProperty("display", "none", "important");
+  } else {
+    els.leewayParams.style.setProperty("display", "none", "important");
+    els.oilParams.style.setProperty("display", "block", "important");
+  }
+  if (scenario === "leeway") {
+    if (els.oilBudgetCard) els.oilBudgetCard.style.setProperty("display", "none", "important");
+    if (els.exportBudgetCsvBtn) els.exportBudgetCsvBtn.style.setProperty("display", "none", "important");
+    if (els.responseCard) els.responseCard.style.setProperty("display", "none", "important");
+  }
+  buildPresetOptions(preservePreset ? els.scenarioPreset.value : null);
+  updateScenarioBadges();
+  updateOilProperties();
+  updateStoryCard();
+  updateBodyState();
+}
+
+/* Wind controls depend on both dataset availability and scenario mode. */
+function syncWindControls() {
+  if (Field.hasWind) {
+    els.useWind.disabled = false;
+    els.useWind.checked = true;
+    els.windStatus.textContent = "Wind ready";
+    els.windNote.textContent = `Wind loaded: ${Field.meta.wind_source}`;
+  } else {
+    els.useWind.checked = false;
+    els.useWind.disabled = true;
+    els.windStatus.textContent = "No wind in this dataset";
+    els.windNote.textContent = "Current package is currents-only. The daily refresh pipeline can attach GFS wind when available.";
+  }
+}
+
+function updateStoryCard() {
+  const preset = selectedPreset();
+  if (!els.missionSummary || !preset) return;
+  const release = releasePoint
+    ? `${releasePoint.lat.toFixed(4)} N, ${releasePoint.lon.toFixed(4)} E`
+    : "No release point set";
+  const wind = els.useWind?.checked && Field.hasWind ? "wind drift enabled" : "currents only";
+  els.missionSummary.dataset.scenario = activeScenario;
+  const lede = els.missionSummary.querySelector(".lede");
+  if (lede) {
+    lede.textContent = `${preset.label}: ${preset.durHours} h, ${preset.nEns} particles, ${wind}. Release: ${release}.`;
+  }
+  updateScenarioBadges();
+}
+
+/* Restore UI state from the query string so scenarios can be shared. */
+function applyStateFromUrl() {
+  const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
+  if (!hash) {
+    return;
+  }
+  const params = new URLSearchParams(hash);
+  const scenario = params.get("scenario");
+  if (scenario === "leeway" || scenario === "oil") setScenario(scenario, true);
+  const preset = params.get("preset");
+  if (preset) buildPresetOptions(preset);
+  if (params.get("category")) els.leewayCat.value = params.get("category");
+  if (params.get("oilType")) els.oilType.value = params.get("oilType");
+  if (params.get("oilVol")) {
+    els.oilVol.value = params.get("oilVol");
+    numericInputValue(els.oilVol, 10);
+  }
+  [["dur", els.durHours], ["nEns", els.nEns], ["relRadius", els.relRadius], ["diffK", els.diffK]].forEach(([key, element]) => {
+    if (params.get(key)) {
+      element.value = params.get(key);
+      numericInputValue(element, Number(element.defaultValue) || 0);
+    }
+  });
+  if (params.get("useWind") !== null) els.useWind.checked = params.get("useWind") === "1";
+  const lat = Number(params.get("lat"));
+  const lon = Number(params.get("lon"));
+  if (params.has("lat") && params.has("lon") && Number.isFinite(lat) && Number.isFinite(lon)) {
+    releasePoint = { lat, lon };
+    map.panTo([lat, lon]);
+  }
+  updateReleaseInfo();
+  updateStoryCard();
+}
+
+/* Jump the playback head relative to the current time. */
+function seekHours(deltaHours) {
+  let nextSec = tIdxToSec(tIdx) + deltaHours * 3600;
+  if (activeRun) {
+    nextSec = clamp(nextSec, activeRun.startSec, activeRun.endSec);
+  } else if (Field.loaded) {
+    nextSec = clamp(nextSec, Field.t0Unix, maxDataSec());
+  }
+  // Snap jumps onto the chosen time-step grid so consecutive presses don't
+  // drift off the slider tick alignment.
+  const nextIdx = snapToTimelineStep(secToTIdx(nextSec));
+  tIdx = nextIdx;
+  if (els.timeSlider) {
+    els.timeSlider.value = String(Math.floor(tIdx));
+    paintSliderProgress(els.timeSlider);
+  }
+  resetFrameCache();
+  updateTimelinePill();
+  updateResultsPanel(false);
+  updatePlotCursor(true);
+}
+
+function timelineStepToIndexDelta(stepHours = timelineStepHours) {
+  const secondsPerFrame = Field.meta?.time_step_sec || 3600;
+  return Math.max(1, Math.round((stepHours * 3600) / secondsPerFrame));
+}
+
+function snapToTimelineStep(indexValue) {
+  const stepFrames = timelineStepToIndexDelta();
+  const snappedIndex = clamp(Math.round(indexValue / stepFrames) * stepFrames, 0, Field.times.length - 1);
+  if (!activeRun) return snappedIndex;
+  const snappedSec = tIdxToSec(snappedIndex);
+  return secToTIdx(clamp(snappedSec, activeRun.startSec, activeRun.endSec));
+}
+
+function setTimelineStep(stepHours, snapCurrent = true) {
+  if (!Number.isFinite(stepHours) || stepHours <= 0) return;
+  timelineStepHours = stepHours;
+  if (els.timeStepLabel) els.timeStepLabel.textContent = `${stepHours} hr`;
+  document.querySelectorAll(".time-step-option").forEach((button) => {
+    const isActive = Number(button.dataset.stepHours) === stepHours;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  if (els.timeSlider && Field.loaded) {
+    els.timeSlider.step = String(timelineStepToIndexDelta(stepHours));
+    if (snapCurrent) {
+      tIdx = snapToTimelineStep(tIdx);
+      els.timeSlider.value = Math.floor(tIdx);
+      paintSliderProgress(els.timeSlider);
+      resetFrameCache();
+      updateTimelinePill();
+      updateResultsPanel(false);
+      updatePlotCursor(true);
+    }
+  }
+}
+
+let lastTickTime = performance.now();
+/* Main requestAnimationFrame loop.
+ * This does the screen-time work only: advance playback, redraw layers, and
+ * refresh metrics. The expensive physical run itself happens inside runEnsemble.
+ */
+function tick(now) {
+  const dt = Math.max(0, Math.min((now - lastTickTime) / 1000, 0.1));
+  lastTickTime = now;
+
+  if (playing && Field.loaded) {
+    tIdx += playSpeed * dt;
+  }
+
+  if (Field.loaded) {
+    const nT = Field.times.length;
+    if (activeRun) {
+      /* Inside a constrained run we clamp to [startSec, endSec] WITHOUT the
+         modulo wrap. The previous order wrapped first (so reaching endSec
+         folded tIdx back to ~0), then clamped to startSec — producing an
+         infinite endSec↔startSec teleport every frame. */
+      tIdx = secToTIdx(clamp(tIdxToSec(tIdx), activeRun.startSec, activeRun.endSec));
+    } else {
+      /* No active run: loop the full forcing timeline. */
+      tIdx = ((tIdx % nT) + nT) % nT;
+    }
+    
+    const currentIndex = Math.floor(tIdx);
+    const timeChanged = Math.abs(tIdx - (tick._lastTIdx || -1)) > 0.001;
+    tick._lastTIdx = tIdx;
+
+    if (timeChanged) {
+      els.timeSlider.value = currentIndex;
+      paintSliderProgress(els.timeSlider);
+      els.timeLabel.textContent = `${Field.times[currentIndex] || ""} UTC`;
+      drawField();
+      drawDrift();
+      updateTimelinePill();
+      updateResultsPanel(false);
+      updatePlotCursor(false);
+    }
+    
+    // Always step and draw background tracers so they feel "alive" even when paused
+    stepBgParticles(dt);
+    drawBgParticles();
+  }
+
+  requestAnimationFrame(tick);
+}
+
+/* Cache all frequently used DOM nodes once so the rest of the file can work
+   with direct references instead of repeated querySelector lookups. */
+function collectDomRefs() {
+  Object.assign(els, {
+    clearBtn: document.getElementById("clearBtn"),
+    clearTopBtn: document.getElementById("clearTopBtn"),
+    runTopBtn: document.getElementById("runTopBtn"),
+    controlScenario: document.getElementById("controlScenario"),
+    copyLinkBtn: document.getElementById("copyLinkBtn"),
+    copyValidationBtn: document.getElementById("copyValidationBtn"),
+    dataFreshness: document.getElementById("data-freshness"),
+    dataGenerated: document.getElementById("data-generated"),
+    dataGrid: document.getElementById("data-grid"),
+    dataHealth: document.getElementById("data-health"),
+    dataMeta: document.getElementById("data-meta"),
+    dataQualityNote: document.getElementById("data-quality-note"),
+    dataResolution: document.getElementById("data-resolution"),
+    dataSourceChip: document.getElementById("data-source-chip"),
+    dataWindow: document.getElementById("data-window"),
+    diffK: document.getElementById("diffK"),
+    durHours: document.getElementById("durHours"),
+    exportCsvBtn: document.getElementById("exportCsvBtn"),
+    exportJsonBtn: document.getElementById("exportJsonBtn"),
+    exportBudgetCsvBtn: document.getElementById("exportBudgetCsvBtn"),
+    exportMenu: document.getElementById("exportMenu"),
+    expertToggleBtn: document.getElementById("expertToggleBtn"),
+    focusBtn: document.getElementById("focusBtn"),
+    jumpBack24: document.getElementById("jumpBack24"),
+    jumpBack6: document.getElementById("jumpBack6"),
+    jumpForward24: document.getElementById("jumpForward24"),
+    jumpForward6: document.getElementById("jumpForward6"),
+    leewayCat: document.getElementById("leewayCat"),
+    leewayParams: document.getElementById("leeway-params"),
+    hideMapUiBtn: document.getElementById("hideMapUiBtn"),
+    missionSummary: document.getElementById("mission-summary"),
+    mapChipResolution: document.getElementById("map-chip-resolution"),
+    mapChipSource: document.getElementById("map-chip-source"),
+    mapChipChunk: document.getElementById("map-chip-chunk"),
+    nEns: document.getElementById("nEns"),
+    nLabel: document.getElementById("n-label"),
+    nSlider: document.getElementById("nSlider"),
+    layerCurrents: document.getElementById("layerCurrents"),
+    layerDensity: document.getElementById("layerDensity"),
+    layerOilRadius: document.getElementById("layerOilRadius"),
+    layerRelease: document.getElementById("layerRelease"),
+    layerTracers: document.getElementById("layerTracers"),
+    layerTrails: document.getElementById("layerTrails"),
+    layerUncertainty: document.getElementById("layerUncertainty"),
+    oilParams: document.getElementById("oil-params"),
+    opApi: document.getElementById("op-api"),
+    opEmuls: document.getElementById("op-emuls"),
+    opEvap: document.getElementById("op-evap"),
+    opRho: document.getElementById("op-rho"),
+    opSara: document.getElementById("op-sara"),
+    oilType: document.getElementById("oilType"),
+    oilVol: document.getElementById("oilVol"),
+    playBtn: document.getElementById("playBtn"),
+    presetGuide: document.getElementById("preset-guide"),
+    presetCards: document.getElementById("presetCards"),
+    progressDetail: document.getElementById("progress-detail"),
+    progressFill: document.getElementById("progress-fill"),
+    progressLabel: document.getElementById("progress-label"),
+    quickRunRailBtn: document.getElementById("quickRunRailBtn"),
+    relRadius: document.getElementById("relRadius"),
+    releaseInfo: document.getElementById("release-info"),
+    resetMapBtn: document.getElementById("resetMapBtn"),
+    results: document.getElementById("results"),
+    runBtn: document.getElementById("runBtn"),
+    runProgress: document.getElementById("run-progress"),
+    runStatus: document.getElementById("run-status"),
+    scenarioPreset: document.getElementById("scenarioPreset"),
+    saraA: document.getElementById("sara-A"),
+    saraAs: document.getElementById("sara-As"),
+    saraR: document.getElementById("sara-R"),
+    saraS: document.getElementById("sara-S"),
+    speedScaleMax: document.getElementById("speed-scale-max"),
+    speedScaleMid: document.getElementById("speed-scale-mid"),
+    summaryData: document.getElementById("summary-data"),
+    summaryRelease: document.getElementById("summary-release"),
+    summaryScenario: document.getElementById("summary-scenario"),
+    summaryWindow: document.getElementById("summary-window"),
+    showMapUiBtn: document.getElementById("showMapUiBtn"),
+    speedLabel: document.getElementById("speed-label"),
+    speedSlider: document.getElementById("speedSlider"),
+    timeLabel: document.getElementById("time-label"),
+    timelineCurrent: document.getElementById("timeline-current"),
+    timelineEnd: document.getElementById("timeline-end"),
+    timelineEvents: document.getElementById("timeline-events"),
+    timelinePhase: document.getElementById("timeline-phase"),
+    timelineStart: document.getElementById("timeline-start"),
+    timeStepLabel: document.getElementById("timeStepLabel"),
+    timeSlider: document.getElementById("timeSlider"),
+    timeWindowLabel: document.getElementById("time-window-label"),
+    tsPlot: document.getElementById("ts-plot"),
+    useWind: document.getElementById("useWind"),
+    windNote: document.getElementById("wind-note"),
+    windStatus: document.getElementById("windStatus"),
+    // Map HUD
+    areaHud: document.getElementById("areaHud"),
+    hudFootprint: document.getElementById("hudFootprint"),
+    hudTrail: document.getElementById("hudTrail"),
+    // Response options
+    responseCard: document.getElementById("response-card"),
+    skimActive: document.getElementById("skimActive"),
+    skimStart: document.getElementById("skimStart"),
+    skimEnd: document.getElementById("skimEnd"),
+    skimRate: document.getElementById("skimRate"),
+    skimEff: document.getElementById("skimEff"),
+    burnActive: document.getElementById("burnActive"),
+    burnStart: document.getElementById("burnStart"),
+    burnEnd: document.getElementById("burnEnd"),
+    burnEff: document.getElementById("burnEff"),
+    dispActive: document.getElementById("dispActive"),
+    dispStart: document.getElementById("dispStart"),
+    dispEnd: document.getElementById("dispEnd"),
+    dispEff: document.getElementById("dispEff"),
+    // Oil budget
+    oilBudgetCard: document.getElementById("oil-budget-card"),
+    oilBudgetInsights: document.getElementById("oil-budget-insights"),
+    oilBudgetPlot: document.getElementById("oil-budget-plot"),
+    oilBudgetSummary: document.getElementById("oil-budget-summary"),
+    emulsionNote: document.getElementById("emulsion-note"),
+    marineToggleBtn: document.getElementById("marineToggleBtn"),
+    marineOpenLink: document.getElementById("marineOpenLink"),
+    seamarkToggleBtn: document.getElementById("seamarkToggleBtn"),
+    khargSlickBtn: document.getElementById("khargSlickBtn"),
+  });
+}
+
+/* MarineTraffic deep-link / embed helpers. We compose URLs from the current
+   map center + zoom so traffic and the simulation stay in sync. */
+function marineTrafficViewUrl() {
+  const center = map.getCenter();
+  const zoom = Math.max(5, Math.min(13, Math.round(map.getZoom())));
+  return `${MARINE_TRAFFIC_BASE_URL}/centerx:${center.lng.toFixed(3)}/centery:${center.lat.toFixed(3)}/zoom:${zoom}`;
+}
+
+function refreshMarineLinks() {
+  if (els.marineOpenLink) els.marineOpenLink.href = marineTrafficViewUrl();
+  if (els.marineToggleBtn) els.marineToggleBtn.title = `Open MarineTraffic centered at ${map.getCenter().lat.toFixed(3)}, ${map.getCenter().lng.toFixed(3)}`;
+}
+
+/* MarineTraffic live AIS is opened externally because its authenticated map
+   layers are not stable public Leaflet tiles. */
+function openMarineTrafficView() {
+  refreshMarineLinks();
+  window.open(marineTrafficViewUrl(), "_blank", "noopener");
+  setStatus("MarineTraffic live AIS opened in a synced external view.");
+}
+
+/* Toggle the OpenSeaMap seamark overlay (lighthouses, channels, port marks). */
+function toggleSeamarks() {
+  if (!els.seamarkToggleBtn) return;
+  if (map.hasLayer(seamarkLayer)) {
+    map.removeLayer(seamarkLayer);
+    els.seamarkToggleBtn.textContent = "Show seamarks";
+  } else {
+    seamarkLayer.addTo(map);
+    els.seamarkToggleBtn.textContent = "Hide seamarks";
+  }
+}
+
+function updateKhargSlickButton() {
+  if (!els.khargSlickBtn) return;
+  els.khargSlickBtn.textContent = map.hasLayer(khargSlickLayer) ? "Hide Kharg slick" : "Show Kharg slick";
+}
+
+/* Toggle the reported Kharg Island oil-slick context layer. The geometry is an
+   approximate incident marker, not a replacement for source satellite pixels. */
+function toggleKhargSlick() {
+  ensureKhargSlickLayer();
+  if (map.hasLayer(khargSlickLayer)) {
+    map.removeLayer(khargSlickLayer);
+    setStatus("Kharg slick context hidden.");
+  } else {
+    khargSlickLayer.addTo(map);
+    map.fitBounds(khargSlickLayer.getBounds(), { padding: [80, 80], maxZoom: 9 });
+    setStatus("Approximate Kharg slick context shown from the source report.");
+  }
+  updateKhargSlickButton();
+}
+
+function resetMapView() {
+  fitMapToDataDomain();
+  refreshMarineLinks();
+  setStatus("Map view reset to the active data grid.");
+}
+
+/* Attach all event handlers after DOM refs have been collected. */
+function wireUi() {
+  els.timeSlider.oninput = (event) => {
+    tIdx = snapToTimelineStep(Number(event.target.value));
+    event.target.value = Math.floor(tIdx);
+    paintSliderProgress(event.target);
+    resetFrameCache();
+    updateTimelinePill();
+    updateResultsPanel(false);
+    updatePlotCursor(true);
+  };
+
+  /* Prime the cyan progress fill for all three sliders at boot. */
+  [els.timeSlider, els.speedSlider, els.nSlider].forEach(paintSliderProgress);
+
+  document.querySelectorAll(".time-step-option").forEach((button) => {
+    button.onclick = () => setTimelineStep(Number(button.dataset.stepHours));
+  });
+
+  els.speedSlider.oninput = (event) => {
+    playSpeed = Number(event.target.value);
+    els.speedLabel.textContent = `${playSpeed.toFixed(1)}×`;
+    paintSliderProgress(event.target);
+  };
+
+  els.nSlider.oninput = (event) => {
+    nParticles = Number(event.target.value);
+    els.nLabel.textContent = String(nParticles);
+    makeBgParticles(nParticles);
+    paintSliderProgress(event.target);
+  };
+
+  if (els.marineToggleBtn) {
+    els.marineToggleBtn.onclick = openMarineTrafficView;
+  }
+  if (els.seamarkToggleBtn) {
+    els.seamarkToggleBtn.onclick = toggleSeamarks;
+  }
+  if (els.khargSlickBtn) {
+    els.khargSlickBtn.onclick = toggleKhargSlick;
+  }
+  if (els.marineOpenLink) {
+    els.marineOpenLink.addEventListener("click", refreshMarineLinks);
+    refreshMarineLinks();
+  }
+  map.on("moveend zoomend", refreshMarineLinks);
+
+  /* Wheel containment for floating map cards that sit over the canvas.
+     Leaflet attaches the scroll-wheel zoom handler to its own container,
+     but it also listens at the document level for some configurations
+     (especially after Hide UI when the side panel is gone). Without
+     disabling scroll propagation explicitly, hovering the wheel over the
+     legend card would still zoom the map underneath. Leaflet's built-in
+     `L.DomEvent.disableScrollPropagation` is the idiomatic way to do this. */
+  const wheelContainmentTargets = [
+    document.querySelector(".map-legend"),
+    document.querySelector(".results-card"),
+    document.querySelector(".map-status-chips"),
+    document.getElementById("map-toolbar"),
+  ].filter(Boolean);
+  for (const target of wheelContainmentTargets) {
+    L.DomEvent.disableScrollPropagation(target);
+    L.DomEvent.disableClickPropagation(target);
+    /* Also stop native wheel from propagating to the page, so any internal
+       scroll stays inside the card and the rest of the page doesn't move. */
+    target.style.overscrollBehavior = "contain";
+  }
+
+  if (els.hideMapUiBtn) {
+    els.hideMapUiBtn.onclick = () => {
+      mapChromeHidden = !mapChromeHidden;
+      els.hideMapUiBtn.textContent = mapChromeHidden ? "Show UI" : "Hide UI";
+      els.hideMapUiBtn.setAttribute("aria-pressed", String(mapChromeHidden));
+      updateBodyState();
+    };
+  }
+  if (els.showMapUiBtn) {
+    els.showMapUiBtn.onclick = () => {
+      focusMode = false;
+      mapChromeHidden = false;
+      if (els.hideMapUiBtn) {
+        els.hideMapUiBtn.textContent = "Hide UI";
+        els.hideMapUiBtn.setAttribute("aria-pressed", "false");
+      }
+      if (els.focusBtn) {
+        els.focusBtn.textContent = "Focus mode";
+      }
+      updateBodyState();
+    };
+  }
+  if (els.resetMapBtn) {
+    els.resetMapBtn.onclick = resetMapView;
+  }
+  if (els.expertToggleBtn) {
+    els.expertToggleBtn.onclick = () => {
+      expertToolsOpen = !expertToolsOpen;
+      updateBodyState();
+    };
+  }
+
+  els.playBtn.onclick = () => {
+    playing = !playing;
+    updatePlayButton();
+  };
+  if (els.quickRunRailBtn) els.quickRunRailBtn.onclick = runEnsemble;
+  if (els.runTopBtn) els.runTopBtn.onclick = runEnsemble;
+  if (els.clearTopBtn) els.clearTopBtn.onclick = clearRun;
+  els.jumpBack24.onclick = () => seekHours(-24);
+  els.jumpBack6.onclick = () => seekHours(-6);
+  els.jumpForward6.onclick = () => seekHours(6);
+  els.jumpForward24.onclick = () => seekHours(24);
+
+  document.querySelectorAll(".scenario-tabs button").forEach((button) => {
+    button.onclick = () => setScenario(button.dataset.scenario, false);
+  });
+
+  els.scenarioPreset.onchange = () => applyPreset(els.scenarioPreset.value);
+  if (els.oilType) {
+    els.oilType.onchange = () => {
+      updateOilProperties();
+      updateStoryCard();
+    };
+  }
+  els.runBtn.onclick = runEnsemble;
+  els.clearBtn.onclick = clearRun;
+  els.exportJsonBtn.onclick = () => { exportRunJson(); els.exportMenu.open = false; };
+  els.exportBudgetCsvBtn.onclick = () => { exportOilBudgetCsv(); els.exportMenu.open = false; };
+
+  const openWebgnomeBtn = document.getElementById("openWebgnomeBtn");
+  const downloadOpenDriftBtn = document.getElementById("downloadOpenDriftBtn");
+  const downloadPygnomeBtn = document.getElementById("downloadPygnomeBtn");
+  const webgnomeHelpBtn = document.getElementById("webgnomeHelpBtn");
+  const closeWgModal = document.getElementById("closeWgModal");
+  const closeWgModal2 = document.getElementById("closeWgModal2");
+  const webgnomeModal = document.getElementById("webgnome-modal");
+  if (openWebgnomeBtn) openWebgnomeBtn.onclick = openWebgnome;
+  if (downloadOpenDriftBtn) downloadOpenDriftBtn.onclick = downloadOpenDriftCase;
+  if (downloadPygnomeBtn) downloadPygnomeBtn.onclick = downloadPygnomeScript;
+  if (els.copyValidationBtn) els.copyValidationBtn.onclick = copyValidationSummary;
+  if (webgnomeHelpBtn) webgnomeHelpBtn.onclick = showWgModal;
+  if (closeWgModal) closeWgModal.onclick = hideWgModal;
+  if (webgnomeModal) {
+    webgnomeModal.addEventListener("click", (event) => {
+      if (event.target === webgnomeModal) hideWgModal();
+    });
+  }
+
+  // Response tab switching
+  document.querySelectorAll(".resp-tab").forEach((tab) => {
+    tab.onclick = () => {
+      document.querySelectorAll(".resp-tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelectorAll(".resp-panel").forEach((p) => p.style.setProperty("display", "none", "important"));
+      const target = document.getElementById(`resp-${tab.dataset.resp}`);
+      if (target) target.style.removeProperty("display");
+    };
+  });
+  els.exportCsvBtn.onclick = () => { exportRunCsv(); els.exportMenu.open = false; };
+  els.copyLinkBtn.onclick = () => { copyShareLink(); els.exportMenu.open = false; };
+
+  document.addEventListener("click", (event) => {
+    if (els.exportMenu && els.exportMenu.open && !els.exportMenu.contains(event.target)) {
+      els.exportMenu.open = false;
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.code === "Space" && event.target === document.body) {
+      event.preventDefault();
+      playing = !playing;
+      updatePlayButton();
+    }
+  });
+
+  const bindLayer = (key, inputs) => {
+    inputs.filter(Boolean).forEach((input) => {
+      input.onchange = () => {
+        overlayState[key] = input.checked;
+        syncLayerInputs();
+        drawField();
+        drawBgParticles();
+        drawDrift();
+        updateResultsPanel(true);
+      };
+    });
+  };
+  bindLayer("currents", [els.layerCurrents]);
+  bindLayer("tracers", [els.layerTracers]);
+  bindLayer("trails", [els.layerTrails]);
+  bindLayer("density", [els.layerDensity]);
+  bindLayer("uncertainty", [els.layerUncertainty]);
+  bindLayer("release", [els.layerRelease]);
+  bindLayer("oilRadius", [els.layerOilRadius]);
+  els.useWind.onchange = updateStoryCard;
+
+  if (els.focusBtn) els.focusBtn.onclick = () => {
+    focusMode = !focusMode;
+    els.focusBtn.textContent = focusMode ? "Exit focus" : "Focus mode";
+    updateBodyState();
+  };
+
+}
+
+/* One-time startup orchestration for map, data, controls, legend, and the
+   initial background animation. */
+/* Wrap every direct child of #side inside a .side-scroll container so the
+   inner element handles scrolling and the outer #side stays overflow:hidden
+   (whose border-radius cleanly clips anything inside — including the
+   scrollbar buttons Chrome on Windows insists on painting). */
+function wrapSidePanelForScroll() {
+  const side = document.getElementById("side");
+  if (!side || side.querySelector(":scope > .side-scroll")) return;
+  const wrap = document.createElement("div");
+  wrap.className = "side-scroll";
+  while (side.firstChild) wrap.appendChild(side.firstChild);
+  side.appendChild(wrap);
+}
+
+async function boot() {
+  collectDomRefs();
+  wrapSidePanelForScroll();
+  wireUi();
+  /* Register the chunk-caching service worker; ignore failures (some browsers
+     block sw on insecure contexts and Safari Private Mode). */
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+  updateBodyState();
+  updatePlayButton();
+
+  try {
+    await Field.load();
+  } catch (err) {
+    showStartupError(`Failed to load currents data: ${err.message}`);
+    return;
+  }
+
+  /* Boot-time background warm-up: kick off the rest of the dataset chunks in
+     parallel so the user can scrub anywhere without hitting the network.
+     Fired during browser idle to avoid contending with paint/layout. */
+  if (typeof Field.prefetchAll === "function") {
+    const warm = () => Field.prefetchAll();
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(warm, { timeout: 2000 });
+    } else {
+      setTimeout(warm, 800);
+    }
+  }
+
+  fieldLayer = new DualCanvasLayer().addTo(map);
+  fitMapToDataDomain();
+  makeBgParticles(nParticles);
+  drawField();
+  buildLeewayOptions();
+  buildOilOptions();
+  buildPresetOptions();
+  setScenario("leeway", true);
+  updateOilProperties();
+  syncWindControls();
+  updateDataQualityPanel();
+  syncLayerInputs();
+
+  els.timeSlider.max = Field.times.length - 1;
+  paintSliderProgress(els.timeSlider);
+  setTimelineStep(timelineStepHours, false);
+  els.dataMeta.textContent = `${Field.meta.source} | ${Field.times[0]} to ${Field.times[Field.times.length - 1]} UTC | ${Field.times.length} hourly frames`;
+
+  /* Auto-set a default release point at the centre of the data grid so the
+     run buttons are immediately usable without requiring a map click first. */
+  if (!releasePoint) {
+    const g = Field.grid;
+    const midLat = (g.latMin + g.latMax) / 2;
+    const midLon = (g.lonMin + g.lonMax) / 2;
+    /* Guard against Field still being half-initialized — without these
+       step sizes the spiral search would just probe the same midpoint
+       cell repeatedly and silently leave releasePoint unset. Fall back
+       to absolute step magnitudes so this still works when the grid
+       axes are descending and dlat/dlon are negative. */
+    const stepLon = Math.abs(g.dlon) || 0.05;
+    const stepLat = Math.abs(g.dlat) || 0.05;
+    if (Number.isFinite(midLat) && Number.isFinite(midLon)) {
+      outer: for (let r = 0; r <= 10; r++) {
+        for (let di = -r; di <= r; di++) {
+          for (let dj = -r; dj <= r; dj++) {
+            if (Math.abs(di) !== r && Math.abs(dj) !== r) continue;
+            const tryLon = midLon + di * stepLon;
+            const tryLat = midLat + dj * stepLat;
+            if (!Field.isLand(tryLon, tryLat)) {
+              releasePoint = { lat: tryLat, lon: tryLon };
+              break outer;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* Ensure optional context layers are off and buttons show correct initial state. */
+  if (map.hasLayer(seamarkLayer)) {
+    map.removeLayer(seamarkLayer);
+    if (els.seamarkToggleBtn) els.seamarkToggleBtn.textContent = "Show seamarks";
+  }
+  if (map.hasLayer(khargSlickLayer)) {
+    map.removeLayer(khargSlickLayer);
+  }
+  updateKhargSlickButton();
+
+  updateReleaseInfo();
+  updateStoryCard();
+  applyStateFromUrl();
+
+  map.on("click", (event) => {
+    if (Field.isLand(event.latlng.lng, event.latlng.lat)) {
+      showMapToast("On land — click open water to set a release point.", event.containerPoint);
+      return;
+    }
+    releasePoint = { lat: event.latlng.lat, lon: event.latlng.lng };
+    updateReleaseInfo();
+    updateStoryCard();
+    setStatus("Release point set.");
+  });
+
+  requestAnimationFrame(tick);
+}
+
+boot();
