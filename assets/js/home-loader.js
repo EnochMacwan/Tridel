@@ -22,11 +22,10 @@ window.renderHomeCards = function(container) {
 
     container.innerHTML = '';
 
-    data.forEach((card, index) => {
+    data.forEach(card => {
         const cardLink = document.createElement('a');
-        cardLink.className = 'grid-card-wrapper reveal-child';
+        cardLink.className = 'grid-card-wrapper';
         cardLink.href = esc(card.link || '#');
-        cardLink.style.setProperty('--item-index', index);
 
         cardLink.innerHTML = `
             <div class="grid-card-visual">
