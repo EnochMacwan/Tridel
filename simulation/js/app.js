@@ -77,6 +77,14 @@ const WIDE_GULF_CONTEXT_BOUNDS = {
   north: 31.05,
   east: 60.35,
 };
+const TRIDEL_DUBAI_OFFICE = {
+  lat: 25.28934,
+  lon: 55.40345,
+  name: "Tridel Technologies - Dubai",
+  address: "QD01, DAFZA Industrial Park, Al Qusais Industrial Area 5, Dubai, UAE",
+  phone: "+971 4 288 4395",
+  website: "https://www.trideltechnologies.com/",
+};
 
 const map = L.map("map", {
   zoomControl: false,
@@ -147,6 +155,54 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
   subdomains: "abcd",
 }).addTo(map);
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+const landmarksPane = map.createPane("landmarks");
+landmarksPane.style.zIndex = "720";
+
+function addTridelDubaiMarker() {
+  const icon = L.divIcon({
+    className: "tridel-office-marker",
+    html: `
+      <div class="tridel-office-marker__drop" aria-hidden="true">
+        <span class="tridel-office-marker__logo">
+          <img src="assets/tridel.png" alt="" />
+        </span>
+        <span class="tridel-office-marker__point"></span>
+      </div>
+    `,
+    iconSize: [58, 70],
+    iconAnchor: [29, 66],
+    popupAnchor: [0, -62],
+    tooltipAnchor: [0, -58],
+  });
+
+  const popupHtml = `
+    <div class="tridel-office-popup">
+      <strong>${TRIDEL_DUBAI_OFFICE.name}</strong>
+      <span>${TRIDEL_DUBAI_OFFICE.address}</span>
+      <span>${TRIDEL_DUBAI_OFFICE.phone}</span>
+      <a href="${TRIDEL_DUBAI_OFFICE.website}" target="_blank" rel="noopener">Open Tridel website</a>
+    </div>
+  `;
+
+  const marker = L.marker([TRIDEL_DUBAI_OFFICE.lat, TRIDEL_DUBAI_OFFICE.lon], {
+    icon,
+    pane: "landmarks",
+    title: TRIDEL_DUBAI_OFFICE.name,
+    alt: TRIDEL_DUBAI_OFFICE.name,
+    keyboard: true,
+    zIndexOffset: 1200,
+  })
+    .addTo(map)
+    .bindTooltip("Tridel Dubai", { direction: "top", offset: [0, -52], opacity: 0.96 })
+    .bindPopup(popupHtml);
+  const markerElement = marker.getElement();
+  if (markerElement) {
+    markerElement.setAttribute("role", "button");
+    markerElement.setAttribute("aria-label", `${TRIDEL_DUBAI_OFFICE.name}, ${TRIDEL_DUBAI_OFFICE.address}`);
+  }
+}
+addTridelDubaiMarker();
 
 /* MarineTraffic does not expose a reliable public Leaflet tile endpoint for
    live AIS density here, so the app opens a synced external MarineTraffic view

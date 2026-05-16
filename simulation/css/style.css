@@ -2492,6 +2492,90 @@ canvas.overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
 
 .leaflet-popup-tip { background: rgba(255, 255, 255, 0.96); color: var(--text); }
 
+.tridel-office-marker {
+  background: transparent;
+  border: 0;
+}
+
+.tridel-office-marker__drop {
+  position: relative;
+  width: 58px;
+  height: 70px;
+  transform: translateZ(0);
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.45));
+}
+
+.tridel-office-marker__drop::before {
+  content: "";
+  position: absolute;
+  inset: 4px 5px 17px;
+  border-radius: 50% 50% 50% 12px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(218, 244, 255, 0.86)),
+    var(--ink);
+  border: 2px solid rgba(0, 229, 255, 0.9);
+  box-shadow:
+    0 0 0 5px rgba(0, 229, 255, 0.16),
+    0 0 22px rgba(0, 229, 255, 0.38);
+  transform: rotate(-45deg);
+}
+
+.tridel-office-marker__logo {
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.tridel-office-marker__logo img {
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+
+.tridel-office-marker__point {
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #00e5ff;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 8px rgba(0, 229, 255, 0.13);
+}
+
+.tridel-office-popup {
+  display: grid;
+  gap: 6px;
+  min-width: 230px;
+  color: #062033;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.tridel-office-popup strong {
+  color: #001220;
+  font-size: 15px;
+}
+
+.tridel-office-popup span {
+  display: block;
+}
+
+.tridel-office-popup a {
+  color: #0081b0;
+  font-weight: 800;
+}
+
 .incident-popup {
   display: grid;
   gap: 6px;
