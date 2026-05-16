@@ -47,9 +47,12 @@
             '</div>' +
           '</div>';
       }
+      var classes = 'header__nav-link';
+      if (link.customClass) classes += ' ' + esc(link.customClass);
+      var targetAttr = link.external ? ' target="_blank" rel="noopener"' : '';
       navItems +=
         '<li>' +
-          '<a class="header__nav-link" href="' + esc(link.href) + '">' +
+          '<a class="' + classes + '" href="' + esc(link.href) + '"' + targetAttr + '>' +
             esc(link.label) + chevron +
           '</a>' +
           megaMenu +
