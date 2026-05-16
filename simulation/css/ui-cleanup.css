@@ -1,0 +1,2176 @@
+/*
+  Final UI cleanup layer.
+  Keep this file as the single source for the current Tridel map layout so the
+  older experimental rules in style.css do not keep fighting new UI fixes.
+*/
+
+:root {
+  --ui-cyan: #23f8ff;
+  --ui-blue: #12aee7;
+  --ui-amber: #ffbe56;
+  --ui-ink: #03111f;
+  --ui-glass: rgba(5, 18, 27, 0.54);
+  --ui-glass-strong: rgba(4, 18, 33, 0.72);
+  --ui-line: rgba(70, 236, 255, 0.32);
+  --ui-text: rgba(244, 250, 255, 0.94);
+  --ui-muted: rgba(218, 232, 244, 0.68);
+  --ui-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
+  --ui-glass-card:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035) 46%, rgba(0, 38, 58, 0.28)),
+    var(--ui-glass);
+}
+
+body:not(.compact-reference-ui) #app {
+  grid-template-columns: minmax(760px, 1fr) 420px !important;
+}
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) .current-scenario-card {
+  border: 1px solid var(--ui-line) !important;
+  background: var(--ui-glass-card) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    var(--ui-shadow) !important;
+  backdrop-filter: blur(28px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+}
+
+body:not(.compact-reference-ui) #banner {
+  left: 32px !important;
+  top: 18px !important;
+  width: 500px !important;
+  max-width: calc(100vw - 520px) !important;
+  padding: 16px 22px 18px !important;
+  border-radius: 24px !important;
+  gap: 14px !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-lockup {
+  gap: 16px !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-logo {
+  width: 76px !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-name {
+  color: #ffffff !important;
+  font-size: 36px !important;
+  letter-spacing: .18em !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy {
+  gap: 6px !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy b {
+  color: #ffffff !important;
+  font-size: 22px !important;
+  line-height: 1.08 !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy span {
+  color: var(--ui-muted) !important;
+  font-size: 12px !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy a {
+  width: fit-content !important;
+  padding: 9px 16px !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--ui-cyan), var(--ui-blue)) !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo {
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+}
+
+body:not(.compact-reference-ui) #side {
+  top: 18px !important;
+  right: 22px !important;
+  bottom: 18px !important;
+  width: 410px !important;
+  max-height: calc(100vh - 36px) !important;
+  /* Layout moved to the inner .side-scroll wrapper (see style.css EOF).
+     #side is now a non-scrolling rounded clip container so its
+     border-radius eats any native scrollbar arrow buttons Chrome on
+     Windows insists on painting. */
+  display: block !important;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  border-radius: 24px !important;
+  color: var(--ui-text) !important;
+  scrollbar-color: rgba(35, 248, 255, 0.75) rgba(255, 255, 255, 0.08) !important;
+  background-attachment: local, local, scroll, scroll !important;
+  background-image:
+    linear-gradient(var(--ui-glass-strong) 30%, transparent),
+    linear-gradient(transparent, var(--ui-glass-strong) 70%),
+    linear-gradient(rgba(35, 248, 255, 0.18), transparent 60%),
+    linear-gradient(transparent 40%, rgba(35, 248, 255, 0.10)) !important;
+  background-size: 100% 28px, 100% 28px, 100% 28px, 100% 28px !important;
+  background-repeat: no-repeat !important;
+  background-position: top, bottom, top, bottom !important;
+}
+
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card {
+  position: relative !important;
+  top: auto !important;
+  margin: 0 0 10px !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+}
+
+body:not(.compact-reference-ui) #side .side-header {
+  order: 10 !important;
+}
+
+body:not(.compact-reference-ui) #side .current-scenario-card {
+  order: 20 !important;
+}
+
+body:not(.compact-reference-ui) #side .side-header h2 {
+  color: #ffffff !important;
+  font-size: 17px !important;
+  letter-spacing: .18em !important;
+}
+
+body:not(.compact-reference-ui) #side .dim,
+body:not(.compact-reference-ui) #side .hint {
+  color: var(--ui-muted) !important;
+}
+
+body:not(.compact-reference-ui) .summary-kicker,
+body:not(.compact-reference-ui) .panel-section-label {
+  color: var(--ui-cyan) !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: .22em !important;
+  text-transform: uppercase !important;
+}
+
+body:not(.compact-reference-ui) .current-scenario-card strong {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+}
+
+body:not(.compact-reference-ui) #side .summary-chip-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+body:not(.compact-reference-ui) #side .summary-chip-row span {
+  display: inline-flex !important;
+}
+
+body:not(.compact-reference-ui) .summary-chip-row span,
+body:not(.compact-reference-ui) #side .tag {
+  border: 1px solid rgba(93, 181, 222, 0.22) !important;
+  color: rgba(230, 242, 250, 0.78) !important;
+  background: rgba(0, 16, 30, 0.46) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-playback {
+  order: 30 !important;
+}
+
+body:not(.compact-reference-ui) #side #controls {
+  order: 40 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-run-setup {
+  order: 50 !important;
+}
+
+body:not(.compact-reference-ui) #side .scenario-card {
+  order: 60 !important;
+}
+
+body:not(.compact-reference-ui) #side .release-physics-card {
+  order: 70 !important;
+}
+
+body:not(.compact-reference-ui) #side .playback-tuning-card {
+  /* Promoted: sits right under #controls so Speed + Tracers are reachable
+     without scrolling past mission/data-quality/etc. */
+  order: 45 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-visual {
+  order: 90 !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card {
+  order: 100 !important;
+}
+
+body:not(.compact-reference-ui) #side .data-quality-card {
+  order: 110 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-mission {
+  order: 130 !important;
+}
+
+body:not(.compact-reference-ui) #side .intro-card {
+  order: 140 !important;
+}
+
+body:not(.compact-reference-ui) #side .tridel-area-card {
+  order: 150 !important;
+}
+
+body:not(.compact-reference-ui) #side .marinetraffic-card {
+  order: 160 !important;
+}
+
+body:not(.compact-reference-ui) #side #response-card {
+  order: 170 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-run-outputs {
+  order: 180 !important;
+}
+
+body:not(.compact-reference-ui) #side .run-share-card {
+  order: 190 !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-budget-card {
+  order: 200 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-validate {
+  order: 210 !important;
+}
+
+body:not(.compact-reference-ui) #side .webgnome-card {
+  order: 220 !important;
+}
+
+body:not(.compact-reference-ui) #side .data-provenance-card {
+  order: 230 !important;
+}
+
+/* Forces every flex-item child of the panel to fixed sizing so the cards
+   stack without growing/shrinking when the scroll wrapper is tall.
+   Tightly scoped to the direct children of .side-scroll only — narrower
+   than the original `#side *` which broke inner flex/grid layouts in
+   range inputs, SARA cells, tuning rows. */
+body:not(.compact-reference-ui) #side > .side-scroll > * {
+  flex: 0 0 auto !important;
+}
+
+body:not(.compact-reference-ui) #side .caveat-card {
+  order: 240 !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal-overlay {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(35, 248, 255, 0.12), transparent 30%),
+    rgba(1, 10, 20, 0.72) !important;
+  backdrop-filter: blur(12px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal {
+  color: rgba(236, 248, 255, 0.92) !important;
+  background:
+    radial-gradient(circle at 92% 6%, rgba(35, 248, 255, 0.18), transparent 34%),
+    linear-gradient(155deg, rgba(9, 26, 37, 0.98), rgba(6, 18, 31, 0.96)) !important;
+  border: 1px solid rgba(35, 248, 255, 0.26) !important;
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal-head,
+body:not(.compact-reference-ui) .wg-modal-foot {
+  border-color: rgba(35, 248, 255, 0.16) !important;
+  background: rgba(3, 16, 28, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal-head h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) .wg-step {
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, rgba(24, 54, 78, 0.58), rgba(10, 31, 54, 0.48)) !important;
+  border: 1px solid rgba(93, 181, 222, 0.20) !important;
+}
+
+body:not(.compact-reference-ui) .wg-step strong,
+body:not(.compact-reference-ui) .wg-tip strong {
+  color: #ffffff !important;
+}
+
+body:not(.compact-reference-ui) .wg-step p,
+body:not(.compact-reference-ui) .wg-tip {
+  color: rgba(222, 239, 248, 0.82) !important;
+}
+
+body:not(.compact-reference-ui) .wg-code {
+  color: #23f8ff !important;
+  background: rgba(35, 248, 255, 0.10) !important;
+  border: 1px solid rgba(35, 248, 255, 0.24) !important;
+}
+
+body:not(.compact-reference-ui) .wg-tip {
+  background: linear-gradient(135deg, rgba(9, 63, 86, 0.76), rgba(8, 35, 56, 0.72)) !important;
+  border: 1px solid rgba(35, 248, 255, 0.24) !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal .ghost,
+body:not(.compact-reference-ui) .wg-modal .wg-link {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+  background: rgba(4, 18, 33, 0.68) !important;
+}
+
+body:not(.compact-reference-ui) .wg-modal .wg-link {
+  color: #23f8ff !important;
+}
+
+body:not(.compact-reference-ui) #side .label-results,
+body:not(.compact-reference-ui) #side .results-card {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) .panel-section-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 12px 2px 7px !important;
+}
+
+body:not(.compact-reference-ui) #side .label-run-setup {
+  margin-top: 2px !important;
+}
+
+body:not(.compact-reference-ui) .panel-section-label::after {
+  content: "" !important;
+  flex: 1 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(35, 248, 255, 0.32), transparent) !important;
+}
+
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #side .section-card {
+  margin: 0 0 10px !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+}
+
+body:not(.compact-reference-ui) #controls {
+  display: grid !important;
+  grid-auto-rows: max-content !important;
+  gap: 10px !important;
+  height: auto !important;
+  min-height: max-content !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin-bottom: 18px !important;
+}
+
+body:not(.compact-reference-ui) #controls > *:not(.timeline-shell) {
+  position: static !important;
+}
+
+body:not(.compact-reference-ui) #controls .controls-top {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+}
+
+body:not(.compact-reference-ui) #controls .control-cluster {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  min-height: max-content !important;
+}
+
+body:not(.compact-reference-ui) #controls #playBtn,
+body:not(.compact-reference-ui) #controls #quickRunRailBtn,
+body:not(.compact-reference-ui) #controls #focusBtn {
+  min-height: 38px !important;
+  padding: 9px 12px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+body:not(.compact-reference-ui) #controls #controlScenario {
+  display: inline-flex !important;
+  min-height: 38px !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+}
+
+body:not(.compact-reference-ui) #controls #time-window-label,
+body:not(.compact-reference-ui) #controls #timeline-phase {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-head {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 8px !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+}
+
+body:not(.compact-reference-ui) #controls #time-label {
+  display: block !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+body:not(.compact-reference-ui) #controls #time-label::before,
+body:not(.compact-reference-ui) #controls #time-label::after {
+  content: none !important;
+}
+
+body:not(.compact-reference-ui) #controls .time-step-control {
+  display: grid !important;
+  gap: 7px !important;
+  padding: 6px 0 0 !important;
+  min-height: max-content !important;
+}
+
+body:not(.compact-reference-ui) #controls .time-step-options {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 5px !important;
+}
+
+body:not(.compact-reference-ui) #controls .time-step-option {
+  min-width: 0 !important;
+  min-height: 30px !important;
+  padding: 7px 4px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta {
+  display: grid !important;
+  grid-template-columns: minmax(72px, .8fr) minmax(0, 1.3fr) minmax(72px, .8fr) !important;
+  gap: 8px !important;
+  min-height: max-content !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta .control-cluster {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta button {
+  min-height: 28px !important;
+  padding: 5px 4px !important;
+  font-size: 10px !important;
+}
+
+body:not(.compact-reference-ui) #controls #data-meta {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
+body:not(.compact-reference-ui) #side .scenario-card .scenario-tabs {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 7px !important;
+}
+
+body:not(.compact-reference-ui) #side .preset-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+body:not(.compact-reference-ui) #side .preset-card {
+  min-height: 0 !important;
+  padding: 9px !important;
+  border-radius: 14px !important;
+}
+
+body:not(.compact-reference-ui) #side .preset-card strong {
+  font-size: 12px !important;
+}
+
+body:not(.compact-reference-ui) #side .preset-card span,
+body:not(.compact-reference-ui) #side .preset-guide,
+body:not(.compact-reference-ui) #side .term-card span {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
+body:not(.compact-reference-ui) #side .term-grid,
+body:not(.compact-reference-ui) #side .quality-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .quality-grid > div {
+  padding: 8px !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card .toggle-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill,
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill:nth-child(n+5) {
+  min-height: 50px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+  gap: 5px !important;
+  padding: 8px 6px !important;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+  font-size: 10px !important;
+  text-align: center !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill input[type="checkbox"] {
+  width: 40px !important;
+  height: 18px !important;
+  min-height: 18px !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card .hint {
+  margin-top: 8px !important;
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props.oil-props-strip {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  overflow: visible !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .op-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 9px 12px !important;
+  overflow: visible !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .op-label {
+  flex: 0 0 82px !important;
+  min-width: 82px !important;
+  margin: 0 !important;
+  color: rgba(226, 240, 248, 0.86) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .op-cell > span:last-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .sara-cell {
+  display: grid !important;
+  grid-template-columns: 82px minmax(0, 1fr) !important;
+  align-items: center !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .sara-bar {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 12px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  box-shadow: inset 0 0 0 1px rgba(134, 201, 226, 0.18) !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-props .sara-seg {
+  display: block !important;
+  height: 100% !important;
+  min-width: 0 !important;
+}
+
+body:not(.compact-reference-ui) #side #sara-S {
+  background: #68d7ff !important;
+}
+
+body:not(.compact-reference-ui) #side #sara-A {
+  background: #ffa84a !important;
+}
+
+body:not(.compact-reference-ui) #side #sara-R {
+  background: #8de0b3 !important;
+}
+
+body:not(.compact-reference-ui) #side #sara-As {
+  background: #f06292 !important;
+}
+
+/* ── Oil-budget card — restore flex/grid layouts killed by #side * rule ──── */
+body:not(.compact-reference-ui) #side .budget-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+}
+
+body:not(.compact-reference-ui) #side .budget-legend {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+body:not(.compact-reference-ui) #side .budget-summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body:not(.compact-reference-ui) #side .budget-insights {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+body:not(.compact-reference-ui) #side .label-visual,
+body:not(.compact-reference-ui) #side .visual-overlay-card,
+body:not(.compact-reference-ui) #side .visual-overlay-card h3 {
+  padding-left: 4px !important;
+}
+
+body:not(.compact-reference-ui) .map-status-chips {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only {
+  top: auto !important;
+  bottom: 28px !important;
+  /* Park well clear of the side panel so the E label is fully visible. */
+  right: calc(420px + 80px) !important;
+  left: auto !important;
+  width: 110px !important;
+  height: 110px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only::before {
+  content: none !important;
+}
+
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only .direction-compass {
+  width: 132px !important;
+  height: 132px !important;
+  border-color: rgba(255, 255, 255, 0.74) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only .direction-disc {
+  width: 78px !important;
+  height: 78px !important;
+}
+
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only .direction-label {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  text-shadow: 0 2px 9px rgba(0, 0, 0, 0.88) !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card {
+  left: 42px !important;
+  bottom: 34px !important;
+  width: 360px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card h3,
+body:not(.compact-reference-ui) #map-shell > .results-card #ts-plot,
+body:not(.compact-reference-ui) #map-shell > .results-card .result-subvalue {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card #results {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.86fr) minmax(190px, 1.14fr) !important;
+  gap: 12px 24px !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card .result-card {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card .result-label {
+  color: var(--ui-cyan) !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: .18em !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.86) !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card .result-value {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.92), 0 0 18px rgba(0, 18, 32, 0.72) !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card .centroid-card {
+  min-width: 190px !important;
+}
+
+body:not(.compact-reference-ui) #map-shell > .results-card .centroid-card .result-value {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  font-size: 17px !important;
+  letter-spacing: -0.02em !important;
+}
+
+#map.greenpeace-reference-map .leaflet-tile-pane .leaflet-tile {
+  filter: grayscale(0.34) brightness(1.72) contrast(0.76) saturate(0.46) !important;
+}
+
+#map.greenpeace-reference-map::after {
+  background:
+    radial-gradient(circle at 52% 42%, transparent 0%, transparent 52%, rgba(0, 0, 0, 0.06) 100%),
+    linear-gradient(90deg, rgba(0, 15, 30, 0.06), transparent 24%, transparent 76%, rgba(0, 15, 30, 0.06)) !important;
+}
+
+#map.greenpeace-reference-map .leaflet-labels-pane .leaflet-tile {
+  filter: brightness(1.18) contrast(1.12) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85)) !important;
+  opacity: 1 !important;
+}
+
+body.focus-mode #banner,
+body.focus-mode #side,
+body.focus-mode .reference-current-legend,
+body.focus-mode .map-status-chips,
+body.focus-mode #map-shell > .results-card,
+body.focus-mode .area-hud,
+body.focus-mode .leaflet-control-scale {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.focus-mode #showMapUiBtn,
+body.map-chrome-hidden #showMapUiBtn {
+  display: inline-flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+body:not(.compact-reference-ui) .map-ui-show-btn,
+body:not(.compact-reference-ui) .map-ui-hide-btn {
+  border-color: rgba(35, 248, 255, 0.36) !important;
+  background: rgba(4, 18, 33, 0.72) !important;
+  color: #ffffff !important;
+}
+
+/* UX pass: keep the first screen operational, then let expert-only material
+   expand on demand instead of crowding the run workflow. */
+body:not(.compact-reference-ui) #side .label-playback {
+  order: 30 !important;
+}
+
+body:not(.compact-reference-ui) #side #controls {
+  order: 40 !important;
+}
+
+body:not(.compact-reference-ui) #side .scenario-card {
+  order: 50 !important;
+}
+
+body:not(.compact-reference-ui) #side .run-share-card {
+  order: 60 !important;
+}
+
+body:not(.compact-reference-ui) #side .expert-toggle-btn {
+  order: 70 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 40px !important;
+  margin: 0 0 10px !important;
+  border: 1px solid rgba(35, 248, 255, 0.30) !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: rgba(4, 18, 33, 0.64) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+body:not(.compact-reference-ui) #side .expert-toggle-btn::after {
+  content: " ▾" !important;
+  color: var(--ui-cyan) !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open #side .expert-toggle-btn::after {
+  content: " ▴" !important;
+}
+
+body:not(.compact-reference-ui) #side .release-physics-card,
+body:not(.compact-reference-ui) #side .visual-overlay-card,
+body:not(.compact-reference-ui) #side .data-quality-card,
+body:not(.compact-reference-ui) #side .intro-card,
+body:not(.compact-reference-ui) #side .marinetraffic-card,
+body:not(.compact-reference-ui) #side #response-card,
+body:not(.compact-reference-ui) #side .webgnome-card,
+body:not(.compact-reference-ui) #side .data-provenance-card,
+body:not(.compact-reference-ui) #side .caveat-card,
+body:not(.compact-reference-ui) #side .label-mission,
+body:not(.compact-reference-ui) #side .label-run-outputs {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open #side .release-physics-card,
+body:not(.compact-reference-ui).expert-tools-open #side .playback-tuning-card,
+body:not(.compact-reference-ui).expert-tools-open #side .visual-overlay-card,
+body:not(.compact-reference-ui).expert-tools-open #side .data-quality-card,
+body:not(.compact-reference-ui).expert-tools-open #side .intro-card,
+body:not(.compact-reference-ui).expert-tools-open #side .tridel-area-card,
+body:not(.compact-reference-ui).expert-tools-open #side .marinetraffic-card,
+body:not(.compact-reference-ui).expert-tools-open #side .webgnome-card,
+body:not(.compact-reference-ui).expert-tools-open #side .data-provenance-card,
+body:not(.compact-reference-ui).expert-tools-open #side .caveat-card,
+body:not(.compact-reference-ui).expert-tools-open #side .label-mission,
+body:not(.compact-reference-ui).expert-tools-open #side .label-run-outputs {
+  display: block !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open #side .label-run-outputs,
+body:not(.compact-reference-ui).expert-tools-open #side .label-mission {
+  display: flex !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open.oil-scenario #side #response-card {
+  display: block !important;
+}
+
+body:not(.compact-reference-ui) #side .release-physics-card {
+  order: 80 !important;
+}
+
+body:not(.compact-reference-ui) #side .playback-tuning-card {
+  /* Promoted: positioned right after #controls. */
+  order: 45 !important;
+}
+
+body:not(.compact-reference-ui) #side .visual-overlay-card {
+  order: 100 !important;
+}
+
+body:not(.compact-reference-ui) #side .data-quality-card {
+  order: 110 !important;
+}
+
+body:not(.compact-reference-ui) #side .label-mission {
+  order: 120 !important;
+}
+
+body:not(.compact-reference-ui) #side .intro-card {
+  order: 130 !important;
+}
+
+body:not(.compact-reference-ui) #side .tridel-area-card {
+  /* Promoted: sits right after Playback + tuning so the "recreate this map
+     for your area" CTA is visible without scrolling. */
+  order: 47 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+body:not(.compact-reference-ui) #side .marinetraffic-card {
+  order: 150 !important;
+}
+
+body:not(.compact-reference-ui) #side #response-card {
+  order: 160 !important;
+}
+
+body:not(.compact-reference-ui) #side #oil-budget-card {
+  order: 170 !important;
+}
+
+body:not(.compact-reference-ui) #side .webgnome-card {
+  order: 180 !important;
+}
+
+body:not(.compact-reference-ui) #side .data-provenance-card {
+  order: 190 !important;
+}
+
+body:not(.compact-reference-ui) #side .caveat-card {
+  order: 200 !important;
+}
+
+body:not(.compact-reference-ui) .map-reset-btn {
+  position: absolute !important;
+  left: 42px !important;
+  top: 78px !important;
+  z-index: 1020 !important;
+  min-height: 34px !important;
+  padding: 8px 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: rgba(4, 18, 33, 0.70) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24) !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+body:not(.compact-reference-ui) .map-reset-btn:hover {
+  border-color: rgba(35, 248, 255, 0.48) !important;
+  color: var(--ui-cyan) !important;
+}
+
+body:not(.compact-reference-ui) #map-chip-chunk.loading {
+  color: #03111f !important;
+  background: linear-gradient(135deg, var(--ui-cyan), var(--ui-amber)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .release-physics-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .visual-overlay-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .data-quality-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .intro-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .marinetraffic-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side #response-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .webgnome-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .data-provenance-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .caveat-card,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .label-mission,
+body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .label-run-outputs {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open #app #side .release-physics-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .playback-tuning-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .visual-overlay-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .data-quality-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .intro-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .tridel-area-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .marinetraffic-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .webgnome-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .data-provenance-card,
+body:not(.compact-reference-ui).expert-tools-open #app #side .caveat-card {
+  display: block !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open #app #side .label-mission,
+body:not(.compact-reference-ui).expert-tools-open #app #side .label-run-outputs {
+  display: flex !important;
+}
+
+body:not(.compact-reference-ui).expert-tools-open.oil-scenario #app #side #response-card {
+  display: block !important;
+}
+
+.map-toast {
+  position: absolute;
+  z-index: 2000;
+  transform: translate(-50%, -100%);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(4, 18, 33, 0.88);
+  border: 1px solid rgba(255, 51, 102, 0.55);
+  color: #ff6688;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: map-toast-in 0.18s ease, map-toast-out 0.3s ease 1.9s forwards;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+@keyframes map-toast-in {
+  from { opacity: 0; transform: translate(-50%, -80%); }
+  to   { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+@keyframes map-toast-out {
+  to { opacity: 0; transform: translate(-50%, -110%); }
+}
+
+@media (max-width: 1320px) {
+  body:not(.compact-reference-ui) #banner {
+    width: 390px !important;
+  }
+
+  body:not(.compact-reference-ui) #banner .brand-name {
+    font-size: 30px !important;
+  }
+
+  body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only {
+    right: 500px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Re-applied UI cleanup — banner shrink, paired logos, top-row controls,
+   hide-UI behavior, run progress states, empty state, label/font fixes.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+body:not(.compact-reference-ui) #banner {
+  left: 32px !important;
+  top: 18px !important;
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: 280px !important;
+  padding: 10px 14px !important;
+  border-radius: 18px !important;
+  gap: 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-lockup {
+  display: inline-flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-lockup:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Tridel = primary brand. Large logo + wordmark side-by-side. */
+body:not(.compact-reference-ui) #banner .brand-logo {
+  width: 64px !important;
+  height: 64px !important;
+  object-fit: contain !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-wordmark {
+  display: inline-block !important;
+  color: #ffffff !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+  line-height: 1 !important;
+}
+
+/* Austides = partner credit. Eyebrow + smaller logo, clearly secondary. */
+body:not(.compact-reference-ui) #banner .brand-partner-row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 3px !important;
+  margin-top: 2px !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-partner-kicker {
+  font-size: 9px !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: rgba(218, 232, 244, 0.55) !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 48px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  text-decoration: none !important;
+  transition: transform 0.15s ease, opacity 0.15s ease !important;
+  opacity: 0.95 !important;
+}
+
+/* Restore grid/flex layouts broken by the global `#side * { display: block !important }` rule.
+   The rule at style.css:3805 forces every #side descendant to block, which collapses
+   flex rows (wg-feat) and grid containers (webgnome-feature-list, action-grid, toggle-grid).
+   We re-apply the original display values here with !important to win the specificity race. */
+body:not(.compact-reference-ui) #side .webgnome-feature-list {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .wg-feat {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 9px !important;
+}
+
+body:not(.compact-reference-ui) #side .action-grid,
+body:not(.compact-reference-ui) #side .webgnome-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .toggle-grid {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+body:not(.compact-reference-ui) #side .validation-checklist {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+body:not(.compact-reference-ui) #side .caveat-list,
+body:not(.compact-reference-ui) #side .roadmap-list {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .map-polish-note {
+  display: grid !important;
+  gap: 4px !important;
+}
+
+/* Flex containers */
+body:not(.compact-reference-ui) #side .side-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+body:not(.compact-reference-ui) #side .webgnome-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+body:not(.compact-reference-ui) #side .section-heading-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+body:not(.compact-reference-ui) #side .budget-insights {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .insight-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Grid containers */
+body:not(.compact-reference-ui) #side .quality-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+body:not(.compact-reference-ui) #side .tridel-area-card {
+  display: grid !important;
+  gap: 5px !important;
+}
+
+body:not(.compact-reference-ui) #side .color-wheel-card {
+  display: grid !important;
+  grid-template-columns: 116px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+body:not(.compact-reference-ui) #side .budget-summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .quick-stats {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+/* Restore flex on .row containers (flex is killed by the global #side * block rule).
+   Also covers <a> anchors styled as ghost buttons which must be inline-flex, not block. */
+body:not(.compact-reference-ui) #side .row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+body:not(.compact-reference-ui) #side a.ghost,
+body:not(.compact-reference-ui) #side a.primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+
+/* POWERED BY badge — re-skin from light to dark to match the side panel theme */
+body:not(.compact-reference-ui) #side .opendrift-attribution {
+  display: inline-flex !important;
+  align-items: center !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(35, 248, 255, 0.18) !important;
+  box-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side .opendrift-attribution span {
+  color: rgba(213, 237, 252, 0.55) !important;
+}
+
+body:not(.compact-reference-ui) #side .opendrift-attribution img {
+  display: block !important;
+  height: 32px !important;
+  width: auto !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo-inline:hover {
+  transform: translateY(-1px) !important;
+  opacity: 1 !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo-inline img {
+  height: 44px !important;
+  width: auto !important;
+  display: block !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy {
+  gap: 4px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy b {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-copy a[href="README.md"] {
+  margin-top: 4px !important;
+  padding: 6px 14px !important;
+  font-size: 11px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(35, 248, 255, 0.35) !important;
+  color: var(--ui-cyan) !important;
+  background: rgba(35, 248, 255, 0.07) !important;
+  text-decoration: none !important;
+}
+
+/* Hide UI button — fixed anchor between map and side panel. */
+body:not(.compact-reference-ui) .map-ui-hide-btn {
+  position: fixed !important;
+  top: 22px !important;
+  right: calc(420px + 24px) !important;
+  z-index: 1100 !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  min-height: 34px !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  border: 1px solid rgba(35, 248, 255, 0.36) !important;
+  background: rgba(4, 18, 33, 0.72) !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+}
+
+/* Reset View — outside #map-shell, painted above banner. */
+body:not(.compact-reference-ui) .map-reset-btn {
+  position: absolute !important;
+  left: 32px !important;
+  top: 210px !important;
+  z-index: 1020 !important;
+  min-height: 34px !important;
+  padding: 8px 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: rgba(4, 18, 33, 0.70) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24) !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+body:not(.compact-reference-ui) .map-reset-btn:hover {
+  border-color: rgba(35, 248, 255, 0.48) !important;
+  color: var(--ui-cyan) !important;
+}
+
+/* Top controls row */
+body:not(.compact-reference-ui) #runTopBtn.primary {
+  min-height: 34px !important;
+  padding: 6px 18px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+body:not(.compact-reference-ui) #runTopBtn.primary:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.4) !important;
+}
+
+body:not(.compact-reference-ui) #playBtn.ghost,
+body:not(.compact-reference-ui) #clearTopBtn.clear-ghost {
+  min-height: 34px !important;
+}
+
+body:not(.compact-reference-ui) #clearTopBtn.clear-ghost {
+  padding: 6px 14px !important;
+  color: rgba(255, 138, 138, 0.92) !important;
+  border-color: rgba(255, 138, 138, 0.32) !important;
+  background: rgba(255, 138, 138, 0.06) !important;
+}
+
+body:not(.compact-reference-ui) #clearTopBtn.clear-ghost:hover {
+  color: #ff9d9d !important;
+  border-color: rgba(255, 138, 138, 0.55) !important;
+  background: rgba(255, 138, 138, 0.12) !important;
+}
+
+body:not(.compact-reference-ui) .tag.tag-muted {
+  background: transparent !important;
+  border-color: rgba(70, 236, 255, 0.18) !important;
+  color: rgba(218, 232, 244, 0.55) !important;
+}
+
+body:not(.compact-reference-ui) .tag.tag-muted:empty {
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) #time-window-label.tag {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: rgba(218, 232, 244, 0.50) !important;
+}
+
+body:not(.compact-reference-ui) #time-label {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  font-family: "JetBrains Mono", "Fira Mono", "Consolas", monospace !important;
+  letter-spacing: 0.02em !important;
+}
+
+body:not(.compact-reference-ui) .controls-top {
+  align-items: center !important;
+  margin-bottom: 8px !important;
+}
+
+body:not(.compact-reference-ui) .controls-top .control-cluster {
+  gap: 8px !important;
+}
+
+/* Run-progress — dark glass + green "done" state via data-done attr. */
+body:not(.compact-reference-ui) .run-progress {
+  background:
+    radial-gradient(circle at top right, rgba(0, 170, 231, 0.10), transparent 40%),
+    rgba(6, 22, 36, 0.72) !important;
+  border: 1px solid rgba(70, 236, 255, 0.20) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+body:not(.compact-reference-ui) .progress-copy {
+  color: rgba(244, 250, 255, 0.90) !important;
+}
+
+body:not(.compact-reference-ui) .progress-copy span {
+  color: rgba(200, 220, 240, 0.65) !important;
+}
+
+body:not(.compact-reference-ui) .progress-track {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+body:not(.compact-reference-ui) #run-progress[data-done="true"] #progress-fill {
+  background: linear-gradient(90deg, #00e5a0, #00c48c) !important;
+  box-shadow: 0 0 10px rgba(0, 229, 160, 0.45) !important;
+}
+
+body:not(.compact-reference-ui) #run-progress[data-done="true"] #progress-label {
+  color: #00e5a0 !important;
+}
+
+/* Empty-state card */
+body:not(.compact-reference-ui) .result-card.empty-state {
+  border: 1px dashed rgba(70, 236, 255, 0.28) !important;
+  background: rgba(8, 22, 36, 0.45) !important;
+  text-align: center !important;
+  padding: 18px 14px !important;
+}
+
+body:not(.compact-reference-ui) .result-card.empty-state .result-label {
+  color: var(--ui-cyan) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.22em !important;
+  text-transform: uppercase !important;
+}
+
+body:not(.compact-reference-ui) .result-card.empty-state .result-value {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  margin: 4px 0 6px !important;
+}
+
+body:not(.compact-reference-ui) .result-card.empty-state .result-subvalue {
+  font-size: 12px !important;
+  color: rgba(218, 232, 244, 0.72) !important;
+  line-height: 1.45 !important;
+}
+
+body:not(.compact-reference-ui) .result-card.empty-state strong {
+  color: var(--ui-cyan) !important;
+  font-weight: 700 !important;
+}
+
+/* Hide UI extended — also hide side panel + reset button.
+   The hue-wheel legend (.map-legend) is intentionally NOT in this list so
+   the N/E/S/W compass + surface-currents key stay visible as a permanent
+   legend the user can still hover/scroll over while the chrome is hidden. */
+body:not(.compact-reference-ui).map-chrome-hidden #side,
+body:not(.compact-reference-ui).map-chrome-hidden .map-reset-btn {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body:not(.compact-reference-ui).map-chrome-hidden #app {
+  grid-template-columns: 1fr !important;
+}
+
+body:not(.compact-reference-ui).map-chrome-hidden .results-card {
+  z-index: 1050 !important;
+}
+
+/* scenarioPreset min-width so it doesn't collapse */
+body:not(.compact-reference-ui) #scenarioPreset {
+  min-width: 160px !important;
+  width: 100% !important;
+}
+
+/* ── Map toolbar — true viewport-center pill at the top ─────────────────── */
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
+  position: fixed !important;
+  top: 22px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  right: auto !important;
+  z-index: 1100 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(35, 248, 255, 0.36) !important;
+  background: rgba(4, 18, 33, 0.78) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28) !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn {
+  appearance: none !important;
+  border: none !important;
+  background: transparent !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  min-height: 28px !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn:hover {
+  background: rgba(35, 248, 255, 0.12) !important;
+  color: var(--ui-cyan) !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn[aria-pressed="true"] {
+  background: rgba(35, 248, 255, 0.18) !important;
+  color: var(--ui-cyan) !important;
+}
+
+/* When chrome is hidden, the toolbar stays — it holds the only way back. */
+body:not(.compact-reference-ui).map-chrome-hidden #map-toolbar {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Color wheel — slide to bottom-right of the now-full viewport. */
+body:not(.compact-reference-ui).map-chrome-hidden .reference-current-legend.hue-wheel-only {
+  right: 32px !important;
+}
+
+/* style.css hides every `.reference-current-legend` when chrome is hidden,
+   which also wipes out the N/E/S/W compass that lives inside the persistent
+   `.map-legend` card. Restore visibility for that nested instance so the
+   hue wheel + cardinal labels stay readable in Hide UI mode. */
+body:not(.compact-reference-ui).map-chrome-hidden .map-legend .reference-current-legend,
+body:not(.compact-reference-ui).map-chrome-hidden .map-legend .direction-compass,
+body:not(.compact-reference-ui).map-chrome-hidden .map-legend .direction-disc {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+/* Cardinal labels: restore visibility/opacity ONLY — do NOT reset transform,
+   because each .direction-label-{n,e,s,w} relies on its own translateX/Y(-50%)
+   to center on the cardinal point. A blanket `transform: none` would offset
+   N and S to the right by half their width, breaking the compass alignment. */
+body:not(.compact-reference-ui).map-chrome-hidden .map-legend .direction-label {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Old standalone reset/show buttons no longer exist — disable any leftover
+   absolute-positioned rules so they don't paint phantom elements. */
+body:not(.compact-reference-ui) .map-reset-btn,
+body:not(.compact-reference-ui) .map-ui-show-btn,
+body:not(.compact-reference-ui) .map-ui-hide-btn:not(.map-toolbar-btn) {
+  display: none !important;
+}
+
+/* ── Playback card — Run / Play / Clear as a 2-column grid ──────────────── */
+body:not(.compact-reference-ui) .controls-top .control-cluster {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+/* RUN spans both columns — primary CTA gets the visual weight. */
+body:not(.compact-reference-ui) .controls-top .control-cluster #runTopBtn {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-height: 38px !important;
+  padding: 8px 18px !important;
+  font-size: 13px !important;
+}
+
+body:not(.compact-reference-ui) .controls-top .control-cluster #playBtn,
+body:not(.compact-reference-ui) .controls-top .control-cluster #clearTopBtn {
+  width: 100% !important;
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+}
+
+/* time-window-label tag sits on its own row, no overlap. */
+body:not(.compact-reference-ui) .controls-top {
+  flex-wrap: wrap !important;
+  gap: 6px 12px !important;
+}
+
+/* ── Timeline-meta: 2-row layout — dates side-by-side, jumps centered below ── */
+body:not(.compact-reference-ui) #controls .timeline-meta {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-areas:
+    "release end"
+    "jumps jumps" !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-start {
+  grid-area: release !important;
+  text-align: left !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-end {
+  grid-area: end !important;
+  text-align: right !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta > .control-cluster {
+  grid-area: jumps !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-start,
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-end {
+  font-family: "JetBrains Mono", "Fira Mono", "Consolas", monospace !important;
+  font-size: 11px !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.3 !important;
+  color: rgba(244, 250, 255, 0.85) !important;
+  white-space: nowrap !important;
+}
+
+body:not(.compact-reference-ui) #controls .timeline-meta .meta-kicker {
+  display: block !important;
+  font-size: 9px !important;
+  letter-spacing: 0.18em !important;
+  color: var(--ui-cyan) !important;
+  opacity: 0.7 !important;
+  margin-bottom: 2px !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Jump buttons — aggressive specificity to beat .ghost.small base. */
+body:not(.compact-reference-ui) #controls .timeline-meta .control-cluster > button {
+  min-height: 26px !important;
+  height: 26px !important;
+  padding: 0 10px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  width: auto !important;
+  line-height: 1 !important;
+}
+
+/* data-meta — quieter, single line caption (no longer a wall of text). */
+body:not(.compact-reference-ui) #data-meta {
+  margin-top: 8px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.04em !important;
+  color: rgba(218, 232, 244, 0.55) !important;
+  text-align: center !important;
+  font-style: italic !important;
+}
+
+/* ── Map legend — vector key + compass, anchored bottom-right of the map ── */
+body:not(.compact-reference-ui) .map-legend {
+  position: fixed !important;
+  right: calc(420px + 24px) !important;
+  bottom: 24px !important;
+  z-index: 950 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 16px 20px !important;
+  width: 300px !important;
+  /* Cap the height so an overflowing compass/legend stays inside its card
+     instead of pushing past the viewport edge. `overscroll-behavior: contain`
+     keeps the wheel event from bleeding out to the page or the map below. */
+  max-height: calc(100vh - 48px) !important;
+  overflow-y: visible !important;
+  overscroll-behavior: contain !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(70, 236, 255, 0.22) !important;
+  background: rgba(4, 18, 33, 0.78) !important;
+  backdrop-filter: blur(14px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(170%) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28) !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  pointer-events: auto !important;
+  /* Smooth slide when Hide UI hands the right rail back to the legend. */
+  transition: right 220ms cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+
+/* Hide UI is active — the 420px side-panel column is gone, so slide the
+   legend to the actual viewport edge. Uses the same `body:not(.compact…)`
+   guard as the base rule so specificity is identical (1,2,1) and !important
+   matters; with the same specificity, the later rule wins. */
+body:not(.compact-reference-ui).map-chrome-hidden .map-legend {
+  right: 24px !important;
+}
+
+body:not(.compact-reference-ui) .map-legend-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+body:not(.compact-reference-ui) .legend-swatch {
+  flex: 0 0 24px !important;
+  width: 24px !important;
+  height: 10px !important;
+  margin-top: 3px !important;
+  border-radius: 999px !important;
+}
+
+/* Current vector: rainbow gradient matching the hue wheel. */
+body:not(.compact-reference-ui) .legend-swatch-current {
+  background: linear-gradient(90deg, #ff3b30, #ffbe56, #34c759, #00aae7, #af52de, #ff3b30) !important;
+  box-shadow: 0 0 6px rgba(70, 236, 255, 0.28) !important;
+}
+
+/* Wind vector: white streak. */
+body:not(.compact-reference-ui) .legend-swatch-wind {
+  background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.95)) !important;
+  height: 4px !important;
+  margin-top: 6px !important;
+}
+
+body:not(.compact-reference-ui) .legend-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  line-height: 1.25 !important;
+}
+
+body:not(.compact-reference-ui) .legend-text strong {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  color: #ffffff !important;
+}
+
+body:not(.compact-reference-ui) .legend-text small {
+  font-size: 11px !important;
+  color: rgba(218, 232, 244, 0.65) !important;
+  line-height: 1.3 !important;
+}
+
+body:not(.compact-reference-ui) .map-legend-compass {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding-top: 6px !important;
+  border-top: 1px solid rgba(70, 236, 255, 0.18) !important;
+}
+
+body:not(.compact-reference-ui) .map-legend-compass-title {
+  font-size: 10px !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--ui-cyan) !important;
+  opacity: 0.85 !important;
+}
+
+/* Inline (in-legend) wheel — reset the floating positioning and shrink the
+   compass so the N/E/S/W labels stay centered on the visible wheel. */
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only.hue-wheel-inline {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 140px !important;
+  height: 140px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-compass,
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only.hue-wheel-inline .direction-compass {
+  width: 140px !important;
+  height: 140px !important;
+  min-height: 140px !important;
+  max-height: 140px !important;
+  position: relative !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-disc,
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only.hue-wheel-inline .direction-disc {
+  width: 100px !important;
+  height: 100px !important;
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* Re-center the N/E/S/W labels using the standard top:50% / left:50% pattern
+   so they sit on the four cardinal edges of the visible wheel — overriding
+   the earlier {top:0 / right:0 / bottom:0 / left:0} corner rule. */
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-label {
+  position: absolute !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85) !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-label-n {
+  top: 0px !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translateX(-50%) !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-label-s {
+  bottom: 0px !important;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  transform: translateX(-50%) !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-label-w {
+  left: 2px !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+
+body:not(.compact-reference-ui) .hue-wheel-inline .direction-label-e {
+  right: 2px !important;
+  top: 50% !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+
+/* If the inline wheel exists, hide any leftover floating instance (defensive). */
+body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only:not(.hue-wheel-inline) {
+  display: none !important;
+}
+
+/* When chrome is hidden, the legend stays anchored in its original spot so it doesn't jump. */
+/* Narrow viewports: shrink/relocate. */
+@media (max-width: 1100px) {
+  body:not(.compact-reference-ui) .map-legend { width: 200px !important; }
+}
+
+/* ── Unified range-slider styling for ALL sliders in the side panel ──────── */
+body:not(.compact-reference-ui) #side input[type="range"],
+body:not(.compact-reference-ui) #controls input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 22px !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Track — WebKit */
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-runnable-track,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, rgba(35, 248, 255, 0.85) 0%, rgba(35, 248, 255, 0.85) var(--slider-pct, 0%), rgba(255, 255, 255, 0.10) var(--slider-pct, 0%), rgba(255, 255, 255, 0.10) 100%) !important;
+  border: 1px solid rgba(70, 236, 255, 0.25) !important;
+}
+
+/* Track — Firefox */
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-track,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-track {
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(70, 236, 255, 0.25) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-progress,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-progress {
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #12aee7, #23f8ff) !important;
+}
+
+/* Thumb — WebKit */
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-thumb,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-top: -6px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2px solid var(--ui-cyan) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 8px rgba(35, 248, 255, 0.35) !important;
+  cursor: grab !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-thumb:hover,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 0 14px rgba(35, 248, 255, 0.65) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-thumb:active,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing !important;
+  transform: scale(1.18) !important;
+}
+
+/* Thumb — Firefox */
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-thumb,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2px solid var(--ui-cyan) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 8px rgba(35, 248, 255, 0.35) !important;
+  cursor: grab !important;
+}
+
+/* ── Tuning card: compact tuning rows for Speed + Tracers ──────────────── */
+body:not(.compact-reference-ui) #app #side #playback-tuning-card.playback-tuning-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 10px 14px 12px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+body:not(.compact-reference-ui) .tuning-row {
+  display: grid !important;
+  grid-template-columns: 64px 1fr 52px !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+body:not(.compact-reference-ui) .tuning-label {
+  font-size: 10px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: rgba(218, 232, 244, 0.75) !important;
+  font-weight: 600 !important;
+}
+
+body:not(.compact-reference-ui) .tuning-val {
+  font-family: "JetBrains Mono", "Fira Mono", "Consolas", monospace !important;
+  font-size: 12px !important;
+  text-align: right !important;
+  color: var(--ui-cyan) !important;
+}
+
+/* ── SARA — percentage legend row underneath the stacked bar ──────────────
+   #side prefix on every selector is required to beat the universal
+   `#side * { display: block !important }` rule in style.css. */
+body:not(.compact-reference-ui) #side .sara-legend {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-column: 1 / -1 !important;
+  gap: 4px 8px !important;
+  margin-top: 6px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.02em !important;
+  color: rgba(218, 232, 244, 0.65) !important;
+}
+
+body:not(.compact-reference-ui) #side .sara-leg {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+
+body:not(.compact-reference-ui) #side .sara-leg strong {
+  margin-left: 2px !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  font-family: "JetBrains Mono", "Fira Mono", "Consolas", monospace !important;
+  font-weight: 700 !important;
+}
+
+body:not(.compact-reference-ui) #side .sara-swatch {
+  display: inline-block !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 2px !important;
+  flex: 0 0 8px !important;
+}
+
+body:not(.compact-reference-ui) #side .sara-swatch-s  { background: var(--ui-cyan) !important; }
+body:not(.compact-reference-ui) #side .sara-swatch-a  { background: var(--ui-amber) !important; }
+body:not(.compact-reference-ui) #side .sara-swatch-r  { background: #ff7f50 !important; }
+body:not(.compact-reference-ui) #side .sara-swatch-as { background: #6d4c41 !important; }
+
+/* ── Native <select> theming — match the app's dark cyan glassmorphism ────
+   Strips browser-default styling and uses an inline-SVG caret so the
+   chevron stays crisp at any zoom level and tints the cyan accent. */
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #controls select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  padding: 7px 36px 7px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(70, 236, 255, 0.28) !important;
+  background-color: rgba(4, 18, 33, 0.72) !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2323f8ff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 11px 7px !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  font-family: "Inter", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  cursor: pointer !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+  /* Hide the native focus ring; we draw our own. */
+  outline: none !important;
+}
+
+body:not(.compact-reference-ui) #side select:hover,
+body:not(.compact-reference-ui) #controls select:hover {
+  border-color: rgba(35, 248, 255, 0.55) !important;
+  background-color: rgba(8, 28, 50, 0.85) !important;
+}
+
+body:not(.compact-reference-ui) #side select:focus-visible,
+body:not(.compact-reference-ui) #controls select:focus-visible {
+  border-color: var(--ui-cyan) !important;
+  box-shadow: 0 0 0 3px rgba(35, 248, 255, 0.20) !important;
+}
+
+body:not(.compact-reference-ui) #side select:disabled,
+body:not(.compact-reference-ui) #controls select:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+/* The <option> items the browser pops up. Styling is limited cross-browser
+   (Firefox + Chromium honor most of these; Safari ignores everything but
+   the system menu colors). Setting a dark base + light text keeps the
+   open menu legible in Chromium-based browsers, which is what the
+   target audience uses. */
+body:not(.compact-reference-ui) #side select option,
+body:not(.compact-reference-ui) #controls select option {
+  background: #06192b !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+  padding: 6px 10px !important;
+}
+
+body:not(.compact-reference-ui) #side select option:checked,
+body:not(.compact-reference-ui) #controls select option:checked {
+  background: linear-gradient(rgba(35, 248, 255, 0.18), rgba(35, 248, 255, 0.18)) !important;
+  color: #ffffff !important;
+}
+
+/* ── Responsive Mobile/Tablet Layout Overrides ──────── */
+@media (max-width: 1024px) {
+  body:not(.compact-reference-ui) #app {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  body:not(.compact-reference-ui) #map-shell {
+    flex: 1 1 auto !important;
+    min-height: 50vh !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+  body:not(.compact-reference-ui) #side {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-height: 50vh !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+  }
+  body:not(.compact-reference-ui) #banner {
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+    top: 10px !important;
+    left: 16px !important;
+    padding: 10px 14px !important;
+  }
+  body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only {
+    display: none !important;
+  }
+}
