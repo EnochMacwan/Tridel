@@ -3913,6 +3913,52 @@ body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
   backdrop-filter: none !important;
 }
 
+/* The L2701 rule applied the same milky linear-gradient(white-grey) +
+   rgba(245,247,249,0.18) + grayscale(1) brightness(124%) backdrop-filter to
+   a LONG list of inner elements: .resp-panel (Skimming/Burning/Dispersant
+   inputs the user just flagged), #run-status, .wg-step, .wg-tip, .budget-stat,
+   .insight-pill, .op-cell, plus the cards I already covered. Catch them all. */
+body:not(.compact-reference-ui) #side .resp-panel,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #side .wg-step,
+body:not(.compact-reference-ui) #side .wg-tip,
+body:not(.compact-reference-ui) #side .budget-stat,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .op-cell,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #run-status,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-step,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-tip,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-stat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .insight-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Native HTML form controls (number / text inputs and selects) — the user's
+   CSS at L2701 also paints them, plus they often have agent stylesheet
+   defaults. Force clean glass with white text. */
+body:not(.compact-reference-ui) #side input[type="number"],
+body:not(.compact-reference-ui) #side input[type="text"],
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #controls input[type="number"],
+body:not(.compact-reference-ui) #controls input[type="text"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper input,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
 /* ============================================================
    ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
    The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
