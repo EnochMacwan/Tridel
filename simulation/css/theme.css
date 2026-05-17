@@ -36,12 +36,14 @@
   --sim-edge-hover:              1px solid var(--sim-edge-hover-color);
 
   /* ---------- Backdrop ----------
-     Pure refraction only — no saturate() boost. saturate(140%) was lifting
-     the colours of the map under every card, producing a green/teal tint
-     across every glass surface. blur() alone gives clean glass. */
-  --sim-backdrop-card:           blur(6px);
-  --sim-backdrop-modal:          blur(20px);
-  --sim-backdrop-overlay:        blur(6px);
+     blur() for refraction + saturate(0) to fully desaturate map colours
+     behind every glass surface, so the actual map hue (green/teal/purple/
+     orange current overlays) never tints the cards. The result is clean
+     monochrome glass that shows brightness/depth from the map without
+     any colour cast. */
+  --sim-backdrop-card:           blur(8px) saturate(0);
+  --sim-backdrop-modal:          blur(20px) saturate(0);
+  --sim-backdrop-overlay:        blur(6px) saturate(0);
 
   /* ---------- Shape ---------- */
   --sim-radius-pill:             18px;
@@ -408,11 +410,11 @@ body:not(.compact-reference-ui) .map-legend .map-legend-compass-title {
   text-shadow: var(--sim-text-shadow) !important;
 }
 
-/* Tone down the map-toolbar backdrop blur+saturate that produced the white
-   "frosted" sheen on the HIDE UI / RESET pill against the dark map. */
+/* Tone down the map-toolbar backdrop and desaturate the map underneath
+   so the HIDE UI / RESET pill stays a colour-neutral glass surface. */
 body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect {
-  -webkit-backdrop-filter: blur(4px) !important;
-  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(0) !important;
+  backdrop-filter: blur(4px) saturate(0) !important;
 }
 
 /* Cyan accent for eyebrow / kicker / micro-label text */
