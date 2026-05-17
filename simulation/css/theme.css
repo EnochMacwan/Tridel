@@ -1,0 +1,589 @@
+/* ============================================================================
+   SIMULATION GLASS THEME — single source of truth
+   ============================================================================
+   Every glass surface, edge, colour, radius, font, padding, and accent in the
+   simulation UI reads from the CSS variables defined below. Edit a token here
+   to update the entire interface uniformly. Nothing else in the simulation
+   should hard-code these values.
+
+   This file is loaded LAST in simulation/index.html so it wins the cascade
+   over every rule in style.css and ui-cleanup.css.
+
+   Layer overview:
+     1. :root tokens           - the named design values
+     2. Outer wrapper recipe   - #banner / #side / #controls / #map-toolbar /
+                                 .map-legend (the 5 liquid-glass containers)
+     3. Card recipe            - .section-card and friends
+     4. Pill recipe            - editable fields, label chips, buttons, tabs
+     5. Active / primary state - cyan ring + glow
+     6. Text recipe            - white body + cyan accent
+   ============================================================================ */
+
+:root {
+  /* ---------- Surfaces ---------- */
+  --sim-surface-glass:           transparent;
+  --sim-surface-overlay-dim:     rgba(1, 10, 20, 0.55);
+
+  /* ---------- Edges ---------- */
+  --sim-edge-alpha:              0.18;
+  --sim-edge-color:              rgba(255, 255, 255, var(--sim-edge-alpha));
+  --sim-edge:                    1px solid var(--sim-edge-color);
+  --sim-edge-hover-color:        rgba(35, 248, 255, 0.55);
+  --sim-edge-hover:              1px solid var(--sim-edge-hover-color);
+
+  /* ---------- Backdrop ---------- */
+  --sim-backdrop-card:           blur(6px) saturate(140%);
+  --sim-backdrop-modal:          blur(20px) saturate(140%);
+  --sim-backdrop-overlay:        blur(6px);
+
+  /* ---------- Shape ---------- */
+  --sim-radius-pill:             18px;
+  --sim-radius-chip:             999px;
+  --sim-radius-card:             22px;
+  --sim-radius-card-lg:          2rem;
+
+  /* ---------- Spacing ---------- */
+  --sim-pad-pill-y:              7px;
+  --sim-pad-pill-x:              12px;
+  --sim-pad-pill-x-select:       36px;          /* room for the chevron */
+  --sim-pad-card:                14px;
+  --sim-min-height-pill:         36px;
+
+  /* ---------- Typography ---------- */
+  --sim-font-family:             "Inter", system-ui, -apple-system, sans-serif;
+  --sim-text-primary:            #ffffff;
+  --sim-text-accent:             #23f8ff;
+  --sim-text-link:               #5be9ff;
+  --sim-text-shadow:             none;
+  --sim-pill-font-size:          12px;
+  --sim-pill-font-weight:        600;
+  --sim-label-font-size:         10px;
+  --sim-label-font-weight:       800;
+
+  /* ---------- Accent (active / primary) ---------- */
+  --sim-accent-color:            #23f8ff;
+  --sim-accent-ring:             0 0 0 1px rgba(35, 248, 255, 0.55);
+  --sim-accent-glow:             0 0 14px rgba(35, 248, 255, 0.20);
+  --sim-accent-combined:         var(--sim-accent-ring), var(--sim-accent-glow);
+
+  /* ---------- Modal ---------- */
+  --sim-modal-bg:                rgba(8, 22, 40, 0.42);
+}
+
+/* ============================================================================
+   1. OUTER WRAPPERS — #banner / #side / #controls / #map-toolbar / .map-legend
+   The 5 top-level liquid-glass containers. Background fully transparent;
+   only the inner .liquidGlass-effect's backdrop-filter provides refraction.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Strip the iridescent ::before / ::after gradient overlays on all five */
+body:not(.compact-reference-ui) #banner::before,
+body:not(.compact-reference-ui) #banner::after,
+body:not(.compact-reference-ui) #side::before,
+body:not(.compact-reference-ui) #side::after,
+body:not(.compact-reference-ui) #controls::before,
+body:not(.compact-reference-ui) #controls::after,
+body:not(.compact-reference-ui) #map-toolbar::before,
+body:not(.compact-reference-ui) #map-toolbar::after,
+body:not(.compact-reference-ui) .map-legend::before,
+body:not(.compact-reference-ui) .map-legend::after,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after {
+  background: transparent !important;
+  background-image: none !important;
+  opacity: 0 !important;
+  mask: none !important;
+  -webkit-mask: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Inner liquid-glass tint layer — fully transparent */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-tint {
+  background: var(--sim-surface-glass) !important;
+}
+
+/* Inner shine layer — no inset highlight (kills the silvery edge) */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-shine {
+  box-shadow: none !important;
+}
+
+/* Effect layer — only backdrop blur, no SVG specular distortion */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-effect {
+  filter: none !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-card) !important;
+  backdrop-filter: var(--sim-backdrop-card) !important;
+}
+
+/* ============================================================================
+   2. CARDS — .section-card and the inner panels (resp-panel, term-card,
+      caveat-list children, quality-grid children, wg-feat, intro-card, etc.)
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .resp-panel,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #side .wg-step,
+body:not(.compact-reference-ui) #side .wg-tip,
+body:not(.compact-reference-ui) #side .wg-feat,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .caveat-list > div,
+body:not(.compact-reference-ui) #side .quality-grid > div,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side #preset-guide,
+body:not(.compact-reference-ui) #side .budget-stat,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .op-cell,
+body:not(.compact-reference-ui) #side .opendrift-attribution,
+body:not(.compact-reference-ui) #side .budget-summary-grid > div,
+body:not(.compact-reference-ui) #side .budget-insights > div,
+body:not(.compact-reference-ui) #side #oil-budget-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #run-status,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-step,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-tip,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-stat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .insight-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-summary-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-insights > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #oil-budget-card,
+body:not(.compact-reference-ui) .results-card,
+body:not(.compact-reference-ui) #map-shell > .section-card.results-card {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Result card on the map (empty-state floating text) — no chrome at all */
+body:not(.compact-reference-ui) .result-card.wide,
+body:not(.compact-reference-ui) .result-card.wide.empty-state {
+  background: var(--sim-surface-glass) !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ============================================================================
+   3. PILL RECIPE — editable fields, label chips, buttons, tabs
+   Every interactive or label pill in the side panel shares this recipe.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side input[type="number"],
+body:not(.compact-reference-ui) #side input[type="text"],
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side .check-pill,
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
+body:not(.compact-reference-ui) #side .validation-checklist span,
+body:not(.compact-reference-ui) #side .wg-feat-icon,
+body:not(.compact-reference-ui) #side .wg-code,
+body:not(.compact-reference-ui) #side .noaa-logo-text,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side button.ghost.small,
+body:not(.compact-reference-ui) #side a.ghost.small,
+body:not(.compact-reference-ui) #side .time-step-option,
+body:not(.compact-reference-ui) #side .expert-toggle-btn,
+body:not(.compact-reference-ui) #side details summary,
+body:not(.compact-reference-ui) #side #runBtn,
+body:not(.compact-reference-ui) #side #runTopBtn,
+body:not(.compact-reference-ui) #side #playBtn,
+body:not(.compact-reference-ui) #side #clearBtn,
+body:not(.compact-reference-ui) #side #clearTopBtn,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .wg-primary,
+body:not(.compact-reference-ui) #controls input[type="number"],
+body:not(.compact-reference-ui) #controls input[type="text"],
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .leaflet-control-scale-line {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+  font-size: var(--sim-pill-font-size) !important;
+  font-weight: var(--sim-pill-font-weight) !important;
+  min-height: var(--sim-min-height-pill) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Selects need extra right padding for the dropdown chevron */
+body:not(.compact-reference-ui) #side select {
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x-select) var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+}
+
+/* Strip native number-spinner arrows */
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-outer-spin-button,
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+/* ============================================================================
+   4. ACTIVE / PRIMARY STATE — cyan ring + glow, no fill
+   The ONLY visual cue for active/primary is the cyan accent ring.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side input:hover,
+body:not(.compact-reference-ui) #side input:focus,
+body:not(.compact-reference-ui) #side select:hover,
+body:not(.compact-reference-ui) #side select:focus,
+body:not(.compact-reference-ui) #side .scenario-tabs button:hover,
+body:not(.compact-reference-ui) #side .resp-tab:hover,
+body:not(.compact-reference-ui) #side button.ghost:hover,
+body:not(.compact-reference-ui) #side .check-pill:hover {
+  border-color: var(--sim-edge-hover-color) !important;
+  outline: none !important;
+}
+
+body:not(.compact-reference-ui) #side .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #side .preset-card.active,
+body:not(.compact-reference-ui) #side .time-step-option.active,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .wg-primary,
+body:not(.compact-reference-ui) #side #runBtn.primary,
+body:not(.compact-reference-ui) #side #runTopBtn.primary,
+body:not(.compact-reference-ui) #controls #runTopBtn.primary {
+  border-color: var(--sim-edge-hover-color) !important;
+  box-shadow: var(--sim-accent-combined) !important;
+}
+
+/* ============================================================================
+   5. TEXT RECIPE — white body, cyan accent, no halos
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #side *,
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #banner *,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #controls *,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar *,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .map-legend *,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .result-card.wide,
+body:not(.compact-reference-ui) .result-card.wide * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Cyan accent for eyebrow / kicker / micro-label text */
+body:not(.compact-reference-ui) #side .panel-section-label,
+body:not(.compact-reference-ui) #side .summary-kicker,
+body:not(.compact-reference-ui) #side .eyebrow,
+body:not(.compact-reference-ui) #side .stat-label,
+body:not(.compact-reference-ui) #side .op-label,
+body:not(.compact-reference-ui) #side .quality-grid > div > span:first-child,
+body:not(.compact-reference-ui) #side .reference-control-label span,
+body:not(.compact-reference-ui) #side .opendrift-attribution span,
+body:not(.compact-reference-ui) #side .wg-feat-icon,
+body:not(.compact-reference-ui) #side .wg-code,
+body:not(.compact-reference-ui) #side .budget-header h3,
+body:not(.compact-reference-ui) #side .budget-legend,
+body:not(.compact-reference-ui) #side h3,
+body:not(.compact-reference-ui) #side .meta-kicker {
+  color: var(--sim-text-accent) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Hyperlinks */
+body:not(.compact-reference-ui) #side a,
+body:not(.compact-reference-ui) #banner a {
+  color: var(--sim-text-link) !important;
+}
+
+/* ============================================================================
+   6. MODAL (OpenDrift / WebGNOME setup) — same vocabulary
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay {
+  background-color: var(--sim-surface-overlay-dim) !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-overlay) !important;
+  backdrop-filter: var(--sim-backdrop-overlay) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal {
+  background-color: var(--sim-modal-bg) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-modal) !important;
+  backdrop-filter: var(--sim-backdrop-modal) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step,
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  color: var(--sim-text-primary) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step *,
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-code {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  color: var(--sim-text-accent) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-foot {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal h2,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal:hover,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link:hover {
+  border-color: var(--sim-edge-hover-color) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  color: var(--sim-text-accent) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step-num {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-accent) !important;
+  border: 1px solid var(--sim-edge-hover-color) !important;
+  box-shadow: var(--sim-accent-glow) !important;
+}
+
+/* ============================================================================
+   7. CHARTS — Oil budget canvas + Plotly fallbacks
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #oil-budget-plot,
+body:not(.compact-reference-ui) #ts-plot {
+  background: var(--sim-surface-glass) !important;
+}
+
+body:not(.compact-reference-ui) #oil-budget-plot text,
+body:not(.compact-reference-ui) #ts-plot text {
+  fill: var(--sim-text-primary) !important;
+}
+
+/* ============================================================================
+   8. SPECIFICITY TAX — repeat the wrapper class to beat any competing rule
+   Some declarations in style.css / ui-cleanup.css carry !important AND match
+   .check-pill / .resp-tab / button.ghost with higher specificity than the
+   blocks above. Duplicating #side.liquidGlass-wrapper.liquidGlass-wrapper
+   doubles its specificity (10 + 10 = 20) so the recipe always wins.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="number"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="text"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper select,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .check-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .tag,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .summary-chip-row span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .validation-checklist span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-code,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .noaa-logo-text,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .scenario-tabs button,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-tab,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper a.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .time-step-option,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .expert-toggle-btn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper details summary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #playBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #clearBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #clearTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-primary,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper input,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper button,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper #time-label {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+  font-size: var(--sim-pill-font-size) !important;
+  font-weight: var(--sim-pill-font-weight) !important;
+  min-height: var(--sim-min-height-pill) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Select chevron padding override (re-apply at the higher specificity) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper select {
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x-select) var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+}
+
+/* Active / primary cyan ring (specificity tax) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-tab.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .preset-card.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .time-step-option.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runTopBtn.primary {
+  border: 1px solid var(--sim-edge-hover-color) !important;
+  box-shadow: var(--sim-accent-combined) !important;
+}
+
+/* Card recipe specificity tax */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .section-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .side-header,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .current-scenario-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-panel,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .opendrift-attribution,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #preset-guide,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #oil-budget-card {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Text recipe specificity tax — every nested element under #side */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Cyan accents (override the white catch-all above) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .panel-section-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .summary-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .eyebrow,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .stat-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .op-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .meta-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper h3,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-code,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .opendrift-attribution span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .budget-header h3,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .budget-legend {
+  color: var(--sim-text-accent) !important;
+}
+
+/* Links */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper a {
+  color: var(--sim-text-link) !important;
+}
