@@ -3900,3 +3900,87 @@ body:not(.compact-reference-ui) .result-card.wide {
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.10) !important;
 }
+
+/* ============================================================
+   ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
+   The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
+   .section-card / .side-header / .current-scenario-card / #time-label /
+   .time-step-option. Override with transparent so the cards inherit the
+   colourful map underneath via the outer wrapper's distortion + shine layers.
+   ============================================================ */
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper .time-step-option,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.10) !important;
+}
+
+/* Kill the grey distortion-wash ::before pseudo-element that adds a
+   blur(8px) saturate(0%) grayscale(1) overlay with 0.24 alpha. */
+body:not(.compact-reference-ui) #banner::before,
+body:not(.compact-reference-ui) #side::before,
+body:not(.compact-reference-ui) #controls::before,
+body:not(.compact-reference-ui) .map-legend::before,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar::before,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  opacity: 0 !important;
+}
+
+/* The progress-track in the run-share-card and small dark chips (run-progress,
+   noaa-logo-text) — keep them legible but glass-thin. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .run-progress {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .progress-track {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .noaa-logo-text {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+}
+
+/* The .meta-kicker tiny eyebrow used in timeline-meta ("Start", "End") */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .meta-kicker,
+body:not(.compact-reference-ui) #controls .meta-kicker {
+  color: #ffffff !important;
+}
+
+/* check-pill LABEL itself (the input + text wrapper) was rgba(231,242,249,0.92) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper label.check-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
+  color: #ffffff !important;
+}
+
+/* .primary.wg-primary buttons (Download OpenDrift / Open WebGNOME) had
+   dark navy text on cyan glow — switch text to white too for consistency. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .primary.wg-primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.primary {
+  color: #ffffff !important;
+}
