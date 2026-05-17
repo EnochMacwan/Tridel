@@ -2671,11 +2671,11 @@ body:not(.compact-reference-ui) #map-toolbar.map-toolbar::before {
   border-radius: inherit !important;
   z-index: 0 !important;
   pointer-events: none !important;
-  background: rgba(255, 255, 255, 0.24) !important;
-  backdrop-filter: blur(8px) saturate(0%) grayscale(1) brightness(122%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(0%) grayscale(1) brightness(122%) !important;
-  filter: url("#tridel-liquid-glass-distortion") !important;
-  opacity: 0.88 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  opacity: 0 !important;
 }
 
 body:not(.compact-reference-ui) #banner::after,
@@ -3126,14 +3126,11 @@ body:not(.compact-reference-ui) #side .side-header,
 body:not(.compact-reference-ui) #side .current-scenario-card,
 body:not(.compact-reference-ui) #controls #time-label,
 body:not(.compact-reference-ui) #controls .time-step-option {
-  background: rgba(255, 255, 255, 0.24) !important;
+  background: transparent !important;
   border-color: transparent !important;
-  box-shadow:
-    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.38),
-    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.34),
-    0 6px 16px rgba(0, 0, 0, 0.12) !important;
-  backdrop-filter: blur(3px) !important;
-  -webkit-backdrop-filter: blur(3px) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-effect,

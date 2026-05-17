@@ -109,7 +109,10 @@ body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
   backdrop-filter: none !important;
 }
 
-/* Strip the iridescent ::before / ::after gradient overlays on all five */
+/* Strip the iridescent ::before / ::after gradient overlays on ALL wrapped
+   surfaces — outer containers AND inner cards (.section-card, .side-header,
+   .current-scenario-card etc.). These pseudo-elements were the last source
+   of tint/shimmer on any glass surface. */
 body:not(.compact-reference-ui) #banner::before,
 body:not(.compact-reference-ui) #banner::after,
 body:not(.compact-reference-ui) #side::before,
@@ -129,7 +132,44 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::after,
 body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before,
 body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::after,
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::before,
-body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after {
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side .section-card::before,
+body:not(.compact-reference-ui) #side .section-card::after,
+body:not(.compact-reference-ui) #side .side-header::before,
+body:not(.compact-reference-ui) #side .side-header::after,
+body:not(.compact-reference-ui) #side .current-scenario-card::before,
+body:not(.compact-reference-ui) #side .current-scenario-card::after,
+body:not(.compact-reference-ui) #side .preset-card::before,
+body:not(.compact-reference-ui) #side .preset-card::after,
+body:not(.compact-reference-ui) #side .resp-panel::before,
+body:not(.compact-reference-ui) #side .resp-panel::after,
+body:not(.compact-reference-ui) #side .term-card::before,
+body:not(.compact-reference-ui) #side .term-card::after,
+body:not(.compact-reference-ui) #side .stat-card::before,
+body:not(.compact-reference-ui) #side .stat-card::after,
+body:not(.compact-reference-ui) #side .wg-feat::before,
+body:not(.compact-reference-ui) #side .wg-feat::after,
+body:not(.compact-reference-ui) #side .opendrift-attribution::before,
+body:not(.compact-reference-ui) #side .opendrift-attribution::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution::after {
+  content: none !important;
   background: transparent !important;
   background-image: none !important;
   opacity: 0 !important;
