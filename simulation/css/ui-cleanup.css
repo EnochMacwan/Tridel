@@ -3341,3 +3341,141 @@ body:not(.compact-reference-ui) .leaflet-control-scale-line {
   border-radius: 6px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
 }
+
+/* ============================================================
+   HIGH-TRANSPARENCY GLASS PASS
+   The default tints were ~0.50 white — that produced a strong white fade
+   that washed colour from the underlying map. Lower the tint, then crank
+   text contrast back up with dark colours + tight text-shadows so every
+   label and paragraph stays readable through the more transparent glass.
+   ============================================================ */
+
+/* 1. Lighter tint on every wrapped container — less "white fade" */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-tint {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* 2. Also drop the opaque side-panel base background that adds to the haze */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper {
+  background: transparent !important;
+  background-blend-mode: normal !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* 3. Eyebrow / micro-label classes were near-white at 0.72 alpha — invisible
+   against the new transparent glass. Recolour to a dark navy with a faint
+   white text-shadow so they read no matter what's behind the panel. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card .stat-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div > span:first-child,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell .op-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .eyebrow,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .panel-section-label {
+  color: rgba(7, 25, 44, 0.86) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Keep the cyan accent variant on .panel-section-label readable too. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .panel-section-label {
+  color: #0a6c80 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 4. The mission-card lead paragraph & generic intro-card paragraphs use a
+   light text colour that disappears on the transparent glass. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .lede,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card p,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card .lede {
+  color: rgba(4, 22, 43, 0.92) !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+
+/* 5. Visual-overlay check-pill toggles had white text on a near-clear bg
+   so the labels (Currents, Tracers, Trails…) vanished. Give each pill
+   a faint white wash and dark navy text. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill:hover {
+  background: rgba(255, 255, 255, 0.30) !important;
+  border-color: rgba(35, 248, 255, 0.45) !important;
+}
+
+/* 6. WebGNOME handoff action buttons. The .ghost variants were heavy
+   dark-navy pills (rgba(4,18,33,0.7)) — out of place on glass. Soften
+   them to a translucent glass chip with dark text. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .webgnome-actions .ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-tab,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper details summary {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.50),
+    0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .webgnome-actions .ghost:hover,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button:hover,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost:hover {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border-color: rgba(35, 248, 255, 0.45) !important;
+}
+
+/* Active scenario tab keeps its cyan tint but on glass instead of opaque navy */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.active {
+  background: rgba(35, 248, 255, 0.22) !important;
+  border-color: rgba(35, 248, 255, 0.60) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.35) !important;
+}
+
+/* 7. The validation checklist below the WebGNOME buttons rendered as heavy
+   navy pills with white text. Soften to glass for visual cohesion. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .validation-checklist span {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 8. Inner chips (preset, term, caveat etc.) — drop their wash from 0.18 to
+   0.14 to match the more transparent surrounding glass. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
+  background: rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 2px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* 9. The OpenDrift attribution chip ("POWERED BY" pill) is also too pale */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+}
