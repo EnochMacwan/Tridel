@@ -4080,6 +4080,119 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .noaa-logo-text {
 }
 
 /* ============================================================
+   OPENDRIFT / WEBGNOME SETUP MODAL — same glass treatment
+   The modal lives at body level (outside #side), so it needs its own
+   override block. The wg-modal card carried a cyan radial-gradient bg,
+   each wg-step carried a dark navy linear-gradient, head/foot bars were
+   navy opaque, and the close button was rgba(4,18,33,0.68) opaque navy.
+   ============================================================ */
+
+/* Modal overlay (dark dim under the card) — keep dim but lighter */
+body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay {
+  background-color: rgba(1, 10, 20, 0.55) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* The modal card itself — transparent glass with a soft blur */
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal {
+  background-color: rgba(8, 22, 40, 0.42) !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+}
+
+/* Each numbered step row — clean transparent panel with thin edge */
+body:not(.compact-reference-ui) #webgnome-modal .wg-step {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step *,
+body:not(.compact-reference-ui) #webgnome-modal .wg-step p,
+body:not(.compact-reference-ui) #webgnome-modal .wg-step strong {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* "wg-tip" callout at the bottom of the steps */
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* "cmems_*.nc or rtofs_*..." inline-code chip — match the OPENOIL pill */
+body:not(.compact-reference-ui) #webgnome-modal .wg-code {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #23f8ff !important;
+}
+
+/* Modal head + foot bars — strip the navy fills */
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-foot {
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal h2,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Close button + Open WebGNOME link — same ghost-button glass recipe */
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal:hover,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link:hover {
+  border-color: rgba(35, 248, 255, 0.55) !important;
+}
+
+/* The "Open WebGNOME" link keeps its cyan text since it's the primary CTA */
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  color: #23f8ff !important;
+}
+
+/* Step number circles (1, 2, 3, 4, 5) keep cyan accent ring + cyan number */
+body:not(.compact-reference-ui) #webgnome-modal .wg-step-num {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #23f8ff !important;
+  border: 1px solid rgba(35, 248, 255, 0.55) !important;
+  box-shadow: 0 0 12px rgba(35, 248, 255, 0.18) !important;
+}
+
+/* ============================================================
    ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
    The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
    .section-card / .side-header / .current-scenario-card / #time-label /
