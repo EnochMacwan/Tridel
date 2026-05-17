@@ -1318,17 +1318,6 @@ body:not(.compact-reference-ui) #banner .banner-copy b {
   margin: 0 !important;
 }
 
-body:not(.compact-reference-ui) #banner .banner-copy a[href="README.md"] {
-  margin-top: 4px !important;
-  padding: 6px 14px !important;
-  font-size: 11px !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(35, 248, 255, 0.35) !important;
-  color: var(--ui-cyan) !important;
-  background: rgba(35, 248, 255, 0.07) !important;
-  text-decoration: none !important;
-}
-
 /* Hide UI button — fixed anchor between map and side panel. */
 body:not(.compact-reference-ui) .map-ui-hide-btn {
   position: fixed !important;
@@ -2457,6 +2446,438 @@ body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"]
     0 10px 24px rgba(0, 195, 255, 0.22) !important;
 }
 
+/* ── Neutral optical liquid glass pass ───────────────────────────────────
+   Clear white/gray glass: blur and edge shine without colored tint. */
+body:not(.compact-reference-ui) {
+  --reference-glass-panel:
+    radial-gradient(82% 58% at 16% 16%, rgba(255, 255, 255, 0.56), transparent 54%),
+    radial-gradient(72% 78% at 94% 8%, rgba(255, 255, 255, 0.28), transparent 62%),
+    radial-gradient(94% 84% at 8% 88%, rgba(255, 255, 255, 0.17), transparent 66%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.32), rgba(232, 235, 239, 0.18) 48%, rgba(178, 184, 191, 0.14) 100%),
+    rgba(238, 241, 244, 0.16);
+  --reference-glass-card:
+    radial-gradient(96% 80% at 18% 10%, rgba(255, 255, 255, 0.44), transparent 56%),
+    radial-gradient(90% 78% at 100% 18%, rgba(255, 255, 255, 0.24), transparent 64%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.28), rgba(232, 235, 239, 0.14) 56%, rgba(178, 184, 191, 0.11)),
+    rgba(238, 241, 244, 0.13);
+}
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend {
+  border-color: rgba(255, 255, 255, 0.33) !important;
+  background: var(--reference-glass-panel) !important;
+  background-blend-mode: screen, screen, screen, normal, normal !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    inset 16px 18px 42px rgba(255, 255, 255, 0.08),
+    inset -22px -20px 42px rgba(255, 255, 255, 0.045),
+    inset 0 -20px 34px rgba(0, 0, 0, 0.18),
+    0 22px 68px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(64px) saturate(0%) grayscale(1) contrast(110%) brightness(126%) !important;
+  -webkit-backdrop-filter: blur(64px) saturate(0%) grayscale(1) contrast(110%) brightness(126%) !important;
+}
+
+body:not(.compact-reference-ui) #banner {
+  border-radius: 34px !important;
+}
+
+body:not(.compact-reference-ui) #side {
+  border-radius: 34px !important;
+}
+
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend {
+  border-radius: 30px !important;
+}
+
+body:not(.compact-reference-ui) #banner::before,
+body:not(.compact-reference-ui) #side::before,
+body:not(.compact-reference-ui) #controls::before,
+body:not(.compact-reference-ui) .map-legend::before {
+  z-index: 0 !important;
+  inset: 1px !important;
+  background:
+    radial-gradient(34% 28% at 14% 16%, rgba(255, 255, 255, 0.42), transparent 62%),
+    radial-gradient(38% 34% at 82% 12%, rgba(255, 255, 255, 0.18), transparent 72%),
+    linear-gradient(100deg, transparent 4%, rgba(255, 255, 255, 0.16) 16%, transparent 29%),
+    linear-gradient(178deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.035) 22%, transparent 56%) !important;
+  filter: blur(0.35px) !important;
+  opacity: 0.88 !important;
+  mix-blend-mode: screen !important;
+}
+
+body:not(.compact-reference-ui) #banner::after,
+body:not(.compact-reference-ui) #side::after,
+body:not(.compact-reference-ui) #controls::after,
+body:not(.compact-reference-ui) .map-legend::after {
+  z-index: 0 !important;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.48), transparent 17%, transparent 78%, rgba(255, 255, 255, 0.24)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.46), transparent 15%, transparent 78%, rgba(255, 255, 255, 0.14)) !important;
+  opacity: 0.62 !important;
+}
+
+body:not(.compact-reference-ui) #banner > *,
+body:not(.compact-reference-ui) #controls > *,
+body:not(.compact-reference-ui) #side .side-scroll,
+body:not(.compact-reference-ui) .map-legend > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side .preset-guide,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #side .resp-panel,
+body:not(.compact-reference-ui) #side .quality-grid > div,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .wg-feat,
+body:not(.compact-reference-ui) #side .wg-step,
+body:not(.compact-reference-ui) #side .wg-tip,
+body:not(.compact-reference-ui) #side .budget-stat,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .op-cell,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option {
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-radius: 24px !important;
+  background: var(--reference-glass-card) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 12px 14px 28px rgba(255, 255, 255, 0.06),
+    inset -12px -14px 26px rgba(255, 255, 255, 0.04),
+    0 12px 28px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: blur(40px) saturate(0%) grayscale(1) brightness(122%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(0%) grayscale(1) brightness(122%) !important;
+}
+
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill,
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background:
+    radial-gradient(90% 130% at 15% 10%, rgba(255, 255, 255, 0.34), transparent 58%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(187, 192, 198, 0.16) 58%, rgba(255, 255, 255, 0.10)),
+    rgba(238, 241, 244, 0.13) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -12px 22px rgba(0, 0, 0, 0.16),
+    0 10px 24px rgba(0, 0, 0, 0.26) !important;
+  backdrop-filter: blur(34px) saturate(0%) grayscale(1) brightness(122%) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(0%) grayscale(1) brightness(122%) !important;
+}
+
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn {
+  border-radius: 999px !important;
+}
+
+body:not(.compact-reference-ui) #runBtn,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #controls .time-step-option.active,
+body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"] {
+  background:
+    radial-gradient(85% 140% at 18% 0%, rgba(255, 255, 255, 0.46), transparent 58%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(226, 228, 232, 0.24) 62%, rgba(255, 255, 255, 0.18)) !important;
+  color: #031420 !important;
+  border-color: rgba(255, 255, 255, 0.44) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.56),
+    inset 0 -16px 28px rgba(0, 0, 0, 0.12),
+    0 14px 30px rgba(0, 0, 0, 0.20),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+
+body:not(.compact-reference-ui) #side input,
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side textarea {
+  border-radius: 18px !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  background:
+    radial-gradient(95% 100% at 18% 0%, rgba(255, 255, 255, 0.18), transparent 58%),
+    rgba(255, 255, 255, 0.08) !important;
+}
+
+/* FreeFrontend-style liquid glass: effect + neutral tint + shine layers. */
+.liquid-glass-svg-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar,
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option {
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
+  border-color: rgba(255, 255, 255, 0.50) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.44), rgba(236, 238, 241, 0.24) 48%, rgba(188, 193, 199, 0.16)),
+    rgba(244, 246, 248, 0.20) !important;
+  background-blend-mode: screen, normal !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.66),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.52),
+    inset 0 -22px 40px rgba(74, 80, 88, 0.14),
+    0 24px 68px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(44px) saturate(0%) grayscale(1) contrast(112%) brightness(126%) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(0%) grayscale(1) contrast(112%) brightness(126%) !important;
+}
+
+body:not(.compact-reference-ui) #banner::before,
+body:not(.compact-reference-ui) #side::before,
+body:not(.compact-reference-ui) #controls::before,
+body:not(.compact-reference-ui) .map-legend::before,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: rgba(255, 255, 255, 0.24) !important;
+  backdrop-filter: blur(8px) saturate(0%) grayscale(1) brightness(122%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(0%) grayscale(1) brightness(122%) !important;
+  filter: url("#tridel-liquid-glass-distortion") !important;
+  opacity: 0.88 !important;
+}
+
+body:not(.compact-reference-ui) #banner::after,
+body:not(.compact-reference-ui) #side::after,
+body:not(.compact-reference-ui) #controls::after,
+body:not(.compact-reference-ui) .map-legend::after,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(70% 44% at 18% 10%, rgba(255, 255, 255, 0.58), transparent 58%),
+    radial-gradient(58% 40% at 92% 8%, rgba(255, 255, 255, 0.34), transparent 66%),
+    linear-gradient(96deg, rgba(255, 255, 255, 0.36), transparent 12%, transparent 82%, rgba(255, 255, 255, 0.24)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 18%, transparent 78%, rgba(255, 255, 255, 0.14)) !important;
+  opacity: 0.72 !important;
+  mix-blend-mode: screen !important;
+}
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #side .resp-panel,
+body:not(.compact-reference-ui) #side .quality-grid > div,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .wg-feat,
+body:not(.compact-reference-ui) #side .wg-step,
+body:not(.compact-reference-ui) #side .wg-tip,
+body:not(.compact-reference-ui) #side .budget-stat,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .op-cell,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option {
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.40), rgba(236, 238, 241, 0.20) 54%, rgba(186, 191, 198, 0.13)),
+    rgba(245, 247, 249, 0.18) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.60),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.45),
+    inset 0 -16px 28px rgba(72, 78, 86, 0.10),
+    0 12px 30px rgba(0, 0, 0, 0.18) !important;
+  backdrop-filter: blur(28px) saturate(0%) grayscale(1) brightness(124%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(0%) grayscale(1) brightness(124%) !important;
+}
+
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend {
+  color: rgba(10, 18, 26, 0.88) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side h2,
+body:not(.compact-reference-ui) #side h3,
+body:not(.compact-reference-ui) #side strong,
+body:not(.compact-reference-ui) #side label,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option,
+body:not(.compact-reference-ui) .map-legend .legend-text strong,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn {
+  color: rgba(7, 16, 24, 0.94) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side .dim,
+body:not(.compact-reference-ui) #side p,
+body:not(.compact-reference-ui) #side small,
+body:not(.compact-reference-ui) #data-meta,
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-start,
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-end,
+body:not(.compact-reference-ui) .map-legend .legend-text small {
+  color: rgba(17, 26, 35, 0.66) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side .summary-kicker,
+body:not(.compact-reference-ui) #side .panel-section-label,
+body:not(.compact-reference-ui) #side .reference-control-label span,
+body:not(.compact-reference-ui) #controls .timeline-meta .meta-kicker,
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
+body:not(.compact-reference-ui) .map-legend-compass-title {
+  color: rgba(23, 32, 40, 0.72) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
+  background:
+    radial-gradient(90% 120% at 16% 8%, rgba(255, 255, 255, 0.40), transparent 60%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.34), rgba(213, 217, 222, 0.20) 64%, rgba(255, 255, 255, 0.16)),
+    rgba(245, 247, 249, 0.16) !important;
+}
+
+body:not(.compact-reference-ui) #runBtn,
+body:not(.compact-reference-ui) #runTopBtn,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #controls .time-step-option.active,
+body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"] {
+  color: rgba(5, 12, 20, 0.96) !important;
+  background:
+    radial-gradient(88% 130% at 20% 0%, rgba(255, 255, 255, 0.56), transparent 58%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.46), rgba(222, 225, 230, 0.30) 62%, rgba(255, 255, 255, 0.20)) !important;
+  border-color: rgba(255, 255, 255, 0.58) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.70),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.44),
+    0 14px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+body:not(.compact-reference-ui) #side button:disabled,
+body:not(.compact-reference-ui) #controls button:disabled {
+  color: rgba(12, 20, 28, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #banner > *,
+body:not(.compact-reference-ui) #side .side-scroll {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-wordmark,
+body:not(.compact-reference-ui) #banner .brand-partner-kicker,
+body:not(.compact-reference-ui) #banner .banner-copy {
+  color: rgba(7, 16, 24, 0.92) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo-inline {
+  display: inline-flex !important;
+  width: fit-content !important;
+  border-radius: 16px !important;
+  padding: 5px 9px !important;
+  background: rgba(12, 18, 24, 0.16) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.40),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.24) !important;
+}
+
+body:not(.compact-reference-ui) #banner .partner-logo-inline img {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.26)) !important;
+}
+
+body:not(.compact-reference-ui) #side .tuning-val,
+body:not(.compact-reference-ui) #side .reference-control-label strong {
+  color: rgba(7, 16, 24, 0.92) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-runnable-track,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-runnable-track {
+  background:
+    linear-gradient(90deg, rgba(28, 35, 43, 0.70) 0%, rgba(28, 35, 43, 0.70) var(--slider-pct, 0%), rgba(255, 255, 255, 0.34) var(--slider-pct, 0%), rgba(255, 255, 255, 0.34) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.56) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.60),
+    inset 0 -2px 3px rgba(30, 38, 46, 0.14) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-track,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.56) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-progress,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-progress {
+  background: rgba(28, 35, 43, 0.70) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-thumb,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-thumb,
+body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-thumb,
+body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-thumb {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(18, 25, 32, 0.34) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.85),
+    0 2px 7px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-thumb:hover,
+body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.85),
+    0 3px 9px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.54) !important;
+}
+
 @supports not (backdrop-filter: blur(1px)) {
   body:not(.compact-reference-ui) #banner,
   body:not(.compact-reference-ui) #side,
@@ -2501,5 +2922,297 @@ body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"]
   }
   body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only {
     display: none !important;
+  }
+}
+
+/* User-provided liquidGlass DOM model: effect + tint + shine + text. */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::after {
+  content: none !important;
+  display: none !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-wrapper {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background: transparent !important;
+  box-shadow:
+    0 6px 6px rgba(0, 0, 0, 0.20),
+    0 0 20px rgba(0, 0, 0, 0.10) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2) !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-effect,
+body:not(.compact-reference-ui) .liquidGlass-tint,
+body:not(.compact-reference-ui) .liquidGlass-shine {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-effect {
+  z-index: 0 !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  filter: url(#glass-distortion) !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-tint {
+  z-index: 1 !important;
+  background: rgba(255, 255, 255, 0.50) !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-shine {
+  z-index: 2 !important;
+  overflow: hidden !important;
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.50),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.50) !important;
+}
+
+body:not(.compact-reference-ui) .liquidGlass-text {
+  position: relative !important;
+  z-index: 3 !important;
+  color: black !important;
+  pointer-events: auto !important;
+}
+
+body:not(.compact-reference-ui) .dock,
+body:not(.compact-reference-ui) .dock > div {
+  border-radius: 2rem !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0.6rem !important;
+  border-radius: 2rem !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper:hover {
+  padding: 0.8rem !important;
+  border-radius: 2.5rem !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .liquidGlass-text,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-content {
+  padding: 0 !important;
+}
+
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn {
+  color: rgba(5, 10, 16, 0.94) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper {
+  display: flex !important;
+  border-radius: 2rem !important;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #banner .banner-glass-content {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+body:not(.compact-reference-ui) #banner .brand-wordmark,
+body:not(.compact-reference-ui) #banner .brand-partner-kicker,
+body:not(.compact-reference-ui) #banner .banner-copy {
+  color: rgba(5, 10, 16, 0.92) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper {
+  display: block !important;
+  border-radius: 2rem !important;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #side > .side-scroll.liquidGlass-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: rgba(5, 10, 16, 0.92) !important;
+}
+
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
+  display: block !important;
+  border-radius: 2rem !important;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #controls .controls-glass-content,
+body:not(.compact-reference-ui) .map-legend .map-legend-content {
+  display: block !important;
+  width: 100% !important;
+}
+
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .section-card {
+  color: rgba(5, 10, 16, 0.90) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side h2,
+body:not(.compact-reference-ui) #side h3,
+body:not(.compact-reference-ui) #side strong,
+body:not(.compact-reference-ui) #side label,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option,
+body:not(.compact-reference-ui) .map-legend .legend-text strong {
+  color: rgba(5, 10, 16, 0.94) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side .dim,
+body:not(.compact-reference-ui) #side .hint,
+body:not(.compact-reference-ui) #side p,
+body:not(.compact-reference-ui) #side small,
+body:not(.compact-reference-ui) #data-meta,
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-start,
+body:not(.compact-reference-ui) #controls .timeline-meta > #timeline-end,
+body:not(.compact-reference-ui) .map-legend .legend-text small {
+  color: rgba(20, 28, 36, 0.64) !important;
+  text-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #controls .time-step-option {
+  background: rgba(255, 255, 255, 0.24) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.38),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.34),
+    0 6px 16px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+}
+
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect {
+  position: absolute !important;
+  z-index: 0 !important;
+}
+
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-tint {
+  position: absolute !important;
+  z-index: 1 !important;
+}
+
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-shine {
+  position: absolute !important;
+  z-index: 2 !important;
+}
+
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-text,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-text,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-text,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-text,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-text {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #controls .ghost,
+body:not(.compact-reference-ui) #controls #playBtn,
+body:not(.compact-reference-ui) #controls #clearTopBtn {
+  color: rgba(5, 10, 16, 0.88) !important;
+  text-shadow: none !important;
+}
+
+@media (min-width: 1025px) {
+  body:not(.compact-reference-ui) #banner.liquidGlass-wrapper {
+    position: absolute !important;
+    top: 18px !important;
+    left: 32px !important;
+    width: fit-content !important;
+    height: auto !important;
+  }
+
+  body:not(.compact-reference-ui) #side.liquidGlass-wrapper {
+    position: fixed !important;
+    top: 18px !important;
+    right: 22px !important;
+    bottom: 18px !important;
+    width: 410px !important;
+    height: auto !important;
+    max-height: calc(100vh - 36px) !important;
+  }
+
+  body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
+    position: fixed !important;
+    right: calc(410px + 24px) !important;
+    bottom: 24px !important;
+    width: 292px !important;
+    height: auto !important;
+  }
+
+  body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper {
+    position: fixed !important;
+    top: 22px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
   }
 }

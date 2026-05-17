@@ -23,38 +23,68 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="assets/tridel.png" />
   <link rel="stylesheet" href="css/style.css?v=60" />
-  <link rel="stylesheet" href="css/ui-cleanup.css?v=62" />
+  <link rel="stylesheet" href="css/ui-cleanup.css?v=69" />
 </head>
 
 <body>
+  <svg class="liquid-glass-svg-filter" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%"
+      filterUnits="objectBoundingBox">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5"
+        result="turbulence" />
+      <feComponentTransfer in="turbulence" result="mapped">
+        <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+        <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+        <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+      </feComponentTransfer>
+      <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+      <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100"
+        lighting-color="white" result="specLight">
+        <fePointLight x="-200" y="-200" z="300" />
+      </feSpecularLighting>
+      <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+      <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
   <div id="app">
 
     <!-- Map controls toolbar: single Hide/Show toggle + Reset view, grouped. -->
-    <div id="map-toolbar" class="map-toolbar">
-      <button id="hideMapUiBtn" class="map-toolbar-btn" type="button"
-        aria-pressed="false" aria-label="Toggle UI visibility">Hide UI</button>
-      <button id="resetMapBtn" class="map-toolbar-btn" type="button"
-        aria-label="Reset view to default">Reset</button>
+    <div id="map-toolbar" class="map-toolbar liquidGlass-wrapper dock">
+      <div class="liquidGlass-effect"></div>
+      <div class="liquidGlass-tint"></div>
+      <div class="liquidGlass-shine"></div>
+      <div class="liquidGlass-text">
+        <div class="dock map-toolbar-content">
+          <button id="hideMapUiBtn" class="map-toolbar-btn" type="button"
+            aria-pressed="false" aria-label="Toggle UI visibility">Hide UI</button>
+          <button id="resetMapBtn" class="map-toolbar-btn" type="button"
+            aria-label="Reset view to default">Reset</button>
+        </div>
+      </div>
     </div>
 
     <!-- Persistent masthead — Tridel is the primary brand; Austides is the
          partner credit (smaller, with an explicit "Partner" eyebrow). -->
-    <div id="banner">
-      <a class="brand-lockup brand-lockup-primary" href="https://www.trideltechnologies.com/"
-        target="_blank" rel="noopener" aria-label="Tridel Technologies">
-        <img src="assets/tridel.png" alt="Tridel" class="brand-logo" />
-        <span class="brand-wordmark">TRIDEL</span>
-      </a>
-      <div class="brand-partner-row">
-        <span class="brand-partner-kicker">In partnership with</span>
-        <a class="partner-logo-inline" href="https://austides.com" target="_blank" rel="noopener"
-          aria-label="Austides Consulting">
-          <img src="assets/austides.png?v=3" alt="Austides Consulting" />
+    <div id="banner" class="liquidGlass-wrapper">
+      <div class="liquidGlass-effect"></div>
+      <div class="liquidGlass-tint"></div>
+      <div class="liquidGlass-shine"></div>
+      <div class="liquidGlass-text banner-glass-content">
+        <a class="brand-lockup brand-lockup-primary" href="https://www.trideltechnologies.com/"
+          target="_blank" rel="noopener" aria-label="Tridel Technologies">
+          <img src="assets/tridel.png" alt="Tridel" class="brand-logo" />
+          <span class="brand-wordmark">TRIDEL</span>
         </a>
-      </div>
-      <div class="banner-copy">
-        <b>Strait of Hormuz<br />Simulation</b>
-        <a href="README.md">About &amp; caveats</a>
+        <div class="brand-partner-row">
+          <span class="brand-partner-kicker">In partnership with</span>
+          <a class="partner-logo-inline" href="https://austides.com" target="_blank" rel="noopener"
+            aria-label="Austides Consulting">
+            <img src="assets/austides.png?v=3" alt="Austides Consulting" />
+          </a>
+        </div>
+        <div class="banner-copy">
+          <b>Strait of Hormuz<br />Simulation</b>
+        </div>
       </div>
     </div>
 
@@ -65,30 +95,35 @@
       <!-- Map legend — explains what the on-map vectors mean and embeds the
            current-direction compass wheel under a clear title. Lives next to
            the Results card so new viewers can decode the visualization fast. -->
-      <div class="map-legend" aria-label="Map legend">
-        <div class="map-legend-row">
-          <span class="legend-swatch legend-swatch-current" aria-hidden="true"></span>
-          <span class="legend-text">
-            <strong>Surface currents</strong>
-            <small>Color = direction (see compass). Brightness = speed.</small>
-          </span>
-        </div>
-        <div class="map-legend-row">
-          <span class="legend-swatch legend-swatch-wind" aria-hidden="true"></span>
-          <span class="legend-text">
-            <strong>Wind</strong>
-            <small>Amber streaks; longer = stronger.</small>
-          </span>
-        </div>
-        <div class="map-legend-compass">
-          <span class="map-legend-compass-title">Surface current direction</span>
-          <div class="reference-current-legend hue-wheel-only hue-wheel-inline" aria-label="Current direction hue wheel">
-            <div class="direction-compass" aria-hidden="true">
-              <span class="direction-disc"></span>
-              <span class="direction-label direction-label-n">N</span>
-              <span class="direction-label direction-label-e">E</span>
-              <span class="direction-label direction-label-s">S</span>
-              <span class="direction-label direction-label-w">W</span>
+      <div class="map-legend liquidGlass-wrapper" aria-label="Map legend">
+        <div class="liquidGlass-effect"></div>
+        <div class="liquidGlass-tint"></div>
+        <div class="liquidGlass-shine"></div>
+        <div class="liquidGlass-text map-legend-content">
+          <div class="map-legend-row">
+            <span class="legend-swatch legend-swatch-current" aria-hidden="true"></span>
+            <span class="legend-text">
+              <strong>Surface currents</strong>
+              <small>Color = direction (see compass). Brightness = speed.</small>
+            </span>
+          </div>
+          <div class="map-legend-row">
+            <span class="legend-swatch legend-swatch-wind" aria-hidden="true"></span>
+            <span class="legend-text">
+              <strong>Wind</strong>
+              <small>Amber streaks; longer = stronger.</small>
+            </span>
+          </div>
+          <div class="map-legend-compass">
+            <span class="map-legend-compass-title">Surface current direction</span>
+            <div class="reference-current-legend hue-wheel-only hue-wheel-inline" aria-label="Current direction hue wheel">
+              <div class="direction-compass" aria-hidden="true">
+                <span class="direction-disc"></span>
+                <span class="direction-label direction-label-n">N</span>
+                <span class="direction-label direction-label-e">E</span>
+                <span class="direction-label direction-label-s">S</span>
+                <span class="direction-label direction-label-w">W</span>
+              </div>
             </div>
           </div>
         </div>
@@ -112,7 +147,11 @@
 
     <!-- Main side panel. Sections are conditionally shown/updated depending on
        scenario type, data availability, and whether a run has been computed. -->
-    <aside id="side">
+    <aside id="side" class="liquidGlass-wrapper">
+      <div class="liquidGlass-effect"></div>
+      <div class="liquidGlass-tint"></div>
+      <div class="liquidGlass-shine"></div>
+      <div class="liquidGlass-text side-scroll">
       <div class="side-header">
         <div class="side-brand">
           <div>
@@ -137,7 +176,11 @@
       <!-- Playback and quick-run controls live in the right rail so the left side
          stays map-only. -->
       <div class="panel-section-label label-playback">Playback</div>
-      <div id="controls">
+      <div id="controls" class="liquidGlass-wrapper">
+        <div class="liquidGlass-effect"></div>
+        <div class="liquidGlass-tint"></div>
+        <div class="liquidGlass-shine"></div>
+        <div class="liquidGlass-text controls-glass-content">
         <div class="row controls-top">
           <div class="control-cluster">
             <button id="runTopBtn" class="primary" title="Run scenario" disabled>Run</button>
@@ -187,6 +230,7 @@
         </div>
 
         <div class="dim" id="data-meta">-</div>
+        </div>
       </div>
 
       <div class="panel-section-label label-mission">Mission Context</div>
@@ -588,6 +632,7 @@
         </div>
       </div>
 
+      </div>
     </aside>
 
   </div>
