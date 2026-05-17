@@ -3350,13 +3350,15 @@ body:not(.compact-reference-ui) .leaflet-control-scale-line {
    label and paragraph stays readable through the more transparent glass.
    ============================================================ */
 
-/* 1. Lighter tint on every wrapped container — less "white fade" */
+/* 1. ZERO white fade on every wrapped container — only the distortion+blur
+   from .liquidGlass-effect and the inner edge highlight from .liquidGlass-shine
+   define the glass. The tint layer becomes fully transparent. */
 body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-tint,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-tint,
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-tint,
 body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-tint,
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-tint {
-  background: rgba(255, 255, 255, 0.18) !important;
+  background: transparent !important;
 }
 
 /* 2. Also drop the opaque side-panel base background that adds to the haze */
@@ -3398,84 +3400,365 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card .lede {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
 }
 
-/* 5. Visual-overlay check-pill toggles had white text on a near-clear bg
-   so the labels (Currents, Tracers, Trails…) vanished. Give each pill
-   a faint white wash and dark navy text. */
+/* 5. Visual-overlay check-pill toggles — ZERO white wash, just a thin
+   white edge outline plus dark navy text with strong text-shadow. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
-  background: rgba(255, 255, 255, 0.22) !important;
+  background: transparent !important;
   color: #04162b !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 1px 2px rgba(0, 0, 0, 0.06) !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 0 0 1px rgba(4, 22, 43, 0.10) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.85),
+    0 -1px 2px rgba(255, 255, 255, 0.55) !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill:hover {
-  background: rgba(255, 255, 255, 0.30) !important;
-  border-color: rgba(35, 248, 255, 0.45) !important;
+  border-color: rgba(35, 248, 255, 0.60) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.30) !important;
 }
 
-/* 6. WebGNOME handoff action buttons. The .ghost variants were heavy
-   dark-navy pills (rgba(4,18,33,0.7)) — out of place on glass. Soften
-   them to a translucent glass chip with dark text. */
+/* 6. WebGNOME / scenario / ghost / summary buttons — clear glass, no white
+   wash. The outer edge ring + inset highlight give them depth. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .webgnome-actions .ghost,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-tab,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper details summary {
-  background: rgba(255, 255, 255, 0.22) !important;
+  background: transparent !important;
   color: #04162b !important;
-  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
-    0 2px 6px rgba(0, 0, 0, 0.08) !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+    0 0 0 1px rgba(4, 22, 43, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.10) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.50) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(160%) !important;
+  backdrop-filter: blur(6px) saturate(160%) !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .webgnome-actions .ghost:hover,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button:hover,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost:hover {
-  background: rgba(255, 255, 255, 0.32) !important;
-  border-color: rgba(35, 248, 255, 0.45) !important;
-}
-
-/* Active scenario tab keeps its cyan tint but on glass instead of opaque navy */
-body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.active {
-  background: rgba(35, 248, 255, 0.22) !important;
   border-color: rgba(35, 248, 255, 0.60) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 0 0 1px rgba(35, 248, 255, 0.35) !important;
+    0 0 0 1px rgba(35, 248, 255, 0.30),
+    0 4px 10px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* 7. The validation checklist below the WebGNOME buttons rendered as heavy
-   navy pills with white text. Soften to glass for visual cohesion. */
+/* Active scenario tab — cyan accent edge, still no white fill */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.active {
+  background: transparent !important;
+  border-color: rgba(35, 248, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.45),
+    0 0 16px rgba(35, 248, 255, 0.18) !important;
+}
+
+/* 7. Validation checklist pills — clear glass with dark text */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .validation-checklist span {
-  background: rgba(255, 255, 255, 0.18) !important;
+  background: transparent !important;
   color: #04162b !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.45) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 0 0 1px rgba(4, 22, 43, 0.08) !important;
 }
 
-/* 8. Inner chips (preset, term, caveat etc.) — drop their wash from 0.18 to
-   0.14 to match the more transparent surrounding glass. */
+/* 8. Inner chips (preset, term, caveat, quality, stat, wg-feat) — ZERO
+   white wash. Defined only by a thin edge + inset highlight. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list > div,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
-  background: rgba(255, 255, 255, 0.14) !important;
+  background: transparent !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.10),
     0 1px 2px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
 }
 
-/* 9. The OpenDrift attribution chip ("POWERED BY" pill) is also too pale */
+/* Active preset still cyan-tinted (the active accent is a state, not white fade) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active {
+  background: transparent !important;
+  border-color: rgba(35, 248, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.45),
+    0 0 16px rgba(35, 248, 255, 0.18) !important;
+}
+
+/* 9. OpenDrift attribution chip — clear glass */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 10. Strengthen text-shadow on every previously-darkened text class so
+   readability survives without a white tint backstop. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card .stat-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div > span:first-child,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell .op-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .eyebrow,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution span {
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.85),
+    0 -1px 2px rgba(255, 255, 255, 0.55) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .roadmap-list strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-guide span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat span:last-child,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .lede,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card p {
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.78),
+    0 -1px 2px rgba(255, 255, 255, 0.42) !important;
+}
+
+/* Preset-guide chip also clear */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 11. Catch-all for every remaining low-alpha text class that was readable
+   against the old white tint but now needs to compete with the colourful
+   map behind the transparent glass. Push every dim/muted/timeline/legend
+   class to full alpha + strong white halo text-shadow. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .dim,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .hint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #data-meta,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-start,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-end,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-current,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-phase,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #time-window-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tag.tag-muted,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .reference-control-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .reference-control-label span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .reference-control-label strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .speed-scale-labels span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .speed-scale-labels strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tuning-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tuning-val,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-chip-row span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .sara-legend span {
+  color: rgba(4, 22, 43, 0.94) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.45),
+    1px 0 2px rgba(255, 255, 255, 0.45),
+    -1px 0 2px rgba(255, 255, 255, 0.45) !important;
+}
+
+/* 12. Map-legend internal text — same treatment. The legend lives outside
+   #side so the selector chain differs. */
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text strong,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text small,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-compass-title {
+  color: rgba(4, 22, 43, 0.94) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.45),
+    1px 0 2px rgba(255, 255, 255, 0.45),
+    -1px 0 2px rgba(255, 255, 255, 0.45) !important;
+}
+
+/* 13. Map-status-chips at the top of the map — also need to read on bare map */
+body:not(.compact-reference-ui) .map-status-chips span {
+  background: transparent !important;
+  color: rgba(4, 22, 43, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.08) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.45) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(160%) !important;
+  backdrop-filter: blur(6px) saturate(160%) !important;
+}
+
+/* 14. Banner title and "IN PARTNERSHIP WITH" eyebrow — readable on any map */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-wordmark,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .banner-copy b,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .banner-copy a,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-partner-kicker {
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.78),
+    0 -1px 2px rgba(255, 255, 255, 0.42),
+    1px 0 2px rgba(255, 255, 255, 0.42),
+    -1px 0 2px rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 15. "No active run" result-card empty-state — was on a dark glass plate.
+   Remove that plate too so we truly have zero fade. Text-shadow keeps it
+   readable on the map. */
+body:not(.compact-reference-ui) .result-card.wide.empty-state {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 6px 10px !important;
+}
+
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-value {
+  color: #f1f9ff !important;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.90),
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 -1px 2px rgba(0, 0, 0, 0.70) !important;
+}
+
+/* 16. The "SHOW EXPERT TOOLS" toggle was rgba(4,18,33,0.64) opaque navy
+   with white text — needs the glass treatment too. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn {
+  background: transparent !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.50),
+    0 0 0 1px rgba(4, 22, 43, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.10) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.50) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(160%) !important;
+  backdrop-filter: blur(6px) saturate(160%) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn:hover {
+  border-color: rgba(35, 248, 255, 0.60) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.30) !important;
+}
+
+/* 17. .ghost.small buttons (jump back / forward / open AIS / etc.) — also glass */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small {
+  background: transparent !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.08) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.78),
+    0 -1px 2px rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 18. Time-step option pills (1 hr / 3 hr / 6 hr / 12 hr / 24 hr) — glass */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option {
+  background: transparent !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.08) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.78),
+    0 -1px 2px rgba(255, 255, 255, 0.42) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option.active {
+  border-color: rgba(35, 248, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.45),
+    0 0 12px rgba(35, 248, 255, 0.18) !important;
+}
+
+/* 19. The big "RUN" / "Pause" / "Clear" / "Run scenario" buttons in #controls.
+   They had heavy white/opaque backgrounds. Make them glass too. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #playBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #clearBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #clearTopBtn,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #runTopBtn,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #playBtn,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #clearTopBtn,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper button {
+  background: transparent !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.50),
+    0 0 0 1px rgba(4, 22, 43, 0.10),
+    0 2px 6px rgba(0, 0, 0, 0.10) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.50) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runTopBtn.primary,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #runTopBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-primary {
+  border-color: rgba(35, 248, 255, 0.65) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.40),
+    0 0 14px rgba(35, 248, 255, 0.18) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .danger,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #clearBtn.danger {
+  border-color: rgba(255, 80, 80, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.50),
+    0 0 0 1px rgba(255, 80, 80, 0.35) !important;
+}
+
+/* 20. Number / text inputs inside the side panel — also glass */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper input[type="number"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper input[type="text"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="number"],
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="text"] {
+  background: transparent !important;
+  color: #04162b !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* 21. Tags / chips (.tag) — also glass instead of opaque */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tag,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-chip-row span,
+body:not(.compact-reference-ui) .map-status-chips span {
+  background: transparent !important;
+  color: rgba(4, 22, 43, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.80),
+    0 -1px 2px rgba(255, 255, 255, 0.45) !important;
 }
