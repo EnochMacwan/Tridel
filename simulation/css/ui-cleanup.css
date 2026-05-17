@@ -339,7 +339,7 @@ body:not(.compact-reference-ui) .wg-tip {
 body:not(.compact-reference-ui) .wg-modal .ghost,
 body:not(.compact-reference-ui) .wg-modal .wg-link {
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.20) !important;
+  border-color: transparent !important;
   background: rgba(4, 18, 33, 0.68) !important;
 }
 
@@ -705,7 +705,7 @@ body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only::before
 body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only .direction-compass {
   width: 132px !important;
   height: 132px !important;
-  border-color: rgba(255, 255, 255, 0.74) !important;
+  border-color: transparent !important;
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -971,7 +971,7 @@ body:not(.compact-reference-ui) .map-reset-btn {
   z-index: 1020 !important;
   min-height: 34px !important;
   padding: 8px 14px !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: none !important;
   border-radius: 999px !important;
   color: #ffffff !important;
   background: rgba(4, 18, 33, 0.70) !important;
@@ -990,7 +990,7 @@ body:not(.compact-reference-ui) .map-reset-btn:hover {
 body:not(.compact-reference-ui) #map-chip-chunk.loading {
   color: #03111f !important;
   background: linear-gradient(135deg, var(--ui-cyan), var(--ui-amber)) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+  border-color: transparent !important;
 }
 
 body:not(.compact-reference-ui):not(.expert-tools-open) #app #side .release-physics-card,
@@ -1343,7 +1343,7 @@ body:not(.compact-reference-ui) .map-reset-btn {
   z-index: 1020 !important;
   min-height: 34px !important;
   padding: 8px 14px !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: none !important;
   border-radius: 999px !important;
   color: #ffffff !important;
   background: rgba(4, 18, 33, 0.70) !important;
@@ -1532,7 +1532,7 @@ body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
   gap: 3px !important;
   padding: 4px !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  border: none !important;
   background:
     radial-gradient(140% 100% at 18% -24%, rgba(255, 255, 255, 0.30), transparent 48%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(4, 18, 33, 0.50) 64%, rgba(255, 255, 255, 0.05)),
@@ -2154,7 +2154,7 @@ body:not(.compact-reference-ui) {
     radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.30), transparent 26%),
     linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.055) 42%, rgba(4, 18, 33, 0.30) 100%),
     rgba(5, 20, 33, 0.30);
-  --liquid-glass-border: rgba(255, 255, 255, 0.46);
+  --liquid-glass-border: none !important;
   --liquid-glass-edge: rgba(255, 255, 255, 0.74);
   --liquid-glass-cyan-edge: rgba(35, 248, 255, 0.34);
 }
@@ -2168,7 +2168,7 @@ body:not(.compact-reference-ui) #side .current-scenario-card,
 body:not(.compact-reference-ui) .map-legend {
   isolation: isolate !important;
   overflow: hidden !important;
-  border-color: color-mix(in srgb, var(--liquid-glass-border) 70%, var(--ui-cyan) 30%) !important;
+  border-color: transparent !important;
   background: var(--liquid-glass-panel) !important;
   background-blend-mode: screen, screen, normal, normal !important;
   box-shadow:
@@ -2297,7 +2297,7 @@ body:not(.compact-reference-ui) #side #run-status,
 body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill,
 body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill:nth-child(n+5),
 body:not(.compact-reference-ui) #side .op-cell {
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, 0.22), transparent 48%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04) 52%, rgba(4, 18, 33, 0.20)),
@@ -2313,7 +2313,7 @@ body:not(.compact-reference-ui) #side .op-cell {
 body:not(.compact-reference-ui) #side input,
 body:not(.compact-reference-ui) #side select,
 body:not(.compact-reference-ui) #side textarea {
-  border-color: rgba(255, 255, 255, 0.22) !important;
+  border-color: transparent !important;
   background-color: rgba(255, 255, 255, 0.085) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -2323,7 +2323,7 @@ body:not(.compact-reference-ui) #side textarea {
 }
 
 body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
-  border-color: rgba(255, 255, 255, 0.42) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(140% 90% at 18% -18%, rgba(255, 255, 255, 0.32), transparent 50%),
     linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(5, 22, 36, 0.48) 58%, rgba(255, 255, 255, 0.06)),
@@ -2373,7 +2373,7 @@ body:not(.compact-reference-ui) .map-legend {
   gap: 10px !important;
   padding: 14px 18px 16px !important;
   overflow: hidden !important;
-  border-color: rgba(255, 255, 255, 0.34) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(130% 88% at 18% -16%, rgba(255, 255, 255, 0.25), transparent 46%),
     radial-gradient(90% 70% at 100% 0%, rgba(35, 248, 255, 0.13), transparent 50%),
@@ -2435,7 +2435,7 @@ body:not(.compact-reference-ui) .reference-current-legend.hue-wheel-only.hue-whe
 body:not(.compact-reference-ui) #side .preset-card.active,
 body:not(.compact-reference-ui) #controls .time-step-option.active,
 body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"] {
-  border-color: rgba(255, 255, 255, 0.38) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.30), transparent 45%),
     linear-gradient(135deg, rgba(35, 248, 255, 0.82), rgba(18, 174, 231, 0.56)) !important;
@@ -2466,7 +2466,7 @@ body:not(.compact-reference-ui) #banner,
 body:not(.compact-reference-ui) #side,
 body:not(.compact-reference-ui) #controls,
 body:not(.compact-reference-ui) .map-legend {
-  border-color: rgba(255, 255, 255, 0.33) !important;
+  border-color: transparent !important;
   background: var(--reference-glass-panel) !important;
   background-blend-mode: screen, screen, screen, normal, normal !important;
   box-shadow:
@@ -2545,7 +2545,7 @@ body:not(.compact-reference-ui) #side .insight-pill,
 body:not(.compact-reference-ui) #side .op-cell,
 body:not(.compact-reference-ui) #controls #time-label,
 body:not(.compact-reference-ui) #controls .time-step-option {
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: transparent !important;
   border-radius: 24px !important;
   background: var(--reference-glass-card) !important;
   box-shadow:
@@ -2566,7 +2566,7 @@ body:not(.compact-reference-ui) #side .scenario-tabs button,
 body:not(.compact-reference-ui) #side .resp-tab,
 body:not(.compact-reference-ui) #controls button,
 body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
-  border-color: rgba(255, 255, 255, 0.28) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(90% 130% at 15% 10%, rgba(255, 255, 255, 0.34), transparent 58%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(187, 192, 198, 0.16) 58%, rgba(255, 255, 255, 0.10)),
@@ -2598,7 +2598,7 @@ body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"]
     radial-gradient(85% 140% at 18% 0%, rgba(255, 255, 255, 0.46), transparent 58%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(226, 228, 232, 0.24) 62%, rgba(255, 255, 255, 0.18)) !important;
   color: #031420 !important;
-  border-color: rgba(255, 255, 255, 0.44) !important;
+  border-color: transparent !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     inset 0 -16px 28px rgba(0, 0, 0, 0.12),
@@ -2610,7 +2610,7 @@ body:not(.compact-reference-ui) #side input,
 body:not(.compact-reference-ui) #side select,
 body:not(.compact-reference-ui) #side textarea {
   border-radius: 18px !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: transparent !important;
   background:
     radial-gradient(95% 100% at 18% 0%, rgba(255, 255, 255, 0.18), transparent 58%),
     rgba(255, 255, 255, 0.08) !important;
@@ -2645,7 +2645,7 @@ body:not(.compact-reference-ui) #side,
 body:not(.compact-reference-ui) #controls,
 body:not(.compact-reference-ui) .map-legend,
 body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
-  border-color: rgba(255, 255, 255, 0.50) !important;
+  border-color: transparent !important;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.44), rgba(236, 238, 241, 0.24) 48%, rgba(188, 193, 199, 0.16)),
     rgba(244, 246, 248, 0.20) !important;
@@ -2713,7 +2713,7 @@ body:not(.compact-reference-ui) #side .insight-pill,
 body:not(.compact-reference-ui) #side .op-cell,
 body:not(.compact-reference-ui) #controls #time-label,
 body:not(.compact-reference-ui) #controls .time-step-option {
-  border-color: rgba(255, 255, 255, 0.42) !important;
+  border-color: transparent !important;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.40), rgba(236, 238, 241, 0.20) 54%, rgba(186, 191, 198, 0.13)),
     rgba(245, 247, 249, 0.18) !important;
@@ -2790,7 +2790,7 @@ body:not(.compact-reference-ui) #controls .time-step-option[aria-pressed="true"]
   background:
     radial-gradient(88% 130% at 20% 0%, rgba(255, 255, 255, 0.56), transparent 58%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.46), rgba(222, 225, 230, 0.30) 62%, rgba(255, 255, 255, 0.20)) !important;
-  border-color: rgba(255, 255, 255, 0.58) !important;
+  border-color: transparent !important;
   box-shadow:
     inset 1px 1px 1px rgba(255, 255, 255, 0.70),
     inset -1px -1px 1px rgba(255, 255, 255, 0.44),
@@ -2841,7 +2841,7 @@ body:not(.compact-reference-ui) #side input[type="range"]::-webkit-slider-runnab
 body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-runnable-track {
   background:
     linear-gradient(90deg, rgba(28, 35, 43, 0.70) 0%, rgba(28, 35, 43, 0.70) var(--slider-pct, 0%), rgba(255, 255, 255, 0.34) var(--slider-pct, 0%), rgba(255, 255, 255, 0.34) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.56) !important;
+  border-color: transparent !important;
   box-shadow:
     inset 1px 1px 1px rgba(255, 255, 255, 0.60),
     inset 0 -2px 3px rgba(30, 38, 46, 0.14) !important;
@@ -2850,7 +2850,7 @@ body:not(.compact-reference-ui) #controls input[type="range"]::-webkit-slider-ru
 body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-track,
 body:not(.compact-reference-ui) #controls input[type="range"]::-moz-range-track {
   background: rgba(255, 255, 255, 0.34) !important;
-  border-color: rgba(255, 255, 255, 0.56) !important;
+  border-color: transparent !important;
 }
 
 body:not(.compact-reference-ui) #side input[type="range"]::-moz-range-progress,
@@ -3008,7 +3008,7 @@ body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper {
   gap: 8px !important;
   padding: 0.6rem !important;
   border-radius: 2rem !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+  border-color: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -3038,7 +3038,7 @@ body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn {
 body:not(.compact-reference-ui) #banner.liquidGlass-wrapper {
   display: flex !important;
   border-radius: 2rem !important;
-  border-color: rgba(255, 255, 255, 0.42) !important;
+  border-color: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -3060,7 +3060,7 @@ body:not(.compact-reference-ui) #banner .banner-copy {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper {
   display: block !important;
   border-radius: 2rem !important;
-  border-color: rgba(255, 255, 255, 0.42) !important;
+  border-color: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -3078,7 +3078,7 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper,
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
   display: block !important;
   border-radius: 2rem !important;
-  border-color: rgba(255, 255, 255, 0.42) !important;
+  border-color: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -3127,7 +3127,7 @@ body:not(.compact-reference-ui) #side .current-scenario-card,
 body:not(.compact-reference-ui) #controls #time-label,
 body:not(.compact-reference-ui) #controls .time-step-option {
   background: rgba(255, 255, 255, 0.24) !important;
-  border-color: rgba(255, 255, 255, 0.36) !important;
+  border-color: transparent !important;
   box-shadow:
     inset 2px 2px 1px 0 rgba(255, 255, 255, 0.38),
     inset -1px -1px 1px 1px rgba(255, 255, 255, 0.34),
@@ -3268,7 +3268,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     0 1px 2px rgba(0, 0, 0, 0.10) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: none !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active {
@@ -3295,7 +3295,7 @@ body:not(.compact-reference-ui) .result-card.wide.empty-state {
   background: rgba(8, 22, 40, 0.55) !important;
   -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
   backdrop-filter: blur(10px) saturate(150%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border: none !important;
   border-radius: 14px !important;
   padding: 10px 14px !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28) !important;
@@ -3310,7 +3310,7 @@ body:not(.compact-reference-ui) .result-card.wide.empty-state .result-value {
    so it fell outside the .preset-card overrides above. Patch it here. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide {
   background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: none !important;
   border-radius: 12px !important;
 }
 
@@ -3327,7 +3327,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide span {
 body:not(.compact-reference-ui) .leaflet-control-scale-line {
   background: rgba(8, 22, 40, 0.55) !important;
   color: #f1f9ff !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border: none !important;
   border-top: none !important;
   -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
   backdrop-filter: blur(8px) saturate(150%) !important;
@@ -3398,7 +3398,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card .lede {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     0 0 0 1px rgba(4, 22, 43, 0.10) !important;
@@ -3420,7 +3420,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper details summary {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
     0 0 0 1px rgba(4, 22, 43, 0.12),
@@ -3453,7 +3453,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .validation-checklist span {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     0 0 0 1px rgba(4, 22, 43, 0.08) !important;
@@ -3472,7 +3472,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.10),
     0 1px 2px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
 }
 
 /* Active preset still cyan-tinted (the active accent is a state, not white fade) */
@@ -3488,7 +3488,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active {
 /* 9. OpenDrift attribution chip — clear glass */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
@@ -3521,7 +3521,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card p {
 /* Preset-guide chip also clear */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
@@ -3563,7 +3563,7 @@ body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-comp
 body:not(.compact-reference-ui) .map-status-chips span {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.08) !important;
@@ -3600,7 +3600,7 @@ body:not(.compact-reference-ui) .result-card.wide.empty-state .result-value {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
     0 0 0 1px rgba(4, 22, 43, 0.12),
@@ -3621,7 +3621,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost.small,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.08) !important;
@@ -3631,7 +3631,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.08) !important;
@@ -3658,7 +3658,7 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #clearTopBtn,
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper button {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
     0 0 0 1px rgba(4, 22, 43, 0.10),
@@ -3692,7 +3692,7 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="number
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="text"] {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
@@ -3702,7 +3702,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-chip-row span
 body:not(.compact-reference-ui) .map-status-chips span {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
 }
 
 /* ============================================================
@@ -3766,7 +3766,7 @@ body:not(.compact-reference-ui) #banner.liquidGlass-wrapper a * {
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper #oil-budget-card {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.10) !important;
@@ -3828,7 +3828,7 @@ body:not(.compact-reference-ui) #ts-plot path.domain {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-summary-grid > div,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-insights > div {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
@@ -3837,7 +3837,7 @@ body:not(.compact-reference-ui) .results-card,
 body:not(.compact-reference-ui) #map-shell > .section-card.results-card,
 body:not(.compact-reference-ui) .result-card.wide {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.10) !important;
@@ -3865,7 +3865,7 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper {
   background: transparent !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0 0 1px rgba(4, 22, 43, 0.10) !important;
@@ -3894,18 +3894,18 @@ body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before {
    noaa-logo-text) — keep them legible but glass-thin. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .run-progress {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  border: none !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .progress-track {
   background: rgba(255, 255, 255, 0.18) !important;
-  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+  border: none !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .noaa-logo-text {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border: none !important;
 }
 
 /* The .meta-kicker tiny eyebrow used in timeline-meta ("Start", "End") */
