@@ -3216,3 +3216,128 @@ body:not(.compact-reference-ui) #controls #clearTopBtn {
     transform: translateX(-50%) !important;
   }
 }
+
+/* ============================================================
+   LIQUID-GLASS CONTRAST FIXES
+   The pre-existing dark-theme rules in style.css use near-white text
+   (rgba(226, 240, 248, 0.76)) for the inner cards (preset, term, caveat,
+   stat, quality, roadmap, wg-feat). Those colours assumed an opaque dark
+   panel underneath. With the new light liquid-glass tint, that text
+   becomes invisible. Flip the inner text to a dark navy when the parent
+   side panel is wrapped in .liquidGlass-wrapper so the cards stay readable.
+   ============================================================ */
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .roadmap-list strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell span:last-child {
+  color: #04162b !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .roadmap-list span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-guide span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .color-wheel-copy span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .map-polish-note span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat span:last-child {
+  color: rgba(7, 25, 44, 0.82) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .color-wheel-copy strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .map-polish-note strong,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card strong {
+  color: #04162b !important;
+}
+
+/* Inner inset cards inside the side panel (preset-card, term-card, etc.) get
+   a faint white wash so they read as distinct chips on top of the light glass. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
+  background: rgba(255, 255, 255, 0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 1px 2px rgba(0, 0, 0, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active {
+  background: rgba(35, 248, 255, 0.18) !important;
+  border-color: rgba(35, 248, 255, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(35, 248, 255, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* The .hint and .dim subtle text classes also need a small bump for the
+   light glass background — keep them dark navy but raise alpha. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .hint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .dim,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-brand .dim {
+  color: rgba(7, 25, 44, 0.78) !important;
+}
+
+/* Results card sits on the map (outside the side panel). The empty-state
+   "No active run" text was floating; give the card a small glass plate so it
+   reads as part of the map UI rather than orphan text. */
+body:not(.compact-reference-ui) .result-card.wide.empty-state {
+  background: rgba(8, 22, 40, 0.55) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
+  backdrop-filter: blur(10px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28) !important;
+}
+
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-value {
+  color: #f1f9ff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* The preset-guide explainer below the preset grid uses #id, not a class,
+   so it fell outside the .preset-card overrides above. Patch it here. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 12px !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide strong {
+  color: #04162b !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide span {
+  color: rgba(7, 25, 44, 0.82) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Leaflet's native scale-bar control ships with an opaque white box and dark
+   text — it clashes with the surrounding glass UI. Re-skin it as a glass chip. */
+body:not(.compact-reference-ui) .leaflet-control-scale-line {
+  background: rgba(8, 22, 40, 0.55) !important;
+  color: #f1f9ff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-top: none !important;
+  -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+  backdrop-filter: blur(8px) saturate(150%) !important;
+  padding: 3px 8px !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+}
