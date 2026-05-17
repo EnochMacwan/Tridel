@@ -31,16 +31,15 @@ window.renderHomeCards = function(container) {
             <div class="grid-card-visual">
               <img loading="lazy" alt="${escapeHtml(card.title)}" src="${escapeHtml(card.image)}">
             </div>
-            <div class="grid-content-outside">
-              <h3 class="card__title">
-                ${escapeHtml(card.title)}
-              </h3>
-              <p class="card__excerpt">
-                ${escapeHtml(card.excerpt)}
-              </p>
-              <span class="card__link">
-                ${escapeHtml(card.linkText)}
-              </span>
+            <div class="grid-content-outside liquidGlass-wrapper">
+              <div class="liquidGlass-effect"></div>
+              <div class="liquidGlass-tint"></div>
+              <div class="liquidGlass-shine"></div>
+              <div class="liquidGlass-text">
+                <h3 class="card__title">${escapeHtml(card.title)}</h3>
+                <p class="card__excerpt">${escapeHtml(card.excerpt)}</p>
+                <span class="card__link">${escapeHtml(card.linkText)}</span>
+              </div>
             </div>
         `;
 
