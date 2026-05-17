@@ -3235,7 +3235,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid strong,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card strong,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat-icon,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell span:last-child {
-  color: #04162b !important;
+  color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
 }
 
@@ -3248,14 +3248,14 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .color-wheel-copy span
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .map-polish-note span,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid span,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat span:last-child {
-  color: rgba(7, 25, 44, 0.82) !important;
+  color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .color-wheel-copy strong,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .map-polish-note strong,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card strong {
-  color: #04162b !important;
+  color: #ffffff !important;
 }
 
 /* Inner inset cards inside the side panel (preset-card, term-card, etc.) get
@@ -3287,7 +3287,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .hint,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .dim,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-brand .dim {
-  color: rgba(7, 25, 44, 0.78) !important;
+  color: #ffffff !important;
 }
 
 /* Results card sits on the map (outside the side panel). The empty-state
@@ -3317,12 +3317,12 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide {
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide strong {
-  color: #04162b !important;
+  color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
 }
 
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide span {
-  color: rgba(7, 25, 44, 0.82) !important;
+  color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
@@ -3379,7 +3379,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-kicker,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .eyebrow,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution span,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .panel-section-label {
-  color: rgba(7, 25, 44, 0.86) !important;
+  color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
   letter-spacing: 0.08em !important;
 }
@@ -3395,7 +3395,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .panel-section-label {
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .lede,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card p,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card .lede {
-  color: rgba(4, 22, 43, 0.92) !important;
+  color: #ffffff !important;
   font-weight: 500 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) !important;
 }
@@ -3404,7 +3404,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .intro-card .lede {
    white edge outline plus dark navy text with strong text-shadow. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
@@ -3429,7 +3429,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-tab,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper details summary {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
@@ -3465,7 +3465,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.
 /* 7. Validation checklist pills — clear glass with dark text */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .validation-checklist span {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.38) !important;
   text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.80),
@@ -3570,7 +3570,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tuning-label,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tuning-val,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-chip-row span,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .sara-legend span {
-  color: rgba(4, 22, 43, 0.94) !important;
+  color: #ffffff !important;
   text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.80),
     0 -1px 2px rgba(255, 255, 255, 0.45),
@@ -3583,7 +3583,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .sara-legend span {
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text strong,
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text small,
 body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-compass-title {
-  color: rgba(4, 22, 43, 0.94) !important;
+  color: #ffffff !important;
   text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.80),
     0 -1px 2px rgba(255, 255, 255, 0.45),
@@ -3594,7 +3594,7 @@ body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-comp
 /* 13. Map-status-chips at the top of the map — also need to read on bare map */
 body:not(.compact-reference-ui) .map-status-chips span {
   background: transparent !important;
-  color: rgba(4, 22, 43, 0.94) !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
@@ -3642,7 +3642,7 @@ body:not(.compact-reference-ui) .result-card.wide.empty-state .result-value {
    with white text — needs the glass treatment too. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
@@ -3666,7 +3666,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn:hov
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost.small,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
@@ -3679,7 +3679,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small {
 /* 18. Time-step option pills (1 hr / 3 hr / 6 hr / 12 hr / 24 hr) — glass */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
@@ -3709,7 +3709,7 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #playBtn,
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #clearTopBtn,
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper button {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
@@ -3746,7 +3746,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper select,
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="number"],
 body:not(.compact-reference-ui) #controls.liquidGlass-wrapper input[type="text"] {
   background: transparent !important;
-  color: #04162b !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
@@ -3756,9 +3756,147 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .tag,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-chip-row span,
 body:not(.compact-reference-ui) .map-status-chips span {
   background: transparent !important;
-  color: rgba(4, 22, 43, 0.94) !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.42) !important;
   text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.80),
     0 -1px 2px rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ============================================================
+   WHITE-TEXT OVERRIDE
+   The user prefers crisp white text everywhere on glass — no dark-navy +
+   text-shadow halo. Pure white reads cleanly against the dark Carto basemap
+   and stays visible through the bright current overlay because the body
+   blur layer (.liquidGlass-effect) provides enough refraction contrast.
+   This block is intentionally last in the file so it wins the cascade.
+   ============================================================ */
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper *,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper *,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper *,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper *,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper *,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .result-card.wide.empty-state,
+body:not(.compact-reference-ui) .result-card.wide.empty-state * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Cyan accents (eyebrow / kicker / active-state labels) stay cyan — they're
+   intentional brand colour, not "dim navy". */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .panel-section-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .summary-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .eyebrow,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div > span:first-child,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .reference-control-label span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-header h3,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-legend {
+  color: #23f8ff !important;
+  text-shadow: none !important;
+}
+
+/* Hyperlinks keep a subtler cyan */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper a,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper a *,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper a,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper a * {
+  color: #5be9ff !important;
+}
+
+/* ============================================================
+   OIL BUDGET + RESULTS CHART — glass treatment
+   These two Plotly charts (#oil-budget-plot, #ts-plot) and the card that
+   holds them (#oil-budget-card, .results-card) carried solid white backgrounds
+   that broke the glass aesthetic. Drop everything to transparent and lift
+   the chart text to white.
+   ============================================================ */
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #oil-budget-card {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.10) !important;
+}
+
+body:not(.compact-reference-ui) #oil-budget-plot,
+body:not(.compact-reference-ui) #ts-plot {
+  background: transparent !important;
+}
+
+/* Plotly internals: the .plot-container > .main-svg has explicit fill
+   attributes. The .bg rect inside it is the plot background. */
+body:not(.compact-reference-ui) #oil-budget-plot .main-svg,
+body:not(.compact-reference-ui) #oil-budget-plot .plot-container,
+body:not(.compact-reference-ui) #oil-budget-plot .svg-container,
+body:not(.compact-reference-ui) #ts-plot .main-svg,
+body:not(.compact-reference-ui) #ts-plot .plot-container,
+body:not(.compact-reference-ui) #ts-plot .svg-container {
+  background: transparent !important;
+}
+
+body:not(.compact-reference-ui) #oil-budget-plot .main-svg .bg,
+body:not(.compact-reference-ui) #oil-budget-plot rect.bg,
+body:not(.compact-reference-ui) #oil-budget-plot .cartesianlayer .bg,
+body:not(.compact-reference-ui) #ts-plot .main-svg .bg,
+body:not(.compact-reference-ui) #ts-plot rect.bg,
+body:not(.compact-reference-ui) #ts-plot .cartesianlayer .bg {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+}
+
+/* Axis labels, tick labels, legend text on charts → white */
+body:not(.compact-reference-ui) #oil-budget-plot text,
+body:not(.compact-reference-ui) #oil-budget-plot .xtick text,
+body:not(.compact-reference-ui) #oil-budget-plot .ytick text,
+body:not(.compact-reference-ui) #oil-budget-plot .xtitle,
+body:not(.compact-reference-ui) #oil-budget-plot .ytitle,
+body:not(.compact-reference-ui) #oil-budget-plot .legend text,
+body:not(.compact-reference-ui) #ts-plot text {
+  fill: #ffffff !important;
+}
+
+/* Grid + axis lines: faint white so they don't punch through */
+body:not(.compact-reference-ui) #oil-budget-plot .xgrid,
+body:not(.compact-reference-ui) #oil-budget-plot .ygrid,
+body:not(.compact-reference-ui) #ts-plot .xgrid,
+body:not(.compact-reference-ui) #ts-plot .ygrid {
+  stroke: rgba(255, 255, 255, 0.22) !important;
+}
+
+body:not(.compact-reference-ui) #oil-budget-plot .xaxis path,
+body:not(.compact-reference-ui) #oil-budget-plot .yaxis path,
+body:not(.compact-reference-ui) #oil-budget-plot path.domain,
+body:not(.compact-reference-ui) #ts-plot path.domain {
+  stroke: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Budget summary grid + insight chips beneath the chart — glass too */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-summary-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-insights > div {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+/* Results-card on the map (centroid / spread / etc.) — same transparency */
+body:not(.compact-reference-ui) .results-card,
+body:not(.compact-reference-ui) #map-shell > .section-card.results-card,
+body:not(.compact-reference-ui) .result-card.wide {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(4, 22, 43, 0.10) !important;
 }
