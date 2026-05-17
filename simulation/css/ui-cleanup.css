@@ -4043,6 +4043,42 @@ body:not(.compact-reference-ui) #side select:focus {
   outline: none !important;
 }
 
+/* The OPENOIL / DATA / OPS feature icon chips were rgba(0,170,231,0.1) cyan
+   tints. Drop to the same recipe as every other pill: transparent bg, thin
+   white edge, no fill — cyan stays only in the text. */
+body:not(.compact-reference-ui) #side .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat-icon {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* .wg-feat row was carrying the same L2701 grayscale(1) brightness(124%)
+   backdrop-filter that everything else got cleaned up from. */
+body:not(.compact-reference-ui) #side .wg-feat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat {
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* NOAA ORR badge and other small label-style chips inside the side panel
+   should also match (clean transparent pill, white edge, accent text). */
+body:not(.compact-reference-ui) #side .noaa-logo-text,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .noaa-logo-text {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* ============================================================
    ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
    The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
