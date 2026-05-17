@@ -27,17 +27,12 @@
     var cards = '';
     data.cards.forEach(function (card) {
       cards +=
-        '<div class="value-prop-card liquidGlass-wrapper">' +
-          '<div class="liquidGlass-effect"></div>' +
-          '<div class="liquidGlass-tint"></div>' +
-          '<div class="liquidGlass-shine"></div>' +
-          '<div class="liquidGlass-text">' +
-            '<div class="value-prop-card__icon">' +
-              '<i class="fas ' + esc(card.icon) + '"></i>' +
-            '</div>' +
-            '<h3 class="value-prop-card__title">' + esc(card.title) + '</h3>' +
-            '<p class="value-prop-card__desc">' + esc(card.desc) + '</p>' +
+        '<div class="value-prop-card">' +
+          '<div class="value-prop-card__icon">' +
+            '<i class="fas ' + esc(card.icon) + '"></i>' +
           '</div>' +
+          '<h3 class="value-prop-card__title">' + esc(card.title) + '</h3>' +
+          '<p class="value-prop-card__desc">' + esc(card.desc) + '</p>' +
         '</div>';
     });
     return (

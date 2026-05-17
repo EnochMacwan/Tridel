@@ -7267,7 +7267,7 @@ html.lenis {
 
 .value-prop-card {
     text-align: center;
-    /* padding & border-radius are set on .value-prop-card.liquidGlass-wrapper below */
+    padding: var(--space-xl, 40px) var(--space-lg, 24px);
 }
 
 .value-prop-card__icon {
@@ -7832,104 +7832,4 @@ html.lenis {
     .mm-services .mega-hub__body {
         grid-template-columns: minmax(0, 1fr) 185px;
     }
-}
-
-/* ============================================
-   LIQUID GLASS EFFECT
-   Layers (bottom→top):  effect → tint → shine → text
-   The wrapper must have position:relative + overflow:hidden.
-   All sibling layer divs need matching border-radius (see below).
-   ============================================ */
-
-.liquidGlass-wrapper {
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.28);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2),
-                box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-}
-
-/* Backdrop + distortion layer */
-.liquidGlass-effect {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    filter: url(#glass-distortion);
-    overflow: hidden;
-}
-
-/* Colour tint */
-.liquidGlass-tint {
-    position: absolute;
-    z-index: 1;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.48);
-}
-
-[data-theme="dark"] .liquidGlass-tint {
-    background: rgba(15, 25, 45, 0.52);
-}
-
-/* Inner edge highlight / shine */
-.liquidGlass-shine {
-    position: absolute;
-    z-index: 2;
-    inset: 0;
-    overflow: hidden;
-    box-shadow:
-        inset  2px  2px 1px 0 rgba(255, 255, 255, 0.60),
-        inset -1px -1px 1px 0 rgba(255, 255, 255, 0.35);
-}
-
-/* Content layer — sits above all glass layers */
-.liquidGlass-text {
-    position: relative;
-    z-index: 3;
-}
-
-/* ------------------------------------------
-   VALUE-PROP CARDS  (What We Do section)
-   ------------------------------------------ */
-
-.value-prop-card.liquidGlass-wrapper {
-    border-radius: var(--radius-lg, 20px);
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    padding: var(--space-xl, 40px) var(--space-lg, 24px);
-}
-
-/* All glass layer children must share the same radius */
-.value-prop-card.liquidGlass-wrapper > div {
-    border-radius: var(--radius-lg, 20px);
-}
-
-.value-prop-card.liquidGlass-wrapper:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.4);
-}
-
-/* Icon colour stays on-brand over glass tint */
-.value-prop-card.liquidGlass-wrapper .value-prop-card__icon {
-    background: linear-gradient(135deg, rgba(0, 170, 231, 0.18), rgba(0, 255, 204, 0.08));
-    box-shadow: 0 0 0 1px rgba(0, 170, 231, 0.2);
-}
-
-/* ------------------------------------------
-   HIGHLIGHTS / GRID CARDS  (grid-content-outside)
-   ------------------------------------------ */
-
-.grid-content-outside.liquidGlass-wrapper {
-    border-radius: var(--radius-lg, 16px);
-    padding: var(--space-lg, 24px);
-}
-
-.grid-content-outside.liquidGlass-wrapper > div {
-    border-radius: var(--radius-lg, 16px);
-}
-
-.grid-card-wrapper:hover .grid-content-outside.liquidGlass-wrapper {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.38);
 }
