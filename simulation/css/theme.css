@@ -56,8 +56,8 @@
   /* ---------- Typography ---------- */
   --sim-font-family:             "Inter", system-ui, -apple-system, sans-serif;
   --sim-text-primary:            #ffffff;
-  --sim-text-accent:             #23f8ff;
-  --sim-text-link:               #5be9ff;
+  --sim-text-accent:             #ffffff;    /* was cyan - now uniform white */
+  --sim-text-link:               #ffffff;    /* was lighter cyan - now uniform white */
   --sim-text-shadow:             none;
   --sim-pill-font-size:          12px;
   --sim-pill-font-weight:        600;
@@ -348,6 +348,37 @@ body:not(.compact-reference-ui) .map-status-chips span,
 body:not(.compact-reference-ui) .result-card.wide,
 body:not(.compact-reference-ui) .result-card.wide * {
   color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* The TRIDEL brand wordmark + "In partnership with" kicker use a dark navy
+   fill + gradient/-webkit-text-fill-color trick that reads as cyan against
+   the glass. Force them to plain white too. */
+body:not(.compact-reference-ui) #banner .brand-wordmark,
+body:not(.compact-reference-ui) #banner .brand-partner-kicker,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-wordmark,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-partner-kicker {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Result-card empty-state label ("READY") + kicker — was the cyan eyebrow
+   above "No active run". Force white too. */
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-label,
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-kicker,
+body:not(.compact-reference-ui) .result-card .result-label,
+body:not(.compact-reference-ui) .result-card .result-kicker,
+body:not(.compact-reference-ui) #map-shell .result-label,
+body:not(.compact-reference-ui) #map-shell .result-kicker {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
   text-shadow: var(--sim-text-shadow) !important;
 }
 
