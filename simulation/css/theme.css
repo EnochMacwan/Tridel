@@ -457,6 +457,56 @@ body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-
   backdrop-filter: blur(4px) saturate(0) !important;
 }
 
+/* Scrollbar — cyan (rgba(35,248,255,0.42)) was the visible cyan line the
+   user spotted next to the TIME STEP card. Switch to white at the same
+   alpha as the glass edge so the scrollbar reads as part of the theme. */
+body:not(.compact-reference-ui),
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) .side-scroll,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-body {
+  scrollbar-color: rgba(255, 255, 255, 0.30) transparent !important;
+  scrollbar-width: thin !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.30) !important;
+  border-radius: var(--sim-radius-pill) !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Timeline date labels (#timeline-start, #timeline-end, #time-label,
+   #data-meta) and the metadata text were using JetBrains Mono / Fira Mono
+   monospace font and dark navy colour. Force the uniform Inter font + white. */
+body:not(.compact-reference-ui) #timeline-start,
+body:not(.compact-reference-ui) #timeline-end,
+body:not(.compact-reference-ui) #timeline-current,
+body:not(.compact-reference-ui) #timeline-phase,
+body:not(.compact-reference-ui) #time-label,
+body:not(.compact-reference-ui) #time-window-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-start,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-end,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #data-meta,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #timeline-start,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #timeline-end {
+  font-family: var(--sim-font-family) !important;
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+}
+
 /* Cyan accent for eyebrow / kicker / micro-label text */
 body:not(.compact-reference-ui) #side .panel-section-label,
 body:not(.compact-reference-ui) #side .summary-kicker,
