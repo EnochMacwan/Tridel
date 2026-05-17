@@ -66,8 +66,11 @@
   --sim-accent-glow:             0 0 14px rgba(35, 248, 255, 0.20);
   --sim-accent-combined:         var(--sim-accent-ring), var(--sim-accent-glow);
 
-  /* ---------- Modal ---------- */
-  --sim-modal-bg:                rgba(8, 22, 40, 0.42);
+  /* ---------- Modal ----------
+     Modal card uses the same transparent surface as every other glass
+     surface. Visual separation comes purely from the dim overlay behind
+     it (--sim-surface-overlay-dim) + the edge ring + the backdrop blur. */
+  --sim-modal-bg:                var(--sim-surface-glass);
 }
 
 /* ============================================================================
@@ -370,16 +373,20 @@ body:not(.compact-reference-ui) #banner a {
    6. MODAL (OpenDrift / WebGNOME setup) — same vocabulary
    ============================================================================ */
 
+body:not(.compact-reference-ui) #webgnome-modal,
 body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay {
   background-color: var(--sim-surface-overlay-dim) !important;
+  background-image: none !important;
   -webkit-backdrop-filter: var(--sim-backdrop-overlay) !important;
   backdrop-filter: var(--sim-backdrop-overlay) !important;
 }
 
-body:not(.compact-reference-ui) #webgnome-modal .wg-modal {
-  background-color: var(--sim-modal-bg) !important;
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
+body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay .wg-modal {
+  background-color: var(--sim-surface-glass) !important;
   background-image: none !important;
   border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
   -webkit-backdrop-filter: var(--sim-backdrop-modal) !important;
   backdrop-filter: var(--sim-backdrop-modal) !important;
 }
