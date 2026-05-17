@@ -3847,6 +3847,58 @@ body:not(.compact-reference-ui) .result-card.wide.empty-state {
 }
 
 /* ============================================================
+   KILL ALL IRIDESCENT GRADIENT OVERLAYS
+   The L2226 ::after pseudo-element paints a 90deg + 180deg linear-gradient
+   wash of rgba(255,255,255,0.13–0.42) on every wrapped card. Combined with
+   the .liquidGlass-shine layer's inset white shadows, that produces the
+   rainbow/silver fade the user keeps pointing at. Disable both.
+   ============================================================ */
+
+body:not(.compact-reference-ui) #banner::after,
+body:not(.compact-reference-ui) #side::after,
+body:not(.compact-reference-ui) #controls::after,
+body:not(.compact-reference-ui) #side .section-card::after,
+body:not(.compact-reference-ui) #side .side-header::after,
+body:not(.compact-reference-ui) #side .current-scenario-card::after,
+body:not(.compact-reference-ui) .map-legend::after,
+body:not(.compact-reference-ui) #map-toolbar::after,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::after {
+  background: transparent !important;
+  opacity: 0 !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Flatten the .liquidGlass-shine layer — drop the inset white highlights
+   that punch a bright edge around every card. */
+body #banner.liquidGlass-wrapper > .liquidGlass-shine,
+body #side.liquidGlass-wrapper > .liquidGlass-shine,
+body #controls.liquidGlass-wrapper > .liquidGlass-shine,
+body #map-toolbar.liquidGlass-wrapper > .liquidGlass-shine,
+body .map-legend.liquidGlass-wrapper > .liquidGlass-shine {
+  box-shadow: none !important;
+}
+
+/* Soften the SVG distortion filter that adds a specular rainbow shimmer.
+   Keep the blur but drop the specular lighting reflection. */
+body #banner.liquidGlass-wrapper > .liquidGlass-effect,
+body #side.liquidGlass-wrapper > .liquidGlass-effect,
+body #controls.liquidGlass-wrapper > .liquidGlass-effect,
+body #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect,
+body .map-legend.liquidGlass-wrapper > .liquidGlass-effect {
+  filter: none !important;
+  -webkit-backdrop-filter: blur(6px) saturate(140%) !important;
+  backdrop-filter: blur(6px) saturate(140%) !important;
+}
+
+/* ============================================================
    ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
    The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
    .section-card / .side-header / .current-scenario-card / #time-label /
