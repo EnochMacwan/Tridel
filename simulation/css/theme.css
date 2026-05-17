@@ -35,9 +35,12 @@
   --sim-edge-hover-color:        rgba(255, 255, 255, var(--sim-edge-alpha-hover));
   --sim-edge-hover:              1px solid var(--sim-edge-hover-color);
 
-  /* ---------- Backdrop ---------- */
-  --sim-backdrop-card:           blur(6px) saturate(140%);
-  --sim-backdrop-modal:          blur(20px) saturate(140%);
+  /* ---------- Backdrop ----------
+     Pure refraction only — no saturate() boost. saturate(140%) was lifting
+     the colours of the map under every card, producing a green/teal tint
+     across every glass surface. blur() alone gives clean glass. */
+  --sim-backdrop-card:           blur(6px);
+  --sim-backdrop-modal:          blur(20px);
   --sim-backdrop-overlay:        blur(6px);
 
   /* ---------- Shape ---------- */
