@@ -22,7 +22,7 @@
 :root {
   /* ---------- Surfaces ---------- */
   --sim-surface-glass:           transparent;
-  --sim-surface-overlay-dim:     rgba(1, 10, 20, 0.55);
+  --sim-surface-overlay-dim:     rgba(1, 10, 20, 0.35);    /* lighter modal dim so modal card reads as glass, not navy plate */
 
   /* ---------- Edges ----------
      Every glass surface — cards, pills, buttons, step circles, modal,
@@ -500,7 +500,60 @@ body:not(.compact-reference-ui) #webgnome-modal .wg-step-num {
 }
 
 /* ============================================================================
-   7. CHARTS — Oil budget canvas + Plotly fallbacks
+   7. RUN PROGRESS + TOGGLE SWITCHES — same transparent recipe
+   ============================================================================ */
+
+/* "Preparing simulation" run-progress panel was rgba(6,22,36,0.72) navy
+   with a cyan radial-gradient. Strip both for full transparency. */
+body:not(.compact-reference-ui) #side #run-progress,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #run-progress {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Progress bar track — barely-visible white fill, keep cyan fill for the
+   actual progress indicator. */
+body:not(.compact-reference-ui) #side .progress-track,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .progress-track {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+}
+
+/* Visual-overlay toggle switches. The native input checkboxes were styled as
+   pills with dark navy fill OFF / cyan gradient ON. Per user "no cyan accent",
+   make both states uniform white-edge pills with the active state using a
+   brighter white fill instead of cyan. Specificity-taxed so the rule wins. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="checkbox"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .toggle-grid input[type="checkbox"],
+body:not(.compact-reference-ui) #side .toggle-grid input[type="checkbox"],
+body:not(.compact-reference-ui) #side input[type="checkbox"] {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-chip) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .toggle-grid input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side .toggle-grid input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side input[type="checkbox"]:checked {
+  background-color: rgba(255, 255, 255, 0.30) !important;
+  background-image: none !important;
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================================
+   8. CHARTS — Oil budget canvas + Plotly fallbacks
    ============================================================================ */
 
 body:not(.compact-reference-ui) #oil-budget-plot,
