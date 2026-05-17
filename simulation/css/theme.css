@@ -382,6 +382,36 @@ body:not(.compact-reference-ui) #map-shell .result-kicker {
   text-shadow: var(--sim-text-shadow) !important;
 }
 
+/* Map-toolbar buttons (HIDE UI / RESET) and map-legend text were carrying
+   dark navy color (rgba(5,10,16,0.94)) + -webkit-text-fill-color from the
+   original style.css. Force white with specificity tax. */
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper button,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper.dock button,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper .map-toolbar-btn,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text strong,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text small,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-compass-title,
+body:not(.compact-reference-ui) .map-legend .legend-text strong,
+body:not(.compact-reference-ui) .map-legend .legend-text small,
+body:not(.compact-reference-ui) .map-legend .legend-text,
+body:not(.compact-reference-ui) .map-legend .map-legend-compass-title {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Tone down the map-toolbar backdrop blur+saturate that produced the white
+   "frosted" sheen on the HIDE UI / RESET pill against the dark map. */
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect {
+  -webkit-backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
 /* Cyan accent for eyebrow / kicker / micro-label text */
 body:not(.compact-reference-ui) #side .panel-section-label,
 body:not(.compact-reference-ui) #side .summary-kicker,
