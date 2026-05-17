@@ -3898,6 +3898,21 @@ body .map-legend.liquidGlass-wrapper > .liquidGlass-effect {
   backdrop-filter: blur(6px) saturate(140%) !important;
 }
 
+/* #banner and #map-toolbar still carried the L2643 white linear-gradient +
+   rgba(244,246,248,0.2) base background that turned them milky. Same
+   treatment .map-legend / #side / #controls already got via earlier overrides. */
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* ============================================================
    ZERO-WHITE-FADE PART 2 — kill the remaining wash on EVERY card
    The rule at L3124 (this file) sets rgba(255,255,255,0.24) on every
