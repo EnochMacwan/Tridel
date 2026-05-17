@@ -3832,15 +3832,18 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-insights > div
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
 }
 
-/* Results-card on the map (centroid / spread / etc.) — same transparency */
+/* Results-card on the map (centroid / spread / etc.) — fully transparent,
+   no inset edge, no outer ring. The "READY / No active run" text floats
+   directly over the map. */
 body:not(.compact-reference-ui) .results-card,
 body:not(.compact-reference-ui) #map-shell > .section-card.results-card,
-body:not(.compact-reference-ui) .result-card.wide {
+body:not(.compact-reference-ui) .result-card.wide,
+body:not(.compact-reference-ui) .result-card.wide.empty-state {
   background: transparent !important;
   border: none !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 0 0 1px rgba(4, 22, 43, 0.10) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 /* ============================================================
