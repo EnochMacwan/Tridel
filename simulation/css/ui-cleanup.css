@@ -3989,23 +3989,58 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.primary {
     0 0 14px rgba(35, 248, 255, 0.20) !important;
 }
 
-/* Native HTML form controls (number / text inputs and selects) — the user's
-   CSS at L2701 also paints them, plus they often have agent stylesheet
-   defaults. Force clean glass with white text. */
+/* Native HTML form controls (number / text inputs and selects) — match the
+   Oil-type select recipe exactly: transparent bg, thin 1px white edge,
+   18px radius, 12px/600 weight, 7px-12px padding, no inset highlight. */
 body:not(.compact-reference-ui) #side input[type="number"],
 body:not(.compact-reference-ui) #side input[type="text"],
 body:not(.compact-reference-ui) #side select,
 body:not(.compact-reference-ui) #controls input[type="number"],
 body:not(.compact-reference-ui) #controls input[type="text"],
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper input,
-body:not(.compact-reference-ui) #side.liquidGlass-wrapper select {
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select,
+body:not(.compact-reference-ui) #side .resp-panel input[type="number"],
+body:not(.compact-reference-ui) #side .resp-panel input[type="text"] {
   background-color: transparent !important;
   background-image: none !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 18px !important;
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  min-height: 36px !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   box-shadow: none !important;
+}
+
+/* Select elements need extra right padding for the dropdown chevron — keep
+   the Oil type select's exact padding. */
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select {
+  padding: 7px 36px 7px 12px !important;
+}
+
+/* Hide native input number spinner arrows so all fields share the same look */
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-outer-spin-button,
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+/* Hover / focus state — slightly brighter edge for affordance */
+body:not(.compact-reference-ui) #side input:hover,
+body:not(.compact-reference-ui) #side input:focus,
+body:not(.compact-reference-ui) #side select:hover,
+body:not(.compact-reference-ui) #side select:focus {
+  border-color: rgba(35, 248, 255, 0.55) !important;
+  outline: none !important;
 }
 
 /* ============================================================
