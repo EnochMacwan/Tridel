@@ -3940,6 +3940,55 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell {
   box-shadow: none !important;
 }
 
+/* Drop the backdrop-filter saturation + inset white highlight on the
+   scenario/response tabs, ghost buttons and tab-pills the user just flagged
+   (.resp-tab Skimming/Burning/Dispersant). Everything sits on the map clean. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-tab,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .webgnome-actions .ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper a.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .expert-toggle-btn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper details summary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .validation-checklist span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #playBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #clearBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #clearTopBtn,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper button,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .check-pill {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Active state on tabs / presets / time-step still highlighted with cyan
+   accent — pure border + glow, no inset shine, no white fill. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-tab.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .time-step-option.active {
+  box-shadow:
+    0 0 0 1px rgba(35, 248, 255, 0.55),
+    0 0 14px rgba(35, 248, 255, 0.20) !important;
+}
+
+/* Primary action buttons (RUN, Download OpenDrift, Open WebGNOME) keep their
+   cyan ring as the only visual cue. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #runTopBtn.primary,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #runTopBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper button.primary {
+  box-shadow:
+    0 0 0 1px rgba(35, 248, 255, 0.55),
+    0 0 14px rgba(35, 248, 255, 0.20) !important;
+}
+
 /* Native HTML form controls (number / text inputs and selects) — the user's
    CSS at L2701 also paints them, plus they often have agent stylesheet
    defaults. Force clean glass with white text. */
