@@ -24,11 +24,15 @@
   --sim-surface-glass:           transparent;
   --sim-surface-overlay-dim:     rgba(1, 10, 20, 0.55);
 
-  /* ---------- Edges ---------- */
+  /* ---------- Edges ----------
+     Every glass surface — cards, pills, buttons, step circles, modal,
+     active state, primary action — uses the same white edge. Cyan is
+     reserved for text only (eyebrow labels, links, code, accent labels). */
   --sim-edge-alpha:              0.18;
+  --sim-edge-alpha-hover:        0.40;
   --sim-edge-color:              rgba(255, 255, 255, var(--sim-edge-alpha));
   --sim-edge:                    1px solid var(--sim-edge-color);
-  --sim-edge-hover-color:        rgba(35, 248, 255, 0.55);
+  --sim-edge-hover-color:        rgba(255, 255, 255, var(--sim-edge-alpha-hover));
   --sim-edge-hover:              1px solid var(--sim-edge-hover-color);
 
   /* ---------- Backdrop ---------- */
@@ -60,11 +64,14 @@
   --sim-label-font-size:         10px;
   --sim-label-font-weight:       800;
 
-  /* ---------- Accent (active / primary) ---------- */
-  --sim-accent-color:            #23f8ff;
-  --sim-accent-ring:             0 0 0 1px rgba(35, 248, 255, 0.55);
-  --sim-accent-glow:             0 0 14px rgba(35, 248, 255, 0.20);
-  --sim-accent-combined:         var(--sim-accent-ring), var(--sim-accent-glow);
+  /* ---------- Accent (active / primary) ----------
+     No coloured ring or glow — active/primary state uses a slightly
+     brighter white edge (same recipe, just lifted alpha). Cyan stays
+     in the TEXT only. */
+  --sim-accent-color:            transparent;
+  --sim-accent-ring:             none;
+  --sim-accent-glow:             none;
+  --sim-accent-combined:         none;
 
   /* ---------- Modal ----------
      Modal card uses the same transparent surface as every other glass
@@ -319,8 +326,8 @@ body:not(.compact-reference-ui) #side .wg-primary,
 body:not(.compact-reference-ui) #side #runBtn.primary,
 body:not(.compact-reference-ui) #side #runTopBtn.primary,
 body:not(.compact-reference-ui) #controls #runTopBtn.primary {
-  border-color: var(--sim-edge-hover-color) !important;
-  box-shadow: var(--sim-accent-combined) !important;
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
 }
 
 /* ============================================================================
@@ -457,8 +464,8 @@ body:not(.compact-reference-ui) #webgnome-modal .wg-step-num {
   background-color: var(--sim-surface-glass) !important;
   background-image: none !important;
   color: var(--sim-text-accent) !important;
-  border: 1px solid var(--sim-edge-hover-color) !important;
-  box-shadow: var(--sim-accent-glow) !important;
+  border: var(--sim-edge) !important;
+  box-shadow: none !important;
 }
 
 /* ============================================================================
@@ -531,7 +538,7 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper se
   padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x-select) var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
 }
 
-/* Active / primary cyan ring (specificity tax) */
+/* Active / primary — slightly brighter white edge only (specificity tax) */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .scenario-tabs button.active,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-tab.active,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .preset-card.active,
@@ -540,8 +547,8 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper bu
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-primary,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runBtn.primary,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runTopBtn.primary {
-  border: 1px solid var(--sim-edge-hover-color) !important;
-  box-shadow: var(--sim-accent-combined) !important;
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
 }
 
 /* Card recipe specificity tax */
