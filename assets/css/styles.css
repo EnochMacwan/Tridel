@@ -299,13 +299,8 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     width: 100%;
 }
 
-/* LIVE Simulation CTA — red badge in the top nav, between Success Stories
-   and Careers. Pulls visual attention to the live external simulation.
-   Label renders on TWO lines: "LIVE" on top, "Simulation" below — the
-   data carries the literal "\n" and white-space:pre-line converts it
-   into a hard line break. display:inline-block keeps the link as ONE
-   block so a SINGLE red pill wraps both lines, instead of inline behaviour
-   that paints a separate background box per line. */
+/* Simulation CTA — red badge in the top nav, between Success Stories
+   and Careers. Pulls visual attention to the detached simulation app. */
 .header__nav-link.nav-cta-hormuz {
     display: inline-block;
     background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
@@ -317,9 +312,7 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     letter-spacing: 0.02em;
     box-shadow: 0 4px 12px rgba(229, 57, 53, 0.35);
     transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
-    /* white-space:pre-line so the literal "\n" between LIVE and Simulation in
-       the data renders as a hard line break — stacks LIVE / Simulation. */
-    white-space: pre-line;
+    white-space: nowrap;
     flex-shrink: 0;
     line-height: 1.15;
     text-align: center;
