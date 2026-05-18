@@ -473,6 +473,38 @@ body:not(.compact-reference-ui) .leaflet-bottom.leaflet-left {
   bottom: 28px !important;
 }
 
+/* CURRENT SCENARIO card — the #summary-window chip swaps between three
+   widths during the lifecycle: "Timeline loading" (121px) -> the full date
+   range "YYYY-MM-DD HH:MM to YYYY-MM-DD HH:MM" (~210px) -> "24 h window"
+   (99px) after Run. Combined with the card's `transition: all` rule, the
+   visible shrink/grow looked like the whole card was resizing. Kill the
+   transition so any future text change doesn't animate the reflow, and
+   lock a stable min-height on the card so chip wrapping changes don't
+   shift the layout. */
+body:not(.compact-reference-ui) .current-scenario-card,
+body:not(.compact-reference-ui) .current-scenario-card * {
+  transition: none !important;
+}
+
+/* Min-height set to the WORST-CASE chip layout (the full date range
+   "2026-MM-DD HH:MM to 2026-MM-DD HH:MM" forces the window chip onto its
+   own second line, bumping card to ~186px). Locking that height means the
+   card never shrinks when the chip shortens to "24 h window" after Run. */
+body:not(.compact-reference-ui) .current-scenario-card {
+  min-height: 186px !important;
+}
+
+body:not(.compact-reference-ui) .current-scenario-card .summary-chip-row {
+  display: flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+}
+
+body:not(.compact-reference-ui) .current-scenario-card .summary-chip-row span {
+  text-align: center !important;
+}
+
 /* Map-toolbar buttons (HIDE UI / RESET) and map-legend text were carrying
    dark navy color (rgba(5,10,16,0.94)) + -webkit-text-fill-color from the
    original style.css. Force white with specificity tax. */
