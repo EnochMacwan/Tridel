@@ -47,6 +47,8 @@ Current `package.json` scripts:
 - SortableJS for admin drag-and-drop ordering
 - Font Awesome for icons
 
+See `TECHNOLOGIES_AND_PLUGINS.md` for the detailed plugin, external service, browser API, CSP, and deployment technology inventory.
+
 ### External Services
 
 - GitHub Contents API for admin publish/sync workflows
