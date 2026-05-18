@@ -463,6 +463,16 @@ body:not(.compact-reference-ui) #map-shell .results-card:not(.empty-state) {
   backdrop-filter: var(--sim-backdrop-card) !important;
 }
 
+/* The Leaflet 100 km scale bar lives in .leaflet-bottom.leaflet-left and
+   stacks below the Results card at the bottom of the map. Put them in the
+   same row by shifting the scale container RIGHT of the Results card so
+   they sit on the same horizontal line. The Results card is ~380px wide
+   at the bottom-left, so place the scale at left:400px to clear it. */
+body:not(.compact-reference-ui) .leaflet-bottom.leaflet-left {
+  left: 400px !important;
+  bottom: 28px !important;
+}
+
 /* Map-toolbar buttons (HIDE UI / RESET) and map-legend text were carrying
    dark navy color (rgba(5,10,16,0.94)) + -webkit-text-fill-color from the
    original style.css. Force white with specificity tax. */
