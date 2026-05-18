@@ -7199,9 +7199,16 @@ html.lenis {
     pointer-events: none;
 }
 
+/* Use flexbox with justify-content:center so the stat tiles always centre
+   on the page no matter how many items the data array has. The previous
+   `grid-template-columns: repeat(8, 1fr)` reserved 8 equal columns even
+   when the data array only had 7 stats — leaving an empty column on the
+   right that visually left-shifted the row. */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
     gap: clamp(10px, 1.6vw, 20px);
     text-align: center;
     position: relative;
@@ -7210,6 +7217,8 @@ html.lenis {
 
 .stat-item {
     padding: 14px 8px;
+    flex: 0 1 auto;
+    min-width: 110px;
 }
 
 .stat-number {
