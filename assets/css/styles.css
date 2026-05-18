@@ -6425,20 +6425,35 @@ html.lenis {
 }
 
 .skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link:focus-visible {
     position: fixed;
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 12px;
+    left: 12px;
+    width: auto;
+    height: auto;
+    margin: 0;
+    clip: auto;
+    clip-path: none;
     z-index: 10000;
-    padding: 12px 24px;
+    padding: 10px 16px;
     background: var(--color-accent, #00AAE7);
     color: #fff;
-    border-radius: 0 0 var(--radius-sm, 8px) var(--radius-sm, 8px);
+    border: 2px solid #061826;
+    border-radius: var(--radius-sm, 8px);
     font-weight: 600;
-    transition: top 0.2s ease;
-}
-.skip-link:focus {
-    top: 0;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
 }
 
 .empty-state {
