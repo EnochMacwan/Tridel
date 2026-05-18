@@ -458,11 +458,13 @@ body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-
 }
 
 /* Scrollbar — cyan (rgba(35,248,255,0.42)) was the visible cyan line the
-   user spotted next to the TIME STEP card. Switch to white at the same
-   alpha as the glass edge so the scrollbar reads as part of the theme. */
+   user spotted next to the TIME STEP card. The original style.css L4012
+   sets it via `body:not(.compact-reference-ui) #side .side-scroll`, so
+   the override must match that specificity. */
 body:not(.compact-reference-ui),
 body:not(.compact-reference-ui) #side,
-body:not(.compact-reference-ui) .side-scroll,
+body:not(.compact-reference-ui) #side .side-scroll,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
 body:not(.compact-reference-ui) #webgnome-modal .wg-modal-body {
   scrollbar-color: rgba(255, 255, 255, 0.30) transparent !important;
   scrollbar-width: thin !important;
@@ -484,6 +486,18 @@ body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb {
 
 body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* The .timeline-ticks element holds 5 empty <span> tick marks rendered as
+   short vertical bars under the slider. User flagged them as a stray
+   vertical line floating next to the TIME STEP card. Hide them. */
+body:not(.compact-reference-ui) .timeline-ticks,
+body:not(.compact-reference-ui) .timeline-ticks span,
+body:not(.compact-reference-ui) #side .timeline-ticks,
+body:not(.compact-reference-ui) #side .timeline-ticks span,
+body:not(.compact-reference-ui) #controls .timeline-ticks,
+body:not(.compact-reference-ui) #controls .timeline-ticks span {
+  display: none !important;
 }
 
 /* Timeline date labels (#timeline-start, #timeline-end, #time-label,
