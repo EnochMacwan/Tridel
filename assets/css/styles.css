@@ -7199,26 +7199,37 @@ html.lenis {
     pointer-events: none;
 }
 
-/* Use flexbox with justify-content:center so the stat tiles always centre
-   on the page no matter how many items the data array has. The previous
-   `grid-template-columns: repeat(8, 1fr)` reserved 8 equal columns even
-   when the data array only had 7 stats — leaving an empty column on the
-   right that visually left-shifted the row. */
+/* Single-row stats bar at every desktop size. Flexbox + flex-wrap:nowrap
+   keeps all 7 tiles on one line; flex:1 1 0 + min-width:0 lets each tile
+   shrink uniformly to fit the viewport so the row never breaks onto a
+   second line on smaller laptops (1024px-1366px). Wrap is only re-enabled
+   on actual mobile widths via the media query below so it doesn't squash
+   to one-cell-wide on phones. */
 .stats-grid {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     align-items: stretch;
-    gap: clamp(10px, 1.6vw, 20px);
+    gap: clamp(6px, 1.2vw, 20px);
     text-align: center;
     position: relative;
     z-index: 1;
 }
 
 .stat-item {
-    padding: 14px 8px;
-    flex: 0 1 auto;
-    min-width: 110px;
+    padding: 14px 6px;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        flex-wrap: wrap;
+    }
+    .stat-item {
+        flex: 0 1 calc(50% - 12px);
+        min-width: 120px;
+    }
 }
 
 .stat-number {
