@@ -204,6 +204,47 @@ function addTridelDubaiMarker() {
 }
 addTridelDubaiMarker();
 
+/* Geographic-feature labels — water bodies, the strait, and bordering
+   countries. Rendered as transparent divIcon markers so the text floats
+   on the dark Carto basemap without any pin/icon graphic. Two classes:
+   .geo-label-water for sea names (italic, cyan-tinted) and
+   .geo-label-country for country names (semi-bold, larger letter-spacing).
+   Pinned to the "labels" Leaflet pane so they sit above tiles but below
+   the simulation overlays. */
+const GEO_LABELS = [
+  // Water bodies
+  { name: "Persian Gulf",      lat: 26.30, lon: 51.80, cls: "geo-label-water" },
+  { name: "Strait of Hormuz",  lat: 26.55, lon: 56.30, cls: "geo-label-water geo-label-water--strait" },
+  { name: "Gulf of Oman",      lat: 25.00, lon: 58.20, cls: "geo-label-water" },
+  // Countries
+  { name: "IRAN",              lat: 28.80, lon: 54.50, cls: "geo-label-country" },
+  { name: "SAUDI ARABIA",      lat: 24.20, lon: 49.50, cls: "geo-label-country" },
+  { name: "UNITED ARAB EMIRATES", lat: 24.20, lon: 54.40, cls: "geo-label-country" },
+  { name: "OMAN",              lat: 23.40, lon: 57.80, cls: "geo-label-country" },
+  { name: "QATAR",             lat: 25.30, lon: 51.20, cls: "geo-label-country" },
+  { name: "BAHRAIN",           lat: 26.15, lon: 50.60, cls: "geo-label-country geo-label-country--sm" },
+  { name: "KUWAIT",            lat: 29.30, lon: 47.80, cls: "geo-label-country geo-label-country--sm" },
+];
+
+function addGeoLabels() {
+  GEO_LABELS.forEach((label) => {
+    const icon = L.divIcon({
+      className: `geo-label ${label.cls}`,
+      html: `<span>${label.name}</span>`,
+      iconSize: [0, 0], // let CSS size it
+      iconAnchor: [0, 0],
+    });
+    L.marker([label.lat, label.lon], {
+      icon,
+      pane: "labels",
+      interactive: false,
+      keyboard: false,
+      zIndexOffset: -200, // below interactive markers
+    }).addTo(map);
+  });
+}
+addGeoLabels();
+
 /* MarineTraffic does not expose a reliable public Leaflet tile endpoint for
    live AIS density here, so the app opens a synced external MarineTraffic view
    instead of adding a broken in-map tile layer. */
