@@ -357,6 +357,30 @@ body:not(.compact-reference-ui) #side input[type="number"] {
   -moz-appearance: textfield !important;
 }
 
+/* Native <select> dropdown <option> elements — when the dropdown opens,
+   each option's background comes from the browser's user-agent stylesheet
+   (white in Chrome/Brave). The currently-selected option then renders as
+   a bright white stripe in the dropdown popup. Force a dark background +
+   white text on every option, and a faint cyan highlight on hover/selected
+   so the dropdown looks consistent with the dark glass theme. */
+body:not(.compact-reference-ui) select option,
+body:not(.compact-reference-ui) #side select option,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option {
+  background-color: #03111f !important;
+  color: #ffffff !important;
+}
+
+body:not(.compact-reference-ui) select option:checked,
+body:not(.compact-reference-ui) select option:hover,
+body:not(.compact-reference-ui) #side select option:checked,
+body:not(.compact-reference-ui) #side select option:hover,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option:checked,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option:hover {
+  background: linear-gradient(0deg, rgba(35, 248, 255, 0.30), rgba(35, 248, 255, 0.30)) !important;
+  background-color: rgba(35, 248, 255, 0.30) !important;
+  color: #ffffff !important;
+}
+
 /* ============================================================================
    4. ACTIVE / PRIMARY STATE — cyan ring + glow, no fill
    The ONLY visual cue for active/primary is the cyan accent ring.
