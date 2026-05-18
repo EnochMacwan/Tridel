@@ -6652,6 +6652,29 @@ html.lenis {
     box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
 }
 
+.form-submit-status {
+    display: none;
+    margin: 0 0 var(--space-sm);
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.form-submit-status.is-error {
+    display: block;
+    color: #B91C1C;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.form-submit-status.is-success {
+    display: block;
+    color: #047857;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
 .submit-btn {
     width: 100%;
     padding: 16px;
