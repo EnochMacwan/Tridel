@@ -423,20 +423,44 @@ body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-partner-kicke
   text-shadow: var(--sim-text-shadow) !important;
 }
 
-/* Result-card empty-state label ("READY") + kicker — was the cyan eyebrow
-   above "No active run". Force white too. */
+/* Result-card labels (PARTICLES / PLAYBACK AGE / SPREAD RADIUS / CENTROID /
+   ENSEMBLE FOOTPRINT / TRAIL COVERAGE / OIL RADIUS / MASS LEFT) + the
+   empty-state kicker ("READY") were cyan. Force white per the all-text-white
+   rule, with stronger specificity so the cyan original doesn't win. */
 body:not(.compact-reference-ui) .result-card.wide.empty-state .result-label,
 body:not(.compact-reference-ui) .result-card.wide.empty-state .result-kicker,
 body:not(.compact-reference-ui) .result-card .result-label,
 body:not(.compact-reference-ui) .result-card .result-kicker,
+body:not(.compact-reference-ui) .result-card.wide .result-label,
+body:not(.compact-reference-ui) .result-card.wide .result-kicker,
+body:not(.compact-reference-ui) .result-card.wide .result-value,
 body:not(.compact-reference-ui) #map-shell .result-label,
-body:not(.compact-reference-ui) #map-shell .result-kicker {
+body:not(.compact-reference-ui) #map-shell .result-kicker,
+body:not(.compact-reference-ui) #map-shell .result-value,
+body:not(.compact-reference-ui) #map-shell .results-card .result-label,
+body:not(.compact-reference-ui) #map-shell .results-card .result-value {
   color: var(--sim-text-primary) !important;
   -webkit-text-fill-color: var(--sim-text-primary) !important;
   background: none !important;
   background-clip: initial !important;
   -webkit-background-clip: initial !important;
   text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* When the result-card has actual results (not the empty-state), give it
+   the same glass card recipe as every other card so it's a proper visible
+   panel on the map. The empty-state variant stays borderless/transparent
+   so "READY / No active run" still floats. */
+body:not(.compact-reference-ui) .result-card.wide:not(.empty-state),
+body:not(.compact-reference-ui) #map-shell .results-card:not(.empty-state) {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--sim-radius-card-lg) !important;
+  padding: var(--sim-pad-card) !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-card) !important;
+  backdrop-filter: var(--sim-backdrop-card) !important;
 }
 
 /* Map-toolbar buttons (HIDE UI / RESET) and map-legend text were carrying
