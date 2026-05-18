@@ -592,6 +592,17 @@ body:not(.compact-reference-ui) #controls .timeline-marker {
   display: none !important;
 }
 
+/* When HIDE UI is pressed, body gets .map-chrome-hidden and the side panel
+   is hidden — that leaves empty real estate on the right. Slide the
+   .map-legend (Surface currents card with the hue wheel) over to the
+   right edge to take advantage of the freed space. */
+body.map-chrome-hidden .map-legend,
+body.map-chrome-hidden .map-legend.liquidGlass-wrapper {
+  left: auto !important;
+  right: 24px !important;
+  bottom: 24px !important;
+}
+
 /* Timeline date labels (#timeline-start, #timeline-end, #time-label,
    #data-meta) and the metadata text were using JetBrains Mono / Fira Mono
    monospace font and dark navy colour. Force the uniform Inter font + white. */
