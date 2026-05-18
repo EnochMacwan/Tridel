@@ -299,24 +299,27 @@ h6 { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-sp
     width: 100%;
 }
 
-/* Hormuz Simulation CTA — red badge in the top nav, between Success Stories
-   and Careers. Pulls visual attention to the live external simulation. */
+/* LIVE Simulation CTA — red badge in the top nav, between Success Stories
+   and Careers. Pulls visual attention to the live external simulation.
+   Label renders on TWO lines: "LIVE" on top, "Simulation" below — the
+   data carries the literal "\n" and white-space:pre-line converts it
+   into a hard line break. */
 .header__nav-link.nav-cta-hormuz {
     background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
     color: #fff !important;
-    padding: 6px 14px;
+    padding: 4px 14px;
     margin: 0 4px;
     border-radius: 6px;
     font-weight: 700;
     letter-spacing: 0.02em;
     box-shadow: 0 4px 12px rgba(229, 57, 53, 0.35);
     transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
-    /* Keep the label on one line so the pill doesn't break apart on narrow
-       laptop widths. flex-shrink:0 prevents the nav layout from squashing
-       the pill into a multi-line blob. */
-    white-space: nowrap;
+    /* white-space:pre-line so the literal "\n" between LIVE and Simulation in
+       the data renders as a hard line break — stacks LIVE / Simulation. */
+    white-space: pre-line;
     flex-shrink: 0;
-    line-height: 1.2;
+    line-height: 1.1;
+    text-align: center;
 }
 
 .header__nav-link.nav-cta-hormuz:hover {

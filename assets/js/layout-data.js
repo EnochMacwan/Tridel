@@ -40,11 +40,11 @@ var NAV_LINKS = [
     "shortLabel": "Stories"
   },
   {
-    "label": "Hormuz Simulation",
+    "label": "LIVE\nSimulation",
     "href": "simulation/index.html",
     "icon": "fa-water",
     "key": "/hormuz-simulation",
-    "shortLabel": "Hormuz",
+    "shortLabel": "LIVE",
     "external": true,
     "customClass": "nav-cta-hormuz"
   },
