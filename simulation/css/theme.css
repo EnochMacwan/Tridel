@@ -83,6 +83,18 @@
      surface. Visual separation comes purely from the dim overlay behind
      it (--sim-surface-overlay-dim) + the edge ring + the backdrop blur. */
   --sim-modal-bg:                var(--sim-surface-glass);
+
+  /* ---------- Glass border recipe ----------
+     The crisp visible "border" the user pointed at on the TRIDEL banner,
+     HIDE UI pill and map-legend is NOT a CSS border — it is a multi-layer
+     inset/outer box-shadow stack on the liquidGlass-wrapper elements.
+     Captured here as one token so every card can wear the same recipe. */
+  --sim-glass-edge-shadow:
+    inset  1px  1px 1px 0 rgba(255, 255, 255, 0.66),
+    inset -1px -1px 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0  -22px 40px 0 rgba(74, 80, 88, 0.14),
+    0 24px 68px 0 rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 /* ============================================================================
@@ -744,14 +756,14 @@ body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrappe
   background-color: var(--sim-surface-glass) !important;
   background-image: none !important;
   color: var(--sim-text-primary) !important;
-  border: var(--sim-edge) !important;
+  border: 1px solid transparent !important;
   border-radius: var(--sim-radius-pill) !important;
   padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
   font-size: var(--sim-pill-font-size) !important;
   font-weight: var(--sim-pill-font-weight) !important;
   min-height: var(--sim-min-height-pill) !important;
   text-shadow: var(--sim-text-shadow) !important;
-  box-shadow: none !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -774,7 +786,10 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #r
   box-shadow: none !important;
 }
 
-/* Card recipe specificity tax */
+/* Card recipe specificity tax — every inner card now wears the exact same
+   crisp glass border as the outer liquidGlass-wrapper cards via the shared
+   --sim-glass-edge-shadow recipe. No CSS border (the inset shadows ARE the
+   border), 32px radius to match TRIDEL/HIDE-UI/map-legend. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .section-card,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .side-header,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .current-scenario-card,
@@ -787,12 +802,13 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .s
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .opendrift-attribution,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #preset-guide,
-body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #oil-budget-card {
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #oil-budget-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #run-progress {
   background-color: var(--sim-surface-glass) !important;
   background-image: none !important;
-  border: var(--sim-edge) !important;
-  border-radius: var(--sim-radius-card) !important;
-  box-shadow: none !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--sim-radius-card-lg) !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
