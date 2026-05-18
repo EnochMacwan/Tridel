@@ -14,7 +14,7 @@
  * and only falls back to the cache when offline. Chunk files are still
  * served cache-first (immutable per release).
  */
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `hormuz-forcing-${CACHE_VERSION}`;
 const DATA_PATTERN = /\/data\/.*\.json(?:\?|$)/;
 const MANIFEST_PATTERN = /\/data\/currents\.json(?:\?|$)/;
