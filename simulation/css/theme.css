@@ -789,7 +789,8 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #r
 /* Card recipe specificity tax — every inner card now wears the exact same
    crisp glass border as the outer liquidGlass-wrapper cards via the shared
    --sim-glass-edge-shadow recipe. No CSS border (the inset shadows ARE the
-   border), 32px radius to match TRIDEL/HIDE-UI/map-legend. */
+   border), 32px radius to match TRIDEL/HIDE-UI/map-legend, and the same
+   inner padding so content doesn't collide with the rounded edges. */
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .section-card,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .side-header,
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .current-scenario-card,
@@ -808,6 +809,8 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #r
   background-image: none !important;
   border: 1px solid transparent !important;
   border-radius: var(--sim-radius-card-lg) !important;
+  padding: var(--sim-pad-card) !important;
+  overflow: hidden !important;
   box-shadow: var(--sim-glass-edge-shadow) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
