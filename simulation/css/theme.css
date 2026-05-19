@@ -1154,3 +1154,55 @@ body:not(.compact-reference-ui) [class*="glass-shine"] {
   -webkit-filter: none !important;
   box-shadow: none !important;
 }
+
+/* 7. Nuclear shine kill — uses the "double-ID specificity tax" pattern
+   (#side#side, #controls#controls, ...) to push every selector into the
+   (2,X,Y) specificity tier. That beats every per-component (1,X,Y) rule
+   in style.css and ui-cleanup.css no matter how many classes they chain,
+   because specificity compares ID-column first.
+
+   Scope is intentionally limited to descendants of the main UI containers
+   so the container itself (which still wants a structural drop-shadow)
+   keeps its shadow — only inner elements lose theirs. */
+body:not(.compact-reference-ui) #side#side *,
+body:not(.compact-reference-ui) #controls#controls *,
+body:not(.compact-reference-ui) #banner#banner *,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar *,
+body:not(.compact-reference-ui) #map-shell#map-shell *,
+body:not(.compact-reference-ui) #map#map *,
+body:not(.compact-reference-ui) #app#app .map-legend *,
+body:not(.compact-reference-ui) #app#app .results-card *,
+body:not(.compact-reference-ui) #app#app .map-status-chips *,
+body:not(.compact-reference-ui) #webgnome-modal#webgnome-modal * {
+  box-shadow: none !important;
+}
+
+/* 8. Top-edge gradient sheens on inner elements — same nuclear scope.
+   Strip background-image only on elements whose source rules add a
+   linear-gradient white-to-transparent sheen (cards, pills, buttons,
+   tabs, active states). NOT applied universally because some elements
+   legitimately use background-image for their actual content/icon. */
+body:not(.compact-reference-ui) #side#side .section-card,
+body:not(.compact-reference-ui) #side#side .current-scenario-card,
+body:not(.compact-reference-ui) #side#side .stat-card,
+body:not(.compact-reference-ui) #side#side .term-card,
+body:not(.compact-reference-ui) #side#side .preset-card,
+body:not(.compact-reference-ui) #side#side .result-card,
+body:not(.compact-reference-ui) #side#side .insight-pill,
+body:not(.compact-reference-ui) #side#side button,
+body:not(.compact-reference-ui) #side#side button.primary,
+body:not(.compact-reference-ui) #side#side button.ghost,
+body:not(.compact-reference-ui) #side#side .scenario-tabs button,
+body:not(.compact-reference-ui) #side#side .resp-tab,
+body:not(.compact-reference-ui) #side#side .check-pill,
+body:not(.compact-reference-ui) #side#side input,
+body:not(.compact-reference-ui) #side#side select,
+body:not(.compact-reference-ui) #controls#controls button,
+body:not(.compact-reference-ui) #controls#controls #time-label,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #app#app .map-legend,
+body:not(.compact-reference-ui) #app#app .map-status-chips span,
+body:not(.compact-reference-ui) #app#app .results-card {
+  background-image: none !important;
+}
