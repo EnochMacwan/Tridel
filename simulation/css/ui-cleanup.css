@@ -31,9 +31,9 @@ body:not(.compact-reference-ui) #side .section-card,
 body:not(.compact-reference-ui) .current-scenario-card {
   border: 1px solid var(--ui-line) !important;
   background: var(--ui-glass-card) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    var(--ui-shadow) !important;
+  /* Inset rim highlight removed — was producing a bright shine line on
+     the top edge of every card. Outer depth shadow kept. */
+  box-shadow: var(--ui-shadow) !important;
   backdrop-filter: blur(28px) saturate(170%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
 }

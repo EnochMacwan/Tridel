@@ -1061,39 +1061,81 @@ body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-tint {
 
 /* 4. All glass wrappers and their typical children — wipe inset white
    highlights ("rim shines") that come from per-component rules across
-   style.css and ui-cleanup.css. */
+   style.css and ui-cleanup.css. Selectors carry `#side` (or other id
+   anchors) wherever needed to beat the per-component (1,2,1)+ source
+   rules. */
 body:not(.compact-reference-ui) .liquidGlass-wrapper,
 body:not(.compact-reference-ui) .liquidGlass-wrapper > *,
 body:not(.compact-reference-ui) #banner,
 body:not(.compact-reference-ui) #side,
 body:not(.compact-reference-ui) #controls,
 body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) .map-toolbar-btn,
 body:not(.compact-reference-ui) .map-legend,
-body:not(.compact-reference-ui) .section-card,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .current-scenario-card,
 body:not(.compact-reference-ui) .current-scenario-card,
-body:not(.compact-reference-ui) .quick-stats .stat-card,
-body:not(.compact-reference-ui) .term-card,
-body:not(.compact-reference-ui) .preset-card,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .quick-stats .stat-card,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side .result-card,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
 body:not(.compact-reference-ui) .summary-chip-row span,
 body:not(.compact-reference-ui) #side .tag,
 body:not(.compact-reference-ui) #side button,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side button.ghost,
 body:not(.compact-reference-ui) #side input,
+body:not(.compact-reference-ui) #side input[type="text"],
+body:not(.compact-reference-ui) #side input[type="number"],
 body:not(.compact-reference-ui) #side select,
 body:not(.compact-reference-ui) #side .check-pill,
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill,
 body:not(.compact-reference-ui) #side .scenario-tabs button,
 body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls,
 body:not(.compact-reference-ui) #controls button,
-body:not(.compact-reference-ui) #map-toolbar button,
-body:not(.compact-reference-ui) .map-toolbar-btn,
-body:not(.compact-reference-ui) .release-coord-field > input,
-body:not(.compact-reference-ui) #release-coord-btn,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #side .release-coord-field > input,
+body:not(.compact-reference-ui) #side .release-coord-entry input,
+body:not(.compact-reference-ui) #side #release-coord-btn,
 body:not(.compact-reference-ui) .partner-logo-inline,
+body:not(.compact-reference-ui) #banner .partner-logo-inline,
 body:not(.compact-reference-ui) .partner-logo-inline img,
+body:not(.compact-reference-ui) #banner .partner-logo-inline img,
 body:not(.compact-reference-ui) .map-status-chips span,
-body:not(.compact-reference-ui) .brand-lockup img {
+body:not(.compact-reference-ui) #map-shell .map-status-chips span,
+body:not(.compact-reference-ui) .brand-lockup img,
+body:not(.compact-reference-ui) #banner .brand-lockup img,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
+body:not(.compact-reference-ui) .wg-modal,
+body:not(.compact-reference-ui) .wg-modal-head {
   /* Drop every inset light highlight while keeping outer drop-shadows
      intact (those are structural depth cues, not "shine"). */
   box-shadow: none !important;
+}
+
+/* 4b. Background-image gradients on glass surfaces that fake a top-edge
+   highlight (linear-gradient(180deg, rgba(255,255,255,...), ...)).
+   Strip those too — they read as "shine" even without box-shadow. */
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .check-pill input[type="checkbox"]::after,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) .map-toolbar-btn,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper button {
+  background-image: none !important;
 }
 
 /* 5. Disable the inline SVG glass-distortion filter that the page defines
