@@ -1446,8 +1446,8 @@ function drawReleaseMarker(ctx) {
   }
   const p = map.latLngToContainerPoint([releasePoint.lat, releasePoint.lon]);
   ctx.save();
-  ctx.strokeStyle = "#0081b0";
-  ctx.fillStyle = "rgba(0, 170, 231, 0.1)";
+  ctx.strokeStyle = "#ffffff";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
