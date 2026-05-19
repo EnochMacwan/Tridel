@@ -13,7 +13,7 @@ See [TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md) for the current s
     - **Dashboard**: Real-time stats, system health checks, and quick actions.
     - **CRUD Operations**: Add, Edit, and Delete content with intuitive forms.
     - **Global Presence**: Manage office locations and map pins directly.
-    - **Data Persistence**: Changes can be exported or synced via GitHub integration.
+    - **Data Persistence**: Changes can be exported or saved to local data files through the localhost admin server.
 - **Responsive Design**: Fully optimized for Desktop, Tablet, and Mobile experiences.
 - **Interactive Elements**: Integrated Leaflet.js maps, dynamic sliders, and modals.
 
@@ -35,26 +35,28 @@ See [TECHNICAL_DOCUMENTATION.md](./TECHNICAL_DOCUMENTATION.md) for the current s
 
 ## 🛠️ Setup & Usage
 
-1. **Clone the Repository**:
+1. **Open the Project Folder**:
    ```bash
-   git clone https://github.com/EnochMacwan/Tridel.git
+   cd Tridel
    ```
 
 2. **Run Locally**:
-   - Simply open `index.html` in any modern web browser.
-   - To manage content, open `admin.html`.
+   - Start the local server with `npm start`.
+   - Browse the public site at `http://localhost:3000/index.html`.
+   - Manage content at `http://localhost:3000/admin.html`.
 
 ## ⚙️ Admin Panel Guide
 
-1. **Access**: Open `admin.html`. No server-side setup required for local editing.
+1. **Access**: Open `http://localhost:3000/admin.html`. The admin panel is intentionally disabled on deployed or remote domains.
 2. **Dashboard**: View an overview of all content and system status.
 3. **Editing Content**: 
    - Navigate to a section (e.g., "Products") using the sidebar.
    - Click **"Add"** to create new items or **"Edit"** to modify existing ones.
    - Use **"Global Settings"** to update contact info and social links.
 4. **Saving Changes**:
-   - Changes are initially saved to the browser's local storage.
-   - Use the **"Export"** or **"Publish"** buttons to generate the updated data files for the repository.
+   - Changes are initially drafts inside the admin session.
+   - Use **"Save Local Files"** to write the updated `assets/js/*-data.js` files through the local Express API.
+   - Use **"Export"** only when you want browser-downloaded copies of the current data.
 
 ## 🌍 Global Locations
 Office locations are managed via the **"Locations"** section in the Admin Panel. The Contact page uses this data to dynamically render address cards and map pins.

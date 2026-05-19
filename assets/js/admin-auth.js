@@ -1,53 +1,31 @@
 /**
  * Admin Authentication Script
- * Keeps the admin UI locked until the Express auth API accepts a login.
+ * Keeps the admin UI locked until the localhost Express auth API accepts a login.
  */
 
 document.documentElement.classList.add('admin-auth-pending');
 
 const AdminAuth = {
     SESSION_KEY: 'tridel_secure_session_v1',
-    // Public fallback for static hosting only. This is intentionally weaker than server-side auth.
-    FALLBACK_HASH: 'b7e109ffa35bfdf3ec2b32ce41b266d6cb39d80d76ac43f7b8d4fc7d95447a7b',
 
     createSessionMarker() {
         return 'auth_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
     },
 
-    async sha256(message) {
-        if (!window.crypto || !window.crypto.subtle) {
-            throw new Error('Web Crypto is unavailable in this browser.');
-        }
-
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    isLocalhost() {
+        const host = window.location.hostname;
+        return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]';
     },
 
     completeLogin(token) {
         if (token) {
             sessionStorage.setItem('adminToken', token);
+            window.authToken = token;
         }
         sessionStorage.setItem(this.SESSION_KEY, this.createSessionMarker());
         this.removeModal();
         this.showContent();
         return { ok: true };
-    },
-
-    async tryFallbackLogin(password) {
-        try {
-            const hash = await this.sha256(password);
-            if (hash === this.FALLBACK_HASH) {
-                return this.completeLogin();
-            }
-            return { ok: false, message: 'Invalid password.' };
-        } catch (e) {
-            return {
-                ok: false,
-                message: 'Login fallback is unavailable in this browser.'
-            };
-        }
     },
 
     setAuthState(state) {
@@ -56,21 +34,68 @@ const AdminAuth = {
         root.classList.add(state);
     },
 
-    init() {
-        const session = sessionStorage.getItem(this.SESSION_KEY);
-        if (!session || !session.startsWith('auth_')) {
-            this.renderLoginModal();
-        } else {
-            this.showContent();
+    clearStoredSession() {
+        sessionStorage.removeItem(this.SESSION_KEY);
+        sessionStorage.removeItem('adminToken');
+        window.authToken = null;
+    },
+
+    async init() {
+        if (!this.isLocalhost()) {
+            this.renderLocalOnlyNotice();
+            return;
         }
+
+        const session = sessionStorage.getItem(this.SESSION_KEY);
+        const token = sessionStorage.getItem('adminToken');
+        if (!session || !session.startsWith('auth_') || !token) {
+            this.renderLoginModal();
+            return;
+        }
+
+        if (await this.verifySession()) {
+            this.showContent();
+            return;
+        }
+
+        this.renderLoginModal();
     },
 
     isAuthenticated() {
         const session = sessionStorage.getItem(this.SESSION_KEY);
-        return session && session.startsWith('auth_');
+        const token = sessionStorage.getItem('adminToken');
+        return session && session.startsWith('auth_') && !!token;
+    },
+
+    async verifySession() {
+        const token = sessionStorage.getItem('adminToken');
+        if (!token) return false;
+
+        try {
+            const res = await fetch('/api/check-auth', {
+                headers: { 'X-Auth-Token': token }
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.authenticated) {
+                window.authToken = token;
+                return true;
+            }
+        } catch (e) {
+            console.warn('Could not verify local admin session.');
+        }
+
+        this.clearStoredSession();
+        return false;
     },
 
     async login(password) {
+        if (!this.isLocalhost()) {
+            return {
+                ok: false,
+                message: 'Admin is available only from localhost.'
+            };
+        }
+
         try {
             const res = await fetch('/api/login', {
                 method: 'POST',
@@ -90,16 +115,57 @@ const AdminAuth = {
                 };
             }
 
-            return this.tryFallbackLogin(password);
+            return {
+                ok: false,
+                message: data.error || 'Local admin server rejected the login request.'
+            };
         } catch (e) {
-            console.warn('Admin login server is unavailable. Falling back to public hash check.');
-            return this.tryFallbackLogin(password);
+            console.warn('Admin login server is unavailable.');
+            return {
+                ok: false,
+                message: 'Local admin server unavailable. Start it with npm start and open http://localhost:3000/admin.html.'
+            };
         }
     },
 
-    logout() {
-        sessionStorage.removeItem(this.SESSION_KEY);
+    async logout() {
+        const token = sessionStorage.getItem('adminToken');
+        if (token) {
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': token }
+                });
+            } catch (e) {
+                console.warn('Could not notify local server about logout.');
+            }
+        }
+        this.clearStoredSession();
         location.reload();
+    },
+
+    renderLocalOnlyNotice() {
+        this.setAuthState('admin-auth-locked');
+        document.body.style.overflow = 'hidden';
+        const mainContainer = document.querySelector('.admin-container');
+        if (mainContainer) {
+            mainContainer.style.filter = 'blur(10px)';
+        }
+
+        if (document.querySelector('.auth-overlay')) {
+            return;
+        }
+
+        const modal = document.createElement('div');
+        modal.className = 'auth-overlay';
+        modal.innerHTML = `
+            <div class="auth-card">
+                <img src="assets/images/logo/tridel.png" alt="Tridel Logo" class="auth-logo">
+                <h2 class="auth-title">Local Admin Only</h2>
+                <p class="auth-subtitle">This panel is disabled on deployed or remote domains. Run the local server and open <strong>http://localhost:3000/admin.html</strong>.</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
     },
 
     renderLoginModal() {

@@ -1,170 +1,23 @@
 /**
  * admin-publish.js
- * GitHub save, publish, reload, undo, and export helpers.
- * Depends on: escapeHTML + showToast (globals), getAdminAuthHeaders /
- *   buildGitHubProxyPayload (admin-github.js), renderSection /
- *   renderDashboard (admin.js), getDataArray (admin.js).
- * Load order: utils.js -> admin-github.js -> admin-form-rows.js
- *           -> admin-publish.js -> admin.js
+ * Local-only save, reload, undo, and export helpers.
+ * Depends on: escapeHTML + showToast (globals), renderSection / renderDashboard
+ * (admin.js), getDataArray (admin.js), and the localhost Express API.
  */
-
-
-// -- GitHub Save (single file) --
-
-async function saveToGitHub(type, data) {
-    if (!hasConfiguredGitHub()) {
-        showToast('GitHub not configured', 'error');
-        return;
-    }
-
-    var filePath = GITHUB_DATA_FILES[type];
-    var varName = GITHUB_VAR_NAMES[type];
-
-    if (!filePath || !varName) return;
-
-    // Generate file content
-    var fileContent = '';
-
-    // Special: multi-var files need custom serialization
-    if (type === 'index_content') {
-        fileContent = serializeIndexPageData();
-    } else if (type === 'about_content') {
-        fileContent = serializeAboutPageData();
-    } else if (type === 'contact_content') {
-        fileContent = serializeContactPageData();
-    } else if (type === 'layout') {
-        fileContent = serializeLayoutData();
-    } else if (type === 'visibility' || type === 'form_settings') {
-        fileContent = 'const SETTINGS_DATA = ' + JSON.stringify(data, null, 2) + ';';
-    } else {
-        fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
-    }
-
-    // For products, also include the featuredProduct for the Spotlight card
-    if (type === 'products') {
-        var featuredProductData = {
-            tag: "Featured",
-            title: "Tridel Aquilon 8000",
-            description: "Our flagship carbon fiber USV for advanced autonomous hydrographic surveys.",
-            link: "#/products/detail?id=aquilon-8000",
-            buttonText: "Learn More",
-            image: "assets/images/products/aquilon-8000/aquilon-8000-01.jpg"
-        };
-        fileContent += '\n\n// Featured Product for Spotlight Card in Mega Menu\nconst featuredProduct = ' + JSON.stringify(featuredProductData, null, 2) + ';';
-    }
-
-    // For services, also include the featuredService for the Spotlight card
-    if (type === 'services') {
-        var featuredServiceData = {
-            tag: "Featured",
-            title: "Comprehensive Solutions",
-            description: "End-to-end expertise from feasibility to real-time monitoring.",
-            link: "#/services",
-            buttonText: "Learn More",
-            image: "assets/images/services/port-monitoring.png"
-        };
-        fileContent += '\n\n// Featured Service for Spotlight Card in Mega Menu\nconst featuredService = ' + JSON.stringify(featuredServiceData, null, 2) + ';';
-    }
-
-    // For team, we want to export only the array
-    if (type === 'team') {
-        fileContent = 'const ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';';
-    }
-
-    if (serverGitHubProxyAvailable) {
-        var proxyRes = await fetch('/api/github/save', {
-            method: 'POST',
-            headers: Object.assign({
-                'Content-Type': 'application/json'
-            }, getAdminAuthHeaders()),
-            body: JSON.stringify(Object.assign(buildGitHubProxyPayload(), {
-                path: filePath,
-                content: fileContent,
-                message: 'Update ' + type + ' via Admin Panel'
-            }))
-        });
-
-        if (!proxyRes.ok) {
-            var proxyErr = await proxyRes.json().catch(function () { return {}; });
-            throw new Error(proxyErr.error || proxyRes.statusText);
-        }
-
-        return;
-    }
-
-    var effectiveConfig = getEffectiveGitHubConfig();
-    var apiUrl = 'https://api.github.com/repos/' + effectiveConfig.owner + '/' + effectiveConfig.repo + '/contents/' + filePath;
-
-    var sha = null;
-    try {
-        var getController = new AbortController();
-        var getTimeout = setTimeout(function() { getController.abort(); }, 30000);
-        var getRes = await fetch(apiUrl, {
-            headers: {
-                'Authorization': 'token ' + effectiveConfig.token,
-                'Accept': 'application/vnd.github.v3+json'
-            },
-            signal: getController.signal
-        });
-        clearTimeout(getTimeout);
-
-        if (getRes.ok) {
-            var fileData = await getRes.json();
-            sha = fileData.sha;
-        }
-    } catch (e) {
-        if (e.name === 'AbortError') throw new Error('GitHub API request timed out (30s). Check your connection.');
-        /* File doesn't exist yet, will create new */
-    }
-
-    var body = {
-        message: 'Update ' + type + ' via Admin Panel',
-        content: btoa(unescape(encodeURIComponent(fileContent))),
-        branch: effectiveConfig.branch
-    };
-    if (sha) body.sha = sha;
-
-    var putController = new AbortController();
-    var putTimeout = setTimeout(function() { putController.abort(); }, 30000);
-    var putRes = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'token ' + effectiveConfig.token,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-        signal: putController.signal
-    });
-    clearTimeout(putTimeout);
-
-    if (!putRes.ok) {
-        var err = await putRes.json();
-        throw new Error(err.message || putRes.statusText);
-    }
-}
-
 
 // -- Publish / Pending State --
 
+function getAdminToken() {
+    authToken = authToken || sessionStorage.getItem('adminToken') || window.authToken || null;
+    return authToken;
+}
+
 function getPublishTargets() {
-    var targets = [];
-    var config = getEffectiveGitHubConfig();
-
-    if (authToken) {
-        targets.push({
-            key: 'server',
-            label: (window.location.origin || 'this site') + ' server'
-        });
-    }
-
-    if (hasConfiguredGitHub()) {
-        targets.push({
-            key: 'github',
-            label: (config.owner || 'GitHub') + '/' + (config.repo || 'repo') + '@' + (config.branch || 'main')
-        });
-    }
-
-    return targets;
+    var token = getAdminToken();
+    return token ? [{
+        key: 'server',
+        label: 'local file server at ' + (window.location.origin || 'localhost')
+    }] : [];
 }
 
 function updatePublishBanner() {
@@ -172,27 +25,23 @@ function updatePublishBanner() {
     if (!banner) return;
 
     var targets = getPublishTargets();
-    var targetText = targets.map(function (target) {
-        return '<strong>' + escapeHTML(target.label) + '</strong>';
-    }).join(' and ');
+    var hasTarget = targets.length > 0;
 
     if (pendingChanges.size > 0) {
-        if (targets.length > 0) {
-            banner.innerHTML = '<strong>Draft only:</strong> these admin changes are not on the website yet. Click <strong>Publish Website</strong> to send them to ' + targetText + '.';
+        if (hasTarget) {
+            banner.innerHTML = '<strong>Draft only:</strong> these admin changes are not on the website yet. Click <strong>Save Local Files</strong> to write them to the local data files.';
         } else {
-            banner.innerHTML = '<strong>Draft only:</strong> changes are saved only in this admin session. Configure GitHub Settings or use the server-backed admin to update the website.';
+            banner.innerHTML = '<strong>Local server required:</strong> log in through <strong>http://localhost:3000/admin.html</strong> before saving files.';
         }
         banner.style.display = 'block';
         return;
     }
 
-    if (targets.length > 0) {
-        banner.innerHTML = 'Publish target: ' + targetText + '. After you save edits, click <strong>Publish Website</strong> to update the website.';
-        banner.style.display = 'block';
-        return;
+    if (hasTarget) {
+        banner.innerHTML = 'Publish target: <strong>' + escapeHTML(targets[0].label) + '</strong>. After you edit content, click <strong>Save Local Files</strong>.';
+    } else {
+        banner.innerHTML = '<strong>Local admin only:</strong> this screen writes files only through the localhost Express server.';
     }
-
-    banner.innerHTML = '<strong>Draft-only mode:</strong> no GitHub or server publish target is configured, so website updates will not go live from this screen.';
     banner.style.display = 'block';
 }
 
@@ -203,7 +52,7 @@ function markAsPending(type) {
     var undoBtn = document.getElementById('undo-btn-' + type);
     if (undoBtn) undoBtn.style.display = 'inline-block';
 
-    showToast('Draft saved in admin only. Click "Publish Website" to update the website.', 'success');
+    showToast('Draft saved in admin. Click "Save Local Files" to update the local website files.', 'success');
 }
 
 function updatePublishButton() {
@@ -216,7 +65,7 @@ function updatePublishButton() {
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-success');
         btn.style.opacity = '1';
-        btn.title = 'Publish pending changes to the website';
+        btn.title = 'Save pending changes to local data files';
 
         if (badge) {
             badge.style.display = 'inline-flex';
@@ -226,7 +75,7 @@ function updatePublishButton() {
         btn.classList.remove('btn-success');
         btn.classList.add('btn-secondary');
         btn.style.opacity = '0.7';
-        btn.title = 'No draft changes to publish';
+        btn.title = 'No draft changes to save';
 
         if (badge) {
             badge.style.display = 'none';
@@ -236,79 +85,81 @@ function updatePublishButton() {
     updatePublishBanner();
 }
 
+function collectPendingPayload(type) {
+    if (type === 'index_content') {
+        return {
+            INDEX_HERO: window.INDEX_HERO || {},
+            INDEX_STATS: window.INDEX_STATS || [],
+            INDEX_WHAT_WE_DO: window.INDEX_WHAT_WE_DO || {},
+            INDEX_CASE_STUDY: window.INDEX_CASE_STUDY || {},
+            INDEX_CTA: window.INDEX_CTA || {},
+            INDEX_WHY_CHOOSE: window.INDEX_WHY_CHOOSE || {},
+            INDEX_SECTION_ORDER: window.INDEX_SECTION_ORDER || []
+        };
+    }
+
+    if (type === 'about_content') {
+        return window.ABOUT_DATA || {};
+    }
+
+    if (type === 'contact_content') {
+        return {
+            CONTACT_INFO_CARDS: window.CONTACT_INFO_CARDS || [],
+            CONTACT_FAQ_DATA: window.CONTACT_FAQ_DATA || [],
+            CONTACT_PAGE_CONFIG: window.CONTACT_PAGE_CONFIG || {}
+        };
+    }
+
+    if (type === 'layout') {
+        return {
+            NAV_LINKS: window.NAV_LINKS || [],
+            MEGA_MENU_CONFIG: ensureMegaMenuConfig(),
+            FOOTER_DATA: window.FOOTER_DATA || {},
+            PAGE_META: window.PAGE_META || {}
+        };
+    }
+
+    if (type === 'visibility' || type === 'form_settings') {
+        return window.SETTINGS_DATA || {};
+    }
+
+    if (type === 'settings') {
+        return typeof getContactSettingsObject === 'function' ? getContactSettingsObject() : (window.CONTACT_DATA || {});
+    }
+
+    return getDataArray(type);
+}
 
 // -- Publish All --
 
 async function publishAllChanges() {
     if (pendingChanges.size === 0) {
-        showToast('No draft changes to publish', 'info');
+        showToast('No draft changes to save', 'info');
+        return;
+    }
+
+    var token = getAdminToken();
+    if (!token) {
+        showToast('Log in through the local admin server before saving files.', 'error');
+        showLogin();
         return;
     }
 
     var btn = document.getElementById('publish-btn');
     var originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     btn.disabled = true;
 
     try {
         var successCount = 0;
         var types = Array.from(pendingChanges);
-        var useGitHub = hasConfiguredGitHub();
-        var canUseServerApi = !!authToken;
-        var targets = getPublishTargets();
-
-        if (!useGitHub && !canUseServerApi) {
-            showToast('Draft saved only in admin. Configure GitHub Settings to publish to the website.', 'error');
-            openGitHubConfig();
-            return;
-        }
 
         for (var i = 0; i < types.length; i++) {
             var type = types[i];
-            var data;
+            var data = collectPendingPayload(type);
+            var serverType = getLocalServerType(type);
 
-            // Special payloads for multi-var files
-            if (type === 'index_content') {
-                data = {
-                    INDEX_HERO: window.INDEX_HERO || {},
-                    INDEX_STATS: window.INDEX_STATS || [],
-                    INDEX_WHAT_WE_DO: window.INDEX_WHAT_WE_DO || {},
-                    INDEX_CASE_STUDY: window.INDEX_CASE_STUDY || {},
-                    INDEX_CTA: window.INDEX_CTA || {},
-                    INDEX_WHY_CHOOSE: window.INDEX_WHY_CHOOSE || {},
-                    INDEX_SECTION_ORDER: window.INDEX_SECTION_ORDER || []
-                };
-            } else if (type === 'about_content') {
-                data = window.ABOUT_DATA || {};
-            } else if (type === 'contact_content') {
-                data = {
-                    CONTACT_INFO_CARDS: window.CONTACT_INFO_CARDS || [],
-                    CONTACT_FAQ_DATA: window.CONTACT_FAQ_DATA || [],
-                    CONTACT_PAGE_CONFIG: window.CONTACT_PAGE_CONFIG || {}
-                };
-            } else if (type === 'layout') {
-                data = {
-                    NAV_LINKS: window.NAV_LINKS || [],
-                    MEGA_MENU_CONFIG: ensureMegaMenuConfig(),
-                    FOOTER_DATA: window.FOOTER_DATA || {},
-                    PAGE_META: window.PAGE_META || {}
-                };
-            } else if (type === 'visibility' || type === 'form_settings') {
-                data = window.SETTINGS_DATA || {};
-            } else {
-                data = getDataArray(type);
-            }
-
-            // Map admin 'linkedin' type to server 'news' type
-            var serverType = (type === 'linkedin') ? 'news' : type;
-
-            if (canUseServerApi) {
-                await publishPendingChangeToServer(serverType, data);
-            }
-
-            if (useGitHub) {
-                await saveToGitHub(type, data);
-            }
+            await publishPendingChangeToServer(serverType, data);
 
             pendingChanges.delete(type);
             updatePublishButton();
@@ -318,57 +169,93 @@ async function publishAllChanges() {
 
             successCount++;
         }
-        updatePublishButton();
 
-        var targetText = targets.map(function (target) {
-            return target.label;
-        }).join(' and ');
-        var deploymentNote = useGitHub ? ' Static website deployments may take 1-3 minutes to refresh.' : '';
-        showToast('Published ' + successCount + ' update(s) to ' + targetText + '.' + deploymentNote, 'success');
+        updatePublishButton();
+        showToast('Saved ' + successCount + ' update(s) to local data files.', 'success');
     } catch (error) {
-        showToast('Error publishing: ' + error.message, 'error');
+        showToast('Error saving local files: ' + error.message, 'error');
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-
 // -- Reload & Undo --
 
 async function reloadSectionData(type) {
-    var filePath = GITHUB_DATA_FILES[type];
-    var varName = GITHUB_VAR_NAMES[type];
-    if (!filePath || !varName) return;
+    var filePath = LOCAL_DATA_FILES[type];
+    var varName = LOCAL_VAR_NAMES[type];
+    if (!filePath || !varName) return false;
 
     try {
-        var content = '';
-        var t = Date.now();
+        var res = await fetch(filePath + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.statusText || 'Failed to load local file');
 
-        if (hasConfiguredGitHub()) {
-            content = await fetchGitHubFileContent(filePath);
+        var content = await res.text();
+
+        if (type === 'index_content') {
+            parseIndexPageContent(content);
+        } else if (type === 'about_content') {
+            parseAboutPageContent(content);
+        } else if (type === 'contact_content') {
+            parseContactPageContent(content);
+        } else if (type === 'layout') {
+            parseLayoutData(content);
         } else {
-            var res2 = await fetch(filePath + '?t=' + t);
-            if (res2.ok) content = await res2.text();
+            window[varName] = parseAssignedJson(content, varName);
         }
 
-        if (content) {
-            var match = content.match(/(?:const|var|let)\s+\w+\s*=\s*(\[[\s\S]*\]);?/);
-            if (match) {
-                window[varName] = JSON.parse(match[1]);
-                if (type === 'products') renderProducts();
-                else if (type === 'services') renderServices();
-                else if (type === 'clients') renderClients();
-                else if (type === 'stories') renderStories();
-                else if (type === 'home') renderHomeCards();
-                else if (type === 'team') renderTeam();
-                else if (type === 'testimonials') renderTestimonials();
-                else if (type === 'linkedin' || type === 'news') renderLinkedIn();
-            }
-        }
+        if (type === 'products') renderProducts();
+        else if (type === 'services') renderServices();
+        else if (type === 'clients') renderClients();
+        else if (type === 'stories') renderStories();
+        else if (type === 'home') renderHomeCards();
+        else if (type === 'team') renderTeam();
+        else if (type === 'testimonials') renderTestimonials();
+        else if (type === 'linkedin' || type === 'news') renderLinkedIn();
+        else if (type === 'settings' || type === 'form_settings' || type === 'contact_content') loadSettingsToForm();
+
+        return true;
     } catch (e) {
-        console.error('Error reloading data:', e);
+        console.error('Error reloading local data for ' + type + ':', e);
+        showToast('Could not reload ' + type + ' from local file: ' + e.message, 'error');
+        return false;
     }
+}
+
+async function reloadAllLocalData() {
+    if (pendingChanges.size > 0 && !confirm('Reloading from disk will discard unsaved admin drafts. Continue?')) {
+        return;
+    }
+
+    var types = [
+        'products',
+        'services',
+        'clients',
+        'stories',
+        'home',
+        'linkedin',
+        'team',
+        'testimonials',
+        'locations',
+        'settings',
+        'form_settings',
+        'index_content',
+        'about_content',
+        'contact_content',
+        'layout'
+    ];
+
+    var loaded = 0;
+    for (var i = 0; i < types.length; i++) {
+        if (await reloadSectionData(types[i])) loaded++;
+    }
+
+    pendingChanges.clear();
+    renderAllSections();
+    loadSettingsToForm();
+    updatePublishButton();
+    showToast('Reloaded ' + loaded + ' local data file(s).', 'success');
 }
 
 async function undoChanges(type) {
@@ -386,16 +273,20 @@ async function undoChanges(type) {
     }
 }
 
-
 // -- Export & Download --
 
 function exportAllData() {
     var exports = [
-        { name: 'products-data.js', varName: 'PRODUCTS_DATA', data: PRODUCTS_DATA },
-        { name: 'services-data.js', varName: 'SERVICES_DATA', data: SERVICES_DATA },
-        { name: 'clients-data.js', varName: 'CLIENTS_DATA', data: CLIENTS_DATA },
-        { name: 'success-stories-data.js', varName: 'SUCCESS_STORIES_DATA', data: SUCCESS_STORIES_DATA },
-        { name: 'home-data.js', varName: 'HOME_CARDS_DATA', data: HOME_CARDS_DATA }
+        { name: 'products-data.js', varName: 'PRODUCTS_DATA', data: window.PRODUCTS_DATA || [] },
+        { name: 'services-data.js', varName: 'SERVICES_DATA', data: window.SERVICES_DATA || [] },
+        { name: 'clients-data.js', varName: 'CLIENTS_DATA', data: window.CLIENTS_DATA || [] },
+        { name: 'success-stories-data.js', varName: 'SUCCESS_STORIES_DATA', data: window.SUCCESS_STORIES_DATA || [] },
+        { name: 'home-data.js', varName: 'HOME_CARDS_DATA', data: window.HOME_CARDS_DATA || [] },
+        { name: 'news-data.js', varName: 'NEWS_DATA', data: window.NEWS_DATA || [] },
+        { name: 'team-data.js', varName: 'TEAM_DATA', data: window.TEAM_DATA || [] },
+        { name: 'testimonials-data.js', varName: 'TESTIMONIALS_DATA', data: window.TESTIMONIALS_DATA || [] },
+        { name: 'locations-data.js', varName: 'LOCATIONS_DATA', data: window.LOCATIONS_DATA || [] },
+        { name: 'settings-data.js', varName: 'SETTINGS_DATA', data: window.SETTINGS_DATA || {} }
     ];
 
     exports.forEach(function (exp) {
@@ -403,7 +294,7 @@ function exportAllData() {
         downloadFile(exp.name, content);
     });
 
-    showToast('All data files exported!', 'success');
+    showToast('Local data files exported!', 'success');
 }
 
 function downloadFile(filename, content) {
@@ -417,4 +308,3 @@ function downloadFile(filename, content) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
-

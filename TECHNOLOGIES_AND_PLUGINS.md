@@ -1,563 +1,942 @@
-# Technologies and Plugins
+# Tridel Technologies and Plugins Inventory
 
-> Exhaustive inventory of every language, framework, library, plugin, external API, browser API, font, data format, and scientific model used by the Tridel + Hormuz simulation codebase. For each entry: **what it is**, **where it lives in this repo**, **why we use it**, and **how to find/update it**.
-
----
-
-## Table of Contents
-
-1. [Languages](#1-languages)
-2. [JavaScript runtime dependencies (npm)](#2-javascript-runtime-dependencies-npm)
-3. [Browser JavaScript libraries (vendored + CDN)](#3-browser-javascript-libraries-vendored--cdn)
-4. [Python libraries](#4-python-libraries)
-5. [Fonts & icon libraries](#5-fonts--icon-libraries)
-6. [CSS frameworks & utilities](#6-css-frameworks--utilities)
-7. [Map tile providers](#7-map-tile-providers)
-8. [External APIs & web services](#8-external-apis--web-services)
-9. [Browser platform APIs](#9-browser-platform-apis)
-10. [Data formats](#10-data-formats)
-11. [Build & dev tools](#11-build--dev-tools)
-12. [Security primitives](#12-security-primitives)
-13. [Scientific models & references](#13-scientific-models--references)
-14. [Hosting & deployment targets](#14-hosting--deployment-targets)
-15. [Quick-reference matrix](#15-quick-reference-matrix)
+> Purpose: a deep, plain-English inventory of the technologies, plugins, browser libraries, server packages, external services, browser APIs, data formats, and security controls used by this Tridel website.
+> Companion: `TECHNICAL_DOCUMENTATION.md` explains how the whole system works together. This file explains each technology and plugin in detail.
 
 ---
 
-## 1. Languages
+## 1. Quick Inventory
 
-| Language | Where | Why | Files / count |
+| Category | Technology | Used where | Why it exists |
 |---|---|---|---|
-| **JavaScript (ES2015+)** | All browser logic + Node backend | Universal browser runtime, no transpilation step needed for our target (modern Chromium-based browsers) | ~55 files, ~12,000 LOC |
-| **Python 3.10+** | Data refresh pipeline | NumPy / xarray ecosystem is the de-facto standard for ocean/climate gridded data | 7 scripts in `scripts/` |
-| **HTML5** | Page shells | Semantic structure for shells; rest is JS-rendered | `index.html`, `admin.html`, `simulation/index.html`, `404.html` |
-| **CSS3** | All styling | Plain CSS with `:root` custom-property tokens — no preprocessor | `styles.css` 7,862 LOC, `simulation/css/theme.css` ~1,200 LOC, plus 6 more |
-| **PowerShell** | Windows admin scripts | Native Windows shell for content-extraction GUI | `scripts/*.ps1` (4 files) |
-| **Batch** | Windows launchers | `.bat` shortcuts for the GUI tools | `scripts/*.bat` (2 files) |
+| Language | HTML5 | `index.html`, `admin.html`, `404.html` | Page shells and semantic structure |
+| Language | CSS3 | `assets/css/*.css` | Styling, layout, themes, responsive behavior |
+| Language | JavaScript | `assets/js/*.js`, `server.js` | Public rendering, admin logic, local API |
+| Runtime | Browser DOM | public site and admin | Interactive UI |
+| Runtime | Node.js | `server.js` | Local admin server |
+| Server package | Express | npm dependency | Routing, static files, JSON API |
+| Server package | CORS | npm dependency | Controlled local cross-origin headers |
+| Server core | `crypto` | `server.js` | Password hashing and token generation |
+| Server core | `fs` | `server.js` | Local data-file reads and writes |
+| Server core | `path` | `server.js` | Safe path construction |
+| Browser plugin | SortableJS | `assets/vendor/sortable/Sortable.min.js` | Drag-and-drop ordering in admin |
+| Browser plugin | Lenis | `assets/vendor/lenis/lenis.min.js` | Smooth scrolling on public pages |
+| Browser plugin | Leaflet | `assets/vendor/leaflet/` | Interactive locations map |
+| Icon library | Font Awesome | CDN in HTML | Admin and website icons |
+| Font assets | Inter | `assets/fonts/inter/` | UI/body typography |
+| Font assets | Outfit | `assets/fonts/outfit/` | Display/brand typography |
+| Content embed | LinkedIn posts | news/social sections | Social proof and news embeds |
+| Form service | FormSubmit | contact/careers forms | Email delivery without a custom mail server |
+| Map tiles | OpenStreetMap/CARTO-style hosts | Leaflet maps | Map backgrounds |
+| Hosting headers | `_headers` | static hosting | CSP, cache, robots, security headers |
+| IIS headers | `web.config` | IIS/static Windows hosting | Equivalent security and rewrite rules |
+| Crawler control | `robots.txt` | static root | Bot and indexer policy |
 
 ---
 
-## 2. JavaScript runtime dependencies (npm)
+## 2. Design Philosophy
 
-The full `package.json`:
+This project is intentionally lightweight.
+
+There is no frontend build step. The browser loads plain JavaScript and CSS directly. That gives the site a low maintenance burden and makes emergency content fixes simple.
+
+There is no database. Content lives in JavaScript data files. The public site reads those files, and the local admin server writes those files.
+
+There is no hosted admin backend. The admin panel is a local tool for trusted maintainers. The deployed website is public/static; the admin editing workflow belongs on the maintainer's machine.
+
+---
+
+## 3. Languages
+
+### 3.1 HTML5
+
+**Where**
+
+- `index.html`
+- `admin.html`
+- `404.html`
+
+**Role**
+
+HTML files provide the root shell. They load styles, data files, runtime scripts, and placeholder containers.
+
+The public site does most page rendering through JavaScript. The admin shell defines the admin layout, modals, buttons, and script order.
+
+**Maintenance notes**
+
+- Keep script order intentional. Data files must load before page renderers that read them.
+- Keep `admin.html` local-only in behavior. It may exist in the deployed file tree, but it must not become a working remote admin.
+- Avoid inline secrets.
+
+### 3.2 CSS3
+
+**Where**
+
+- `assets/css/styles.css`
+- `assets/css/admin.css`
+- `assets/css/admin-auth.css`
+- `assets/css/fonts.css`
+- vendor CSS under `assets/vendor/leaflet/`
+
+**Role**
+
+CSS controls layout, responsive behavior, dark/light themes, admin forms, product cards, navigation, and page sections.
+
+**Key techniques**
+
+- CSS custom properties for theme colors.
+- Media queries for responsive layouts.
+- Local `@font-face` declarations for Inter and Outfit.
+- Admin-specific styles separated from public site styles.
+
+**Maintenance notes**
+
+- Keep public and admin styles separated.
+- Keep button and form states visible.
+- Avoid hiding focus outlines unless replacing them with an equally visible focus style.
+
+### 3.3 JavaScript
+
+**Where**
+
+- `assets/js/*.js`
+- `assets/js/pages/*.js`
+- `server.js`
+
+**Role**
+
+JavaScript is the main application language. Browser scripts render pages, load data, manage admin drafts, validate forms, and initialize plugins. Node.js runs the local admin API.
+
+**Maintenance notes**
+
+- Browser scripts are plain scripts, not modules.
+- Most data is global through constants copied onto `window`.
+- Syntax should stay compatible with modern evergreen browsers.
+- Run `node --check` on browser scripts for syntax validation even though DOM objects are not available in Node.
+
+---
+
+## 4. Server Runtime
+
+### 4.1 Node.js
+
+**Where**
+
+- `server.js`
+
+**Role**
+
+Node runs the local content management server. It serves static files, authenticates admin users, parses data files, writes data files, and records simple metrics.
+
+**How to run**
+
+```powershell
+npm install
+npm start
+```
+
+**Current local URL**
+
+```text
+http://localhost:3000
+```
+
+**Security note**
+
+The server binds to `127.0.0.1`, so it is intended for the local machine only.
+
+### 4.2 Express
+
+**Where**
+
+- npm dependency in `package.json`
+- imported in `server.js`
+
+**What it is**
+
+Express is a small Node.js web framework.
+
+**Why it is used**
+
+Express provides:
+
+- route definitions
+- JSON request parsing
+- static file serving
+- middleware chaining
+- concise local API implementation
+
+**Routes it supports**
+
+- authentication routes
+- data read/write routes
+- metrics routes
+- static file serving
+
+**Failure modes**
+
+- If Express is missing, `npm install` has not been run.
+- If port `3000` is busy, the server cannot start unless `PORT` is changed.
+- If the browser opens the deployed site instead of localhost, admin writes will not work.
+
+### 4.3 CORS
+
+**Where**
+
+- npm dependency in `package.json`
+- configured in `server.js`
+
+**What it is**
+
+CORS middleware controls which browser origins may call the local API.
+
+**Why it is used**
+
+It allows controlled local browser calls while preventing broad cross-origin access.
+
+**Maintenance notes**
+
+- Keep the allowlist narrow.
+- Do not use `*` for admin routes.
+- Localhost and loopback origins should be enough for normal admin use.
+
+### 4.4 Node `crypto`
+
+**Where**
+
+- `server.js`
+
+**What it does**
+
+The server uses Node's `crypto` module for:
+
+- password hashing with `scryptSync`
+- random token creation
+- salt handling
+
+**Why it matters**
+
+Plain text passwords must never be compared or stored as reusable secrets. The local server validates a password through a derived hash.
+
+### 4.5 Node `fs`
+
+**Where**
+
+- `server.js`
+
+**What it does**
+
+The filesystem module reads and writes the local data files.
+
+**Important rule**
+
+The browser does not choose arbitrary file paths. The server maps known content types to known files.
+
+### 4.6 Node `path`
+
+**Where**
+
+- `server.js`
+
+**What it does**
+
+The path module creates stable filesystem paths across Windows and other environments.
+
+**Why it matters**
+
+Path construction should never rely on string concatenation when writing files.
+
+---
+
+## 5. Browser Plugins and Libraries
+
+### 5.1 SortableJS
+
+**Where**
+
+```text
+assets/vendor/sortable/Sortable.min.js
+```
+
+**Loaded by**
+
+```text
+admin.html
+```
+
+**What it is**
+
+SortableJS is a drag-and-drop ordering library.
+
+**Why it is used**
+
+The admin panel has repeated items:
+
+- products
+- services
+- clients
+- team members
+- testimonials
+- navigation links
+- footer links
+- home cards
+
+Maintainers expect to reorder those items visually. Native drag-and-drop is inconsistent across browsers, so SortableJS gives a predictable reorder experience.
+
+**How it works here**
+
+1. Admin renders a list.
+2. SortableJS is attached to the list container.
+3. The user drags a row.
+4. The in-memory array order changes.
+5. The relevant content type is marked pending.
+6. `Save Local Files` writes the reordered array to the local data file.
+
+**Failure mode**
+
+If the script is missing:
+
+- forms still render
+- drag handles may not work
+- the user can still edit text fields
+- ordering may need fallback buttons or manual data edits
+
+**Upgrade notes**
+
+- Replace only `assets/vendor/sortable/Sortable.min.js`.
+- Verify reorder in each admin section.
+- Run browser smoke tests after upgrading.
+
+### 5.2 Lenis
+
+**Where**
+
+```text
+assets/vendor/lenis/lenis.min.js
+```
+
+**Loaded by**
+
+```text
+index.html
+```
+
+**What it is**
+
+Lenis is a smooth-scrolling library.
+
+**Why it is used**
+
+The public site has long visual pages with large sections. Smooth scrolling helps make transitions feel more polished.
+
+**How it works here**
+
+The site initializes smooth scrolling after the main page scripts load. It should behave as an enhancement, not a required dependency.
+
+**Failure mode**
+
+If Lenis fails:
+
+- normal browser scrolling should continue
+- the site should remain readable
+- the console may show a plugin initialization error
+
+**Upgrade notes**
+
+- Replace `assets/vendor/lenis/lenis.min.js`.
+- Test desktop wheel scrolling.
+- Test mobile touch scrolling.
+- Test hash route navigation after scroll initialization.
+
+### 5.3 Leaflet
+
+**Where**
+
+```text
+assets/vendor/leaflet/leaflet.css
+assets/vendor/leaflet/leaflet.js
+```
+
+**Loaded by**
+
+`assets/js/locations-loader.js` lazy-loads Leaflet when the map is needed.
+
+**What it is**
+
+Leaflet is a browser mapping library.
+
+**Why it is used**
+
+The site needs a locations map without a heavy full-map application framework.
+
+**How it works here**
+
+1. The locations section requests map initialization.
+2. `locations-loader.js` loads Leaflet CSS and JS if needed.
+3. The script reads `LOCATIONS_DATA`.
+4. A Leaflet map is created.
+5. Markers are added from the data file.
+6. Map tiles are loaded from allowed tile providers.
+
+**External dependencies**
+
+Leaflet itself is vendored locally, but map background tiles are external network requests.
+
+**Failure modes**
+
+- If Leaflet files are missing, the map cannot initialize.
+- If tile domains are blocked by CSP or the network, markers may appear over a blank or gray map.
+- If `LOCATIONS_DATA` is malformed, markers may fail.
+
+**Upgrade notes**
+
+- Replace both JS and CSS together.
+- Test light and dark theme tile behavior.
+- Test marker popups.
+- Confirm CSP still allows tile hosts.
+
+### 5.4 Font Awesome
+
+**Where**
+
+Loaded from CDN in:
+
+- `index.html`
+- `admin.html`
+
+**What it is**
+
+Font Awesome provides icon glyphs through CSS classes such as:
+
+```html
+<i class="fas fa-save"></i>
+```
+
+**Why it is used**
+
+The project uses icons for:
+
+- admin action buttons
+- navigation helpers
+- theme toggle
+- status labels
+- service/product UI details
+
+**Failure mode**
+
+If the CDN is unavailable:
+
+- text remains visible
+- icon glyphs may disappear
+- layout should not depend on icons alone
+
+**Security note**
+
+The CDN host must remain in `style-src` and `font-src` in CSP if the CDN version is used.
+
+**Local alternative**
+
+For stricter offline operation, vendor the Font Awesome CSS and font files under `assets/vendor/` and update HTML/CSP accordingly.
+
+---
+
+## 6. Fonts
+
+### 6.1 Inter
+
+**Where**
+
+```text
+assets/fonts/inter/
+```
+
+**Files**
+
+- `Inter-Light.ttf`
+- `Inter-Regular.ttf`
+- `Inter-Medium.ttf`
+- `Inter-SemiBold.ttf`
+- `Inter-Bold.ttf`
+
+**Role**
+
+Inter is used for clean UI typography, body text, forms, labels, and admin readability.
+
+### 6.2 Outfit
+
+**Where**
+
+```text
+assets/fonts/outfit/
+```
+
+**Files**
+
+- `Outfit-Regular.ttf`
+- `Outfit-Medium.ttf`
+- `Outfit-Bold.ttf`
+- `Outfit-ExtraBold.ttf`
+
+**Role**
+
+Outfit is used for stronger display typography, headings, and brand-facing sections.
+
+### 6.3 Font Loading Notes
+
+Fonts are declared in:
+
+```text
+assets/css/fonts.css
+```
+
+The browser downloads only the weights requested by CSS. Keep font weights limited to avoid unnecessary page weight.
+
+---
+
+## 7. Content Embeds and External Services
+
+### 7.1 LinkedIn Embeds
+
+**Where**
+
+- content data in `assets/js/linkedin-posts.js`
+- public renderers/loaders for news/social sections
+
+**What it is**
+
+LinkedIn embeds show selected company/news posts inside the website.
+
+**Why it is used**
+
+It gives visitors fresh proof of activity without building a full news CMS.
+
+**Security and reliability notes**
+
+- Embedded posts are iframes or external widgets.
+- CSP must allow the required frame source.
+- Browser privacy settings can block third-party frames.
+- Embeds should never be the only copy of important content.
+
+**Failure mode**
+
+If LinkedIn is blocked, the surrounding section should degrade gracefully.
+
+### 7.2 FormSubmit
+
+**Where**
+
+Contact/careers forms may submit to FormSubmit endpoints, depending on form configuration.
+
+**What it is**
+
+FormSubmit is a hosted form-to-email service.
+
+**Why it is used**
+
+It avoids maintaining a custom email server in this project.
+
+**Security notes**
+
+- Validate visible form fields client-side for usability.
+- Do not rely only on client-side validation for anti-abuse.
+- Keep destination emails in `SETTINGS_DATA`, not hard-coded across many templates.
+
+**Failure mode**
+
+If the service is blocked or down, forms may not deliver. The UI should show a clear failure state.
+
+---
+
+## 8. Map Tile Providers
+
+Leaflet needs tile images to show the map background. The code can reference light and dark tile styles from tile hosts such as CARTO/OpenStreetMap-style providers.
+
+**Where**
+
+- `assets/js/locations-loader.js`
+- `_headers`
+- `web.config`
+
+**Why external tiles are allowed**
+
+The map library is local, but the map background is too large to ship in this repository.
+
+**Maintenance notes**
+
+- Keep tile hosts in CSP `img-src` and `connect-src` when needed.
+- Respect each tile provider's usage terms.
+- If map tiles stop loading, check CSP first, then browser network tab, then provider availability.
+
+---
+
+## 9. Browser Platform APIs
+
+### 9.1 DOM APIs
+
+Used for:
+
+- rendering sections
+- forms
+- modals
+- navigation
+- theme toggles
+- admin tables
+
+Common methods:
+
+- `document.getElementById`
+- `querySelector`
+- `addEventListener`
+- `classList`
+- `innerHTML`
+
+**Safety note**
+
+Use escaping helpers for untrusted text before inserting it into `innerHTML`.
+
+### 9.2 Fetch API
+
+Used for:
+
+- admin login
+- admin session checks
+- local data route reads/writes
+- reloading local data files
+
+**Important**
+
+All admin save calls go to the local server.
+
+### 9.3 Local Storage and Session Storage
+
+Used for:
+
+- theme preference
+- admin session token
+- UI state where needed
+
+**Security note**
+
+The admin token is a local session token. Do not store long-lived secrets in browser storage.
+
+### 9.4 History and Hash APIs
+
+Used for:
+
+- public SPA routes
+- in-page navigation
+
+Routes use `#/path` so static hosts can serve the same HTML file for all pages.
+
+### 9.5 Intersection Observer
+
+Used where scroll-triggered animations or viewport-based section behavior are needed.
+
+**Failure mode**
+
+Older browsers without Intersection Observer should still show the content, just without enhanced animation behavior.
+
+---
+
+## 10. Data Formats
+
+### 10.1 JavaScript Data Files
+
+Primary content format.
+
+Example:
+
+```javascript
+const SERVICES_DATA = [
+  {
+    id: "survey",
+    title: "Survey Services",
+    description: "..."
+  }
+];
+```
+
+**Pros**
+
+- No database.
+- Easy static hosting.
+- Easy browser consumption.
+- Versionable as normal project files.
+
+**Cons**
+
+- Requires careful parsing.
+- A syntax error can break a section.
+- Large files are loaded by the browser.
+
+### 10.2 JSON Payloads
+
+The local admin API sends JSON request bodies:
 
 ```json
 {
-  "name": "tridel-admin",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": { "start": "node server.js", "dev": "node server.js" },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors":    "^2.8.5"
-  }
+  "type": "products",
+  "data": []
 }
 ```
 
-### Express ^4.18.2
+The server converts the JSON payload back into a JavaScript data-file assignment.
 
-- **What:** Minimal, unopinionated Node.js web framework
-- **Where:** `server.js` (the only Node entry point)
-- **Why:** Tiny dependency surface; handles routing, JSON body parsing, and static-file serving with no ceremony
-- **Used for:** `/api/login`, `/api/check-auth`, `/api/metrics/*`, `/api/github/*`, `/api/data/*`, plus serving the SPA shell as a catch-all (`app.get('*', …)`)
-- **Update via:** `npm install express@latest`
+### 10.3 Images
 
-### CORS ^2.8.5
+The project uses:
 
-- **What:** Express middleware that emits the right `Access-Control-Allow-*` response headers
-- **Where:** `server.js` (registered as `app.use(cors({ origin: ALLOWED_ORIGINS }))`)
-- **Why:** The admin panel may be hosted on a different origin from the API (e.g. when proxied) — CORS allows the cross-origin XHRs to succeed
-- **Whitelist:** `http://localhost:3000`, `http://127.0.0.1:3000`, plus origins set via env var
+- `.png`
+- `.jpg`
+- `.jpeg`
+- `.webp`
+- `.avif`
+- video assets where product media needs them
 
-**Intentionally NOT installed (kept minimal):**
-- No bundler (Webpack/Vite/esbuild)
-- No transpiler (Babel/TypeScript)
-- No test framework (Jest/Mocha)
-- No ORM, no database driver — data is plain JSON committed to git via the GitHub API
-- No template engine — everything is `${escapeHtml(...)}` string interpolation
+**Maintenance notes**
+
+- Compress large images.
+- Prefer real product imagery for product pages.
+- Avoid broken relative paths in data files.
 
 ---
 
-## 3. Browser JavaScript libraries (vendored + CDN)
+## 11. Security and Policy Controls
 
-### Leaflet 1.9.4 — interactive map
+### 11.1 Content Security Policy
 
-- **What:** Lightweight, mobile-friendly interactive map library (~140 KB)
-- **Where:** `simulation/index.html` loads from CDN:
-  ```html
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  ```
-- **Also vendored:** `assets/vendor/leaflet/` (used by the marketing site's testimonial-map and admin location editor)
-- **Why:** Mature, no-build, plugin-rich. Pane system lets us stack basemap + labels + landmarks + our custom canvas overlays cleanly.
-- **Custom usage:** `DualCanvasLayer` (in `simulation/js/app.js`) — a custom Leaflet layer that stacks three full-viewport `<canvas>` elements (`_field`, `_part`, `_drift`) over the map to render current vectors, ambient flow tracers, and particle ensembles respectively.
+**Where**
 
-### Plotly.js 2.35.2 — analytics charts
+- `server.js`
+- `_headers`
+- `web.config`
 
-- **What:** D3-based scientific charting library
-- **Where:** `simulation/index.html` from CDN:
-  ```html
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  ```
-- **Why:** Stacked-area + time-series charts with no manual SVG work
-- **Used in:** `#ts-plot` (run analytics: particle count, spread radius over time), `#oil-budget-plot` (compartment evolution)
-- **Note:** The oil-budget chart was eventually re-implemented as a custom 2-D canvas (`drawOilBudgetCanvas` in `app.js`) to bypass Plotly's SVG paint quirks inside the side-panel stacking context. Plotly is still loaded for `#ts-plot`.
+**Purpose**
 
-### Lenis (vendored, version not pinned) — smooth scroll
+CSP limits where scripts, styles, images, frames, and network connections may come from.
 
-- **What:** Smooth-scroll engine that overrides the browser's native scroll
-- **Where:** `assets/vendor/lenis/lenis.min.js`, loaded by `index.html`
-- **Why:** Buttery-smooth scroll on the marketing site
-- **Wired up by:** `assets/js/smooth-scroll.js`
+**Why it matters**
 
-### Sortable.js (vendored, version not pinned) — drag-and-drop
+If a page accidentally tries to load an unapproved external script or frame, the browser blocks it.
 
-- **What:** Drag-and-drop library for HTML lists/tables
-- **Where:** `assets/vendor/sortable/Sortable.min.js`
-- **Why:** Admin panel needs reorderable lists (e.g. nav links, mega-menu items, gallery image order)
-- **Used by:** `assets/js/admin.js` and `admin-form-rows.js`
+### 11.2 X-Robots-Tag and Robots Policy
 
-### Inline SVG: `<filter id="glass-distortion">` — refraction effect
+**Where**
 
-- **What:** SVG `feTurbulence` + `feDisplacementMap` + `feSpecularLighting` filter chain
-- **Where:** Inline in `simulation/index.html` (hidden `<svg>` at the end of `<body>`)
-- **Why:** Provides the macOS-style glass distortion referenced by `.liquidGlass-effect` via `filter: url(#glass-distortion)`. Currently `filter: none` is set in `theme.css` to keep cards colour-neutral, but the SVG is retained for fallback / future use.
+- `robots.txt`
+- `_headers`
+- `web.config`
+- page metadata where applicable
+
+**Purpose**
+
+Prevent indexing and reduce crawler access.
+
+**Important distinction**
+
+Robots controls guide crawlers. They are not a replacement for authentication.
+
+### 11.3 Local-Only Admin Boundary
+
+**Where**
+
+- `assets/js/admin-auth.js`
+- `server.js`
+
+**Controls**
+
+- Browser host check blocks non-local admin use.
+- Server binds to loopback.
+- Admin writes require a local session token.
+
+### 11.4 Password Hashing
+
+**Where**
+
+- `server.js`
+
+**Technology**
+
+Node `crypto.scryptSync`
+
+**Purpose**
+
+Avoid plain-text password comparison and reduce risk if a local hash leaks.
 
 ---
 
-## 4. Python libraries
+## 12. Hosting and Server Config Files
 
-The pipeline doesn't ship a `requirements.txt` but `scripts/fetch_data.py` imports:
+### 12.1 `_headers`
 
-| Library | Version | Where used | Why |
-|---|---|---|---|
-| **xarray** | unpinned | `fetch_data.py`, `forcing_chunks.py` | NumPy-like labelled multi-dimensional arrays. The standard tool for working with NetCDF ocean datasets. |
-| **numpy** | unpinned | All scripts | Numerical arrays, gridded math, bilinear resampling, JSON-safe value coercion |
-| **copernicusmarine** | 2.4.0 | `fetch_data.py` | Official CMEMS Python client. Authenticates with the user's CMEMS account and downloads NetCDF subsets. |
-| **requests** | unpinned | `fetch_data.py` (Open-Meteo call) | HTTP client for the wind API |
-| **stdlib `json`** | — | `forcing_chunks.py` | Serialise the manifest + chunks |
-| **stdlib `pathlib`** | — | All scripts | Cross-platform path handling |
-| **stdlib `datetime`** | — | All scripts | Time-window construction |
+**Used by**
 
-**Install:**
-```bash
-pip install xarray numpy copernicusmarine requests
-# or, if a requirements.txt is added:
-pip install -r scripts/requirements.txt
+Static hosts that understand Netlify-style `_headers`.
+
+**Controls**
+
+- CSP
+- cache policy
+- crawler policy
+- security headers
+
+### 12.2 `_redirects`
+
+**Used by**
+
+Static hosts that understand Netlify-style `_redirects`.
+
+**Controls**
+
+- fallback routing
+- hash route support
+- static app behavior
+
+### 12.3 `web.config`
+
+**Used by**
+
+IIS-style hosting environments.
+
+**Controls**
+
+- header equivalents
+- static fallback routing
+- MIME/static handling where configured
+
+---
+
+## 13. Admin-Specific Plugin Flow
+
+```mermaid
+flowchart LR
+    Login["Local login"] --> AdminState["Admin state"]
+    AdminState --> Forms["Form editors"]
+    Forms --> Sortable["SortableJS reordering"]
+    Forms --> Pending["pendingChanges set"]
+    Pending --> Save["Save Local Files"]
+    Save --> Express["Express local API"]
+    Express --> Files["assets/js/*-data.js"]
 ```
 
----
-
-## 5. Fonts & icon libraries
-
-### Inter (Google Fonts + local fallback)
-
-- **What:** Modern variable sans-serif designed for screens
-- **Where:**
-  - `assets/css/fonts.css` declares local `@font-face` for `Inter-Light.ttf`, `Inter-Regular.ttf`, `Inter-Medium.ttf`, `Inter-SemiBold.ttf`, `Inter-Bold.ttf`, `Inter-ExtraBold.ttf` (300/400/500/600/700/800)
-  - `simulation/index.html` also loads from Google Fonts as a fallback:
-    ```html
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-    ```
-- **Why:** Excellent legibility at every size; weights cover all UI needs
-- **Token:** `--sim-font-family: "Inter", system-ui, -apple-system, sans-serif`
-
-### Font Awesome 6.4.0 (CDN)
-
-- **What:** Icon font library
-- **Where:**
-  ```html
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
-  ```
-- **Used in:** Nav icons (`fa-trophy`, `fa-water`, `fa-chevron-down`, `fa-arrow-up-right-from-square`), social icons (`fab fa-linkedin`), button icons
-- **Why:** Battle-tested icon library with SRI integrity check for tamper protection
-
-### Outfit (font, used in stats)
-
-- **What:** Geometric sans-serif designed for display use
-- **Where:** Referenced in `assets/css/styles.css` for the homepage stats numbers:
-  ```css
-  .stat-number { font-family: 'Outfit', sans-serif; font-weight: 800; }
-  ```
-- **Why:** Distinctive numeric display style for the "26 PRODUCTS / 12 SERVICES / …" stats bar
+The admin panel uses plugins only where they reduce real UI complexity. SortableJS is the main admin UI plugin. Everything else is plain DOM and local API calls.
 
 ---
 
-## 6. CSS frameworks & utilities
-
-We don't use a CSS framework. The project is **plain CSS with design tokens** — `:root` custom properties act as the design system.
-
-### Layers (load order matters)
-
-| File | LOC | Purpose | Where loaded |
-|---|---|---|---|
-| `assets/css/styles.css` | 7,862 | Main marketing-site styles (hero, sections, cards, header, footer, responsive breakpoints) | `index.html` |
-| `assets/css/admin.css` | 1,042 | Admin panel layout + tabs + forms | `admin.html` |
-| `assets/css/admin-auth.css` | 143 | Login form | `admin.html` |
-| `assets/css/fonts.css` | 71 | `@font-face` for Inter | both shells |
-| `simulation/css/style.css` | 5,212 | Simulation base layout (map shell, side panel, controls) | `simulation/index.html` |
-| `simulation/css/ui-cleanup.css` | 3,215 | Legacy polish + responsive cascade fixes | `simulation/index.html` |
-| `simulation/css/theme.css` | ~1,200 | **Single source of truth** — design tokens + component recipes; loaded LAST | `simulation/index.html` |
-
-### Key CSS techniques used
-
-- **CSS custom properties (`var(--token)`)** for theming
-- **`backdrop-filter: blur(…) saturate(0)`** for glass-morphism with no colour bleed
-- **`flex-wrap: nowrap` + `flex: 1 1 0` + `min-width: 0`** for guaranteed single-row layouts
-- **`@media (max-width: 768px)`** mobile breakpoint
-- **CSS `clamp()`** for fluid sizing (e.g. `clamp(6px, 1.2vw, 20px)`)
-- **`:not(.compact-reference-ui)` body-class scoping** to disable the modern theme for legacy "compact reference UI" mode
-- **Specificity tax** (`#side.liquidGlass-wrapper.liquidGlass-wrapper`) to beat `!important` rules from older CSS
-
----
-
-## 7. Map tile providers
-
-### CARTO Dark (current default)
-
-- **What:** Free dark basemap with a clean style
-- **Where:** `simulation/js/app.js`:
-  ```js
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { … })
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { … })
-  ```
-- **Why:** Free, fast, and the dark theme matches the simulation aesthetic. Labels are a separate layer so we can control their z-index.
-- **Attribution:** © OpenStreetMap contributors © CARTO
-
-### OpenSeaMap Seamark overlay
-
-- **What:** Free overlay layer with nautical features (buoys, channels, lighthouses)
-- **Where:** `simulation/js/app.js`:
-  ```js
-  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { … })
-  ```
-- **Used for:** "Show seamarks" toggle in the Vessel Traffic & Incidents card
-
----
-
-## 8. External APIs & web services
-
-### Copernicus Marine Service (CMEMS)
-
-- **What:** EU's operational ocean data service
-- **Where:** `scripts/fetch_data.py` via the `copernicusmarine` Python SDK
-- **Auth:** Required. `CMEMS_USER` + `CMEMS_PASS` env vars (or `COPERNICUSMARINE_SERVICE_USERNAME` + `_PASSWORD`)
-- **Dataset:** `cmems_mod_glo_phy_anfc_merged-uv_PT1H-i` (Global Ocean Analysis & Forecast, merged surface u/v, hourly instantaneous)
-- **Bbox:** lon 47.5–59.0, lat 22.0–30.5 (Persian Gulf)
-- **Output:** `data/cache/cmems.nc` (NetCDF, ~18 MB)
-
-### Open-Meteo Archive API (wind)
-
-- **What:** Free weather API serving GFS surface winds
-- **Where:** `scripts/fetch_data.py` (called via `requests`)
-- **Auth:** None
-- **URL:** `https://archive-api.open-meteo.com/v1/era5?…&hourly=u10,v10`
-- **Why:** Reliable, free, no rate limits at our query volume
-
-### MarineTraffic (external link)
-
-- **What:** Live AIS vessel-tracking service
-- **Where:** `simulation/index.html` — "Open live AIS" / "Open MarineTraffic" buttons link to `https://www.marinetraffic.com/en/ais/home`
-- **Auth:** None (just an external link)
-- **Why:** MarineTraffic doesn't expose a free Leaflet tile endpoint for live AIS, so we open a synced external tab instead of trying to embed it
-
-### NOAA WebGNOME (external link)
-
-- **What:** NOAA's official high-fidelity oil-spill response planning tool
-- **Where:** "Open WebGNOME" button → `https://gnome.orr.noaa.gov/#config`
-- **Why:** Browser app is for fast exploration; operational response planning must use NOAA's validated tools
-
-### GitHub Contents API
-
-- **What:** REST API for reading/writing files in a GitHub repo
-- **Where:** `server.js` — `/api/github/load`, `/api/github/save`, `/api/github/test` endpoints proxy to `https://api.github.com/repos/{repo}/contents/{path}`
-- **Auth:** Personal access token in `GITHUB_TOKEN` env var, with `repo` scope
-- **Why:** Lets the admin panel persist content edits without us running our own database
-
-### LinkedIn embeds (third-party iframes)
-
-- **What:** Embedded LinkedIn post cards for the "Latest from LinkedIn" section
-- **Where:** `assets/js/news-data.js` provides embed URLs; `pages/home.js` (news section) renders `<iframe>` elements
-- **CSP:** `frame-src https://www.linkedin.com` is whitelisted in `server.js`
-
-### FormSubmit (contact form)
-
-- **What:** Free serverless form-handler service
-- **Where:** Contact page form — referenced in CSP allowed-origins
-- **Why:** Sends contact-form submissions to a configured email without us hosting form handling
-
----
-
-## 9. Browser platform APIs
-
-### Web Workers
-
-- **What:** Browser API for running JS on a background thread
-- **Where:** `simulation/js/worker.js` is instantiated by `app.js` via `new Worker('js/worker.js')`. Worker uses `importScripts('field.js', 'weathering.js', 'drift.js')` to share globals.
-- **Why:** Integrating 1,800 particles × 24 h × 1 h dt = 43,200 RK2 steps takes ~3 seconds. Doing this on the main thread freezes the UI. Workers keep the canvas smooth.
-- **Message protocol:** `postMessage({ action, payload })` / `postMessage({ type, … })` (documented in `TECHNICAL_DOCUMENTATION.md` § Part D.5)
-
-### Service Workers
-
-- **What:** Programmable network proxy + persistent cache
-- **Where:** `simulation/sw.js`, registered by `app.js`
-- **Why:** Cache the large forcing-data chunks (~19 MB each, ~126 MB total). Cache-first for chunks (immutable per `CACHE_VERSION`); network-first for the manifest so visitors don't get stale time ranges.
-
-### Canvas 2D rendering context
-
-- **What:** `<canvas>` + `getContext('2d')` pixel-drawing API
-- **Where:** `simulation/js/app.js` (`DualCanvasLayer`) — three stacked canvases over the Leaflet map
-- **Why:** Drawing 1,800 moving particles per frame in DOM is too slow; canvas is the right tool. Also used by `drawOilBudgetCanvas()` for the stacked-area oil-fate chart.
-
-### IntersectionObserver
-
-- **What:** Observes when elements enter/leave the viewport
-- **Where:**
-  - `assets/js/pages/home.js` — animates stats counter when the stats bar scrolls into view
-  - `assets/js/script.js` — scroll-reveal animations
-- **Why:** More performant than scroll-event listeners
-
-### MutationObserver
-
-- **What:** Observes DOM changes
-- **Where:** `simulation/js/liquid-glass.js` (legacy) — used to wrap dynamically-added cards in the 4-layer glass structure
-- **Why:** Lets us decorate cards that get added after initial render
-
-### Fetch API
-
-- **What:** Modern HTTP client (`fetch(url).then(r => r.json())`)
-- **Where:** Everywhere data is loaded (`Field.load()`, admin GitHub I/O, metrics POSTs)
-- **Why:** Native, Promise-based, supersedes XHR
-
-### History API (via Leaflet's panes & hash routing)
-
-- **What:** `window.history.pushState()` for SPA URL changes
-- **Where:** `assets/js/router.js` uses hash routing (`#/route`) so deep links work without server-side rewrite rules
-- **Why:** Simplest SPA routing; works on static hosts
-
-### `localStorage`
-
-- **What:** Persistent key/value storage in the browser
-- **Where:** Theme preference (`theme-toggle.js`), simulation expert-tools state, settings
-- **Why:** Survives tab close; per-origin
-
-### Geolocation API
-
-- Not used. We intentionally never read user location — the simulation only uses map-click coordinates the user provides.
-
-### Service Worker Cache Storage
-
-- **What:** Persistent cache used by service workers
-- **Where:** `sw.js` opens `caches.open('hormuz-forcing-v4')`
-- **Why:** Stores the 126 MB of forcing chunks across visits
-
----
-
-## 10. Data formats
-
-### JSON (everywhere)
-
-- **What:** JavaScript Object Notation — text-based interchange format
-- **Where:** API request/response bodies, `data/currents.json` manifest, chunked forcing data, log files
-- **Why:** Native browser parser, human-readable, language-agnostic
-
-### NetCDF (.nc)
-
-- **What:** Network Common Data Form — binary file format for gridded scientific data
-- **Where:** `data/cache/cmems.nc` (raw CMEMS download before chunking)
-- **Why:** Standard format for ocean/climate data. We use xarray to read it and re-serialise to JSON for the browser.
-
-### "JavaScript as CMS"
-
-- **What:** Content files like `assets/js/products-data.js` are valid JavaScript modules:
-  ```js
-  window.PRODUCTS_DATA = [ { id: '…', name: '…', … }, … ];
-  ```
-- **Where:** All `assets/js/*-data.js` files
-- **Why:** No database, no fetch, no template engine. The page loads, the data is already in `window.*_DATA`, the renderer reads it synchronously. The admin panel writes back to these files as JS source strings (using regex + markers to splice values in/out of preserved comments).
-
-### Service Worker cache (named cache storage)
-
-- **What:** Persistent key/value cache (request → response) per origin
-- **Where:** `simulation/sw.js` manages `hormuz-forcing-v4`
-- **Why:** Stores the forcing JSON chunks across visits, allowing offline playback after first load
-
----
-
-## 11. Build & dev tools
-
-This project intentionally has **no build step**. The files you write are the files the browser loads. Trade-offs:
-
-| Approach | Pro | Con |
-|---|---|---|
-| **No build (chosen)** | Edit → reload. No CI build minutes. No source-map debugging gap. | No minification. No tree-shaking. No TypeScript. |
-| Webpack/Vite | Modern features, smaller bundle | Build step, source-map debugging, longer feedback loop |
-
-### Cache-busting via query string
-
-Each `<link>` and `<script>` carries a manually-bumped version:
-```html
-<link rel="stylesheet" href="css/theme.css?v=31" />
-<script src="js/app.js?v=71"></script>
+## 14. Public-Site Plugin Flow
+
+```mermaid
+flowchart LR
+    Data["Data files"] --> Pages["Page renderers"]
+    Pages --> Lenis["Lenis smooth scroll"]
+    Pages --> Icons["Font Awesome icons"]
+    Pages --> Map["Leaflet locations map"]
+    Pages --> Embeds["LinkedIn embeds"]
+    Map --> Tiles["External tile images"]
 ```
-After editing a file, bump its `?v=` so browsers fetch the new copy past their HTTP cache.
 
-### Local development servers
+Public plugins are progressive enhancements. The website should still display useful content if a plugin or external embed fails.
 
-| Tool | Use case |
+---
+
+## 15. Dependency Maintenance Guide
+
+### Express
+
+1. Update with `npm install express@latest`.
+2. Run `npm start`.
+3. Test login, data read, data write, and static serving.
+4. Check server logs.
+
+### CORS
+
+1. Update with `npm install cors@latest`.
+2. Confirm local admin API calls still work.
+3. Confirm remote origins are not accidentally opened.
+
+### SortableJS
+
+1. Replace `assets/vendor/sortable/Sortable.min.js`.
+2. Test drag-and-drop in all reorderable admin sections.
+3. Save local files and inspect resulting data arrays.
+
+### Lenis
+
+1. Replace `assets/vendor/lenis/lenis.min.js`.
+2. Test scroll on desktop and mobile.
+3. Test route changes after scrolling.
+
+### Leaflet
+
+1. Replace `assets/vendor/leaflet/leaflet.js`.
+2. Replace `assets/vendor/leaflet/leaflet.css`.
+3. Test map load, markers, popup content, and theme behavior.
+4. Confirm CSP allows tile images.
+
+### Font Awesome
+
+1. Update CDN version in HTML or vendor it locally.
+2. Test admin icons and public icons.
+3. If CDN host changes, update CSP.
+
+---
+
+## 16. What Is Intentionally Not Used
+
+| Not used | Reason |
 |---|---|
-| `node server.js` | Full backend (admin panel + metrics + GitHub proxy) on `http://localhost:3000` |
-| `python -m http.server 8000 --bind 127.0.0.1` | Static-only dev (when you don't need the admin API). Used by the conversation transcript's testing flow. |
-
-### git + GitHub
-
-- **Repo:** `https://github.com/EnochMacwan/Tridel`
-- **Worktrees:** `.claude/worktrees/` directory holds Claude Code's isolation worktrees for parallel agent work
-- **Branch model:** Single `main` branch, push-only workflow
-
-### Claude Code MCP integrations
-
-- **claude-in-chrome** — drives Brave/Chrome from JS for live UI verification (used heavily in this transcript)
-- **claude_preview** — quick screenshot preview of a local dev server
-- **graphify** — generates a knowledge-graph visualisation of the codebase (output in `graphify-out/`)
+| Frontend framework | The site is simple enough for plain JavaScript |
+| Bundler | Static file loading is transparent and easy to host |
+| Database | Data files are enough for current content volume |
+| Hosted CMS | Admin is local-only by design |
+| Remote repository API in admin | Admin saves local files only |
+| Client-side secrets | Public browser files cannot safely hold secrets |
+| Heavy map platform SDK | Leaflet is enough for location markers |
 
 ---
 
-## 12. Security primitives
+## 17. Recommended Checks After Plugin Changes
 
-### Node.js `crypto` module
-
-- **What:** Built-in cryptographic API
-- **Where:** `server.js` — `crypto.scryptSync()` for password hashing, `crypto.randomBytes()` for session tokens, `crypto.timingSafeEqual()` for hash comparison
-- **Why:** Built into Node, no extra deps. Scrypt is intentionally slow → resistant to brute-force.
-
-### Content Security Policy (CSP)
-
-- **What:** HTTP header that whitelists script/style/connect sources
-- **Where:** `server.js` sets `Content-Security-Policy` on every response
-- **Why:** Mitigates XSS by preventing inline scripts from unknown origins
-- **Limitation:** `'unsafe-inline'` is currently required for inline `<script>` blocks in shells
-
-### HSTS
-
-- **What:** `Strict-Transport-Security` header forces browsers to use HTTPS for a year
-- **Where:** `server.js` (`max-age=31536000; includeSubDomains`)
-- **Why:** Prevents protocol-downgrade attacks
-
-### X-Frame-Options: DENY
-
-- **What:** Forbids the site from being embedded in iframes
-- **Where:** `server.js`
-- **Why:** Anti-clickjacking
-
-### X-Content-Type-Options: nosniff
-
-- **What:** Disables browser MIME-type sniffing
-- **Where:** `server.js`
-- **Why:** Prevents an uploaded .txt from being executed as .js
-
-### Rate limiting
-
-- **What:** In-memory `Map<ip, { attempts, firstAttemptAt }>`
-- **Where:** `server.js` — applied to `/api/login` (5 attempts / 15 min / IP)
-- **Why:** Brute-force resistance
-
-### `escapeHtml()` (`assets/js/utils.js`)
-
-- **What:** 6-line function that escapes `& < > " '`
-- **Where:** Imported as `esc` and wrapped around every interpolated value in page renderers
-- **Why:** XSS prevention — content from data files goes through this on every render
-
----
-
-## 13. Scientific models & references
-
-These are the published models the simulation implements. Citations are in code comments in `simulation/js/`.
-
-### Particle drift physics
-
-| Reference | Model | Where |
-|---|---|---|
-| **NOAA Allen (2005)** | Leeway parameters for 19 SAR target categories — downwind & crosswind fractions | `drift.js` `LEEWAY_CATEGORIES` |
-| **Breivik et al. (2011)** | Updated leeway coefficients for additional object types | `drift.js` |
-| **Kenyon (1969)** | Stokes drift ≈ 1.6% of wind speed | `drift.js` `STOKES_FRACTION = 0.016` |
-| **Csanady (1973)** | Random-walk eddy diffusion with σ = √(2Kdt) | `drift.js` |
-
-### Oil weathering
-
-| Reference | Model | Where |
-|---|---|---|
-| **Fingas (1998)** | `F(t) = C1·ln(t_min)` — log-linear evaporation rate | `weathering.js` |
-| **Mackay et al. (1980)** | `dW/dt = K_e · U10² · (W_max − W)` — water-in-oil emulsification | `weathering.js` |
-| **Delvigne & Sweeney (1988)** | Natural surface-oil dispersion under wave action | `weathering.js` |
-| **Fay (1971)** | Three-regime slick spreading (gravity-inertial, gravity-viscous, surface-tension) | `drift.js` |
-| **NOAA ADIOS** | Oil-property database (14 Hormuz-relevant oils with API, density, SARA, viscosity) | `weathering.js` `OIL_TYPES` |
-
-### Ocean & wind data
-
-| Source | Variable | Where |
-|---|---|---|
-| **CMEMS GLOBAL_ANALYSISFORECAST_PHY_001_024** | Surface u/v (merged geostrophic + Ekman + tidal), hourly | `scripts/fetch_data.py` |
-| **NOAA NCEP RTOFS Global** | Surface u/v (no-auth fallback) | `scripts/fetch_rtofs_data.py` |
-| **Open-Meteo (GFS)** | 10 m wind u/v, hourly | `scripts/fetch_data.py` |
-
-### Geometric algorithms
-
-| Algorithm | Where | Used for |
-|---|---|---|
-| **Andrew's monotone chain** | `simulation/js/app.js` | O(n log n) convex hull for trail coverage / footprint metrics |
-| **2×2 covariance eigendecomposition** | `simulation/js/app.js` | Uncertainty ellipse axes |
-| **Bilinear interpolation** | `simulation/js/field.js` `_sample()` | Sampling currents at arbitrary lon/lat |
-| **Linear interpolation** | `simulation/js/field.js` | Sampling currents at arbitrary time |
-| **Box-Muller transform** | `simulation/js/drift.js` | Gaussian random numbers for diffusion noise |
-
----
-
-## 14. Hosting & deployment targets
-
-The repo includes rewrite rules for three different static hosting environments:
-
-| File | Host | Purpose |
-|---|---|---|
-| `.htaccess` | Apache (cPanel, traditional shared hosting) | SPA history-fallback rewrite to `/index.html` |
-| `_headers` + `_redirects` | Netlify, Cloudflare Pages | Headers + history fallback in Netlify config format |
-| `web.config` | IIS, Azure App Service | Same fallback for Microsoft-stack hosting |
-
-For Node-backed deploys (when the admin panel is needed), the recommended approach is:
-
-```
-[CDN/edge]  →  [Reverse proxy: nginx/Caddy + TLS]  →  [node server.js on :3000]
+```powershell
+node --check server.js
+node --check assets/js/admin-auth.js
+node --check assets/js/admin.js
+node --check assets/js/admin-publish.js
+git diff --check
 ```
 
-For pure-static deploys (no admin panel needed), point any CDN at the repo root. The simulation and marketing site work fully client-side.
+Manual browser checks:
+
+- Home page renders.
+- Products page renders.
+- Services page renders.
+- About page renders.
+- Contact page renders.
+- Locations map initializes.
+- Admin login works on localhost.
+- Admin refuses non-local use.
+- Drag-and-drop still updates order.
+- `Save Local Files` writes local data files.
+- LinkedIn embeds fail gracefully if blocked.
+- Form links/buttons still go to the expected destination.
 
 ---
 
-## 15. Quick-reference matrix
+## 18. Plain-English Mental Model
 
-| Category | Count | Notes |
-|---|---|---|
-| Languages | 6 | JS, Python, HTML, CSS, PowerShell, Batch |
-| npm dependencies | 2 | express, cors |
-| Browser JS libs | 4 | Leaflet, Plotly, Lenis, Sortable |
-| Python libs | 4 | xarray, numpy, copernicusmarine, requests |
-| External APIs | 6 | CMEMS, Open-Meteo, MarineTraffic, WebGNOME, GitHub, LinkedIn |
-| Map tile providers | 3 | CARTO, Mapbox (optional), OpenSeaMap |
-| Browser APIs | 8+ | Workers, Service Workers, Canvas, Fetch, History, IntersectionObserver, MutationObserver, localStorage |
-| Fonts | 3 | Inter, Outfit, Font Awesome (icons) |
-| Scientific models | 8+ | Fingas, Mackay, Delvigne-Sweeney, Fay, Allen leeway, Kenyon, Csanady, Andrew's hull |
-| Lines of JS | ~12,000 | ~7,000 marketing + ~5,000 simulation |
-| Lines of CSS | ~18,800 | 7,862 main + ~9,500 simulation + others |
-| Lines of Python | ~1,500 | Across 7 scripts |
-| Data size | ~126 MB | 7 chunks × 24 h of CMEMS + wind |
-| External CDN dependencies | 4 | unpkg/Leaflet, cdn.plot.ly, Google Fonts, cdnjs Font Awesome |
+Think of the system like this:
 
----
+The public website is a static showroom. Its products, services, clients, stories, and layout come from local JavaScript data files.
 
-*To find where any technology in this document is used, grep for its name in the codebase. Every dependency was added intentionally, with the reasoning captured in code comments at the import site.*
+The admin panel is a local workshop. It edits those same data files through a small server running on the maintainer's machine.
+
+Plugins are tools inside the showroom and workshop:
+
+- SortableJS helps the workshop reorder content.
+- Lenis makes the showroom scroll smoothly.
+- Leaflet powers the showroom map.
+- Font Awesome supplies icons.
+- LinkedIn embeds show selected social/news content.
+- FormSubmit can deliver form messages.
+
+The security model is simple: public visitors get the showroom; maintainers run the workshop locally.

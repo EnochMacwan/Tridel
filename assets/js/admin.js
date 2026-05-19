@@ -43,6 +43,12 @@
 })();
 
 // Helper: Get Data Array by Type
+function getContactSettingsObject() {
+    var contact = window.CONTACT_DATA;
+    if (Array.isArray(contact)) return contact[0] || {};
+    return contact && typeof contact === 'object' ? contact : {};
+}
+
 function getDataArray(type) {
     var data = [];
     switch (type) {
@@ -55,7 +61,7 @@ function getDataArray(type) {
         case 'team': data = window.TEAM_DATA; break;
         case 'testimonials': data = window.TESTIMONIALS_DATA; break;
         case 'locations': data = window.LOCATIONS_DATA; break;
-        case 'settings': return [window.CONTACT_DATA || {}];
+        case 'settings': return [getContactSettingsObject()];
         case 'index_content': return [window.INDEX_HERO || {}];
         default: return [];
     }
@@ -96,20 +102,10 @@ function updateThemeIcon(theme) {
 })();
 
 // ==========================================
-// 4. GITHUB CONFIGURATION
+// 4. LOCAL DATA FILES
 // ==========================================
 
-var gitHubConfig = {};
-try {
-    gitHubConfig = JSON.parse(sessionStorage.getItem('tridel_github_config') || '{}');
-} catch (e) {
-    gitHubConfig = {};
-}
-
-var serverGitHubConfig = null;
-var serverGitHubProxyAvailable = false;
-
-var GITHUB_DATA_FILES = {
+var LOCAL_DATA_FILES = {
     'products': 'assets/js/products-data.js',
     'services': 'assets/js/services-data.js',
     'clients': 'assets/js/clients-data.js',
@@ -119,6 +115,7 @@ var GITHUB_DATA_FILES = {
     'linkedin': 'assets/js/news-data.js',
     'team': 'assets/js/team-data.js',
     'testimonials': 'assets/js/testimonials-data.js',
+    'locations': 'assets/js/locations-data.js',
     'settings': 'assets/js/contact-data.js',
     'form_settings': 'assets/js/settings-data.js',
     'index_content': 'assets/js/index-page-data.js',
@@ -127,7 +124,7 @@ var GITHUB_DATA_FILES = {
     'layout': 'assets/js/layout-data.js'
 };
 
-var GITHUB_VAR_NAMES = {
+var LOCAL_VAR_NAMES = {
     'products': 'PRODUCTS_DATA',
     'services': 'SERVICES_DATA',
     'clients': 'CLIENTS_DATA',
@@ -137,6 +134,7 @@ var GITHUB_VAR_NAMES = {
     'linkedin': 'NEWS_DATA',
     'team': 'TEAM_DATA',
     'testimonials': 'TESTIMONIALS_DATA',
+    'locations': 'LOCATIONS_DATA',
     'settings': 'CONTACT_DATA',
     'form_settings': 'SETTINGS_DATA',
     'index_content': 'INDEX_HERO',
@@ -145,211 +143,77 @@ var GITHUB_VAR_NAMES = {
     'layout': 'NAV_LINKS'
 };
 
-
-async function loadServerGitHubConfig() {
-    try {
-        var res = await fetch('/api/github/config', {
-            headers: getAdminAuthHeaders()
-        });
-        if (!res.ok) return;
-        serverGitHubConfig = await res.json();
-        serverGitHubProxyAvailable = true;
-    } catch (e) {
-        serverGitHubConfig = null;
-        serverGitHubProxyAvailable = false;
-    }
+function getLocalServerType(type) {
+    if (type === 'linkedin') return 'news';
+    if (type === 'settings') return 'contact';
+    if (type === 'form_settings' || type === 'visibility') return 'settings';
+    return type;
 }
 
+function extractAssignedLiteral(content, varName) {
+    var declaration = new RegExp('(?:const|var|let)\\s+' + varName + '\\s*=\\s*');
+    var match = declaration.exec(content);
+    if (!match) return '';
 
-async function fetchGitHubFileContent(filePath) {
-    if (serverGitHubProxyAvailable) {
-        var proxyRes = await fetch('/api/github/load', {
-            method: 'POST',
-            headers: Object.assign({
-                'Content-Type': 'application/json'
-            }, getAdminAuthHeaders()),
-            body: JSON.stringify(Object.assign(buildGitHubProxyPayload(), {
-                path: filePath
-            }))
-        });
+    var start = match.index + match[0].length;
+    var opener = content[start];
+    var closer = opener === '[' ? ']' : opener === '{' ? '}' : '';
+    if (!closer) return '';
 
-        if (!proxyRes.ok) {
-            var proxyErr = await proxyRes.json().catch(function () { return {}; });
-            throw new Error(proxyErr.error || proxyRes.statusText);
-        }
+    var depth = 0;
+    var inString = false;
+    var quote = '';
+    var escaped = false;
 
-        var proxyData = await proxyRes.json();
-        return proxyData.content || '';
-    }
+    for (var i = start; i < content.length; i++) {
+        var ch = content[i];
 
-    var config = getEffectiveGitHubConfig();
-    var res = await fetch(
-        'https://raw.githubusercontent.com/' + config.owner + '/' + config.repo + '/' + config.branch + '/' + filePath
-    );
-
-    if (!res.ok) {
-        throw new Error(res.statusText || 'Failed to load GitHub content');
-    }
-
-    return res.text();
-}
-
-async function loadDataFromGitHub() {
-    if (!hasConfiguredGitHub()) {
-        showToast('GitHub not configured', 'error');
-        return;
-    }
-
-    showToast('Loading data from GitHub...', 'success');
-
-    var types = ['products', 'services', 'clients', 'stories', 'home', 'news', 'team', 'testimonials', 'locations', 'settings', 'form_settings'];
-
-    for (var i = 0; i < types.length; i++) {
-        var type = types[i];
-        var filePath = GITHUB_DATA_FILES[type];
-        var varName = GITHUB_VAR_NAMES[type];
-
-        try {
-            var content = await fetchGitHubFileContent(filePath);
-            var match = content.match(/(?:const\s+\w+|window\.\w+)\s*=\s*([\{\[][\s\S]*[\]\}]);?/);
-            if (match) {
-                try {
-                    // Sanitize JS to valid JSON
-                    var raw = match[1];
-                    raw = raw.replace(/\/\/.*$/gm, '');           // strip single-line comments
-                    raw = raw.replace(/\/\*[\s\S]*?\*\//g, '');   // strip block comments
-                    raw = raw.replace(/,\s*([\]}])/g, '$1');      // strip trailing commas
-                    raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":'); // quote unquoted keys
-                    // Escape control characters inside JSON string values
-                    var out = '', inStr = false;
-                    for (var ci = 0; ci < raw.length; ci++) {
-                        var ch = raw[ci];
-                        if (ch === '"' && (ci === 0 || raw[ci - 1] !== '\\')) { inStr = !inStr; out += ch; }
-                        else if (inStr && ch === '\n') out += '\\n';
-                        else if (inStr && ch === '\r') out += '\\r';
-                        else if (inStr && ch === '\t') out += '\\t';
-                        else if (inStr && ch.charCodeAt(0) < 0x20) out += '';
-                        else out += ch;
-                    }
-                    raw = out;
-                    var data = JSON.parse(raw);
-                    window[varName] = data;
-                } catch (parseErr) {
-                    // Non-JSON JS data from GitHub is expected; local data files are used instead
-                    console.warn('GitHub data for ' + type + ' not JSON-compatible, using local data');
-                }
+        if (inString) {
+            if (escaped) {
+                escaped = false;
+            } else if (ch === '\\') {
+                escaped = true;
+            } else if (ch === quote) {
+                inString = false;
             }
-        } catch (e) {
-            console.warn('Could not load ' + type + ' from GitHub:', e.message);
+            continue;
+        }
+
+        if (ch === '"' || ch === "'") {
+            inString = true;
+            quote = ch;
+            continue;
+        }
+
+        if (ch === opener) {
+            depth++;
+        } else if (ch === closer) {
+            depth--;
+            if (depth === 0) {
+                return content.slice(start, i + 1);
+            }
         }
     }
 
-    // Special: load multi-var files
-    var multiVarFiles = [
-        { key: 'index_content', parser: parseIndexPageContent },
-        { key: 'about_content', parser: parseAboutPageContent },
-        { key: 'contact_content', parser: parseContactPageContent },
-        { key: 'layout', parser: parseLayoutData }
-    ];
-    for (var mvi = 0; mvi < multiVarFiles.length; mvi++) {
-        try {
-            var mvPath = GITHUB_DATA_FILES[multiVarFiles[mvi].key];
-            var mvContent = await fetchGitHubFileContent(mvPath);
-            multiVarFiles[mvi].parser(mvContent);
-        } catch (e) {
-            console.warn('Could not load ' + multiVarFiles[mvi].key + ' from GitHub:', e.message);
-        }
-    }
+    return '';
+}
 
-    renderAllSections(); // includes renderDashboard()
-    showToast('Data loaded from GitHub!', 'success');
+function parseAssignedJson(content, varName) {
+    var raw = extractAssignedLiteral(content, varName);
+    if (!raw) return null;
+    return JSON.parse(raw);
 }
 
 function parseIndexPageContent(content) {
-    // Parse multiple var declarations from index-page-data.js
     var varNames = ['INDEX_HERO', 'INDEX_STATS', 'INDEX_WHAT_WE_DO', 'INDEX_CASE_STUDY', 'INDEX_CTA', 'INDEX_WHY_CHOOSE', 'INDEX_SECTION_ORDER'];
     varNames.forEach(function (varName) {
-        var regex = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*(?:var\\s|$)', 'g');
-        var match = regex.exec(content);
-        if (!match) {
-            // Try without the trailing var lookahead (for last declaration)
-            var regex2 = new RegExp('var\\s+' + varName + '\\s*=\\s*([\\{\\[][\\s\\S]*?);\\s*$', 'm');
-            match = regex2.exec(content);
-        }
-        if (match) {
-            try {
-                var raw = match[1].trim();
-                // Remove trailing semicolons
-                raw = raw.replace(/;+$/, '');
-                raw = raw.replace(/\/\/.*$/gm, '');
-                raw = raw.replace(/\/\*[\s\S]*?\*\//g, '');
-                raw = raw.replace(/,\s*([\]}])/g, '$1');
-                raw = raw.replace(/([{,]\s*)(?!")(\w+)\s*:/g, '$1"$2":');
-                // Escape control characters
-                var out = '', inStr = false;
-                for (var ci = 0; ci < raw.length; ci++) {
-                    var ch = raw[ci];
-                    if (ch === '"' && (ci === 0 || raw[ci - 1] !== '\\')) { inStr = !inStr; out += ch; }
-                    else if (inStr && ch === '\n') out += '\\n';
-                    else if (inStr && ch === '\r') out += '\\r';
-                    else if (inStr && ch === '\t') out += '\\t';
-                    else if (inStr && ch.charCodeAt(0) < 0x20) out += '';
-                    else out += ch;
-                }
-                var parsed = JSON.parse(out);
-                window[varName] = parsed;
-            } catch (e) {
-                console.warn('Could not parse ' + varName + ':', e.message);
-            }
+        try {
+            var parsed = parseAssignedJson(content, varName);
+            if (parsed !== null) window[varName] = parsed;
+        } catch (e) {
+            console.warn('Could not parse ' + varName + ':', e.message);
         }
     });
-}
-
-
-async function testGitHubConnection() {
-    var formConfig = getGitHubFormConfig();
-    var statusEl = document.getElementById('github-status');
-
-    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-    statusEl.style.color = 'var(--text)';
-
-    try {
-        if (serverGitHubProxyAvailable) {
-            var proxyRes = await fetch('/api/github/test', {
-                method: 'POST',
-                headers: Object.assign({
-                    'Content-Type': 'application/json'
-                }, getAdminAuthHeaders()),
-                body: JSON.stringify(Object.assign(buildGitHubProxyPayload(formConfig), formConfig))
-            });
-
-            if (proxyRes.ok) {
-                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection Successful!';
-                statusEl.style.color = 'var(--success)';
-                return;
-            }
-
-            var proxyErr = await proxyRes.json().catch(function () { return {}; });
-            statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + escapeHTML(proxyErr.error || 'Connection Failed');
-            statusEl.style.color = 'var(--danger)';
-            return;
-        }
-
-        var res = await fetch('https://api.github.com/repos/' + formConfig.owner + '/' + formConfig.repo, {
-            headers: { 'Authorization': 'token ' + formConfig.token }
-        });
-
-        if (res.ok) {
-            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection Successful!';
-            statusEl.style.color = 'var(--success)';
-        } else {
-            statusEl.innerHTML = '<i class="fas fa-times-circle"></i> Connection Failed';
-            statusEl.style.color = 'var(--danger)';
-        }
-    } catch (e) {
-        statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error: ' + escapeHTML(e.message);
-        statusEl.style.color = 'var(--danger)';
-    }
 }
 
 // ==========================================
@@ -368,11 +232,14 @@ async function checkAuth() {
         return;
     }
 
-    var isGitHubPages = !window.location.hostname.includes('localhost') &&
-        !window.location.hostname.includes('127.0.0.1');
+    var isLocalhost = window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '::1' ||
+        window.location.hostname === '[::1]';
 
-    if (isGitHubPages) {
-        hideLogin();
+    if (!isLocalhost) {
+        showToast('Admin is available only from localhost.', 'error');
+        showLogin();
         return;
     }
 
@@ -386,10 +253,7 @@ async function checkAuth() {
                 hideLogin();
                 return;
             }
-        } catch (e) {
-            hideLogin();
-            return;
-        }
+        } catch (e) {}
     }
     showLogin();
 }
@@ -418,19 +282,6 @@ async function doLogin() {
     } catch (e) {
         errorEl.textContent = 'Server not running. Start it with: npm start';
         errorEl.style.display = 'block';
-    }
-}
-
-function enableOfflineMode() {
-    hideLogin();
-    showToast('Running in Offline / GitHub Mode', 'info');
-
-    if (!hasConfiguredGitHub()) {
-        setTimeout(function () {
-            if (confirm('GitHub is not configured. Do you want to configure it now?')) {
-                openGitHubConfig();
-            }
-        }, 1000);
     }
 }
 
@@ -1706,13 +1557,8 @@ async function publishPendingChangeToServer(serverType, data) {
 // ==========================================
 
 async function saveToServer(type, data) {
-    if (hasConfiguredGitHub()) {
-        await saveToGitHub(type, data);
-        return;
-    }
-
     try {
-        var response = await fetch('/api/data/' + type, {
+        var response = await fetch('/api/data/' + getLocalServerType(type), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1732,7 +1578,7 @@ async function saveToServer(type, data) {
             showToast('Failed to save: ' + err.error, 'error');
         }
     } catch (err) {
-        showToast('Configure GitHub in Settings to save changes online', 'error');
+        showToast('Local server unavailable. Start it with npm start and open http://localhost:3000/admin.html.', 'error');
     }
 }
 
@@ -1871,9 +1717,7 @@ function renderHealthResults(results) {
 // ==========================================
 
 function loadSettingsToForm() {
-    var legacyContact = (window.CONTACT_DATA && typeof window.CONTACT_DATA === 'object' && !Array.isArray(window.CONTACT_DATA))
-        ? window.CONTACT_DATA
-        : {};
+    var legacyContact = getContactSettingsObject();
     var config = window.CONTACT_PAGE_CONFIG || {};
     var enquiry = config.enquiry || {};
     var social = legacyContact.social || {};
@@ -1934,7 +1778,7 @@ async function saveGlobalSettings() {
     markAsPending('form_settings');
     markAsPending('contact_content');
 
-    showToast('Settings draft saved. Click "Publish Website" to apply changes to the website.', 'success');
+    showToast('Settings draft saved. Click "Save Local Files" to apply changes to the website.', 'success');
 }
 
 // ==========================================
@@ -2690,17 +2534,11 @@ function saveVisibility() {
 
 document.addEventListener('DOMContentLoaded', async function () {
     await checkAuth();
-    await loadServerGitHubConfig();
     initNavigation();
 
     // Update theme icon now that DOM is ready
     var savedTheme = localStorage.getItem('adminTheme') || 'dark';
     updateThemeIcon(savedTheme);
-
-    // Load data from GitHub if configured
-    if (hasConfiguredGitHub()) {
-        await loadDataFromGitHub();
-    }
 
     renderAllSections(); // includes renderDashboard()
     loadSettingsToForm();
