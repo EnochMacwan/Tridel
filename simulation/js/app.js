@@ -2621,7 +2621,7 @@ function updateTimelinePill() {
       els.timelineStart.innerHTML = `<span class="meta-kicker">Start</span> ${formatTimelineUtc(Field.times[0])}`;
       els.timelineEnd.innerHTML = `<span class="meta-kicker">End</span> ${formatTimelineUtc(Field.times[Field.times.length - 1])}`;
       els.timelineCurrent.textContent = `${formatTimelineUtc(Field.times[currentIndex])} UTC`;
-      if (els.summaryWindow) els.summaryWindow.textContent = `${formatTimelineUtc(Field.times[0])} to ${formatTimelineUtc(Field.times[Field.times.length - 1])}`;
+      if (els.summaryWindow) els.summaryWindow.textContent = `${formatTimelineUtc(Field.times[0])} to ${formatTimelineUtc(Field.times[Field.times.length - 1])} UTC`;
       if (els.timelinePhase) els.timelinePhase.textContent = timelinePhaseFor(currentSec);
       els.timelineEvents.innerHTML = "";
     }
