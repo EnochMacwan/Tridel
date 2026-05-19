@@ -1206,3 +1206,60 @@ body:not(.compact-reference-ui) #app#app .map-status-chips span,
 body:not(.compact-reference-ui) #app#app .results-card {
   background-image: none !important;
 }
+
+/* 9. Clean thin outline standard — give every card / pill / button a
+   single 1px neutral white border at low opacity. Replaces the various
+   cyan-tinted (rgba(70,236,255,0.32)) and white-tinted borders that
+   were inconsistently applied per-component. Uses double-ID specificity
+   so it wins over per-component source rules. */
+body:not(.compact-reference-ui) #side#side .section-card,
+body:not(.compact-reference-ui) #side#side .current-scenario-card,
+body:not(.compact-reference-ui) #side#side .stat-card,
+body:not(.compact-reference-ui) #side#side .term-card,
+body:not(.compact-reference-ui) #side#side .preset-card,
+body:not(.compact-reference-ui) #side#side .result-card,
+body:not(.compact-reference-ui) #side#side .insight-pill,
+body:not(.compact-reference-ui) #side#side .summary-chip-row span,
+body:not(.compact-reference-ui) #side#side .tag,
+body:not(.compact-reference-ui) #side#side button,
+body:not(.compact-reference-ui) #side#side input,
+body:not(.compact-reference-ui) #side#side select,
+body:not(.compact-reference-ui) #side#side .check-pill,
+body:not(.compact-reference-ui) #side#side .scenario-tabs button,
+body:not(.compact-reference-ui) #side#side .resp-tab,
+body:not(.compact-reference-ui) #side#side .release-coord-field > input,
+body:not(.compact-reference-ui) #side#side #release-coord-btn,
+body:not(.compact-reference-ui) #controls#controls,
+body:not(.compact-reference-ui) #controls#controls button,
+body:not(.compact-reference-ui) #controls#controls #time-label,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #app#app .map-legend,
+body:not(.compact-reference-ui) #app#app .map-status-chips span,
+body:not(.compact-reference-ui) #app#app .results-card,
+body:not(.compact-reference-ui) #banner#banner {
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  outline: none !important;
+}
+
+/* 9b. Slightly more visible outline on the major container panels so
+   they read as distinct surfaces, but still thin and neutral. */
+body:not(.compact-reference-ui) #side#side.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #banner#banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #controls#controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #app#app .map-legend.liquidGlass-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  outline: none !important;
+}
+
+/* 9c. Focus state — keep a subtle accent for keyboard users without
+   the puffy box-shadow glow. */
+body:not(.compact-reference-ui) #side#side input:focus,
+body:not(.compact-reference-ui) #side#side select:focus,
+body:not(.compact-reference-ui) #side#side button:focus-visible,
+body:not(.compact-reference-ui) #side#side .release-coord-field > input:focus {
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: none !important;
+}
