@@ -3091,9 +3091,9 @@ body:not(.compact-reference-ui) .liquidGlass-tint {
 body:not(.compact-reference-ui) .liquidGlass-shine {
   z-index: 2 !important;
   overflow: hidden !important;
-  box-shadow:
-    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.50),
-    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.50) !important;
+  /* Inset white highlights removed — they were producing a bright
+     curved "shine" line at panel corners that competed with content. */
+  box-shadow: none !important;
 }
 
 body:not(.compact-reference-ui) .liquidGlass-text {
