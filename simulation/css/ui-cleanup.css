@@ -2819,12 +2819,10 @@ body:not(.compact-reference-ui) #banner .banner-copy {
 body:not(.compact-reference-ui) #banner .partner-logo-inline {
   display: inline-flex !important;
   width: fit-content !important;
-  border-radius: 16px !important;
-  padding: 5px 9px !important;
-  background: rgba(12, 18, 24, 0.16) !important;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.40),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.24) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 body:not(.compact-reference-ui) #banner .partner-logo-inline img {
