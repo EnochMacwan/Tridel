@@ -1065,10 +1065,15 @@ function sampleTrackPosition(drifter, tSec) {
     if (!drifter.stranded || sampleSec <= drifter.t) {
       return Math.exp(-elapsed / drifter.tau_evap);
     }
-    // Evaporation significantly slows down once the oil is stranded on land
+    /* Beached oil evaporates slower than floating oil because it stops
+       spreading, loses heat to ground, and is partly absorbed into the
+       substrate. The ×4 slowdown factor used here is a project heuristic
+       (literature values range from ×2 in ADIOS for sandy beaches to ×10+
+       for porous rocky shore with heavy crude). Treat it as a tunable. */
+    const STRANDED_EVAP_SLOWDOWN = 4;
     const floatingTime = Math.max(0, drifter.t - drifter.t0);
     const beachedTime = sampleSec - drifter.t;
-    return Math.exp(-(floatingTime / drifter.tau_evap + beachedTime / (drifter.tau_evap * 4)));
+    return Math.exp(-(floatingTime / drifter.tau_evap + beachedTime / (drifter.tau_evap * STRANDED_EVAP_SLOWDOWN)));
   };
 
   const track = drifter.track;
@@ -1134,15 +1139,25 @@ function summarizePoints(points, tSec) {
     };
   }
 
-  let sumLon = 0;
-  let sumLat = 0;
+  /* CENTROID — spherical (vector) mean instead of naive lat/lon average so
+     the result stays correct even if the cloud crosses the dateline or
+     spans large longitudes. At Hormuz scale this only matters by <10 m,
+     but the math is no more expensive than the arithmetic mean. */
+  const DEG = Math.PI / 180;
+  let sumX = 0;
+  let sumY = 0;
+  let sumZ = 0;
   let stranded = 0;
   let maxAge = 0;
   let massTotal = 0;
 
   for (const point of points) {
-    sumLon += point.lon;
-    sumLat += point.lat;
+    const lonRad = point.lon * DEG;
+    const latRad = point.lat * DEG;
+    const cosLat = Math.cos(latRad);
+    sumX += cosLat * Math.cos(lonRad);
+    sumY += cosLat * Math.sin(lonRad);
+    sumZ += Math.sin(latRad);
     if (point.stranded) {
       stranded += 1;
     }
@@ -1150,8 +1165,12 @@ function summarizePoints(points, tSec) {
     massTotal += point.massFrac ?? 1;
   }
 
-  const centroidLon = sumLon / points.length;
-  const centroidLat = sumLat / points.length;
+  const meanX = sumX / points.length;
+  const meanY = sumY / points.length;
+  const meanZ = sumZ / points.length;
+  const centroidLon = Math.atan2(meanY, meanX) / DEG;
+  const centroidLat = Math.atan2(meanZ, Math.sqrt(meanX * meanX + meanY * meanY)) / DEG;
+
   const dx = [];
   const dy = [];
   for (const point of points) {
@@ -1159,6 +1178,9 @@ function summarizePoints(points, tSec) {
     dy.push((point.lat - centroidLat) * mPerDegLat(centroidLat));
   }
 
+  /* SPREAD / FOOTPRINT — sample covariance with Bessel's correction
+     (divide by N-1) so this is an unbiased estimator. At N>>1 the
+     difference is tiny, but for small ensembles (<30) it matters. */
   let covXX = 0;
   let covYY = 0;
   let covXY = 0;
@@ -1167,9 +1189,10 @@ function summarizePoints(points, tSec) {
     covYY += dy[i] * dy[i];
     covXY += dx[i] * dy[i];
   }
-  covXX /= Math.max(1, dx.length);
-  covYY /= Math.max(1, dy.length);
-  covXY /= Math.max(1, dx.length);
+  const dof = Math.max(1, dx.length - 1);
+  covXX /= dof;
+  covYY /= dof;
+  covXY /= dof;
 
   const sigmaKm = Math.sqrt((covXX + covYY) / 2) / 1000;
   const trace = covXX + covYY;
@@ -1178,10 +1201,14 @@ function summarizePoints(points, tSec) {
   const lambda2 = Math.max(0, (trace - detTerm) / 2);
   const angleRad = 0.5 * Math.atan2(2 * covXY, covXX - covYY);
 
-  // Ensemble footprint: 2-sigma uncertainty ellipse area (95% containment).
+  /* ENSEMBLE FOOTPRINT — area of the 95% confidence ellipse for a
+     2-D Gaussian. The radius factor is √χ²(2, 0.95) ≈ 2.448, NOT 2.
+     A 1-D mental model of "2-sigma = 95%" is wrong in 2-D: the c=2
+     ellipse only contains 86.5%; you need c≈2.448 for true 95%. */
+  const k95 = 2.448; // sqrt(chi-squared inverse CDF at 0.95 with 2 dof)
   const sigmaMajorM = Math.sqrt(lambda1);
   const sigmaMinorM = Math.sqrt(lambda2);
-  const footprintKm2 = (Math.PI * (2 * sigmaMajorM) * (2 * sigmaMinorM)) / 1e6;
+  const footprintKm2 = (Math.PI * (k95 * sigmaMajorM) * (k95 * sigmaMinorM)) / 1e6;
 
   return {
     total: points.length,
@@ -1193,7 +1220,9 @@ function summarizePoints(points, tSec) {
     footprintKm2,
     maxAgeHours: maxAge / 3600,
     massLeftPct: (massTotal / points.length) * 100,
-    ellipse: { majorM: 2 * Math.sqrt(lambda1), minorM: 2 * Math.sqrt(lambda2), angleRad },
+    /* Drawn-ellipse radii match the 95%-containment scale (k95 = 2.448σ)
+       so the visualization size agrees with the reported footprint area. */
+    ellipse: { majorM: k95 * sigmaMajorM, minorM: k95 * sigmaMinorM, angleRad },
     tSec,
   };
 }
@@ -1970,17 +1999,30 @@ function updateResultsPanel(force) {
   const runId = activeRun.startSec + "_" + activeRun.scenario;
   const cards = els.results.querySelectorAll(".result-card");
   
-  if (els.results.dataset.renderedRun !== runId || cards.length === 0) {
-    const oilCards = activeRun.scenario === "oil" && oilSlickModel ? `
+  /* MASS LEFT preferred source: when OilBudget is active, use the Fingas
+     log-linear model's surface/V0 fraction. The per-particle exponential
+     in summarizePoints is a fallback and disagrees with Fingas by an order
+     of magnitude at t ~ 3τ. */
+  function massLeftPctDisplayed() {
+    if (oilBudgetModel && oilBudgetModel.V0 > 0 && Number.isFinite(oilBudgetModel.surface)) {
+      return (oilBudgetModel.surface / oilBudgetModel.V0) * 100;
+    }
+    return metrics.massLeftPct;
+  }
+  const isOilRun = activeRun.scenario === "oil" && oilSlickModel;
+  const expectedCardCount = isOilRun ? 10 : 8;
+
+  if (els.results.dataset.renderedRun !== runId || cards.length !== expectedCardCount) {
+    const oilCards = isOilRun ? `
       <div class="result-card">
         <span class="result-label">Oil radius</span>
         <span class="result-value">${fmt(oilSlickModel.radius(Math.max(0, frame.tSec - activeRun.startSec)) / 1000, 2)} km</span>
-        <span class="result-subvalue">Fay gravity-viscous approximation</span>
+        <span class="result-subvalue">Blended 2-regime Fay (1971): min(gravity-inertial, gravity-viscous)</span>
       </div>
       <div class="result-card">
         <span class="result-label">Mass left</span>
-        <span class="result-value">${formatPercent(metrics.massLeftPct)}</span>
-        <span class="result-subvalue">Estimated remaining floating mass</span>
+        <span class="result-value">${formatPercent(massLeftPctDisplayed())}</span>
+        <span class="result-subvalue">${oilBudgetModel ? "Fingas log-linear weathering (OilBudget)" : "Per-particle 1st-order decay (no OilBudget)"}</span>
       </div>` : "";
 
     els.results.innerHTML = `
@@ -1997,7 +2039,7 @@ function updateResultsPanel(force) {
       <div class="result-card">
         <span class="result-label">Playback age</span>
         <span class="result-value">${fmt(metrics.maxAgeHours, 1)} h</span>
-        <span class="result-subvalue">${formatRunOffset((frame.tSec - activeRun.startSec) / 3600)} from release</span>
+        <span class="result-subvalue">Oldest particle age · ${formatRunOffset((frame.tSec - activeRun.startSec) / 3600)} from first release</span>
       </div>
       <div class="result-card">
         <span class="result-label">Spread radius</span>
@@ -2012,7 +2054,7 @@ function updateResultsPanel(force) {
       <div class="result-card">
         <span class="result-label">Ensemble footprint</span>
         <span class="result-value">${fmt(metrics.footprintKm2, 2)} km²</span>
-        <span class="result-subvalue">2σ uncertainty ellipse area (95% containment)</span>
+        <span class="result-subvalue">95% containment ellipse (k = √χ²₂,₀.₉₅ ≈ 2.448 σ)</span>
       </div>
       <div class="result-card">
         <span class="result-label">Trail coverage</span>
@@ -2043,12 +2085,13 @@ function updateResultsPanel(force) {
     
     cards[6].querySelector(".result-value").textContent = `${fmt(frame.trailKm2 ?? 0, 2)} km²`;
 
-    if (activeRun.scenario === "oil" && oilSlickModel) {
+    const interpretationText = `${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}`;
+    if (isOilRun && cards.length >= 10) {
       cards[7].querySelector(".result-value").textContent = `${fmt(oilSlickModel.radius(Math.max(0, frame.tSec - activeRun.startSec)) / 1000, 2)} km`;
-      cards[8].querySelector(".result-value").textContent = formatPercent(metrics.massLeftPct);
-      cards[9].querySelector(".result-subvalue").innerHTML = `${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}`;
-    } else {
-      cards[7].querySelector(".result-subvalue").innerHTML = `${overlayState.density ? "Density highlights the most likely particle concentration." : "Enable density to highlight concentration."}${overlayState.uncertainty ? " The cyan ellipse tracks directional spread." : " Enable uncertainty to show the spread ellipse."}`;
+      cards[8].querySelector(".result-value").textContent = formatPercent(massLeftPctDisplayed());
+      cards[9].querySelector(".result-subvalue").innerHTML = interpretationText;
+    } else if (!isOilRun && cards.length >= 8) {
+      cards[7].querySelector(".result-subvalue").innerHTML = interpretationText;
     }
   }
 }

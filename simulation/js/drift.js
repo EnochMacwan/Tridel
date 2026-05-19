@@ -11,9 +11,12 @@
  *   where W = wind speed (m/s), ŵ = wind unit vector,
  *   dw/cw are fractions (typical range 0.01 – 0.05).
  *
- * Oil spreading follows Fay (1971) gravity-viscous regime (t > 1 h):
- *     r(t) = 1.5 · (Δ g V² t^1.5 / ν_w^0.5)^(1/6)
- *   with evaporation fraction = 1 − exp(−t / τ_evap) (first-order).
+ * Oil spreading follows a blended 2-regime Fay (1971) law:
+ *     r_gi = 1.14 · (Δ g V t²)^(1/4)              gravity-inertial (early)
+ *     r_gv = 1.5  · (Δ g V² t^1.5 / √ν_w)^(1/6)   gravity-viscous (late)
+ *     r(t) = min(r_gi, r_gv)
+ *   Evaporation fraction = 1 − exp(−t / τ_evap) (simple first-order;
+ *   the richer Fingas log-linear model lives in weathering.js).
  *
  * ⚠  This is an educational approximation — NOT a replacement for
  *    OpenOil / full OpenDrift. See README for scope & caveats.
@@ -196,8 +199,10 @@ class OilSlick {
   }
   radius(t_sec){
     if (t_sec <= 0) return 0;
-    // Fay 3-regime clamped: short-term gravity-inertial, then gravity-viscous
-    // Blend early/late Fay-style spreading estimates into one simple radius.
+    // Blended 2-regime Fay (1971): gravity-inertial dominates early
+    // (r ∝ t^1/2), gravity-viscous dominates late (r ∝ t^1/4). They cross
+    // once; min(...) picks the active regime on each side of that crossover.
+    // (Surface-tension regime is omitted; advection dominates at that scale.)
     const V = this.V0;
     const r_gi = 1.14 * Math.pow(this.delta * this.g * V * t_sec*t_sec, 0.25);
     const r_gv = 1.5  * Math.pow(
