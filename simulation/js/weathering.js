@@ -388,8 +388,10 @@ class OilBudget {
 
     /* 3. Natural dispersion — Delvigne-Sweeney simplified ---------------- */
     //    D = 0.11 × (U + 0.01)² × Qd   [fraction of oil dispersed per h]
-    //    Qd ∝ fraction of surface covered by breaking waves
-    const Qd  = Math.min(1, 0.032 * Hs);            // wave-breaking coverage
+    //    Qd = 0.032 × Hs²   (Toba/IFREMER fraction of sea surface covered by
+    //    breaking whitecaps, quadratic in significant wave height — earlier
+    //    code used a linear Hs which under-predicts dispersion in big seas).
+    const Qd  = Math.min(1, 0.032 * Hs * Hs);
     const D_rate = 0.11 * Math.pow(U + 0.01, 2) * Qd * this.oil.C_nd;
     const dDisp = Math.min(surf - actualEvap, D_rate * surf * (1 - this.W) * dt_h);
 
@@ -398,6 +400,21 @@ class OilBudget {
     const dBeach = Math.min(surf - actualEvap - dDisp, targetBeach);
 
     /* 5. Response options ------------------------------------------------- */
+    /*
+     * Sequencing caveat: each option below consumes from the residual
+     * "available" pool left by all earlier processes (evap → disp → beach →
+     * skim → burn → chemDisp). This is a serial approximation of what is
+     * physically simultaneous; at the default dt = 0.5 h the under-allocation
+     * to later steps is small, but for dt > 1 h it skews burn/chemDisp down.
+     *
+     * Per-step safety caps are expressed as a "max fraction of available
+     * oil removed PER HOUR" and scaled by dt_h. This keeps each cap dimensionally
+     * consistent across short and long timesteps (the prior hard 0.35/0.25/0.20
+     * per-step caps silently became 70/50/40 %/h at dt=0.5 h and 8.75/6.25/5 %/h
+     * at dt=4 h — same number, very different physics).
+     */
+    const stepCap = (perHourMax) => Math.min(0.95, perHourMax * dt_h);
+
     let dSkim = 0;
     let dBurn = 0;
     let dChemDisp = 0;
@@ -408,36 +425,42 @@ class OilBudget {
     const sk = this.resp.skimming;
     if (sk?.active && t0 >= sk.startH && t0 < sk.endH) {
       const available = surf - actualEvap - dDisp - dBeach;
-      /* Skimming is less effective on high-viscosity emulsions */
+      /* Skimmers slow on emulsified mousse: at W=0 → 1.0×, W=0.65 → 0.61×.
+         Coefficient 0.6 is within the 0.5–0.8 reduction range reported by
+         ASTM F2532 / API for weir + drum skimmers on water-in-oil. */
       const viscPenalty = 1 - 0.6 * this.W;
       const rate = sk.rateM3h * (sk.efficiency_pct / 100) * viscPenalty;
-      dSkim = Math.min(available * 0.35, rate * dt_h);
+      dSkim = Math.min(available * stepCap(0.70), rate * dt_h);
     }
 
     /* In-situ burning */
     const bu = this.resp.burning;
     if (bu?.active && t0 >= bu.startH && t0 < bu.endH) {
-      /* Burn rate ≈ 3.5 mm/min × slick area × efficiency */
+      /* Burn rate ≈ 3.5 mm/min × slick area × efficiency (Mullins 1995,
+         Buist 2003). _slickArea() shrinks as surface volume drops. */
       const burnRateM3h = 3.5e-3 * 60 * this._slickArea() * (bu.efficiency_pct / 100);
       const available    = surf - actualEvap - dDisp - dBeach - dSkim;
-      dBurn = Math.min(available * 0.25, burnRateM3h * dt_h);
-      /* Burning is less effective when W > 0.25 (emulsified mousse) */
-      if (this.W > 0.25) dBurn *= Math.max(0, 1 - (this.W - 0.25) / 0.55);
+      dBurn = Math.min(available * stepCap(0.50), burnRateM3h * dt_h);
+      /* Emulsion penalty: Buist (2003) and IPIECA Burn Guide both show
+         sustained burning becomes impossible at W ≳ 0.50 (mousse self-
+         extinguishes the flame). Ramp linearly from 1.0× at W=0.25 to
+         0.0× at W=0.50. */
+      if (this.W > 0.25) dBurn *= Math.max(0, 1 - (this.W - 0.25) / 0.25);
     }
 
     /* Chemical dispersant */
     const cd = this.resp.dispersant;
     if (cd?.active && t0 >= cd.startH && t0 < cd.endH) {
-      /* Multiplies natural dispersion rate. Both terms must be reduced to a
-         per-step fraction before the min() — D_rate · mult is 1/h, so we
-         must multiply by dt_h before comparing against the dimensionless
-         0.15 per-step cap. */
+      /* Multiplies natural dispersion rate. D_rate is 1/h, so dt_h converts
+         to a per-step fraction before the safety cap. The (1−W) factor matches
+         natural dispersion: dispersant efficacy drops sharply on emulsified
+         oil (Lewis & Daling 2007; NOAA dispersant guidelines) because the
+         surfactant can't penetrate a stable water-in-oil mousse. */
       const mult = cd.effectiveness_pct / 100;
-      const extraFrac = Math.min(0.15, D_rate * mult * dt_h);
+      const extraFrac = Math.min(0.15, D_rate * mult * (1 - this.W) * dt_h);
       const extra = extraFrac * surf;
       const available = surf - actualEvap - dDisp - dBeach - dSkim - dBurn;
-      dChemDisp = Math.min(available * 0.20, extra);
-      /* Chemically dispersed oil is counted separately */
+      dChemDisp = Math.min(available * stepCap(0.40), extra);
     }
 
     /* 6. Update accumulators --------------------------------------------- */
@@ -480,7 +503,11 @@ class OilBudget {
   }
 
   /* -- Summary at current state ------------------------------------------ */
-  /* Compact current-state summary for cards, tooltips, and exports. */
+  /* Compact current-state summary for cards, tooltips, and exports.
+     Note: disp_pct is TOTAL dispersion (natural + chemical, mass-balanced
+     into surface). chemDisp_pct is the subset attributable to dispersant
+     application — informational only, do NOT add to disp_pct or you'll
+     double-count. */
   summary() {
     return {
       surface_pct:    this._pct(this.surface),
@@ -489,9 +516,11 @@ class OilBudget {
       beach_pct:      this._pct(this.beachVol),
       skim_pct:       this._pct(this.skimVol),
       burn_pct:       this._pct(this.burnVol),
+      chemDisp_pct:   this._pct(this.chemDisp),
       water_pct:      this.W * 100,
       volume_m3:      { surface: this.surface, evap: this.evap, disp: this.disp,
-                        beach: this.beachVol, skim: this.skimVol, burn: this.burnVol },
+                        beach: this.beachVol, skim: this.skimVol, burn: this.burnVol,
+                        chemDisp: this.chemDisp },
     };
   }
 
@@ -502,14 +531,15 @@ class OilBudget {
        of the original release volume. */
     const s = this.summary();
     this.history.push({
-      t_h:       this.t_h,
-      surface:   s.surface_pct,
-      evap:      s.evap_pct,
-      disp:      s.disp_pct,
-      beach:     s.beach_pct,
-      skim:      s.skim_pct,
-      burn:      s.burn_pct,
-      water_pct: s.water_pct,
+      t_h:        this.t_h,
+      surface:    s.surface_pct,
+      evap:       s.evap_pct,
+      disp:       s.disp_pct,
+      beach:      s.beach_pct,
+      skim:       s.skim_pct,
+      burn:       s.burn_pct,
+      chemDisp:   s.chemDisp_pct,
+      water_pct:  s.water_pct,
     });
   }
 }
