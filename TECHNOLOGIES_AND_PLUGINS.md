@@ -230,12 +230,6 @@ We don't use a CSS framework. The project is **plain CSS with design tokens** �
 - **Why:** Free, fast, and the dark theme matches the simulation aesthetic. Labels are a separate layer so we can control their z-index.
 - **Attribution:** © OpenStreetMap contributors © CARTO
 
-### Mapbox + Greenpeace style (optional fallback)
-
-- **What:** Custom Mapbox style tied to a Greenpeace Mapbox account
-- **Where:** `simulation/js/app.js` — gated by a Mapbox token; falls back to CARTO if token absent
-- **URL pattern:** `https://api.mapbox.com/styles/v1/greenpeacegmh/cmmafi82g002z01pbhzceg6m3/tiles/…?access_token=…`
-
 ### OpenSeaMap Seamark overlay
 
 - **What:** Free overlay layer with nautical features (buoys, channels, lighthouses)

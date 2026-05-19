@@ -93,52 +93,20 @@ const map = L.map("map", {
   zoomSnap: 0.25,
   zoomDelta: 0.5,
 }).setView(DEFAULT_CONTEXT_CENTER, DEFAULT_CONTEXT_ZOOM);
-map.getContainer().classList.add("greenpeace-reference-map");
+map.getContainer().classList.add("tridel-reference-map");
 
-/* Greenpeace's Hormuz page uses this Mapbox style:
-   mapbox://styles/greenpeacegmh/cmmafi82g002z01pbhzceg6m3.
-   Its raster tiles are restricted to the Greenpeace domain, so localhost and
-   GitHub Pages fall back to a public dark CARTO basemap unless an authorized
-   token is supplied through window.TRIDEL_MAPBOX_TOKEN or ?mapbox_token=... */
-const GREENPEACE_MAPBOX_STYLE = {
-  owner: "greenpeacegmh",
-  id: "cmmafi82g002z01pbhzceg6m3",
-};
-const mapboxToken = window.TRIDEL_MAPBOX_TOKEN || new URLSearchParams(window.location.search).get("mapbox_token");
+/* Public dark CARTO basemap — used unconditionally as the base layer.
+   The map-tile filter rules in css/ui-cleanup.css under .tridel-reference-map
+   give it the bright, low-contrast aesthetic of the reference design. */
 const publicDarkAttribution = "&copy; OpenStreetMap contributors &copy; CARTO";
 
-function addPublicDarkBasemap() {
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
-    attribution: publicDarkAttribution,
-    className: "greenpeace-reference-base",
-    detectRetina: true,
-    maxZoom: 20,
-    subdomains: "abcd",
-  }).addTo(map);
-}
-
-if (mapboxToken) {
-  let exactMapFailed = false;
-  const exactGreenpeaceLayer = L.tileLayer(
-    `https://api.mapbox.com/styles/v1/${GREENPEACE_MAPBOX_STYLE.owner}/${GREENPEACE_MAPBOX_STYLE.id}/tiles/512/{z}/{x}/{y}?access_token=${encodeURIComponent(mapboxToken)}`,
-    {
-      attribution: "&copy; Mapbox &copy; OpenStreetMap",
-      className: "greenpeace-reference-base",
-      maxZoom: 20,
-      tileSize: 512,
-      zoomOffset: -1,
-    }
-  ).addTo(map);
-
-  exactGreenpeaceLayer.once("tileerror", () => {
-    if (exactMapFailed) return;
-    exactMapFailed = true;
-    map.removeLayer(exactGreenpeaceLayer);
-    addPublicDarkBasemap();
-  });
-} else {
-  addPublicDarkBasemap();
-}
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
+  attribution: publicDarkAttribution,
+  className: "tridel-reference-base",
+  detectRetina: true,
+  maxZoom: 20,
+  subdomains: "abcd",
+}).addTo(map);
 
 /* Keep country, city, and shoreline names readable above the animated current
    field by rendering labels in a dedicated pane over the canvas overlays. */
@@ -148,7 +116,7 @@ labelsPane.style.pointerEvents = "none";
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png", {
   pane: "labels",
   attribution: publicDarkAttribution,
-  className: "greenpeace-reference-labels",
+  className: "tridel-reference-labels",
   detectRetina: true,
   maxZoom: 20,
   opacity: 1,
