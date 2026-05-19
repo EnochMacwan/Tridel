@@ -1159,75 +1159,102 @@ body:not(.compact-reference-ui) #banner .partner-logo-inline {
 /* Manual coordinate entry inside the Scenario Builder card.
    Two decimal inputs + a Set button — complements the map-click
    workflow so users can paste known lat/lon directly. Lives under
-   the summary chip row in .current-scenario-card. */
-body:not(.compact-reference-ui) .release-coord-entry {
+   the summary chip row in .current-scenario-card.
+
+   NOTE on specificity: the global `body:not(.compact-reference-ui) #side
+   * { display: block !important }` rule forces every #side descendant
+   to block. We include `#side` in every selector here so our grid /
+   flex / inline-flex displays beat that rule. */
+body:not(.compact-reference-ui) #side .release-coord-entry {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  gap: 8px 10px !important;
-  margin-top: 12px !important;
+  column-gap: 8px !important;
+  row-gap: 10px !important;
+  margin-top: 14px !important;
   align-items: end !important;
+  width: 100% !important;
 }
-body:not(.compact-reference-ui) .release-coord-field {
+body:not(.compact-reference-ui) #side .release-coord-field {
   display: flex !important;
   flex-direction: column !important;
-  gap: 4px !important;
+  gap: 5px !important;
   min-width: 0 !important;
+  margin: 0 !important;
 }
-body:not(.compact-reference-ui) .release-coord-field > span {
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.10em !important;
+body:not(.compact-reference-ui) #side .release-coord-field > span {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
   text-transform: uppercase !important;
-  opacity: 0.70 !important;
+  opacity: 0.62 !important;
+  line-height: 1 !important;
 }
-body:not(.compact-reference-ui) .release-coord-field > input {
+body:not(.compact-reference-ui) #side .release-coord-field > input {
+  display: block !important;
   width: 100% !important;
   font-size: 13px !important;
-  padding: 8px 10px !important;
-  border-radius: 10px !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  background: rgba(8, 12, 18, 0.42) !important;
+  font-weight: 600 !important;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(6, 12, 20, 0.55) !important;
   color: inherit !important;
   font-variant-numeric: tabular-nums !important;
   box-sizing: border-box !important;
+  letter-spacing: 0.02em !important;
+  transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease !important;
 }
-body:not(.compact-reference-ui) .release-coord-field > input:focus {
+body:not(.compact-reference-ui) #side .release-coord-field > input:focus {
   outline: none !important;
-  border-color: rgba(255, 255, 255, 0.55) !important;
-  background: rgba(8, 12, 18, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.50) !important;
+  background: rgba(6, 12, 20, 0.78) !important;
   box-shadow: 0 0 0 2px rgba(120, 200, 255, 0.18) !important;
 }
-body:not(.compact-reference-ui) #release-coord-btn {
+body:not(.compact-reference-ui) #side .release-coord-field > input::placeholder {
+  color: rgba(255, 255, 255, 0.32) !important;
+  font-weight: 500 !important;
+}
+body:not(.compact-reference-ui) #side #release-coord-btn {
   grid-column: 1 / -1 !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  padding: 9px 14px !important;
+  display: block !important;
+  width: 100% !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 10px 14px !important;
+  margin-top: 2px !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   color: inherit !important;
   cursor: pointer !important;
-  letter-spacing: 0.06em !important;
+  letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
-  transition: background 0.12s ease, border-color 0.12s ease !important;
+  text-align: center !important;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease !important;
 }
-body:not(.compact-reference-ui) #release-coord-btn:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
+body:not(.compact-reference-ui) #side #release-coord-btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
   border-color: rgba(255, 255, 255, 0.42) !important;
 }
-body:not(.compact-reference-ui) .release-coord-hint {
+body:not(.compact-reference-ui) #side #release-coord-btn:active {
+  transform: translateY(1px) !important;
+}
+body:not(.compact-reference-ui) #side .release-coord-hint {
   grid-column: 1 / -1 !important;
   display: block !important;
   font-size: 11px !important;
+  line-height: 1.3 !important;
   min-height: 14px !important;
-  opacity: 0.78 !important;
+  margin: -2px 0 0 !important;
+  opacity: 0.72 !important;
+  font-weight: 500 !important;
 }
-body:not(.compact-reference-ui) .release-coord-hint.is-error {
-  color: #ff7080 !important;
+body:not(.compact-reference-ui) #side .release-coord-hint.is-error {
+  color: #ff8497 !important;
   opacity: 1 !important;
 }
-body:not(.compact-reference-ui) .release-coord-hint.is-ok {
-  color: #74e2a8 !important;
+body:not(.compact-reference-ui) #side .release-coord-hint.is-ok {
+  color: #7be0a5 !important;
   opacity: 1 !important;
 }
 
