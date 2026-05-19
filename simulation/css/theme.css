@@ -1021,3 +1021,94 @@ body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .b
 body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper a {
   color: var(--sim-text-link) !important;
 }
+
+/* ============================================================================
+   NO-SHINE OVERRIDE — last block in theme.css (last-loaded stylesheet)
+   ============================================================================
+   Strips every glossy highlight from the UI: dedicated shine layers, inset
+   white box-shadows on glass wrappers and inner cards/buttons/pills, and the
+   SVG specular-lighting + displacement filter on the liquid-glass effect
+   layer. Result: flat translucent panels with no bright "shine" curves.
+
+   Anchored to body:not(.compact-reference-ui) for specificity parity with
+   the rest of the theme, so it beats the per-component rules in style.css
+   and ui-cleanup.css without resorting to `!important`-only declarations
+   on the universal selector.
+   ============================================================================ */
+
+/* 1. Dedicated shine layer — make it invisible AND remove its shadow. */
+body:not(.compact-reference-ui) .liquidGlass-shine,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-shine {
+  display: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 2. Glass-effect layer — disable the SVG specular/distortion filter that
+   paints rippled bright spots; keep the backdrop blur for legibility. */
+body:not(.compact-reference-ui) .liquidGlass-effect,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-effect {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* 3. Glass-tint layer — neutralize any gradient highlight, keep flat tint. */
+body:not(.compact-reference-ui) .liquidGlass-tint,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-tint {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* 4. All glass wrappers and their typical children — wipe inset white
+   highlights ("rim shines") that come from per-component rules across
+   style.css and ui-cleanup.css. */
+body:not(.compact-reference-ui) .liquidGlass-wrapper,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > *,
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .section-card,
+body:not(.compact-reference-ui) .current-scenario-card,
+body:not(.compact-reference-ui) .quick-stats .stat-card,
+body:not(.compact-reference-ui) .term-card,
+body:not(.compact-reference-ui) .preset-card,
+body:not(.compact-reference-ui) .summary-chip-row span,
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side button,
+body:not(.compact-reference-ui) #side input,
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side .check-pill,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #map-toolbar button,
+body:not(.compact-reference-ui) .map-toolbar-btn,
+body:not(.compact-reference-ui) .release-coord-field > input,
+body:not(.compact-reference-ui) #release-coord-btn,
+body:not(.compact-reference-ui) .partner-logo-inline,
+body:not(.compact-reference-ui) .partner-logo-inline img,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .brand-lockup img {
+  /* Drop every inset light highlight while keeping outer drop-shadows
+     intact (those are structural depth cues, not "shine"). */
+  box-shadow: none !important;
+}
+
+/* 5. Disable the inline SVG glass-distortion filter that the page defines
+   in <svg class="liquid-glass-svg-filter">. Without this rule, anything
+   that references filter:url(#glass-distortion) still pulls in the bright
+   specular-lighting <feSpecularLighting> highlight. */
+body:not(.compact-reference-ui) .liquid-glass-svg-filter {
+  display: none !important;
+}
+
+/* 6. Belt-and-braces: any element that explicitly opted into the glass
+   filter via inline style/class never gets the SVG distortion applied. */
+body:not(.compact-reference-ui) [style*="glass-distortion"],
+body:not(.compact-reference-ui) [class*="glass-shine"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  box-shadow: none !important;
+}
