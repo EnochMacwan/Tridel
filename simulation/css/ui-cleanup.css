@@ -170,6 +170,13 @@ body:not(.compact-reference-ui) #side .summary-chip-row {
   gap: 6px !important;
 }
 
+/* CMEMS auth + release coords should share the first line; the wider
+   "YYYY-MM-DD ... to ... UTC" window pill always wraps to its own line. */
+body:not(.compact-reference-ui) .current-scenario-card .summary-chip-row #summary-window {
+  flex: 1 0 100% !important;
+  justify-content: flex-start !important;
+}
+
 body:not(.compact-reference-ui) #side .summary-chip-row span {
   display: inline-flex !important;
 }
