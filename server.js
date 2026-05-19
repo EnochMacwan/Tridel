@@ -528,7 +528,7 @@ app.use((req, res, next) => {
         "script-src 'self' 'unsafe-inline'; " +
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
         "font-src 'self' https://cdnjs.cloudflare.com; " +
-        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com; " +
+        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://raw.githubusercontent.com https://tiles.openseamap.org; " +
         "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com; " +
         "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://formsubmit.co https://*.basemaps.cartocdn.com"
     );
