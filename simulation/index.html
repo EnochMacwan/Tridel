@@ -16,7 +16,6 @@
 -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
   <title>Tridel | Live Simulation of Oil Spill & Drifter Trajectories at Strait of Hormuz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,7 +23,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="assets/tridel.png" />
   <link rel="stylesheet" href="css/style.css?v=60" />
-  <link rel="stylesheet" href="css/ui-cleanup.css?v=91" />
+  <link rel="stylesheet" href="css/ui-cleanup.css?v=92" />
   <!--
     theme.css is the single source of truth for the simulation glass theme.
     Loaded LAST so its :root design tokens and component recipes win every
@@ -256,6 +255,20 @@
           <div class="stat-card">
             <span class="stat-label">Release</span>
             <strong id="release-info">Click on the map to set release point.</strong>
+            <div class="release-coord-entry" role="group" aria-label="Set release point by coordinates">
+              <label class="release-coord-field">
+                <span>Lat</span>
+                <input id="release-lat-input" type="number" step="0.0001" min="-90" max="90"
+                  inputmode="decimal" placeholder="e.g. 26.5" autocomplete="off" />
+              </label>
+              <label class="release-coord-field">
+                <span>Lon</span>
+                <input id="release-lon-input" type="number" step="0.0001" min="-180" max="180"
+                  inputmode="decimal" placeholder="e.g. 56.0" autocomplete="off" />
+              </label>
+              <button id="release-coord-btn" type="button">Set</button>
+            </div>
+            <span id="release-coord-hint" class="release-coord-hint" aria-live="polite"></span>
           </div>
           <div class="stat-card">
             <span class="stat-label">Wind forcing</span>
@@ -711,7 +724,7 @@
   <script src="js/field.js?v=10"></script>
   <script src="js/drift.js?v=5"></script>
   <script src="js/weathering.js?v=5"></script>
-  <script src="js/app.js?v=73"></script>
+  <script src="js/app.js?v=74"></script>
 </body>
 
 </html>

@@ -1149,6 +1149,73 @@ body:not(.compact-reference-ui) #banner .partner-logo-inline {
   opacity: 0.95 !important;
 }
 
+/* Manual coordinate entry inside the Release stat-card.
+   Two compact decimal inputs + a Set button — complements the map-click
+   workflow so users can paste known lat/lon directly. */
+body:not(.compact-reference-ui) .release-coord-entry {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  flex-wrap: wrap !important;
+}
+body:not(.compact-reference-ui) .release-coord-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 1 80px !important;
+  min-width: 70px !important;
+}
+body:not(.compact-reference-ui) .release-coord-field > span {
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  opacity: 0.72 !important;
+}
+body:not(.compact-reference-ui) .release-coord-field > input {
+  width: 100% !important;
+  font-size: 12px !important;
+  padding: 5px 7px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: rgba(8, 12, 18, 0.42) !important;
+  color: inherit !important;
+  font-variant-numeric: tabular-nums !important;
+}
+body:not(.compact-reference-ui) .release-coord-field > input:focus {
+  outline: none !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(8, 12, 18, 0.58) !important;
+}
+body:not(.compact-reference-ui) #release-coord-btn {
+  font-size: 11px !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  letter-spacing: 0.04em !important;
+}
+body:not(.compact-reference-ui) #release-coord-btn:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+body:not(.compact-reference-ui) .release-coord-hint {
+  display: block !important;
+  margin-top: 4px !important;
+  font-size: 10px !important;
+  min-height: 12px !important;
+  opacity: 0.78 !important;
+}
+body:not(.compact-reference-ui) .release-coord-hint.is-error {
+  color: #ff7080 !important;
+  opacity: 1 !important;
+}
+body:not(.compact-reference-ui) .release-coord-hint.is-ok {
+  color: #74e2a8 !important;
+  opacity: 1 !important;
+}
+
 /* Restore grid/flex layouts broken by the global `#side * { display: block !important }` rule.
    The rule at style.css:3805 forces every #side descendant to block, which collapses
    flex rows (wg-feat) and grid containers (webgnome-feature-list, action-grid, toggle-grid).

@@ -2585,7 +2585,7 @@ function updateScenarioBadges() {
 /* Keep the release summary card in sync with the current map click. */
 function updateReleaseInfo() {
   if (!releasePoint) {
-    els.releaseInfo.textContent = "Click on the map to set release point.";
+    els.releaseInfo.textContent = "Click on the map or enter coordinates below to set release point.";
     if (els.summaryRelease) els.summaryRelease.textContent = "Release pending";
     els.runBtn.disabled = true;
     if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = true;
@@ -2595,10 +2595,74 @@ function updateReleaseInfo() {
   }
   els.releaseInfo.textContent = `${releasePoint.lat.toFixed(4)} N, ${releasePoint.lon.toFixed(4)} E`;
   if (els.summaryRelease) els.summaryRelease.textContent = `${releasePoint.lat.toFixed(3)} N, ${releasePoint.lon.toFixed(3)} E`;
+  /* Mirror the active release into the manual-entry inputs unless the
+     user is currently editing one of them — avoids stomping their typing
+     while still keeping the inputs accurate after a map click. */
+  syncReleaseCoordInputs();
   els.runBtn.disabled = false;
   if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = false;
   if (els.runTopBtn) els.runTopBtn.disabled = false;
   updatePresetGuide();
+}
+
+/* Push the current releasePoint into the manual-entry inputs without
+   overwriting a focused field — so the user can type freely. */
+function syncReleaseCoordInputs() {
+  if (!releasePoint) return;
+  const active = document.activeElement;
+  if (els.releaseLatInput && active !== els.releaseLatInput) {
+    els.releaseLatInput.value = releasePoint.lat.toFixed(4);
+  }
+  if (els.releaseLonInput && active !== els.releaseLonInput) {
+    els.releaseLonInput.value = releasePoint.lon.toFixed(4);
+  }
+}
+
+/* Try to set the release point from the manual lat/lon inputs.
+   Validates: numeric, finite, within forcing grid bounds, not on land.
+   On success: pans the map to the new point. On failure: shows a hint
+   in red under the inputs and leaves releasePoint unchanged. */
+function applyManualReleaseCoords() {
+  if (!els.releaseLatInput || !els.releaseLonInput) return;
+  const raw = (input) => String(input.value || "").trim();
+  const lat = parseFloat(raw(els.releaseLatInput));
+  const lon = parseFloat(raw(els.releaseLonInput));
+  const setHint = (msg, kind) => {
+    if (!els.releaseCoordHint) return;
+    els.releaseCoordHint.textContent = msg;
+    els.releaseCoordHint.classList.remove("is-error", "is-ok");
+    if (kind) els.releaseCoordHint.classList.add(kind === "ok" ? "is-ok" : "is-error");
+  };
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    setHint("Enter numeric latitude and longitude in decimal degrees.", "error");
+    return;
+  }
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    setHint("Latitude must be -90..90 and longitude -180..180.", "error");
+    return;
+  }
+  if (Field.loaded) {
+    const g = Field.grid;
+    if (lat < g.latMin || lat > g.latMax || lon < g.lonMin || lon > g.lonMax) {
+      setHint(`Outside loaded forcing grid (lat ${g.latMin.toFixed(2)}..${g.latMax.toFixed(2)}, lon ${g.lonMin.toFixed(2)}..${g.lonMax.toFixed(2)}).`, "error");
+      return;
+    }
+    if (Field.isLand(lon, lat)) {
+      setHint("That point is on land. Pick open water.", "error");
+      return;
+    }
+  }
+  releasePoint = { lat, lon };
+  if (typeof map !== "undefined" && map) {
+    try {
+      const targetZoom = Math.max(map.getZoom(), 8);
+      map.setView([lat, lon], targetZoom, { animate: true });
+    } catch (err) { /* setView failures shouldn't break the release flow */ }
+  }
+  updateReleaseInfo();
+  if (typeof updateStoryCard === "function") updateStoryCard();
+  setStatus("Release point set from coordinates.");
+  setHint(`Set to ${lat.toFixed(4)} N, ${lon.toFixed(4)} E.`, "ok");
 }
 
 function formatTimelineUtc(value) {
@@ -3065,6 +3129,10 @@ function collectDomRefs() {
     quickRunRailBtn: document.getElementById("quickRunRailBtn"),
     relRadius: document.getElementById("relRadius"),
     releaseInfo: document.getElementById("release-info"),
+    releaseLatInput: document.getElementById("release-lat-input"),
+    releaseLonInput: document.getElementById("release-lon-input"),
+    releaseCoordBtn: document.getElementById("release-coord-btn"),
+    releaseCoordHint: document.getElementById("release-coord-hint"),
     resetMapBtn: document.getElementById("resetMapBtn"),
     results: document.getElementById("results"),
     runBtn: document.getElementById("runBtn"),
@@ -3508,6 +3576,20 @@ async function boot() {
     updateReleaseInfo();
     updateStoryCard();
     setStatus("Release point set.");
+  });
+
+  /* Manual coordinate entry — alternative to clicking the map. */
+  if (els.releaseCoordBtn) {
+    els.releaseCoordBtn.addEventListener("click", applyManualReleaseCoords);
+  }
+  [els.releaseLatInput, els.releaseLonInput].forEach((input) => {
+    if (!input) return;
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyManualReleaseCoords();
+      }
+    });
   });
 
   requestAnimationFrame(tick);
