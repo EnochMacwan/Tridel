@@ -1,0 +1,16 @@
+/simulation   /simulation/   301
+/simulation/  /simulation/index.html   200
+/simulation/data/currents.json  /simulation/data/currents.json  200
+/simulation/data/chunks/*  /simulation/data/chunks/:splat  200
+/robots.txt  /robots.txt  200
+/.git*   /404.html   404
+/_headers   /404.html   404
+/_redirects   /404.html   404
+/crossdomain.xml   /404.html   404
+/sitemap.xml   /404.html   404
+/logs/*   /404.html   404
+/*.md   /404.html   404
+/*.txt   /404.html   404
+/*.json   /404.html   404
+/*.*   /404.html   404
+/*     /index.html 200

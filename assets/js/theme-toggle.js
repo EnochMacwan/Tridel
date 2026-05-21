@@ -23,6 +23,13 @@
     icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
   }
 
+  function updateToggleText(button, theme) {
+    if (!button) return;
+    var nextAction = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    button.setAttribute('aria-label', nextAction);
+    button.setAttribute('title', nextAction);
+  }
+
   /**
    * Bind the theme toggle button. Call after #theme-toggle is in the DOM.
    */
@@ -33,6 +40,7 @@
     var icon = toggleButton.querySelector('i');
     var currentTheme = htmlElement.getAttribute('data-theme') || 'light';
     updateIcon(icon, currentTheme);
+    updateToggleText(toggleButton, currentTheme);
 
     toggleButton.addEventListener('click', function () {
       var current = htmlElement.getAttribute('data-theme');
@@ -41,6 +49,7 @@
       htmlElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
       updateIcon(icon, newTheme);
+      updateToggleText(toggleButton, newTheme);
 
       window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
     });

@@ -1,16 +1,12 @@
 /**
  * Home Page Renderer (/)
- * Renders the full home/index page with hero, stats, what-we-do, highlights,
- * news, clients, case study, and CTA sections.
+ * Renders the home/index page: hero, stats, what-we-do, highlights,
+ * news feed, clients, and testimonials.
  */
 (function () {
   'use strict';
 
-  var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) {
-    return String(s).replace(/[&<>"']/g, function (m) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
-    });
-  };
+  var esc = escapeHtml;
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/']) || {};
 
@@ -52,74 +48,6 @@
     );
   }
 
-  function buildWhyChooseHtml(data) {
-    var reasons = '';
-    (data.reasons || []).forEach(function (r, i) {
-      reasons +=
-        '<div class="why-choose-card reveal" style="animation-delay:' + (i * 0.1) + 's">' +
-          '<div class="why-choose-card__number">' + String(i + 1).padStart(2, '0') + '</div>' +
-          '<div class="why-choose-card__icon"><i class="fas ' + esc(r.icon) + '"></i></div>' +
-          '<h3 class="why-choose-card__title">' + esc(r.title) + '</h3>' +
-          '<p class="why-choose-card__desc">' + esc(r.desc) + '</p>' +
-        '</div>';
-    });
-    return (
-      '<section class="section why-choose-section reveal">' +
-        '<div class="container">' +
-          '<div class="section__header">' +
-            '<h2 class="section__title">' + esc(data.title) + '</h2>' +
-            '<p class="section__subtitle">' + esc(data.subtitle) + '</p>' +
-          '</div>' +
-          '<div class="why-choose-grid">' + reasons + '</div>' +
-        '</div>' +
-      '</section>'
-    );
-  }
-
-  function buildCaseStudyHtml(cs) {
-    return (
-      '<section class="section reveal">' +
-        '<div class="container">' +
-          '<div class="case-study-banner">' +
-            '<div class="case-study-banner__visual">' +
-              '<img loading="lazy" src="' + esc(cs.image) + '" alt="' + esc(cs.imageAlt) + '"' +
-                ' onerror="this.src=\'assets/images/logo/tridel.png\'">' +
-            '</div>' +
-            '<div class="case-study-banner__info">' +
-              '<span class="case-study-banner__label">' + esc(cs.label) + '</span>' +
-              '<h3 class="case-study-banner__title">' + esc(cs.title) + '</h3>' +
-              '<p class="case-study-banner__desc">' + esc(cs.desc) + '</p>' +
-              '<a href="' + esc(cs.linkHref) + '" class="button button--primary">' + esc(cs.linkText) + '</a>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>'
-    );
-  }
-
-  function buildCtaHtml(cta) {
-    return (
-      '<section class="section reveal">' +
-        '<div class="container">' +
-          '<div class="cta-banner">' +
-            '<div class="cta-banner__content">' +
-              '<h2 class="cta-banner__title">' + esc(cta.title) + '</h2>' +
-              '<p class="cta-banner__desc">' + esc(cta.desc) + '</p>' +
-              '<div class="cta-banner__actions">' +
-                '<a href="' + esc(cta.primaryBtn.href) + '" class="cta-banner__btn cta-banner__btn--primary">' +
-                  esc(cta.primaryBtn.text) + (cta.primaryBtn.icon ? ' <i class="fas ' + esc(cta.primaryBtn.icon) + '"></i>' : '') +
-                '</a>' +
-                '<a href="' + esc(cta.secondaryBtn.href) + '" class="cta-banner__btn cta-banner__btn--secondary">' +
-                  esc(cta.secondaryBtn.text) +
-                '</a>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>'
-    );
-  }
-
   function initStatsCounter() {
     var counters = document.querySelectorAll('.stat-number[data-target]');
     if (!counters.length) return;
@@ -149,19 +77,15 @@
     counters.forEach(function (c) { observer.observe(c); });
   }
 
-  function render(mainEl) {
+  function renderHomePage(mainEl) {
     var hero = (typeof INDEX_HERO !== 'undefined') ? INDEX_HERO : { title: 'Pioneering the Future of Maritime Intelligence', subtitle: 'We deliver integrated hardware, software, and services for the comprehensive maritime domain.' };
     var stats = (typeof INDEX_STATS !== 'undefined') ? INDEX_STATS : [];
     var whatWeDo = (typeof INDEX_WHAT_WE_DO !== 'undefined') ? INDEX_WHAT_WE_DO : null;
-    var caseStudy = (typeof INDEX_CASE_STUDY !== 'undefined') ? INDEX_CASE_STUDY : null;
-    var cta = (typeof INDEX_CTA !== 'undefined') ? INDEX_CTA : null;
-
-    var whyChoose = (typeof INDEX_WHY_CHOOSE !== 'undefined') ? INDEX_WHY_CHOOSE : null;
 
     var html = '';
 
     // Default section order
-    var defaultOrder = ['hero', 'stats', 'whatWeDo', 'whyChoose', 'highlights', 'news', 'clients', 'caseStudy', 'cta', 'testimonialMap'];
+    var defaultOrder = ['hero', 'stats', 'whatWeDo', 'highlights', 'news', 'clients', 'testimonialMap'];
     var sectionOrder = (typeof INDEX_SECTION_ORDER !== 'undefined' && Array.isArray(INDEX_SECTION_ORDER) && INDEX_SECTION_ORDER.length)
       ? INDEX_SECTION_ORDER
       : defaultOrder;
@@ -200,10 +124,6 @@
         if (!whatWeDo || !isSectionVisible('home', 'whatWeDo')) return '';
         return buildWhatWeDoHtml(whatWeDo);
       },
-      whyChoose: function () {
-        if (!whyChoose || !whyChoose.reasons || !whyChoose.reasons.length || !isSectionVisible('home', 'whyChoose')) return '';
-        return buildWhyChooseHtml(whyChoose);
-      },
       highlights: function () {
         return (
           '<section class="section reveal" id="highlights">' +
@@ -222,12 +142,12 @@
           '<section class="section linkedin-section reveal">' +
             '<div class="container--wide">' +
               '<div class="linkedin-feed">' +
-                '<div class="section__header">' +
-                  '<div class="linkedin-section__badge">' +
-                    '<i class="fab fa-linkedin"></i>' +
-                  '</div>' +
-                  '<h2 class="section__title">Latest from LinkedIn</h2>' +
-                  '<p class="section__subtitle">Stay connected with our latest updates, insights, and milestone announcements.</p>' +
+                '<div class="section__header linkedin-section__header linkedin-section__header--compact">' +
+                  '<h2 class="linkedin-section__title">' +
+                    '<i class="fab fa-linkedin linkedin-section__title-icon" aria-hidden="true"></i>' +
+                    '<span>Latest from LinkedIn</span>' +
+                  '</h2>' +
+                  '<a class="linkedin-section__corner-link" href="#/articles-blogs">Articles / Blogs <i class="fas fa-arrow-up-right-from-square"></i></a>' +
                 '</div>' +
                 '<div id="news-feed-container" class="linkedin-feed__grid">' +
                   '<div class="linkedin-feed__loading">' +
@@ -262,28 +182,28 @@
           '</section>'
         );
       },
-      clients: function () {
-        return (
-          '<section class="section reveal" id="clients">' +
-            '<div class="container">' +
-              '<div class="section__header">' +
-                '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
+        clients: function () {
+          return (
+            '<section class="section reveal" id="clients">' +
+              '<div class="container">' +
+                '<div class="section__header">' +
+                  '<h2 class="section__title">Our Clients &amp; Partners</h2>' +
+                '</div>' +
               '</div>' +
-            '</div>' +
             '<div class="client-logos">' +
-              '<div class="client-logo-track"></div>' +
-            '</div>' +
-          '</section>'
-        );
-      },
-      caseStudy: function () {
-        if (!caseStudy || !isSectionVisible('home', 'caseStudy')) return '';
-        return buildCaseStudyHtml(caseStudy);
-      },
-      cta: function () {
-        if (!cta || !isSectionVisible('home', 'cta')) return '';
-        return buildCtaHtml(cta);
-      },
+                '<button class="client-logos__control client-logos__control--prev" type="button" aria-label="Show previous clients and partners">' +
+                  '<span aria-hidden="true">&larr;</span>' +
+                '</button>' +
+                '<div class="client-logos__viewport">' +
+                  '<div class="client-logo-track"></div>' +
+                '</div>' +
+                '<button class="client-logos__control client-logos__control--next" type="button" aria-label="Show next clients and partners">' +
+                  '<span aria-hidden="true">&rarr;</span>' +
+                '</button>' +
+              '</div>' +
+            '</section>'
+          );
+        },
       testimonialMap: function () {
         return '<div id="testimonial-map-root"></div>';
       }
@@ -319,7 +239,7 @@
       renderClientLogos();
     }
 
-    // Lazy-load Leaflet and testimonial map
+    // Render the testimonial card deck
     loadTestimonialMap();
 
     // Initialize scroll reveal
@@ -341,39 +261,20 @@
   }
 
   function loadTestimonialMap() {
-    // Check if Leaflet is already loaded
-    if (typeof L !== 'undefined') {
-      if (typeof renderTestimonialMap === 'function') {
-        renderTestimonialMap();
-      }
+    if (typeof renderTestimonialMap === 'function') {
+      renderTestimonialMap();
       return;
     }
 
-    // Load Leaflet CSS
-    if (!document.querySelector('link[href*="leaflet"]')) {
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-      link.crossOrigin = '';
-      document.head.appendChild(link);
-    }
-
-    // Load Leaflet JS
-    var script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-    script.crossOrigin = '';
-    script.onload = function () {
+    setTimeout(function () {
       if (typeof renderTestimonialMap === 'function') {
         renderTestimonialMap();
       }
-    };
-    document.head.appendChild(script);
+    }, 50);
   }
 
   window.registerRoute('/', {
-    render: render,
+    render: renderHomePage,
     title: meta.title || 'Tridel Technologies',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-home'

@@ -5,7 +5,7 @@
  * Exports:
  *   window.renderClientLogos(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
 
 /**
  * Renders the Client Logos into the track element
@@ -25,29 +25,26 @@ window.renderClientLogos = function(container) {
     container.innerHTML = '';
 
     // Function to create logo element
-    const createLogo = (client) => {
+    const createLogo = (client, isClone) => {
         const div = document.createElement('div');
+        const slug = String(client.name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
         div.className = 'client-logo';
-        div.innerHTML = `<img loading="lazy" alt="${escapeHtml(client.name)}" src="${client.logo}">`;
+        div.dataset.clientSlug = slug;
+        div.dataset.clientLabel = client.name || '';
+        if (slug === 'behbehani-brothers' || slug === 'dp-world') {
+            div.classList.add('client-logo--needs-label');
+        }
+        if (isClone) div.setAttribute('aria-hidden', 'true');
+        div.innerHTML = `<img loading="lazy" alt="${esc(client.name)}" src="${client.logo}">`;
         return div;
     };
 
-    // 1. Render Original Set
-    data.forEach(client => {
-        container.appendChild(createLogo(client));
-    });
-
-    // 2. Render Duplicate Set (for seamless scroll)
-    // We typically duplicate the list enough times to fill the specific width.
-    // For CSS infinite scroll, we usually need at least 2 sets.
-    data.forEach(client => {
-        container.appendChild(createLogo(client));
-    });
-
-    // 3. Triplicate (as in original HTML for wide screens)
-    data.forEach(client => {
-        container.appendChild(createLogo(client));
-    });
+    // Render logos twice for a seamless marquee loop
+    data.forEach(client => container.appendChild(createLogo(client, false)));
+    data.forEach(client => container.appendChild(createLogo(client, true)));
 };
 
 // --- DOMContentLoaded Fallback (for admin.html / standalone page compatibility) ---

@@ -3,30 +3,45 @@
  * Content data for the home page hero, stats, value props, case study, and CTA
  */
 var INDEX_HERO = {
-  "title": "Pioneering the Future of Maritime Intelligence",
-  "subtitle": "We deliver integrated hardware, software, and services for the comprehensive maritime domain."
+  "title": "Pioneering the Future of Environmental & Maritime Intelligence",
+  "subtitle": "We deliver Integrated Hardware, Software, and Services for the Comprehensive Environment & Maritime Domain."
 };
 
 var INDEX_STATS = [
   {
     "target": 26,
-    "suffix": "+",
+    "suffix": "",
     "label": "Products"
   },
   {
-    "target": 10,
-    "suffix": "+",
+    "target": 12,
+    "suffix": "",
     "label": "Services"
-  },
-  {
-    "target": 26,
-    "suffix": "+",
-    "label": "Global Clients"
   },
   {
     "target": 3,
     "suffix": "",
-    "label": "Countries"
+    "label": "Global Offices"
+  },
+  {
+    "target": 50,
+    "suffix": "+",
+    "label": "Govt. & Industry Clients"
+  },
+  {
+    "target": 170,
+    "suffix": "+",
+    "label": "Projects Delivered"
+  },
+  {
+    "target": 10,
+    "suffix": "+",
+    "label": "Years"
+  },
+  {
+    "target": 15,
+    "suffix": "+",
+    "label": "Countries Served"
   }
 ];
 
@@ -36,23 +51,23 @@ var INDEX_WHAT_WE_DO = {
   "cards": [
     {
       "icon": "fa-microchip",
-      "title": "Hardware Solutions",
-      "desc": "Custom-built dataloggers, buoys, survey vessels, and monitoring stations designed for harsh marine environments."
+      "title": "Proprietary Hardware Solutions",
+      "desc": "Custom built hardware platforms for integrated Environment Monitoring, Surveying, and Research purposes in Terrestrial, Marine, and Subsea domain."
     },
     {
       "icon": "fa-laptop-code",
-      "title": "Software Platforms",
-      "desc": "TEMS and eSpecia — cloud-based platforms for real-time data management, analytics, and GIS integration."
+      "title": "Proprietary Software Platforms",
+      "desc": "On premises and/or cloud based software platforms for Environmental and Survey Data Management, analytics, and GIS integration."
     },
     {
       "icon": "fa-water",
       "title": "Surveying Services",
-      "desc": "Hydrographic, geophysical, and environmental surveys with full project lifecycle management."
+      "desc": "Hydrographic, Geophysical, and Environmental Surveys with full project lifecycle management."
     },
     {
       "icon": "fa-chart-line",
       "title": "Data Analytics",
-      "desc": "Advanced environmental data processing, interpretation, and integration with GIS databases for informed decision making."
+      "desc": "Advanced environmental data processing, statistical / map-based analysis, interpretation, and integration with GIS databases for informed decision making."
     }
   ]
 };
@@ -93,7 +108,7 @@ var INDEX_WHY_CHOOSE = {
     {
       "icon": "fa-award",
       "title": "Proven Expertise",
-      "desc": "Our team brings deep industry experience and technical mastery."
+      "desc": "Our team brings deep industry knowledge, experience and technical mastery."
     },
     {
       "icon": "fa-lightbulb",

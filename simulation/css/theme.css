@@ -1,0 +1,1265 @@
+/* ============================================================================
+   SIMULATION GLASS THEME — single source of truth
+   ============================================================================
+   Every glass surface, edge, colour, radius, font, padding, and accent in the
+   simulation UI reads from the CSS variables defined below. Edit a token here
+   to update the entire interface uniformly. Nothing else in the simulation
+   should hard-code these values.
+
+   This file is loaded LAST in simulation/index.html so it wins the cascade
+   over every rule in style.css and ui-cleanup.css.
+
+   Layer overview:
+     1. :root tokens           - the named design values
+     2. Outer wrapper recipe   - #banner / #side / #controls / #map-toolbar /
+                                 .map-legend (the 5 liquid-glass containers)
+     3. Card recipe            - .section-card and friends
+     4. Pill recipe            - editable fields, label chips, buttons, tabs
+     5. Active / primary state - cyan ring + glow
+     6. Text recipe            - white body + cyan accent
+   ============================================================================ */
+
+:root {
+  /* ---------- Surfaces ---------- */
+  --sim-surface-glass:           transparent;
+  --sim-surface-overlay-dim:     rgba(1, 10, 20, 0.35);    /* lighter modal dim so modal card reads as glass, not navy plate */
+
+  /* ---------- Edges ----------
+     Every glass surface — cards, pills, buttons, step circles, modal,
+     active state, primary action — uses the same white edge. Cyan is
+     reserved for text only (eyebrow labels, links, code, accent labels). */
+  --sim-edge-alpha:              0.18;
+  --sim-edge-alpha-hover:        0.40;
+  --sim-edge-color:              rgba(255, 255, 255, var(--sim-edge-alpha));
+  --sim-edge:                    1px solid var(--sim-edge-color);
+  --sim-edge-hover-color:        rgba(255, 255, 255, var(--sim-edge-alpha-hover));
+  --sim-edge-hover:              1px solid var(--sim-edge-hover-color);
+
+  /* ---------- Backdrop ----------
+     blur() for refraction + saturate(0) to fully desaturate map colours
+     behind every glass surface, so the actual map hue (green/teal/purple/
+     orange current overlays) never tints the cards. The result is clean
+     monochrome glass that shows brightness/depth from the map without
+     any colour cast. */
+  --sim-backdrop-card:           blur(8px) saturate(0);
+  --sim-backdrop-modal:          blur(20px) saturate(0);
+  --sim-backdrop-overlay:        blur(6px) saturate(0);
+
+  /* ---------- Shape ---------- */
+  --sim-radius-pill:             18px;
+  --sim-radius-chip:             999px;
+  --sim-radius-card:             22px;
+  --sim-radius-card-lg:          2rem;
+
+  /* ---------- Spacing ---------- */
+  --sim-pad-pill-y:              7px;
+  --sim-pad-pill-x:              12px;
+  --sim-pad-pill-x-select:       36px;          /* room for the chevron */
+  --sim-pad-card:                14px;
+  --sim-min-height-pill:         36px;
+
+  /* ---------- Typography ---------- */
+  --sim-font-family:             "Inter", system-ui, -apple-system, sans-serif;
+  --sim-text-primary:            #ffffff;
+  --sim-text-accent:             #ffffff;    /* was cyan - now uniform white */
+  --sim-text-link:               #ffffff;    /* was lighter cyan - now uniform white */
+  --sim-text-shadow:             none;
+  --sim-pill-font-size:          12px;
+  --sim-pill-font-weight:        600;
+  --sim-label-font-size:         10px;
+  --sim-label-font-weight:       800;
+
+  /* ---------- Accent (active / primary) ----------
+     No coloured ring or glow — active/primary state uses a slightly
+     brighter white edge (same recipe, just lifted alpha). Cyan stays
+     in the TEXT only. */
+  --sim-accent-color:            transparent;
+  --sim-accent-ring:             none;
+  --sim-accent-glow:             none;
+  --sim-accent-combined:         none;
+
+  /* ---------- Modal ----------
+     Modal card uses the same transparent surface as every other glass
+     surface. Visual separation comes purely from the dim overlay behind
+     it (--sim-surface-overlay-dim) + the edge ring + the backdrop blur. */
+  --sim-modal-bg:                var(--sim-surface-glass);
+
+  /* ---------- Glass border recipe ----------
+     The crisp visible "border" the user pointed at on the TRIDEL banner,
+     HIDE UI pill and map-legend is NOT a CSS border — it is a multi-layer
+     inset/outer box-shadow stack on the liquidGlass-wrapper elements.
+     Captured here as one token so every card can wear the same recipe. */
+  --sim-glass-edge-shadow:
+    inset  1px  1px 1px 0 rgba(255, 255, 255, 0.66),
+    inset -1px -1px 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0  -22px 40px 0 rgba(74, 80, 88, 0.14),
+    0 24px 68px 0 rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================================================
+   1. OUTER WRAPPERS — #banner / #side / #controls / #map-toolbar / .map-legend
+   The 5 top-level liquid-glass containers. Background fully transparent;
+   only the inner .liquidGlass-effect's backdrop-filter provides refraction.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar.map-toolbar,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Strip the iridescent ::before / ::after gradient overlays on ALL wrapped
+   surfaces — outer containers AND inner cards (.section-card, .side-header,
+   .current-scenario-card etc.). These pseudo-elements were the last source
+   of tint/shimmer on any glass surface. */
+body:not(.compact-reference-ui) #banner::before,
+body:not(.compact-reference-ui) #banner::after,
+body:not(.compact-reference-ui) #side::before,
+body:not(.compact-reference-ui) #side::after,
+body:not(.compact-reference-ui) #controls::before,
+body:not(.compact-reference-ui) #controls::after,
+body:not(.compact-reference-ui) #map-toolbar::before,
+body:not(.compact-reference-ui) #map-toolbar::after,
+body:not(.compact-reference-ui) .map-legend::before,
+body:not(.compact-reference-ui) .map-legend::after,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::before,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper::after,
+body:not(.compact-reference-ui) #side .section-card::before,
+body:not(.compact-reference-ui) #side .section-card::after,
+body:not(.compact-reference-ui) #side .side-header::before,
+body:not(.compact-reference-ui) #side .side-header::after,
+body:not(.compact-reference-ui) #side .current-scenario-card::before,
+body:not(.compact-reference-ui) #side .current-scenario-card::after,
+body:not(.compact-reference-ui) #side .preset-card::before,
+body:not(.compact-reference-ui) #side .preset-card::after,
+body:not(.compact-reference-ui) #side .resp-panel::before,
+body:not(.compact-reference-ui) #side .resp-panel::after,
+body:not(.compact-reference-ui) #side .term-card::before,
+body:not(.compact-reference-ui) #side .term-card::after,
+body:not(.compact-reference-ui) #side .stat-card::before,
+body:not(.compact-reference-ui) #side .stat-card::after,
+body:not(.compact-reference-ui) #side .wg-feat::before,
+body:not(.compact-reference-ui) #side .wg-feat::after,
+body:not(.compact-reference-ui) #side .opendrift-attribution::before,
+body:not(.compact-reference-ui) #side .opendrift-attribution::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat::after,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution::before,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution::after {
+  content: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  opacity: 0 !important;
+  mask: none !important;
+  -webkit-mask: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Inner liquid-glass tint layer — fully transparent */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-tint,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-tint {
+  background: var(--sim-surface-glass) !important;
+}
+
+/* Inner shine layer — no inset highlight (kills the silvery edge) */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-shine,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-shine {
+  box-shadow: none !important;
+}
+
+/* Effect layer — only backdrop blur, no SVG specular distortion */
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper > .liquidGlass-effect {
+  filter: none !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-card) !important;
+  backdrop-filter: var(--sim-backdrop-card) !important;
+}
+
+/* ============================================================================
+   2. CARDS — .section-card and the inner panels (resp-panel, term-card,
+      caveat-list children, quality-grid children, wg-feat, intro-card, etc.)
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .side-header,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .resp-panel,
+body:not(.compact-reference-ui) #side #run-status,
+body:not(.compact-reference-ui) #side .wg-step,
+body:not(.compact-reference-ui) #side .wg-tip,
+body:not(.compact-reference-ui) #side .wg-feat,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .caveat-list > div,
+body:not(.compact-reference-ui) #side .quality-grid > div,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side #preset-guide,
+body:not(.compact-reference-ui) #side .budget-stat,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .op-cell,
+body:not(.compact-reference-ui) #side .opendrift-attribution,
+body:not(.compact-reference-ui) #side .budget-summary-grid > div,
+body:not(.compact-reference-ui) #side .budget-insights > div,
+body:not(.compact-reference-ui) #side #oil-budget-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .section-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .side-header,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .current-scenario-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .resp-panel,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #run-status,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-step,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-tip,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .wg-feat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #preset-guide,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-stat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .insight-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .op-cell,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .opendrift-attribution,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-summary-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .budget-insights > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #oil-budget-card,
+body:not(.compact-reference-ui) .results-card,
+body:not(.compact-reference-ui) #map-shell > .section-card.results-card {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Result card on the map (empty-state floating text) — no chrome at all */
+body:not(.compact-reference-ui) .result-card.wide,
+body:not(.compact-reference-ui) .result-card.wide.empty-state {
+  background: var(--sim-surface-glass) !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ============================================================================
+   3. PILL RECIPE — editable fields, label chips, buttons, tabs
+   Every interactive or label pill in the side panel shares this recipe.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side input[type="number"],
+body:not(.compact-reference-ui) #side input[type="text"],
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side .check-pill,
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
+body:not(.compact-reference-ui) #side .validation-checklist span,
+body:not(.compact-reference-ui) #side .wg-feat-icon,
+body:not(.compact-reference-ui) #side .wg-code,
+body:not(.compact-reference-ui) #side .noaa-logo-text,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side button.ghost.small,
+body:not(.compact-reference-ui) #side a.ghost.small,
+body:not(.compact-reference-ui) #side .time-step-option,
+body:not(.compact-reference-ui) #side .expert-toggle-btn,
+body:not(.compact-reference-ui) #side details summary,
+body:not(.compact-reference-ui) #side #runBtn,
+body:not(.compact-reference-ui) #side #runTopBtn,
+body:not(.compact-reference-ui) #side #playBtn,
+body:not(.compact-reference-ui) #side #clearBtn,
+body:not(.compact-reference-ui) #side #clearTopBtn,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .wg-primary,
+body:not(.compact-reference-ui) #controls input[type="number"],
+body:not(.compact-reference-ui) #controls input[type="text"],
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .leaflet-control-scale-line {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+  font-size: var(--sim-pill-font-size) !important;
+  font-weight: var(--sim-pill-font-weight) !important;
+  min-height: var(--sim-min-height-pill) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Selects need extra right padding for the dropdown chevron */
+body:not(.compact-reference-ui) #side select {
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x-select) var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+}
+
+/* Strip native number-spinner arrows */
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-outer-spin-button,
+body:not(.compact-reference-ui) #side input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+body:not(.compact-reference-ui) #side input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+/* Native <select> dropdown <option> elements — when the dropdown opens,
+   each option's background comes from the browser's user-agent stylesheet
+   (white in Chrome/Brave). The currently-selected option then renders as
+   a bright white stripe in the dropdown popup. Force a dark background +
+   white text on every option, and a faint cyan highlight on hover/selected
+   so the dropdown looks consistent with the dark glass theme. */
+body:not(.compact-reference-ui) select option,
+body:not(.compact-reference-ui) #side select option,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option {
+  background-color: #03111f !important;
+  color: #ffffff !important;
+}
+
+body:not(.compact-reference-ui) select option:checked,
+body:not(.compact-reference-ui) select option:hover,
+body:not(.compact-reference-ui) #side select option:checked,
+body:not(.compact-reference-ui) #side select option:hover,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option:checked,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper select option:hover {
+  background: linear-gradient(0deg, rgba(35, 248, 255, 0.30), rgba(35, 248, 255, 0.30)) !important;
+  background-color: rgba(35, 248, 255, 0.30) !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================================
+   4. ACTIVE / PRIMARY STATE — cyan ring + glow, no fill
+   The ONLY visual cue for active/primary is the cyan accent ring.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side input:hover,
+body:not(.compact-reference-ui) #side input:focus,
+body:not(.compact-reference-ui) #side select:hover,
+body:not(.compact-reference-ui) #side select:focus,
+body:not(.compact-reference-ui) #side .scenario-tabs button:hover,
+body:not(.compact-reference-ui) #side .resp-tab:hover,
+body:not(.compact-reference-ui) #side button.ghost:hover,
+body:not(.compact-reference-ui) #side .check-pill:hover {
+  border-color: var(--sim-edge-hover-color) !important;
+  outline: none !important;
+}
+
+body:not(.compact-reference-ui) #side .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #side .preset-card.active,
+body:not(.compact-reference-ui) #side .time-step-option.active,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .wg-primary,
+body:not(.compact-reference-ui) #side #runBtn.primary,
+body:not(.compact-reference-ui) #side #runTopBtn.primary,
+body:not(.compact-reference-ui) #controls #runTopBtn.primary {
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================================
+   5. TEXT RECIPE — white body, cyan accent, no halos
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #side *,
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #banner *,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #controls *,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar *,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .map-legend *,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) .result-card.wide,
+body:not(.compact-reference-ui) .result-card.wide * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* The TRIDEL brand wordmark + "In partnership with" kicker use a dark navy
+   fill + gradient/-webkit-text-fill-color trick that reads as cyan against
+   the glass. Force them to plain white too. */
+body:not(.compact-reference-ui) #banner .brand-wordmark,
+body:not(.compact-reference-ui) #banner .brand-partner-kicker,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-wordmark,
+body:not(.compact-reference-ui) #banner.liquidGlass-wrapper .brand-partner-kicker {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Result-card labels (PARTICLES / PLAYBACK AGE / SPREAD RADIUS / CENTROID /
+   ENSEMBLE FOOTPRINT / TRAIL COVERAGE / OIL RADIUS / MASS LEFT) + the
+   empty-state kicker ("READY") were cyan. Force white per the all-text-white
+   rule, with stronger specificity so the cyan original doesn't win. */
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-label,
+body:not(.compact-reference-ui) .result-card.wide.empty-state .result-kicker,
+body:not(.compact-reference-ui) .result-card .result-label,
+body:not(.compact-reference-ui) .result-card .result-kicker,
+body:not(.compact-reference-ui) .result-card.wide .result-label,
+body:not(.compact-reference-ui) .result-card.wide .result-kicker,
+body:not(.compact-reference-ui) .result-card.wide .result-value,
+body:not(.compact-reference-ui) #map-shell .result-label,
+body:not(.compact-reference-ui) #map-shell .result-kicker,
+body:not(.compact-reference-ui) #map-shell .result-value,
+body:not(.compact-reference-ui) #map-shell .results-card .result-label,
+body:not(.compact-reference-ui) #map-shell .results-card .result-value {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* When the result-card has actual results (not the empty-state), give it
+   the same glass card recipe as every other card so it's a proper visible
+   panel on the map. The empty-state variant stays borderless/transparent
+   so "READY / No active run" still floats. */
+body:not(.compact-reference-ui) .result-card.wide:not(.empty-state),
+body:not(.compact-reference-ui) #map-shell .results-card:not(.empty-state) {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--sim-radius-card-lg) !important;
+  padding: var(--sim-pad-card) !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-card) !important;
+  backdrop-filter: var(--sim-backdrop-card) !important;
+}
+
+/* The Leaflet 100 km scale bar lives in .leaflet-bottom.leaflet-left and
+   stacks below the Results card at the bottom of the map. Put them in the
+   same row by shifting the scale container RIGHT of the Results card so
+   they sit on the same horizontal line. The Results card is ~380px wide
+   at the bottom-left, so place the scale at left:400px to clear it. */
+body:not(.compact-reference-ui) .leaflet-bottom.leaflet-left {
+  left: 400px !important;
+  bottom: 28px !important;
+}
+
+/* CURRENT SCENARIO card — the #summary-window chip swaps between three
+   widths during the lifecycle: "Timeline loading" (121px) -> the full date
+   range "YYYY-MM-DD HH:MM to YYYY-MM-DD HH:MM" (~210px) -> "24 h window"
+   (99px) after Run. Combined with the card's `transition: all` rule, the
+   visible shrink/grow looked like the whole card was resizing. Kill the
+   transition so any future text change doesn't animate the reflow, and
+   lock a stable min-height on the card so chip wrapping changes don't
+   shift the layout. */
+body:not(.compact-reference-ui) .current-scenario-card,
+body:not(.compact-reference-ui) .current-scenario-card * {
+  transition: none !important;
+}
+
+/* Min-height set to the WORST-CASE chip layout (the full date range
+   "2026-MM-DD HH:MM to 2026-MM-DD HH:MM" forces the window chip onto its
+   own second line, bumping card to ~186px). Locking that height means the
+   card never shrinks when the chip shortens to "24 h window" after Run. */
+body:not(.compact-reference-ui) .current-scenario-card {
+  min-height: 186px !important;
+}
+
+body:not(.compact-reference-ui) .current-scenario-card .summary-chip-row {
+  display: flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+}
+
+body:not(.compact-reference-ui) .current-scenario-card .summary-chip-row span {
+  text-align: center !important;
+}
+
+/* Map-toolbar buttons (HIDE UI / RESET) and map-legend text were carrying
+   dark navy color (rgba(5,10,16,0.94)) + -webkit-text-fill-color from the
+   original style.css. Force white with specificity tax. */
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper button,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper.dock button,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper .map-toolbar-btn,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text strong,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text small,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .legend-text,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper .map-legend-compass-title,
+body:not(.compact-reference-ui) .map-legend .legend-text strong,
+body:not(.compact-reference-ui) .map-legend .legend-text small,
+body:not(.compact-reference-ui) .map-legend .legend-text,
+body:not(.compact-reference-ui) .map-legend .map-legend-compass-title {
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+  background: none !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Tone down the map-toolbar backdrop and desaturate the map underneath
+   so the HIDE UI / RESET pill stays a colour-neutral glass surface. */
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper > .liquidGlass-effect {
+  -webkit-backdrop-filter: blur(4px) saturate(0) !important;
+  backdrop-filter: blur(4px) saturate(0) !important;
+}
+
+/* Scrollbar — cyan (rgba(35,248,255,0.42)) was the visible cyan line the
+   user spotted next to the TIME STEP card. The original style.css L4012
+   sets it via `body:not(.compact-reference-ui) #side .side-scroll`, so
+   the override must match that specificity. */
+body:not(.compact-reference-ui),
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #side .side-scroll,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-body {
+  scrollbar-color: rgba(255, 255, 255, 0.30) transparent !important;
+  scrollbar-width: thin !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.30) !important;
+  border-radius: var(--sim-radius-pill) !important;
+}
+
+body:not(.compact-reference-ui) ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* The .timeline-ticks element holds 5 empty <span> tick marks rendered as
+   short vertical bars under the slider. User flagged them as a stray
+   vertical line floating next to the TIME STEP card. Hide them. */
+body:not(.compact-reference-ui) .timeline-ticks,
+body:not(.compact-reference-ui) .timeline-ticks span,
+body:not(.compact-reference-ui) #side .timeline-ticks,
+body:not(.compact-reference-ui) #side .timeline-ticks span,
+body:not(.compact-reference-ui) #controls .timeline-ticks,
+body:not(.compact-reference-ui) #controls .timeline-ticks span {
+  display: none !important;
+}
+
+/* Timeline event markers — the orange "Max spread" and cyan "Release" dots
+   that float over the timeline slider after Run. User wants them removed. */
+body:not(.compact-reference-ui) #timeline-events,
+body:not(.compact-reference-ui) #timeline-events span,
+body:not(.compact-reference-ui) .timeline-events,
+body:not(.compact-reference-ui) .timeline-events span,
+body:not(.compact-reference-ui) .timeline-marker,
+body:not(.compact-reference-ui) .timeline-marker.release,
+body:not(.compact-reference-ui) .timeline-marker.spread,
+body:not(.compact-reference-ui) #controls .timeline-events,
+body:not(.compact-reference-ui) #controls .timeline-marker {
+  display: none !important;
+}
+
+/* When HIDE UI is pressed, body gets .map-chrome-hidden and the side panel
+   is hidden — that leaves empty real estate on the right. Slide the
+   .map-legend (Surface currents card with the hue wheel) over to the
+   right edge to take advantage of the freed space. */
+body.map-chrome-hidden .map-legend,
+body.map-chrome-hidden .map-legend.liquidGlass-wrapper {
+  left: auto !important;
+  right: 24px !important;
+  bottom: 24px !important;
+}
+
+/* Geographic-feature labels injected by addGeoLabels() in app.js — Persian
+   Gulf, Strait of Hormuz, Gulf of Oman + bordering country names. The
+   Leaflet divIcon container is 0x0 so the span has to position itself
+   absolutely + centre on the container point via translate(-50%,-50%). */
+body:not(.compact-reference-ui) .geo-label {
+  background: transparent !important;
+  border: none !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+body:not(.compact-reference-ui) .geo-label > span {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  color: var(--sim-text-primary) !important;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.85),
+    0 1px 2px rgba(0, 0, 0, 0.75),
+    0 -1px 2px rgba(0, 0, 0, 0.55) !important;
+  font-family: var(--sim-font-family) !important;
+  letter-spacing: 0.10em !important;
+}
+
+/* Water-body labels — italic cyan accent so the strait & seas read as
+   marine context separate from country names. */
+body:not(.compact-reference-ui) .geo-label-water > span {
+  color: var(--sim-text-accent) !important;
+  font-style: italic !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* The Strait of Hormuz gets a slightly larger weight since it's the focal
+   feature of the whole app. */
+body:not(.compact-reference-ui) .geo-label-water--strait > span {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+}
+
+/* Country labels — uppercase, wider letter-spacing, semi-bold white. */
+body:not(.compact-reference-ui) .geo-label-country > span {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.20em !important;
+  text-transform: uppercase !important;
+  opacity: 0.78 !important;
+}
+
+/* Smaller country variant for tiny states (Bahrain, Kuwait) so they don't
+   overpower their tiny footprint on the map. */
+body:not(.compact-reference-ui) .geo-label-country--sm > span {
+  font-size: 10px !important;
+  letter-spacing: 0.18em !important;
+  opacity: 0.72 !important;
+}
+
+/* Timeline date labels (#timeline-start, #timeline-end, #time-label,
+   #data-meta) and the metadata text were using JetBrains Mono / Fira Mono
+   monospace font and dark navy colour. Force the uniform Inter font + white. */
+body:not(.compact-reference-ui) #timeline-start,
+body:not(.compact-reference-ui) #timeline-end,
+body:not(.compact-reference-ui) #timeline-current,
+body:not(.compact-reference-ui) #timeline-phase,
+body:not(.compact-reference-ui) #time-label,
+body:not(.compact-reference-ui) #time-window-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-start,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #timeline-end,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #data-meta,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #time-label,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #timeline-start,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper #timeline-end {
+  font-family: var(--sim-font-family) !important;
+  color: var(--sim-text-primary) !important;
+  -webkit-text-fill-color: var(--sim-text-primary) !important;
+}
+
+/* Cyan accent for eyebrow / kicker / micro-label text */
+body:not(.compact-reference-ui) #side .panel-section-label,
+body:not(.compact-reference-ui) #side .summary-kicker,
+body:not(.compact-reference-ui) #side .eyebrow,
+body:not(.compact-reference-ui) #side .stat-label,
+body:not(.compact-reference-ui) #side .op-label,
+body:not(.compact-reference-ui) #side .quality-grid > div > span:first-child,
+body:not(.compact-reference-ui) #side .reference-control-label span,
+body:not(.compact-reference-ui) #side .opendrift-attribution span,
+body:not(.compact-reference-ui) #side .wg-feat-icon,
+body:not(.compact-reference-ui) #side .wg-code,
+body:not(.compact-reference-ui) #side .budget-header h3,
+body:not(.compact-reference-ui) #side .budget-legend,
+body:not(.compact-reference-ui) #side h3,
+body:not(.compact-reference-ui) #side .meta-kicker {
+  color: var(--sim-text-accent) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Hyperlinks */
+body:not(.compact-reference-ui) #side a,
+body:not(.compact-reference-ui) #banner a {
+  color: var(--sim-text-link) !important;
+}
+
+/* ============================================================================
+   6. MODAL (OpenDrift / WebGNOME setup) — same vocabulary
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #webgnome-modal,
+body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay {
+  background-color: var(--sim-surface-overlay-dim) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-overlay) !important;
+  backdrop-filter: var(--sim-backdrop-overlay) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
+body:not(.compact-reference-ui) #webgnome-modal.wg-modal-overlay .wg-modal {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  -webkit-backdrop-filter: var(--sim-backdrop-modal) !important;
+  backdrop-filter: var(--sim-backdrop-modal) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step,
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  color: var(--sim-text-primary) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step *,
+body:not(.compact-reference-ui) #webgnome-modal .wg-tip * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-code {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  color: var(--sim-text-accent) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-foot {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal h2,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal-head * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-pill) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal #closeWgModal:hover,
+body:not(.compact-reference-ui) #webgnome-modal .wg-link:hover {
+  border-color: var(--sim-edge-hover-color) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-link {
+  color: var(--sim-text-accent) !important;
+}
+
+body:not(.compact-reference-ui) #webgnome-modal .wg-step-num {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-accent) !important;
+  border: var(--sim-edge) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================================
+   7. RUN PROGRESS + TOGGLE SWITCHES — same transparent recipe
+   ============================================================================ */
+
+/* "Preparing simulation" run-progress panel was rgba(6,22,36,0.72) navy
+   with a cyan radial-gradient. Strip both for full transparency. */
+body:not(.compact-reference-ui) #side #run-progress,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper #run-progress {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-card) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Progress bar track — barely-visible white fill, keep cyan fill for the
+   actual progress indicator. */
+body:not(.compact-reference-ui) #side .progress-track,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper .progress-track {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+}
+
+/* Visual-overlay toggle switches. The native input checkboxes were styled as
+   pills with dark navy fill OFF / cyan gradient ON. Per user "no cyan accent",
+   make both states uniform white-edge pills with the active state using a
+   brighter white fill instead of cyan. Specificity-taxed so the rule wins. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="checkbox"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .toggle-grid input[type="checkbox"],
+body:not(.compact-reference-ui) #side .toggle-grid input[type="checkbox"],
+body:not(.compact-reference-ui) #side input[type="checkbox"] {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: var(--sim-edge) !important;
+  border-radius: var(--sim-radius-chip) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .toggle-grid input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side .toggle-grid input[type="checkbox"]:checked,
+body:not(.compact-reference-ui) #side input[type="checkbox"]:checked {
+  background-color: rgba(255, 255, 255, 0.30) !important;
+  background-image: none !important;
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================================
+   8. CHARTS — Oil budget canvas + Plotly fallbacks
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #oil-budget-plot,
+body:not(.compact-reference-ui) #ts-plot {
+  background: var(--sim-surface-glass) !important;
+}
+
+body:not(.compact-reference-ui) #oil-budget-plot text,
+body:not(.compact-reference-ui) #ts-plot text {
+  fill: var(--sim-text-primary) !important;
+}
+
+/* ============================================================================
+   8. SPECIFICITY TAX — repeat the wrapper class to beat any competing rule
+   Some declarations in style.css / ui-cleanup.css carry !important AND match
+   .check-pill / .resp-tab / button.ghost with higher specificity than the
+   blocks above. Duplicating #side.liquidGlass-wrapper.liquidGlass-wrapper
+   doubles its specificity (10 + 10 = 20) so the recipe always wins.
+   ============================================================================ */
+
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="number"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper input[type="text"],
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper select,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .check-pill,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .tag,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .summary-chip-row span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .validation-checklist span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-code,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .noaa-logo-text,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .scenario-tabs button,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-tab,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.ghost,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper a.ghost.small,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .time-step-option,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .expert-toggle-btn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper details summary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #playBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #clearBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #clearTopBtn,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-primary,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper input,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper button,
+body:not(.compact-reference-ui) #controls.liquidGlass-wrapper.liquidGlass-wrapper #time-label {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  color: var(--sim-text-primary) !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--sim-radius-pill) !important;
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+  font-size: var(--sim-pill-font-size) !important;
+  font-weight: var(--sim-pill-font-weight) !important;
+  min-height: var(--sim-min-height-pill) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Select chevron padding override (re-apply at the higher specificity) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper select {
+  padding: var(--sim-pad-pill-y) var(--sim-pad-pill-x-select) var(--sim-pad-pill-y) var(--sim-pad-pill-x) !important;
+}
+
+/* Active / primary — slightly brighter white edge only (specificity tax) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .scenario-tabs button.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-tab.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .preset-card.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .time-step-option.active,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper button.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runBtn.primary,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #runTopBtn.primary {
+  border: var(--sim-edge-hover) !important;
+  box-shadow: none !important;
+}
+
+/* Card recipe specificity tax — every inner card now wears the exact same
+   crisp glass border as the outer liquidGlass-wrapper cards via the shared
+   --sim-glass-edge-shadow recipe. No CSS border (the inset shadows ARE the
+   border), 32px radius to match TRIDEL/HIDE-UI/map-legend, and the same
+   inner padding so content doesn't collide with the rounded edges. */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .section-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .side-header,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .current-scenario-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .resp-panel,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .term-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .preset-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .quality-grid > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .caveat-list > div,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .stat-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .opendrift-attribution,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #preset-guide,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #oil-budget-card,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper #run-progress {
+  background-color: var(--sim-surface-glass) !important;
+  background-image: none !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--sim-radius-card-lg) !important;
+  padding: var(--sim-pad-card) !important;
+  overflow: hidden !important;
+  box-shadow: var(--sim-glass-edge-shadow) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Text recipe specificity tax — every nested element under #side */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper * {
+  color: var(--sim-text-primary) !important;
+  text-shadow: var(--sim-text-shadow) !important;
+}
+
+/* Cyan accents (override the white catch-all above) */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .panel-section-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .summary-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .eyebrow,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .stat-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .op-label,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .meta-kicker,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper h3,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-feat-icon,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .wg-code,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .opendrift-attribution span,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .budget-header h3,
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper .budget-legend {
+  color: var(--sim-text-accent) !important;
+}
+
+/* Links */
+body:not(.compact-reference-ui) #side.liquidGlass-wrapper.liquidGlass-wrapper a {
+  color: var(--sim-text-link) !important;
+}
+
+/* ============================================================================
+   NO-SHINE OVERRIDE — last block in theme.css (last-loaded stylesheet)
+   ============================================================================
+   Strips every glossy highlight from the UI: dedicated shine layers, inset
+   white box-shadows on glass wrappers and inner cards/buttons/pills, and the
+   SVG specular-lighting + displacement filter on the liquid-glass effect
+   layer. Result: flat translucent panels with no bright "shine" curves.
+
+   Anchored to body:not(.compact-reference-ui) for specificity parity with
+   the rest of the theme, so it beats the per-component rules in style.css
+   and ui-cleanup.css without resorting to `!important`-only declarations
+   on the universal selector.
+   ============================================================================ */
+
+/* 1. Dedicated shine layer — make it invisible AND remove its shadow. */
+body:not(.compact-reference-ui) .liquidGlass-shine,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-shine {
+  display: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 2. Glass-effect layer — disable the SVG specular/distortion filter that
+   paints rippled bright spots; keep the backdrop blur for legibility. */
+body:not(.compact-reference-ui) .liquidGlass-effect,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-effect {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* 3. Glass-tint layer — neutralize any gradient highlight, keep flat tint. */
+body:not(.compact-reference-ui) .liquidGlass-tint,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > .liquidGlass-tint {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* 4. All glass wrappers and their typical children — wipe inset white
+   highlights ("rim shines") that come from per-component rules across
+   style.css and ui-cleanup.css. Selectors carry `#side` (or other id
+   anchors) wherever needed to beat the per-component (1,2,1)+ source
+   rules. */
+body:not(.compact-reference-ui) .liquidGlass-wrapper,
+body:not(.compact-reference-ui) .liquidGlass-wrapper > *,
+body:not(.compact-reference-ui) #banner,
+body:not(.compact-reference-ui) #side,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) .map-toolbar-btn,
+body:not(.compact-reference-ui) .map-legend,
+body:not(.compact-reference-ui) .map-legend.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) .current-scenario-card,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .quick-stats .stat-card,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side .result-card,
+body:not(.compact-reference-ui) #side .insight-pill,
+body:not(.compact-reference-ui) #side .summary-chip-row span,
+body:not(.compact-reference-ui) .summary-chip-row span,
+body:not(.compact-reference-ui) #side .tag,
+body:not(.compact-reference-ui) #side button,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side button.ghost,
+body:not(.compact-reference-ui) #side input,
+body:not(.compact-reference-ui) #side input[type="text"],
+body:not(.compact-reference-ui) #side input[type="number"],
+body:not(.compact-reference-ui) #side select,
+body:not(.compact-reference-ui) #side .check-pill,
+body:not(.compact-reference-ui) #side .visual-overlay-card .check-pill,
+body:not(.compact-reference-ui) #side .scenario-tabs button,
+body:not(.compact-reference-ui) #side .resp-tab,
+body:not(.compact-reference-ui) #controls,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) #controls #time-label,
+body:not(.compact-reference-ui) #side .release-coord-field > input,
+body:not(.compact-reference-ui) #side .release-coord-entry input,
+body:not(.compact-reference-ui) #side #release-coord-btn,
+body:not(.compact-reference-ui) .partner-logo-inline,
+body:not(.compact-reference-ui) #banner .partner-logo-inline,
+body:not(.compact-reference-ui) .partner-logo-inline img,
+body:not(.compact-reference-ui) #banner .partner-logo-inline img,
+body:not(.compact-reference-ui) .map-status-chips span,
+body:not(.compact-reference-ui) #map-shell .map-status-chips span,
+body:not(.compact-reference-ui) .brand-lockup img,
+body:not(.compact-reference-ui) #banner .brand-lockup img,
+body:not(.compact-reference-ui) #webgnome-modal .wg-modal,
+body:not(.compact-reference-ui) .wg-modal,
+body:not(.compact-reference-ui) .wg-modal-head {
+  /* Drop every inset light highlight while keeping outer drop-shadows
+     intact (those are structural depth cues, not "shine"). */
+  box-shadow: none !important;
+}
+
+/* 4b. Background-image gradients on glass surfaces that fake a top-edge
+   highlight (linear-gradient(180deg, rgba(255,255,255,...), ...)).
+   Strip those too — they read as "shine" even without box-shadow. */
+body:not(.compact-reference-ui) #side .section-card,
+body:not(.compact-reference-ui) #side .current-scenario-card,
+body:not(.compact-reference-ui) #side .stat-card,
+body:not(.compact-reference-ui) #side .term-card,
+body:not(.compact-reference-ui) #side .preset-card,
+body:not(.compact-reference-ui) #side button.primary,
+body:not(.compact-reference-ui) #side .check-pill input[type="checkbox"]::after,
+body:not(.compact-reference-ui) #side .resp-tab.active,
+body:not(.compact-reference-ui) #controls button,
+body:not(.compact-reference-ui) .map-toolbar-btn,
+body:not(.compact-reference-ui) #map-toolbar.liquidGlass-wrapper button {
+  background-image: none !important;
+}
+
+/* 5. Disable the inline SVG glass-distortion filter that the page defines
+   in <svg class="liquid-glass-svg-filter">. Without this rule, anything
+   that references filter:url(#glass-distortion) still pulls in the bright
+   specular-lighting <feSpecularLighting> highlight. */
+body:not(.compact-reference-ui) .liquid-glass-svg-filter {
+  display: none !important;
+}
+
+/* 6. Belt-and-braces: any element that explicitly opted into the glass
+   filter via inline style/class never gets the SVG distortion applied. */
+body:not(.compact-reference-ui) [style*="glass-distortion"],
+body:not(.compact-reference-ui) [class*="glass-shine"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* 7. Nuclear shine kill — uses the "double-ID specificity tax" pattern
+   (#side#side, #controls#controls, ...) to push every selector into the
+   (2,X,Y) specificity tier. That beats every per-component (1,X,Y) rule
+   in style.css and ui-cleanup.css no matter how many classes they chain,
+   because specificity compares ID-column first.
+
+   Scope is intentionally limited to descendants of the main UI containers
+   so the container itself (which still wants a structural drop-shadow)
+   keeps its shadow — only inner elements lose theirs. */
+body:not(.compact-reference-ui) #side#side *,
+body:not(.compact-reference-ui) #controls#controls *,
+body:not(.compact-reference-ui) #banner#banner *,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar *,
+body:not(.compact-reference-ui) #map-shell#map-shell *,
+body:not(.compact-reference-ui) #map#map *,
+body:not(.compact-reference-ui) #app#app .map-legend *,
+body:not(.compact-reference-ui) #app#app .results-card *,
+body:not(.compact-reference-ui) #app#app .map-status-chips *,
+body:not(.compact-reference-ui) #webgnome-modal#webgnome-modal * {
+  box-shadow: none !important;
+}
+
+/* 8. Top-edge gradient sheens on inner elements — same nuclear scope.
+   Strip background-image only on elements whose source rules add a
+   linear-gradient white-to-transparent sheen (cards, pills, buttons,
+   tabs, active states). NOT applied universally because some elements
+   legitimately use background-image for their actual content/icon. */
+body:not(.compact-reference-ui) #side#side .section-card,
+body:not(.compact-reference-ui) #side#side .current-scenario-card,
+body:not(.compact-reference-ui) #side#side .stat-card,
+body:not(.compact-reference-ui) #side#side .term-card,
+body:not(.compact-reference-ui) #side#side .preset-card,
+body:not(.compact-reference-ui) #side#side .result-card,
+body:not(.compact-reference-ui) #side#side .insight-pill,
+body:not(.compact-reference-ui) #side#side button,
+body:not(.compact-reference-ui) #side#side button.primary,
+body:not(.compact-reference-ui) #side#side button.ghost,
+body:not(.compact-reference-ui) #side#side .scenario-tabs button,
+body:not(.compact-reference-ui) #side#side .resp-tab,
+body:not(.compact-reference-ui) #side#side .check-pill,
+body:not(.compact-reference-ui) #side#side input,
+body:not(.compact-reference-ui) #side#side select,
+body:not(.compact-reference-ui) #controls#controls button,
+body:not(.compact-reference-ui) #controls#controls #time-label,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #app#app .map-legend,
+body:not(.compact-reference-ui) #app#app .map-status-chips span,
+body:not(.compact-reference-ui) #app#app .results-card {
+  background-image: none !important;
+}
+
+/* 9. Clean thin outline standard — give every card / pill / button a
+   single 1px neutral white border at low opacity. Replaces the various
+   cyan-tinted (rgba(70,236,255,0.32)) and white-tinted borders that
+   were inconsistently applied per-component. Uses double-ID specificity
+   so it wins over per-component source rules. */
+body:not(.compact-reference-ui) #side#side .section-card,
+body:not(.compact-reference-ui) #side#side .current-scenario-card,
+body:not(.compact-reference-ui) #side#side .stat-card,
+body:not(.compact-reference-ui) #side#side .term-card,
+body:not(.compact-reference-ui) #side#side .preset-card,
+body:not(.compact-reference-ui) #side#side .result-card,
+body:not(.compact-reference-ui) #side#side .insight-pill,
+body:not(.compact-reference-ui) #side#side .summary-chip-row span,
+body:not(.compact-reference-ui) #side#side .tag,
+body:not(.compact-reference-ui) #side#side button,
+body:not(.compact-reference-ui) #side#side input,
+body:not(.compact-reference-ui) #side#side select,
+body:not(.compact-reference-ui) #side#side .check-pill,
+body:not(.compact-reference-ui) #side#side .scenario-tabs button,
+body:not(.compact-reference-ui) #side#side .resp-tab,
+body:not(.compact-reference-ui) #side#side .release-coord-field > input,
+body:not(.compact-reference-ui) #side#side #release-coord-btn,
+body:not(.compact-reference-ui) #controls#controls,
+body:not(.compact-reference-ui) #controls#controls button,
+body:not(.compact-reference-ui) #controls#controls #time-label,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar button,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar .map-toolbar-btn,
+body:not(.compact-reference-ui) #app#app .map-legend,
+body:not(.compact-reference-ui) #app#app .map-status-chips span,
+body:not(.compact-reference-ui) #app#app .results-card,
+body:not(.compact-reference-ui) #banner#banner {
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  outline: none !important;
+}
+
+/* 9b. Slightly more visible outline on the major container panels so
+   they read as distinct surfaces, but still thin and neutral. */
+body:not(.compact-reference-ui) #side#side.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #banner#banner.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #controls#controls.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #map-toolbar#map-toolbar.liquidGlass-wrapper,
+body:not(.compact-reference-ui) #app#app .map-legend.liquidGlass-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  outline: none !important;
+}
+
+/* 9c. Focus state — keep a subtle accent for keyboard users without
+   the puffy box-shadow glow. */
+body:not(.compact-reference-ui) #side#side input:focus,
+body:not(.compact-reference-ui) #side#side select:focus,
+body:not(.compact-reference-ui) #side#side button:focus-visible,
+body:not(.compact-reference-ui) #side#side .release-coord-field > input:focus {
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: none !important;
+}

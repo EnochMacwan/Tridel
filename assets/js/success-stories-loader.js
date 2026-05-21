@@ -5,7 +5,22 @@
  * Exports:
  *   window.renderSuccessStories(container)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
+
+var SUCCESS_STORY_CATEGORY_META = {
+    'Environmental Monitoring': {
+        subtitle: 'Real-time air, odor, noise, and weather monitoring systems for compliance and operational visibility.'
+    },
+    'Environmental Surveying': {
+        subtitle: 'Comprehensive hydrographic and geophysical survey services.'
+    },
+    'Integrated Solutions': {
+        subtitle: 'Integrated platforms that combine sensors, analytics, reporting, and decision support into one workflow.'
+    },
+    'Offshore Infrastructure': {
+        subtitle: 'Marine and offshore systems designed for deployment support, long-term monitoring, and field operations.'
+    }
+};
 
 /**
  * Renders the Success Stories
@@ -35,27 +50,49 @@ window.renderSuccessStories = function(container) {
     for (const [categoryName, stories] of Object.entries(categories)) {
         const section = document.createElement('section');
         section.className = 'section product-category';
+        const categoryMeta = SUCCESS_STORY_CATEGORY_META[categoryName] || {
+            subtitle: ''
+        };
 
         let html = `
             <div class="container">
-                <h2 class="product-category__title">${escapeHtml(categoryName)}</h2>
+                <div class="section__header success-stories-category-header">
+                    <h2 class="section__title success-stories-category-title">${escapeHtml(categoryName)}</h2>
+                    ${categoryMeta.subtitle ? `<p class="section__subtitle success-stories-category-subtitle">${escapeHtml(categoryMeta.subtitle)}</p>` : ''}
+                </div>
                 <div class="product-list-grid">
         `;
 
         stories.forEach(story => {
+            var hasImage = !!(story.image && String(story.image).trim());
+            var hasDescription = !!(story.description && String(story.description).trim());
+            var escapedTitle = escapeHtml(story.title);
+            var escapedDescription = escapeHtml(story.description || '');
             html += `
-                <div class="grid-card-wrapper">
-                    <div class="grid-card-visual">
-                        <img loading="lazy" alt="${escapeHtml(story.title)}" class="story-card__image"
-                            src="${escapeHtml(story.image || 'assets/images/logo/tridel.png')}">
+                <div class="grid-card-wrapper success-story-card ${hasImage ? 'success-story-card--with-image' : 'success-story-card--text-only'}"${hasImage ? ' tabindex="0"' : ''}>
+                    ${hasImage ? `
+                    <div class="grid-card-visual success-story-card__visual">
+                        <img loading="lazy" alt="${escapedTitle}" class="story-card__image"
+                            src="${escapeHtml(story.image)}" onerror="this.onerror=null;this.closest('.success-story-card__visual').remove();this.closest('.success-story-card').classList.remove('success-story-card--with-image');this.closest('.success-story-card').classList.add('success-story-card--text-only');">
+                        ${hasDescription ? `
+                        <div class="success-story-card__overlay">
+                            <div class="success-story-card__overlay-inner">
+                                <span class="success-story-card__overlay-label">Brief</span>
+                                <p class="success-story-card__overlay-brief">${escapedDescription}</p>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
-                    <div class="grid-content-outside">
+                    ` : ''}
+                    <div class="grid-content-outside success-story-card__content">
                         <h3 class="story-card__title">
-                            ${escapeHtml(story.title)}
+                            ${escapedTitle}
                         </h3>
-                        <p>
-                            ${escapeHtml(story.description)}
-                        </p>
+                        ${hasImage && hasDescription ? `
+                        <p class="success-story-card__brief">${escapedDescription}</p>
+                        ` : hasDescription ? `
+                        <p>${escapedDescription}</p>
+                        ` : ''}
                     </div>
                 </div>
             `;

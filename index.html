@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <title>Tridel Technologies</title>
   <meta
     content="Tridel Technologies is a multinational organization in Environmental Industry, specialized in developing end-to-end solutions for Surveying, Monitoring and Mapping through environmental data collection, data management, data analytics, integration with GIS database and developing custom build software and applications."
@@ -31,20 +32,20 @@
   </script>
 
   <!-- Styles -->
+  <link href="assets/css/fonts.css" rel="stylesheet">
   <link href="assets/css/styles.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Outfit:wght@400;500;700;800&amp;display=swap"
-    rel="stylesheet">
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer">
 
   <!-- Theme flash prevention (runs immediately on parse) -->
   <script src="assets/js/theme-toggle.js"></script>
 </head>
 
 <body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
   <noscript>
     <div class="noscript-message">
       <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to
@@ -62,6 +63,7 @@
 
   <!-- 1. Core Utilities -->
   <script src="assets/js/utils.js"></script>
+  <script src="assets/js/viewport-detector.js"></script>
 
   <!-- 2. Data Files (global arrays/objects, no DOM dependency) -->
   <script src="assets/js/products-data.js"></script>
@@ -81,6 +83,7 @@
   <script src="assets/js/index-page-data.js"></script>
   <script src="assets/js/about-page-data.js"></script>
   <script src="assets/js/contact-page-data.js"></script>
+  <script src="assets/js/honors-awards-data.js"></script>
   <script src="assets/js/layout-data.js"></script>
 
   <!-- 4. Loaders (callable functions, depend on data files) -->
@@ -107,19 +110,12 @@
   <!-- 7. Router (defines registerRoute, navigate, initRouter) -->
   <script src="assets/js/router.js"></script>
 
-  <!-- 8. Page Renderers (call registerRoute to register their routes) -->
+  <!-- 8. Page Renderers — only home is eager; everything else is lazy-loaded
+       on demand by router.js (see PAGE_SCRIPTS map). -->
   <script src="assets/js/pages/home.js"></script>
-  <script src="assets/js/pages/about.js"></script>
-  <script src="assets/js/pages/products.js"></script>
-  <script src="assets/js/pages/product-detail.js"></script>
-  <script src="assets/js/pages/services.js"></script>
-  <script src="assets/js/pages/service-detail.js"></script>
-  <script src="assets/js/pages/success-stories.js"></script>
-  <script src="assets/js/pages/contact.js"></script>
-  <script src="assets/js/pages/careers.js"></script>
 
   <!-- 9. Smooth Scroll (Lenis) -->
-  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+  <script src="assets/vendor/lenis/lenis.min.js"></script>
   <script src="assets/js/smooth-scroll.js"></script>
 
   <!-- 10. Boot -->

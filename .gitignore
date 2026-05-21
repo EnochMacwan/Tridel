@@ -18,3 +18,21 @@ Thumbs.db
 *.swp
 archive/git_auth.txt
 oracleJdk-25
+
+# Graphify knowledge graph outputs
+graphify-out/.graphify_python
+graphify-out/cost.json
+
+# Local assistant state
+.c[l]aude/
+
+# Server logs (auto-created at runtime)
+logs/
+
+# Production build output
+dist/
+
+# CSS consolidation backups (working files, not source of truth)
+simulation/css/main.css
+simulation/css/main_pre_refactor_backup.css
+simulation/css/*.backup.css

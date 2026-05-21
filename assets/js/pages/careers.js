@@ -7,7 +7,14 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/careers']) || {};
 
-  function render(mainEl) {
+  function getCareersFormAction() {
+    if (typeof SETTINGS_DATA !== 'undefined' && SETTINGS_DATA && SETTINGS_DATA.careersEmail) {
+      return 'https://formsubmit.co/' + SETTINGS_DATA.careersEmail;
+    }
+    return 'https://formsubmit.co/geminibaba1@gmail.com';
+  }
+
+  function renderCareersPage(mainEl) {
     var html = '';
 
     // Page header with breadcrumb
@@ -32,9 +39,11 @@
           '</div>';
 
     html += window.renderForm({
-      action: 'https://formsubmit.co/geminibaba1@gmail.com',
+      action: getCareersFormAction(),
       method: 'POST',
       enctype: 'multipart/form-data',
+      formId: 'careers-form',
+      formType: 'careers',
       fields: [
         {
           type: 'text',
@@ -42,6 +51,7 @@
           label: 'Full Name',
           required: true,
           placeholder: 'Enter your full name',
+          autocomplete: 'name',
           row: 'a'
         },
         {
@@ -49,6 +59,7 @@
           name: 'dob',
           label: 'Date of Birth',
           required: true,
+          autocomplete: 'off',
           row: 'a'
         },
         {
@@ -57,6 +68,7 @@
           label: 'Highest Qualification',
           required: true,
           placeholder: 'e.g., Master of Hydrography',
+          autocomplete: 'off',
           row: 'b'
         },
         {
@@ -65,6 +77,7 @@
           label: 'Preferred Location',
           required: true,
           placeholder: 'Select a location',
+          autocomplete: 'off',
           options: [
             'Australia',
             'UAE',
@@ -79,6 +92,7 @@
           label: 'Interested Areas & Position',
           required: true,
           placeholder: 'Tell us about the roles and fields you are interested in...',
+          autocomplete: 'off',
           rows: 3
         },
         {
@@ -87,6 +101,7 @@
           label: 'Cover Letter',
           required: false,
           placeholder: 'Tell us why you\'d be a great fit for TRIDEL...',
+          autocomplete: 'off',
           rows: 3
         },
         {
@@ -118,7 +133,7 @@
   }
 
   window.registerRoute('/careers', {
-    render: render,
+    render: renderCareersPage,
     title: meta.title || 'Join Our Team | TRIDEL Careers',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-careers'

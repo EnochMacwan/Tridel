@@ -7,7 +7,7 @@
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/products/detail']) || {};
 
-  function render(mainEl, params) {
+  function renderProductDetailPage(mainEl, params) {
     var html = '';
 
     // Product detail container with loading spinner
@@ -38,7 +38,7 @@
   }
 
   window.registerRoute('/products/detail', {
-    render: render,
+    render: renderProductDetailPage,
     title: meta.title || 'Product Details | Tridel',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-product-detail'

@@ -6,13 +6,13 @@
 (function () {
   'use strict';
 
-  var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) {
-    return String(s).replace(/[&<>"']/g, function (m) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
-    });
-  };
+  var esc = escapeHtml;
 
   var meta = (typeof PAGE_META !== 'undefined' && PAGE_META['/contact']) || {};
+
+  function isExternalUrl(value) {
+    return typeof value === 'string' && /^(https?:)?\/\//i.test(value);
+  }
 
   // ── Map state for cleanup ──
   var _contactMapInstance = null;
@@ -23,6 +23,32 @@
     options.forEach(function (opt) {
       html += '<option value="' + esc(opt) + '">' + esc(opt) + '</option>';
     });
+    return html;
+  }
+
+  function buildContactInfoCards(cards) {
+    if (!cards || !cards.length) return '';
+
+    var html = '<div class="contact-sidebar-card">';
+    cards.forEach(function (card) {
+      var iconClass = (card.icon || '').trim();
+      if (!iconClass) {
+        iconClass = 'fas fa-circle-info';
+      } else if (!/^(fas|far|fab|fal|fad|fa-solid|fa-regular|fa-brands)\s/.test(iconClass)) {
+        iconClass = 'fas ' + iconClass;
+      }
+
+      html +=
+        '<div class="contact-info-item">' +
+          '<div class="contact-info-icon"><i class="' + esc(iconClass) + '"></i></div>' +
+          '<div>' +
+            '<h4>' + esc(card.title || 'Info') + '</h4>' +
+            '<div class="contact-info-copy">' + (card.detail || '') + '</div>' +
+          '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+
     return html;
   }
 
@@ -41,25 +67,31 @@
       grouped[country].push(loc);
     });
 
-    Object.keys(grouped).forEach(function (country) {
+    var preferredOrder = ['Australia', 'India', 'UAE'];
+    var otherCountries = Object.keys(grouped).filter(function (country) {
+      return preferredOrder.indexOf(country) === -1;
+    });
+    var sortedCountries = preferredOrder.concat(otherCountries);
+
+    sortedCountries.forEach(function (country) {
+      if (!grouped[country]) return;
+
       html += '<div class="office-country-group">';
       html += '<div class="office-country-label">' + esc(country) + '</div>';
 
       grouped[country].forEach(function (loc) {
+        var officeName = loc.name || loc.companyName;
+        var officeDesignation = loc.designation || loc.type || '';
         var iconClass = loc.type === 'Factory' ? 'fa-industry' :
                         loc.type === 'Registered Office' ? 'fa-landmark' : 'fa-building';
-        var cleanAddr = (loc.address || '')
-          .replace(/<br\s*\/?>/gi, ', ')
-          .replace(/Tridel Technologies Pvt Ltd,?\s*/gi, '');
 
         html +=
           '<div class="office-card" data-location-id="' + esc(loc.id) + '" ' +
                'data-lat="' + parseFloat(loc.lat) + '" data-lng="' + parseFloat(loc.lng) + '" tabindex="0" role="button">' +
             '<div class="office-card-icon"><i class="fas ' + iconClass + '"></i></div>' +
             '<div class="office-card-body">' +
-              '<div class="office-card-name">' + esc(loc.name) + '</div>' +
-              '<div class="office-card-meta">' + esc(loc.type) + '</div>' +
-              '<div class="office-card-address">' + esc(cleanAddr) + '</div>' +
+              '<div class="office-card-name">' + esc(officeName) + '</div>' +
+              (officeDesignation ? '<div class="office-card-meta">' + esc(officeDesignation) + '</div>' : '') +
             '</div>' +
           '</div>';
       });
@@ -71,15 +103,62 @@
     return html;
   }
 
-  function render(mainEl) {
+  function scrollToContactForm() {
+    var formCard = document.getElementById('project-enquiry-card');
+    if (!formCard) return;
+
+    var headerOffset = 96;
+    var top = formCard.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    if (window.__lenis && typeof window.__lenis.scrollTo === 'function') {
+      window.__lenis.scrollTo(Math.max(0, top), { force: true });
+    } else {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  }
+
+  function applyContactRouteParams(params) {
+    if (!params) return;
+
+    var subjectField = document.querySelector('#contact-form input[name="_subject"]');
+    if (subjectField && params.subject) {
+      subjectField.value = params.subject;
+    }
+
+    if (params.focus === 'form' || params.subject) {
+      setTimeout(scrollToContactForm, 120);
+    }
+  }
+
+  function getContactFormAction(enquiry) {
+    if (typeof SETTINGS_DATA !== 'undefined' && SETTINGS_DATA && SETTINGS_DATA.contactEmail) {
+      return 'https://formsubmit.co/' + SETTINGS_DATA.contactEmail;
+    }
+    if (isExternalUrl(enquiry && enquiry.formAction)) {
+      return enquiry.formAction;
+    }
+    return 'https://formsubmit.co/mail@trideltechnologies.com';
+  }
+
+  function renderContactPage(mainEl, params) {
     var config = (typeof CONTACT_PAGE_CONFIG !== 'undefined') ? CONTACT_PAGE_CONFIG : {};
+    var infoCards = (typeof CONTACT_INFO_CARDS !== 'undefined' && Array.isArray(CONTACT_INFO_CARDS)) ? CONTACT_INFO_CARDS : [];
     var faqData = (typeof CONTACT_FAQ_DATA !== 'undefined') ? CONTACT_FAQ_DATA : [];
 
     var hero = config.hero || {};
     var enquiry = config.enquiry || {};
+    var contactSocial = (typeof CONTACT_DATA !== 'undefined' && CONTACT_DATA && CONTACT_DATA.social) ? CONTACT_DATA.social : {};
     var offices = config.offices || { label: 'Our Offices', locations: [] };
     var guarantee = config.responseGuarantee || {};
     var sectorOpts = config.sectorOptions || ['Product Enquiry', 'Service Enquiry', 'Custom Solution', 'Partnership', 'General Question'];
+    var linkedInUrl = enquiry.linkedinUrl ||
+      contactSocial.linkedin ||
+      (isExternalUrl(enquiry.linkedin) ? enquiry.linkedin : '') ||
+      ((typeof FOOTER_DATA !== 'undefined' && FOOTER_DATA && FOOTER_DATA.linkedIn) ? FOOTER_DATA.linkedIn : '') ||
+      '#';
+    var linkedInLabel = enquiry.linkedinLabel ||
+      (!isExternalUrl(enquiry.linkedin) && enquiry.linkedin ? enquiry.linkedin : '') ||
+      'Tridel Technologies';
 
     var html = '';
 
@@ -106,47 +185,46 @@
     // ── LEFT: Form Card ──
     if (showForm)
     html +=
-      '<div class="contact-form-card">' +
+      '<div class="contact-form-card" id="project-enquiry-card">' +
         '<div class="contact-section-label">Send us a Message</div>' +
-        '<h2 class="contact-form-title">Project Enquiry</h2>' +
-        '<form id="contact-form" class="contact-form" action="' + esc(enquiry.formAction || '#') + '" method="POST">' +
-          '<input type="hidden" name="_subject" value="New Contact Enquiry - Tridel Website">' +
+        '<form id="contact-form" class="contact-form" data-form-type="contact" action="' + esc(getContactFormAction(enquiry)) + '" method="POST">' +
+          '<input type="hidden" name="_subject" value="New Contact Message - Tridel Website">' +
           '<input type="hidden" name="_captcha" value="false">' +
           '<input type="hidden" name="_template" value="table">' +
           '<div class="contact-form-row">' +
             '<div class="form-group">' +
               '<label for="contact-name">Full Name <span class="required">*</span></label>' +
-              '<input type="text" id="contact-name" name="name" class="form-input" placeholder="John Smith" required>' +
+              '<input type="text" id="contact-name" name="name" class="form-input" placeholder="John Smith" autocomplete="name" required>' +
               '<span class="form-error">Please enter your name</span>' +
             '</div>' +
             '<div class="form-group">' +
               '<label for="contact-company">Company / Organisation</label>' +
-              '<input type="text" id="contact-company" name="company" class="form-input" placeholder="Your company name">' +
+              '<input type="text" id="contact-company" name="company" class="form-input" placeholder="Your company name" autocomplete="organization">' +
             '</div>' +
           '</div>' +
           '<div class="contact-form-row">' +
             '<div class="form-group">' +
               '<label for="contact-email">Email Address <span class="required">*</span></label>' +
-              '<input type="email" id="contact-email" name="email" class="form-input" placeholder="john@company.com" required>' +
+              '<input type="email" id="contact-email" name="email" class="form-input" placeholder="john@company.com" autocomplete="email" required>' +
               '<span class="form-error">Please enter a valid email</span>' +
             '</div>' +
             '<div class="form-group">' +
               '<label for="contact-phone">Phone Number</label>' +
-              '<input type="tel" id="contact-phone" name="phone" class="form-input" placeholder="+971 5XX XXXX">' +
+              '<input type="tel" id="contact-phone" name="phone" class="form-input" placeholder="+971 5XX XXXX" autocomplete="tel">' +
             '</div>' +
           '</div>' +
           '<div class="form-group">' +
             '<label for="contact-sector">Sector of Interest</label>' +
-            '<select id="contact-sector" name="interest" class="form-input form-select">' +
+            '<select id="contact-sector" name="interest" class="form-input form-select" autocomplete="off">' +
               buildSectorOptions(sectorOpts) +
             '</select>' +
           '</div>' +
           '<div class="form-group">' +
-            '<label for="contact-message">Tell Us About Your Project <span class="required">*</span></label>' +
-            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Describe your project, timeline, and any specific requirements..." required></textarea>' +
-            '<span class="form-error">Please describe your project</span>' +
+            '<label for="contact-message">Message <span class="required">*</span></label>' +
+            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Share your requirements, questions, or message..." autocomplete="off" required></textarea>' +
+            '<span class="form-error">Please enter your message</span>' +
           '</div>' +
-          '<button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Enquiry</button>' +
+          '<button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>' +
         '</form>' +
         '<div id="contact-success" class="eoi-success" style="display:none;">' +
           '<i class="fas fa-check-circle"></i>' +
@@ -170,6 +248,8 @@
           '</div>' +
         '</div>';
     }
+
+    html += buildContactInfoCards(infoCards);
 
     // Contact info card
     html +=
@@ -198,7 +278,7 @@
           '<div class="contact-info-icon"><i class="fab fa-linkedin"></i></div>' +
           '<div>' +
             '<h4>LinkedIn</h4>' +
-            '<a href="' + esc(enquiry.linkedin || '#') + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(enquiry.linkedin || 'Follow us on LinkedIn') + '</a>' +
+            '<a href="' + esc(linkedInUrl) + '" target="_blank" rel="noopener noreferrer" class="contact-link-item">' + esc(linkedInLabel) + '</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -235,6 +315,7 @@
 
     // Initialize form validation
     initContactForm();
+    applyContactRouteParams(params);
 
     // Initialize offices map
     if (offices.locations.length) {
@@ -267,19 +348,15 @@
       if (typeof L !== 'undefined') return cb();
 
       // Load Leaflet CSS
-      if (!document.querySelector('link[href*="leaflet"]')) {
+      if (!document.querySelector('link[href$="assets/vendor/leaflet/leaflet.css"]')) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = 'anonymous';
+        link.href = 'assets/vendor/leaflet/leaflet.css';
         document.head.appendChild(link);
       }
 
       var script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = 'anonymous';
+      script.src = 'assets/vendor/leaflet/leaflet.js';
       script.onload = cb;
       document.head.appendChild(script);
     }
@@ -364,14 +441,17 @@
         markers[loc.id] = marker;
 
         marker.on('click', function () {
-          setActiveLocation(loc.id);
+          setActiveLocation(loc.id, { scrollCard: true });
         });
       });
 
       // Active state management
       var activeId = null;
 
-      function setActiveLocation(id) {
+      function setActiveLocation(id, options) {
+        options = options || {};
+        var shouldScrollCard = !!options.scrollCard;
+
         // Reset previous
         if (activeId && markers[activeId]) {
           markers[activeId].setIcon(pinNormal);
@@ -386,14 +466,31 @@
           markers[id].setIcon(pinActive);
           markers[id].setZIndexOffset(1000);
           var ll = markers[id].getLatLng();
-          map.flyTo(ll, 8, { animate: true, duration: 1200 });
+          map.stop();
+          if (map.getZoom() < 8) {
+            map.flyTo(ll, 8, {
+              animate: true,
+              duration: 0.7,
+              easeLinearity: 0.2,
+              noMoveStart: true
+            });
+          } else {
+            map.panTo(ll, {
+              animate: true,
+              duration: 0.6,
+              easeLinearity: 0.2,
+              noMoveStart: true
+            });
+          }
         }
 
         var escapedId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(id) : id.replace(/(["\\])/g, '\\$1');
         var newCard = document.querySelector('.office-card[data-location-id="' + escapedId + '"]');
         if (newCard) {
           newCard.classList.add('active');
-          newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (shouldScrollCard) {
+            newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }
         }
       }
 
@@ -457,6 +554,14 @@
       });
       if (!valid) {
         e.preventDefault();
+        return;
+      }
+
+      if (typeof window.trackSiteEnquiry === 'function') {
+        window.trackSiteEnquiry({
+          path: '/contact',
+          interest: (form.querySelector('[name="interest"]') || {}).value || 'General'
+        });
       }
     });
   }
@@ -483,7 +588,7 @@
   }
 
   window.registerRoute('/contact', {
-    render: render,
+    render: renderContactPage,
     title: meta.title || 'Contact Us | TRIDEL',
     description: meta.description || '',
     bodyClass: meta.bodyClass || 'page-contact'

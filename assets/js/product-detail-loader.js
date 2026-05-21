@@ -5,7 +5,75 @@
  * Exports:
  *   window.renderProductDetail(container, productId)
  */
-var esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+var esc = escapeHtml;
+var formatAllowedInlineHtml = typeof formatAllowedInlineHtml === 'function'
+    ? formatAllowedInlineHtml
+    : function(text) {
+        return esc(text == null ? '' : text).replace(/&lt;(\/?)strong&gt;/gi, '<$1strong>');
+    };
+
+function getProductDataLookupId(product) {
+    if (product && product.id) {
+        return String(product.id).trim();
+    }
+
+    if (product && product.link) {
+        var match = String(product.link).match(/[?&]id=([^&]+)/i);
+        if (match && match[1]) {
+            try {
+                return decodeURIComponent(match[1]).trim();
+            } catch (e) {
+                return String(match[1]).trim();
+            }
+        }
+    }
+
+    return '';
+}
+
+function getProductGallery(product) {
+    var rawGallery = Array.isArray(product && product.gallery) ? product.gallery : [];
+    var sourceImages = rawGallery.length
+        ? rawGallery
+        : (product && product.image ? [product.image] : []);
+    var seen = Object.create(null);
+    var uniqueImages = [];
+
+    sourceImages.forEach(function(image) {
+        if (!image) {
+            return;
+        }
+
+        var normalized = String(image).trim();
+        if (!normalized) {
+            return;
+        }
+
+        var dedupeKey = normalized.indexOf('data:') === 0
+            ? normalized.slice(0, 128) + '::' + normalized.length
+            : normalized.toLowerCase();
+
+        if (seen[dedupeKey]) {
+            return;
+        }
+
+        seen[dedupeKey] = true;
+        uniqueImages.push(normalized);
+    });
+
+    return uniqueImages;
+}
+
+function getProductDetailDescription(product) {
+    var description = String((product && product.description) || '').trim();
+    var longDescription = String((product && product.longDescription) || '').trim();
+
+    if (!description) return longDescription;
+    if (!longDescription) return description;
+    if (longDescription.indexOf('[...]') !== -1) return description;
+    if (description.length >= longDescription.length) return description;
+    return longDescription;
+}
 
 /**
  * Renders a Product Detail page into the given container.
@@ -23,7 +91,10 @@ window.renderProductDetail = function(container, productId) {
         return;
     }
 
-    const product = data.find(p => p.id === productId);
+    var requestedProductId = String(productId).trim().toLowerCase();
+    const product = data.find(function(p) {
+        return getProductDataLookupId(p).toLowerCase() === requestedProductId;
+    });
 
     if (!product) {
         container.innerHTML = '<div style="text-align:center;"><h2>Product Not Found</h2><p>The requested product ID does not exist.</p><a href="#/products" class="button button--primary">View All Products</a></div>';
@@ -33,7 +104,7 @@ window.renderProductDetail = function(container, productId) {
     // Update Page Title
     document.title = `${product.name} | TRIDEL`;
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.content = product.description;
+    if (metaDesc) metaDesc.content = getProductDetailDescription(product);
 
     // Build Features List
     let featuresHtml = '';
@@ -41,16 +112,17 @@ window.renderProductDetail = function(container, productId) {
         featuresHtml = `
             <h3>Key Features</h3>
             <ul class="detail-layout__list">
-                ${product.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+                ${product.features.map(f => `<li>${formatAllowedInlineHtml(f)}</li>`).join('')}
             </ul>
         `;
     }
 
     // Build Gallery
     let galleryHtml = '';
-    if (product.gallery && product.gallery.length > 0) {
-        const mainImage = product.gallery[0];
-        const thumbsHtml = product.gallery.map((img, index) => `
+    const galleryImages = getProductGallery(product);
+    if (galleryImages.length > 0) {
+        const mainImage = galleryImages[0];
+        const thumbsHtml = galleryImages.map((img, index) => `
             <img loading="lazy" src="${img}" onclick="changeImage('${img}')" onkeydown="if(event.key==='Enter')changeImage('${img}')" tabindex="0" role="button" ${img === mainImage ? 'class="active"' : ''} alt="${escapeHtml(product.name)} - Image ${index + 1}">
         `).join('');
 
@@ -75,7 +147,7 @@ window.renderProductDetail = function(container, productId) {
         <div class="detail-layout">
           <div class="detail-layout__content">
             <h1 class="detail-layout__title">${escapeHtml(product.name)}</h1>
-            <p class="detail-layout__description">${escapeHtml(product.longDescription || product.description)}</p>
+            <p class="detail-layout__description">${escapeHtml(getProductDetailDescription(product))}</p>
             ${featuresHtml}
 
             <div class="product-actions">
@@ -106,7 +178,7 @@ window.renderProductDetail = function(container, productId) {
                             </div>
                             <div class="product-content-outside">
                                 <h4>${escapeHtml(sub.name)}</h4>
-                                <p class="product-item__excerpt">${escapeHtml((sub.description || '').substring(0, 100))}...</p>
+                                <p class="product-item__excerpt">${escapeHtml(getProductDetailDescription(sub))}</p>
                                 <span class="button button--secondary">View Details</span>
                             </div>
                         </a>

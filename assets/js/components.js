@@ -5,11 +5,7 @@
 (function () {
   'use strict';
 
-  var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) {
-    return String(s).replace(/[&<>"']/g, function (m) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
-    });
-  };
+  var esc = escapeHtml;
 
   /**
    * Render a page header with breadcrumb and hero canvas
@@ -116,14 +112,18 @@
         (field.options || []).forEach(function (opt) {
           opts += '<option value="' + esc(opt) + '">' + esc(opt) + '</option>';
         });
-        input = '<select class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' + (field.required ? ' required' : '') + '>' + opts + '</select>';
+        input = '<select class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
+          (field.required ? ' required' : '') + '>' + opts + '</select>';
       } else if (field.type === 'textarea') {
         input = '<textarea class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
           (field.required ? ' required aria-required="true"' : '') +
           (field.placeholder ? ' placeholder="' + esc(field.placeholder) + '"' : '') +
           ' rows="' + (field.rows || 5) + '"></textarea>';
       } else if (field.type === 'file') {
         input = '<input class="form-control" type="file" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="off"' +
           (field.accept ? ' accept="' + esc(field.accept) + '"' : '') +
           (field.required ? ' required aria-required="true"' : '') + '>';
         if (field.helpText) {
@@ -131,6 +131,7 @@
         }
       } else {
         input = '<input class="form-control" type="' + esc(field.type || 'text') + '" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
           (field.required ? ' required aria-required="true"' : '') +
           (field.placeholder ? ' placeholder="' + esc(field.placeholder) + '"' : '') + '>';
       }
@@ -156,11 +157,17 @@
 
     var method = config.method || 'POST';
 
+    var formAttrs = '';
+    if (config.formId) formAttrs += ' id="' + esc(config.formId) + '"';
+    if (config.formClass) formAttrs += ' class="' + esc(config.formClass) + '"';
+    if (config.formType) formAttrs += ' data-form-type="' + esc(config.formType) + '"';
+
     return (
       '<div class="contact-form">' +
         (config.title ? '<div class="section__header" style="text-align:left;"><h2 class="section__title">' + esc(config.title) + '</h2></div>' : '') +
         (config.subtitle ? '<p style="margin-bottom:var(--space-lg);color:var(--color-text-muted);">' + esc(config.subtitle) + '</p>' : '') +
         '<form action="' + esc(config.action) + '" method="' + esc(method) + '"' +
+          formAttrs +
           (config.enctype ? ' enctype="' + esc(config.enctype) + '"' : '') + '>' +
           '<input type="hidden" name="_captcha" value="false">' +
           fieldsHtml +

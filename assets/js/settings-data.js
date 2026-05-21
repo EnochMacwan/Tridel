@@ -1,12 +1,12 @@
 const SETTINGS_DATA = {
-  "contactEmail": "geminibaba1@gmail.com",
-  "careersEmail": "geminibaba1@gmail.com",
+  "contactEmail": "mail@trideltechnologies.com",
+  "careersEmail": "careers@trideltechnologies.com",
   "sectionVisibility": {
     "home": {
       "hero": true,
       "stats": true,
       "whatWeDo": true,
-      "whyChoose": true,
+      "whyChoose": false,
       "caseStudy": false,
       "cta": false
     },
