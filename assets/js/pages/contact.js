@@ -194,34 +194,34 @@
           '<div class="contact-form-row">' +
             '<div class="form-group">' +
               '<label for="contact-name">Full Name <span class="required">*</span></label>' +
-              '<input type="text" id="contact-name" name="name" class="form-input" placeholder="John Smith" required>' +
+              '<input type="text" id="contact-name" name="name" class="form-input" placeholder="John Smith" autocomplete="name" required>' +
               '<span class="form-error">Please enter your name</span>' +
             '</div>' +
             '<div class="form-group">' +
               '<label for="contact-company">Company / Organisation</label>' +
-              '<input type="text" id="contact-company" name="company" class="form-input" placeholder="Your company name">' +
+              '<input type="text" id="contact-company" name="company" class="form-input" placeholder="Your company name" autocomplete="organization">' +
             '</div>' +
           '</div>' +
           '<div class="contact-form-row">' +
             '<div class="form-group">' +
               '<label for="contact-email">Email Address <span class="required">*</span></label>' +
-              '<input type="email" id="contact-email" name="email" class="form-input" placeholder="john@company.com" required>' +
+              '<input type="email" id="contact-email" name="email" class="form-input" placeholder="john@company.com" autocomplete="email" required>' +
               '<span class="form-error">Please enter a valid email</span>' +
             '</div>' +
             '<div class="form-group">' +
               '<label for="contact-phone">Phone Number</label>' +
-              '<input type="tel" id="contact-phone" name="phone" class="form-input" placeholder="+971 5XX XXXX">' +
+              '<input type="tel" id="contact-phone" name="phone" class="form-input" placeholder="+971 5XX XXXX" autocomplete="tel">' +
             '</div>' +
           '</div>' +
           '<div class="form-group">' +
             '<label for="contact-sector">Sector of Interest</label>' +
-            '<select id="contact-sector" name="interest" class="form-input form-select">' +
+            '<select id="contact-sector" name="interest" class="form-input form-select" autocomplete="off">' +
               buildSectorOptions(sectorOpts) +
             '</select>' +
           '</div>' +
           '<div class="form-group">' +
             '<label for="contact-message">Message <span class="required">*</span></label>' +
-            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Share your requirements, questions, or message..." required></textarea>' +
+            '<textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Share your requirements, questions, or message..." autocomplete="off" required></textarea>' +
             '<span class="form-error">Please enter your message</span>' +
           '</div>' +
           '<button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>' +

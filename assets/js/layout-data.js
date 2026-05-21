@@ -123,7 +123,7 @@ var MEGA_MENU_CONFIG = {
       "description": "Precision air quality monitoring for offshore and coastal projects. Our setups measure key pollutants and meteorological parameters to ensure compliance with environmental regulations and safeguard operational health.",
       "link": "#/services",
       "buttonText": "Learn More",
-      "image": "assets/images/Integrated Solutions/AQMS/aqms.png"
+      "image": "assets/images/integrated-solutions/aqms/aqms.png"
     }
   }
 };

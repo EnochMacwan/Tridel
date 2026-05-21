@@ -36,7 +36,7 @@ globalThis.Field = (() => {
        browser-level cross-origin error. */
     if (globalThis.location.protocol === 'file:'){
       throw new Error(
-        'This app cannot load data over file://. Start a local server and open http://localhost:8000 instead.'
+        'This app cannot load data over file://. Start the local server and open the simulation through localhost instead.'
       );
     }
 
@@ -47,7 +47,7 @@ globalThis.Field = (() => {
       r = await fetch(manifestUrl);
     } catch (err) {
       throw new Error(
-        `Could not reach ${url}. Start a local server and open the site over http://localhost:8000.`
+        `Could not reach ${url}. Start the local server and open the simulation through localhost.`
       );
     }
 

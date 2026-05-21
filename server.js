@@ -9,6 +9,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const https = require('https');
 
 function loadEnvFile(filePath) {
     if (!fs.existsSync(filePath)) return;
@@ -40,7 +41,10 @@ loadEnvFile(path.join(__dirname, '.env.local'));
 const app = express();
 const PORT = 3000;
 const HOST = '127.0.0.1';
+const ADMIN_ENABLED = process.env.ADMIN_ENABLED !== 'false';
 const METRICS_FILE = path.join(__dirname, 'logs', 'site-metrics.json');
+const ROBOTS_TAG_VALUE = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+const BLOCKED_USER_AGENT_PATTERN = /(?:gptbot|chatgpt-user|oai-searchbot|ccbot|claudebot|claude-web|anthropic-ai|perplexitybot|perplexity-user|googlebot|google-extended|bingbot|duckduckbot|applebot|facebookexternalhit|twitterbot|linkedinbot|slurp|yandex|baiduspider|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|bytespider|dataforseo|blexbot|seznambot|sogou|ia_archiver|archive\.org_bot|crawler|spider|scrapy|curl|wget|python-requests|python-urllib|aiohttp|httpx|go-http-client|java\/|okhttp|axios|node-fetch|undici|libwww-perl|phpcrawl)/i;
 
 app.disable('x-powered-by');
 
@@ -392,6 +396,11 @@ function requireAuth(req, res, next) {
     }
 }
 
+function isBlockedUserAgent(req) {
+    const userAgent = String(req.get('user-agent') || '').trim();
+    return !userAgent || BLOCKED_USER_AGENT_PATTERN.test(userAgent);
+}
+
 // ============================================
 // SECURITY: Headers Middleware
 // ============================================
@@ -402,6 +411,7 @@ app.use((req, res, next) => {
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+    res.setHeader('X-Robots-Tag', ROBOTS_TAG_VALUE);
     // HSTS: enforce HTTPS for 1 year (only effective when served over HTTPS)
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     // CSP: Add domains to frame-src/img-src as needed when embedding new sources
@@ -411,14 +421,20 @@ app.use((req, res, next) => {
         "base-uri 'self'; " +
         "object-src 'none'; " +
         "frame-ancestors 'none'; " +
-        "form-action 'self' https://formsubmit.co; " +
-        "script-src 'self' 'unsafe-inline'; " +
-        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
-        "font-src 'self' https://cdnjs.cloudflare.com; " +
-        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://tiles.openseamap.org; " +
-        "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com; " +
-        "connect-src 'self' https://formsubmit.co https://*.basemaps.cartocdn.com"
+        "form-action 'self' https://formsubmit.co https://www.formsubmit.co; " +
+        "script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.plot.ly; " +
+        "worker-src 'self' blob:; " +
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://unpkg.com; " +
+        "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; " +
+        "img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://api.mapbox.com https://server.arcgisonline.com https://tiles.openseamap.org; " +
+        "frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.google.com https://app.netlify.com; " +
+        "connect-src 'self' https://formsubmit.co https://www.formsubmit.co https://unpkg.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://api.mapbox.com https://tiles.openseamap.org https://server.arcgisonline.com"
     );
+
+    if (req.path !== '/robots.txt' && isBlockedUserAgent(req)) {
+        return res.status(403).type('text/plain').send('Forbidden');
+    }
+
     next();
 });
 
@@ -449,7 +465,11 @@ app.use(cors({
     }
 }));
 
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' }));
+
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain').sendFile(path.join(__dirname, 'robots.txt'));
+});
 
 const BLOCKED_PUBLIC_FILES = new Set([
     '/server.js',
@@ -492,10 +512,22 @@ app.use((req, res, next) => {
         return res.status(404).type('text/plain').send('Not found');
     }
 
+    if (normalizedPath === '/simulation/data/currents.json' || normalizedPath.startsWith('/simulation/data/chunks/')) {
+        return next();
+    }
+
     if (BLOCKED_PUBLIC_FILES.has(normalizedPath) || BLOCKED_PUBLIC_EXTENSIONS.has(ext)) {
         return res.status(404).type('text/plain').send('Not found');
     }
 
+    next();
+});
+
+// Block admin folder when ADMIN_ENABLED is false
+app.use((req, res, next) => {
+    if (!ADMIN_ENABLED && req.path.startsWith('/admin')) {
+        return res.status(404).type('text/plain').send('Not found');
+    }
     next();
 });
 
@@ -507,6 +539,7 @@ app.use(express.static('.'));  // Serve static files from current directory
 
 // Login (with rate limiting)
 app.post('/api/login', (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
 
     // Check rate limit
@@ -533,6 +566,7 @@ app.post('/api/login', (req, res) => {
 
 // Logout
 app.post('/api/logout', (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const token = req.headers['x-auth-token'];
     if (token) sessions.delete(token);
     res.json({ success: true });
@@ -540,6 +574,7 @@ app.post('/api/logout', (req, res) => {
 
 // Check if authenticated
 app.get('/api/check-auth', (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const token = req.headers['x-auth-token'];
     if (token && sessions.has(token) && sessions.get(token) > Date.now()) {
         res.json({ authenticated: true });
@@ -567,6 +602,77 @@ app.post('/api/metrics/enquiry', (req, res) => {
         console.error('Failed to record site enquiry:', err.message);
         res.status(204).end();
     }
+});
+
+// ============================================
+// FORM PROXY  (avoids browser CORS restriction)
+// POST /api/form-proxy  — body: { target, fields }
+//   target: 'contact' | 'careers'
+//   fields: object of form field name→value pairs
+// ============================================
+app.post('/api/form-proxy', express.json({ limit: '64kb' }), (req, res) => {
+    const { target, fields } = req.body || {};
+    if (!target || !fields || typeof fields !== 'object') {
+        return res.status(400).json({ success: false, message: 'Invalid request' });
+    }
+
+    // Resolve email address from settings-data.js
+    let email = null;
+    try {
+        const raw = fs.readFileSync(path.join(__dirname, 'assets/js/settings-data.js'), 'utf8');
+        // Extract the JSON object from `const SETTINGS_DATA = {...};`
+        const match = raw.match(/=\s*(\{[\s\S]*\})\s*;?\s*$/);
+        if (match) {
+            const sd = JSON.parse(match[1]);
+            email = target === 'careers' ? sd.careersEmail : sd.contactEmail;
+        }
+    } catch (e) { /* fall through to default */ }
+    if (!email) email = target === 'careers' ? 'careers@trideltechnologies.com' : 'mail@trideltechnologies.com';
+
+    // Build multipart/form-data body
+    const boundary = '----FormBoundary' + crypto.randomBytes(8).toString('hex');
+    let body = '';
+    const allFields = Object.assign({}, fields, { _captcha: 'false', _template: 'table' });
+    for (const [k, v] of Object.entries(allFields)) {
+        body += `--${boundary}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`;
+    }
+    body += `--${boundary}--\r\n`;
+    const bodyBuf = Buffer.from(body);
+
+    const options = {
+        hostname: 'formsubmit.co',
+        path: `/ajax/${encodeURIComponent(email)}`,
+        method: 'POST',
+        headers: {
+            'Content-Type': `multipart/form-data; boundary=${boundary}`,
+            'Content-Length': bodyBuf.length,
+            'Accept': 'application/json',
+        },
+        timeout: 10000
+    };
+
+    const request = https.request(options, (upstream) => {
+        let data = '';
+        upstream.on('data', chunk => { data += chunk; });
+        upstream.on('end', () => {
+            try {
+                const json = JSON.parse(data);
+                res.status(upstream.statusCode).json(json);
+            } catch {
+                res.status(upstream.statusCode).json({ success: upstream.statusCode < 300, raw: data });
+            }
+        });
+    });
+    request.on('error', (err) => {
+        console.error('Form proxy error:', err.message);
+        res.status(502).json({ success: false, message: 'Could not reach mail service. Please try again later.' });
+    });
+    request.on('timeout', () => {
+        request.destroy();
+        res.status(504).json({ success: false, message: 'Mail service timed out. Please try again.' });
+    });
+    request.write(bodyBuf);
+    request.end();
 });
 
 app.get('/api/dashboard/metrics', requireAuth, (req, res) => {
@@ -686,6 +792,7 @@ function parseDataFileContent(content, varName) {
 
 // API: Get all data (protected)
 app.get('/api/data/:type', requireAuth, (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const type = req.params.type;
     const filePath = DATA_FILES[type];
 
@@ -705,6 +812,7 @@ app.get('/api/data/:type', requireAuth, (req, res) => {
 
 // API: Save data (protected, with input validation)
 app.post('/api/data/:type', requireAuth, (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const type = req.params.type;
     const filePath = DATA_FILES[type];
     const varName = VAR_NAMES[type];
@@ -818,6 +926,7 @@ app.post('/api/data/:type', requireAuth, (req, res) => {
 
 // API: Get all data types at once (protected)
 app.get('/api/all-data', requireAuth, (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const allData = {};
 
     for (const [type, filePath] of Object.entries(DATA_FILES)) {
@@ -835,6 +944,7 @@ app.get('/api/all-data', requireAuth, (req, res) => {
 
 // API: Save all data at once (protected, with input validation)
 app.post('/api/save-all', requireAuth, (req, res) => {
+    if (!ADMIN_ENABLED) return res.status(404).json({ error: 'Not found' });
     const results = {};
 
     // Validate that all keys in the body correspond to valid DATA_FILES keys
@@ -947,7 +1057,7 @@ app.listen(PORT, HOST, () => {
     console.log('========================================================');
     console.log('   Tridel Content Manager (SECURED)                     ');
     console.log('========================================================');
-    console.log(`   Admin Panel: http://localhost:${PORT}/admin.html`);
+    console.log(`   Admin Panel: http://localhost:${PORT}/admin/ (ADMIN_ENABLED=${ADMIN_ENABLED})`);
     console.log(`   Website:     http://localhost:${PORT}/index.html`);
     console.log(`   Bind Host:   ${HOST} (localhost only)`);
     console.log('--------------------------------------------------------');

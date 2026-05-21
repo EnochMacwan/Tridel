@@ -112,14 +112,18 @@
         (field.options || []).forEach(function (opt) {
           opts += '<option value="' + esc(opt) + '">' + esc(opt) + '</option>';
         });
-        input = '<select class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' + (field.required ? ' required' : '') + '>' + opts + '</select>';
+        input = '<select class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
+          (field.required ? ' required' : '') + '>' + opts + '</select>';
       } else if (field.type === 'textarea') {
         input = '<textarea class="form-control" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
           (field.required ? ' required aria-required="true"' : '') +
           (field.placeholder ? ' placeholder="' + esc(field.placeholder) + '"' : '') +
           ' rows="' + (field.rows || 5) + '"></textarea>';
       } else if (field.type === 'file') {
         input = '<input class="form-control" type="file" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="off"' +
           (field.accept ? ' accept="' + esc(field.accept) + '"' : '') +
           (field.required ? ' required aria-required="true"' : '') + '>';
         if (field.helpText) {
@@ -127,6 +131,7 @@
         }
       } else {
         input = '<input class="form-control" type="' + esc(field.type || 'text') + '" id="' + esc(field.name) + '" name="' + esc(field.name) + '"' +
+          ' autocomplete="' + esc(field.autocomplete || 'off') + '"' +
           (field.required ? ' required aria-required="true"' : '') +
           (field.placeholder ? ' placeholder="' + esc(field.placeholder) + '"' : '') + '>';
       }

@@ -102,11 +102,13 @@ function enhanceFormSubmitForm(form) {
 
     form.addEventListener('submit', function (event) {
         if (event.defaultPrevented) return;
-        if (!/formsubmit\.co/i.test(form.action || '')) return;
         if (!form.checkValidity()) return;
 
-        var ajaxAction = getFormSubmitAjaxAction(form.action);
-        if (!ajaxAction || typeof fetch !== 'function' || typeof FormData !== 'function') return;
+        // Determine form type for the server-side proxy
+        var formType = form.getAttribute('data-form-type') ||
+                       (form.id === 'contact-form' ? 'contact' : '') ||
+                       (form.id === 'careers-form' ? 'careers' : '');
+        if (!formType && !/formsubmit\.co/i.test(form.action || '')) return;
 
         event.preventDefault();
 
@@ -118,13 +120,22 @@ function enhanceFormSubmitForm(form) {
         }
         showFormSubmitStatus(form, '', '');
 
-        fetch(ajaxAction, {
+        // Collect all form fields into a plain object
+        var fields = {};
+        var formData = new FormData(form);
+        formData.forEach(function (value, key) {
+            // Skip internal formsubmit fields; proxy adds them server-side
+            if (key.charAt(0) !== '_') fields[key] = value;
+        });
+
+        // Use the same-origin proxy to avoid CORS issues with formsubmit.co
+        fetch('/api/form-proxy', {
             method: 'POST',
-            headers: { Accept: 'application/json' },
-            body: new FormData(form)
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ target: formType || 'contact', fields: fields })
         }).then(function (response) {
             if (!response.ok) {
-                throw new Error('FormSubmit returned ' + response.status);
+                throw new Error('Proxy returned ' + response.status);
             }
             return response.json().catch(function () { return {}; });
         }).then(function () {

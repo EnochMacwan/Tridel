@@ -669,9 +669,9 @@ function updateDataQualityPanel() {
 function showStartupError(message) {
   setStatus(message);
   els.timeLabel.textContent = "server required";
-  els.dataMeta.textContent = "Open this app through http://localhost:8000, not file://";
-  els.releaseInfo.textContent = "Startup failed. Use start_local_server.bat or python -m http.server 8000.";
-  els.results.innerHTML = '<div class="result-card wide"><span class="result-label">Startup</span><span class="result-value">Data unavailable</span><span class="result-subvalue">This page was opened without a local web server.</span></div>';
+  els.dataMeta.textContent = "Open this app through the local web server, not file://";
+  els.releaseInfo.textContent = "Startup failed. Start the local web server and open the simulation through localhost.";
+  els.results.innerHTML = '<div class="result-card wide"><span class="result-label">Startup</span><span class="result-value">Data unavailable</span><span class="result-subvalue">Start the local server and open this page through localhost.</span></div>';
   els.runBtn.disabled = true;
   if (els.quickRunRailBtn) els.quickRunRailBtn.disabled = true;
   if (els.runTopBtn) els.runTopBtn.disabled = true;

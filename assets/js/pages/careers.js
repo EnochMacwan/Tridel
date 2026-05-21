@@ -51,6 +51,7 @@
           label: 'Full Name',
           required: true,
           placeholder: 'Enter your full name',
+          autocomplete: 'name',
           row: 'a'
         },
         {
@@ -58,6 +59,7 @@
           name: 'dob',
           label: 'Date of Birth',
           required: true,
+          autocomplete: 'off',
           row: 'a'
         },
         {
@@ -66,6 +68,7 @@
           label: 'Highest Qualification',
           required: true,
           placeholder: 'e.g., Master of Hydrography',
+          autocomplete: 'off',
           row: 'b'
         },
         {
@@ -74,6 +77,7 @@
           label: 'Preferred Location',
           required: true,
           placeholder: 'Select a location',
+          autocomplete: 'off',
           options: [
             'Australia',
             'UAE',
@@ -88,6 +92,7 @@
           label: 'Interested Areas & Position',
           required: true,
           placeholder: 'Tell us about the roles and fields you are interested in...',
+          autocomplete: 'off',
           rows: 3
         },
         {
@@ -96,6 +101,7 @@
           label: 'Cover Letter',
           required: false,
           placeholder: 'Tell us why you\'d be a great fit for TRIDEL...',
+          autocomplete: 'off',
           rows: 3
         },
         {
